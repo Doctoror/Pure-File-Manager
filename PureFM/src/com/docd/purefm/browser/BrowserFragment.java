@@ -43,21 +43,22 @@ import com.docd.purefm.view.SequentalTextView;
 import com.docd.purefm.view.SequentalTextView.OnSequenceClickListener;
 
 public final class BrowserFragment extends Fragment {
-    
+
     private static final String KEY_FILE = "KEY_SAVED_FILE";
     private static final String KEY_PREV_ID = "KEY_PREVIOUS_ID";
-    
+
     private ActionBar actionBar;
+    private BrowserActivity browserActivity;
     private ActionModeController actionModeController;
     private MenuController menuController;
-    
+
     private Browser browser;
     private BrowserBaseAdapter adapter;
     private OnNavigateListener parentListener;
-    
+
     private SequentalTextView title;
     private OnSequenceClickListener sequenceListener;
-    
+
     private AbsListView list;
     private View menuProgress;
     private View mainProgress;
@@ -65,13 +66,13 @@ public final class BrowserFragment extends Fragment {
     private DirectoryScanTask scanner;
     private String mimeType;
     private MenuItem refreshItem;
-    
+
     private boolean refreshFlag;
-    
+
     private int prevId;
-    private boolean firstRun; 
+    private boolean firstRun;
     private boolean isVisible;
-    
+
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -87,21 +88,23 @@ public final class BrowserFragment extends Fragment {
 
     private void ensureGridViewColumns(Configuration config) {
         if (this.list instanceof GridView) {
-            ((GridView)this.list).setNumColumns(config.orientation == Configuration.ORIENTATION_LANDSCAPE ? 6 : 4);
+            ((GridView) this.list)
+                    .setNumColumns(config.orientation == Configuration.ORIENTATION_LANDSCAPE ? 6
+                            : 4);
         }
     }
-    
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         this.ensureGridViewColumns(newConfig);
     }
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.menuProgress = new ProgressBar(activity);
-        
+
         this.browser = new Browser(activity);
         this.browser.setOnNavigateListener(new OnNavigateListener() {
 
@@ -114,7 +117,7 @@ public final class BrowserFragment extends Fragment {
                     startScan();
                 }
             }
-            
+
             @Override
             public void onNavigationCompleted(GenericFile path) {
                 if (mainProgress.getVisibility() == View.VISIBLE) {
@@ -125,9 +128,9 @@ public final class BrowserFragment extends Fragment {
                 }
                 parentListener.onNavigationCompleted(path);
             }
-            
+
         });
-        
+
         this.sequenceListener = new OnSequenceClickListener() {
             @Override
             public void onSequenceClick(String sequence) {
@@ -138,20 +141,20 @@ public final class BrowserFragment extends Fragment {
                 browser.navigate(target, true);
             }
         };
-        
-        
-        final BrowserActivity a = (BrowserActivity) activity;
-        this.menuController = new MenuController(a, browser);
-        this.actionModeController = new ActionModeController(a);
+
+        this.browserActivity = (BrowserActivity) activity;
+        this.menuController = new MenuController(this.browserActivity, browser);
+        this.actionModeController = new ActionModeController(this.browserActivity);
     }
-    
+
     @Override
     public void onCreate(Bundle state) {
         this.setRetainInstance(true);
         this.setHasOptionsMenu(true);
         this.firstRun = true;
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter(Extras.BROADCAST_REFRESH));
-        if (state != null){
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                receiver, new IntentFilter(Extras.BROADCAST_REFRESH));
+        if (state != null) {
             if (state.containsKey(KEY_FILE)) {
                 this.browser.setInitialPath((File) state.get(KEY_FILE));
             }
@@ -161,61 +164,63 @@ public final class BrowserFragment extends Fragment {
         }
         super.onCreate(state);
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(
+                receiver);
     }
-    
+
     public boolean onBackPressed() {
         if (this.browser == null) {
             return false;
         }
         return this.browser.back();
     }
-    
+
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
         this.ensureGridViewColumns(getResources().getConfiguration());
         this.actionModeController.setListView(list);
-        
-        final BrowserActivity a = (BrowserActivity) getActivity();
-        this.actionBar = a.getActionBar();
-        this.title = a.getTitleView();
-        this.parentListener = a.getOnNavagationListener();
+
+        this.actionBar = this.browserActivity.getActionBar();
+        this.title = this.browserActivity.getTitleView();
+        this.parentListener = this.browserActivity.getOnNavagationListener();
         if (this.isVisible() && this.isAdded() && this.isVisible) {
             this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
             this.title.setOnSequenceClickListener(this.sequenceListener);
         }
     }
-    
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.browser, menu);
+        if (this.browserActivity != null && !this.browserActivity.isDrawerOpened()) {
+            inflater.inflate(R.menu.browser, menu);
 
-        final MenuItem content = menu.findItem(android.R.id.content);
-        this.refreshItem = menu.findItem(R.id.refresh);
+            final MenuItem content = menu.findItem(android.R.id.content);
+            this.refreshItem = menu.findItem(R.id.refresh);
 
-        if (Settings.appearance == Settings.APPEARANCE_LIST) {
-            content.setIcon(R.drawable.action_view_as_grid)
-                    .setTitle(R.string.menu_view_as_grid)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        } else {
-            content.setIcon(R.drawable.action_view_as_list)
-                    .setTitle(R.string.menu_view_as_list)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
+            if (Settings.appearance == Settings.APPEARANCE_LIST) {
+                content.setIcon(R.drawable.action_view_as_grid)
+                        .setTitle(R.string.menu_view_as_grid)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            } else {
+                content.setIcon(R.drawable.action_view_as_list)
+                        .setTitle(R.string.menu_view_as_list)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
 
-        if (ClipBoard.isEmpty()) {
-            menu.removeItem(android.R.id.paste);
-        }
-        
-        if (refreshFlag) {
-            refreshFlag = false;
-            startScan();
+            if (ClipBoard.isEmpty()) {
+                menu.removeItem(android.R.id.paste);
+            }
+
+            if (refreshFlag) {
+                refreshFlag = false;
+                startScan();
+            }
         }
     }
 
@@ -223,21 +228,22 @@ public final class BrowserFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         return this.menuController.onMenuItemSelected(item);
     }
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
         this.initList(parent);
         return parent;
     }
-    
+
     private void initList(View parent) {
         if (this.list != null) {
             this.list.getEmptyView().setVisibility(View.GONE);
             this.list.setVisibility(View.GONE);
         }
         this.mainProgress = parent.findViewById(android.R.id.progress);
-        
+
         if (Settings.appearance == Settings.APPEARANCE_LIST) {
             View vs = parent.findViewById(android.R.id.list);
             if (vs instanceof ViewStub) {
@@ -253,7 +259,7 @@ public final class BrowserFragment extends Fragment {
             this.list = (AbsListView) vs;
             this.adapter = new BrowserGridAdapter(this.getActivity());
         }
-        
+
         this.menuController.setAdapter(this.adapter);
 
         this.list.setId(this.getNewId(parent));
@@ -265,7 +271,8 @@ public final class BrowserFragment extends Fragment {
         this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
-                final GenericFile target = (GenericFile) (av.getItemAtPosition(pos));
+                final GenericFile target = (GenericFile) (av
+                        .getItemAtPosition(pos));
                 if (target.isDirectory()) {
                     browser.navigate(target, true);
                 } else {
@@ -283,21 +290,21 @@ public final class BrowserFragment extends Fragment {
             }
         });
     }
-    
+
     private void onFirstInvalidate() {
         this.actionModeController.setBrowser(this.browser);
         this.actionModeController.setListView(this.list);
         this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
         this.browser.invalidate();
     }
-    
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(KEY_FILE, this.browser.getPath().toFile());
         outState.putInt(KEY_PREV_ID, this.prevId);
     }
-        
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -305,11 +312,12 @@ public final class BrowserFragment extends Fragment {
             if (this.firstRun && this.isVisible()) {
                 this.onFirstInvalidate();
             } else {
-                this.parentListener.onNavigationCompleted(this.browser.getPath());
+                this.parentListener.onNavigationCompleted(this.browser
+                        .getPath());
             }
             this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
             this.title.setOnSequenceClickListener(this.sequenceListener);
-
+            this.browserActivity.updateCurrentlyDisplayedFragment(this);
         } else {
             if (this.actionModeController != null) {
                 this.actionModeController.finishActionMode();
@@ -317,15 +325,18 @@ public final class BrowserFragment extends Fragment {
         }
         this.isVisible = isVisibleToUser;
     }
-    
+
     @Override
     public void onStart() {
         super.onStart();
         if (this.firstRun && this.isVisible) {
+            if (this.isAdded()) {
+                this.browserActivity.updateCurrentlyDisplayedFragment(this);
+            }
             this.onFirstInvalidate();
         }
     }
-    
+
     @Override
     public void onStop() {
         if (this.scanner != null
@@ -338,27 +349,30 @@ public final class BrowserFragment extends Fragment {
 
     private int getNewId(View parent) {
         this.prevId++;
-        while (parent.findViewById(this.prevId) != null){  
-              this.prevId++;
-        }  
-        return this.prevId;  
+        while (parent.findViewById(this.prevId) != null) {
+            this.prevId++;
+        }
+        return this.prevId;
     }
-    
+
     private void startScan() {
         if (this.scanner != null
                 && this.scanner.getStatus() == AsyncTask.Status.RUNNING) {
             this.scanner.cancel(false);
         }
 
-        this.scanner = new DirectoryScanTask(browser, refreshItem, menuProgress, mimeType, adapter);
+        this.scanner = new DirectoryScanTask(browser, refreshItem,
+                menuProgress, mimeType, adapter);
         this.scanner.execute(this.browser.getPath());
     }
-    
+
     public void setMimeType(final String type) {
         this.mimeType = type;
-        this.list.setChoiceMode(type == null ? AbsListView.CHOICE_MODE_MULTIPLE_MODAL : AbsListView.CHOICE_MODE_NONE);
+        this.list
+                .setChoiceMode(type == null ? AbsListView.CHOICE_MODE_MULTIPLE_MODAL
+                        : AbsListView.CHOICE_MODE_NONE);
     }
-    
+
     public Browser getBrowser() {
         return this.browser;
     }

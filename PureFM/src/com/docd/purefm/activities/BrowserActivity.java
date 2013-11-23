@@ -16,6 +16,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
@@ -36,16 +38,25 @@ public final class BrowserActivity extends FragmentActivity {
             .getName() + "REQUESTED_PATH";
 
     public static final String TAG_DIALOG = "dialog";
-    
+
     public static final int REQUEST_CODE_SETTINGS = 0;
 
     private ActionBar actionBar;
     private SequentalTextView title;
-    
+    private boolean isDrawerOpened;
+
     BookmarksAdapter bookmarksAdapter;
-    
+    GenericFile currentPath;
+
     private ViewPager pager;
     private BrowserTabsAdapter pagerAdapter;
+
+    private final Object currentlyDisplayedFragmentLock;
+    private BrowserFragment currentlyDisplayedFragment;
+
+    public BrowserActivity() {
+        this.currentlyDisplayedFragmentLock = new Object();
+    }
 
     /**
      * If not null it means we are in GET_CONTENT mode
@@ -61,7 +72,7 @@ public final class BrowserActivity extends FragmentActivity {
         this.initView();
         this.checkForPath(getIntent());
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -72,56 +83,62 @@ public final class BrowserActivity extends FragmentActivity {
             fm.executePendingTransactions();
         }
     }
-    
+
     @Override
     public void onLowMemory() {
         PreviewHolder.recycle();
     }
-    
+
     private void initActiobBar() {
         this.actionBar = this.getActionBar();
         this.actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-                | ActionBar.DISPLAY_SHOW_CUSTOM
-                | ActionBar.DISPLAY_USE_LOGO);
-        
+                | ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_USE_LOGO);
+
         final View custom = LayoutInflater.from(this).inflate(
                 R.layout.activity_browser_actionbar, null);
         this.actionBar.setCustomView(custom);
-        
+
         this.title = (SequentalTextView) custom
                 .findViewById(android.R.id.title);
     }
-    
+
     private void initView() {
         this.pager = (ViewPager) this.findViewById(R.id.pager);
-        this.pagerAdapter = new BrowserTabsAdapter(this.getSupportFragmentManager());
+        this.pagerAdapter = new BrowserTabsAdapter(
+                this.getSupportFragmentManager());
         this.pager.setAdapter(this.pagerAdapter);
         this.pager.setOffscreenPageLimit(2);
-        
-        final DrawerLayout drawerLayout = (DrawerLayout) this.findViewById(R.id.drawer);
+
+        final DrawerLayout drawerLayout = (DrawerLayout) this
+                .findViewById(R.id.drawer);
         drawerLayout.setDrawerListener(new DrawerListener() {
-            
+
             private boolean hadShowHomeAsUp;
 
             @Override
             public void onDrawerOpened(View arg0) {
+                isDrawerOpened = true;
                 this.hadShowHomeAsUp = (actionBar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) == ActionBar.DISPLAY_HOME_AS_UP;
                 actionBar.setTitle(R.string.menu_bookmarks);
-                actionBar.setDisplayOptions(
-                        ActionBar.DISPLAY_SHOW_HOME |
-                        ActionBar.DISPLAY_USE_LOGO |
-                        ActionBar.DISPLAY_SHOW_TITLE);
+                actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+                        | ActionBar.DISPLAY_USE_LOGO
+                        | ActionBar.DISPLAY_SHOW_TITLE);
+                invalidateOptionsMenu();
             }
+
             @Override
             public void onDrawerClosed(View arg0) {
-                actionBar.setDisplayOptions(
-                        ActionBar.DISPLAY_SHOW_HOME |
-                        ActionBar.DISPLAY_SHOW_CUSTOM |
-                        ActionBar.DISPLAY_USE_LOGO | 
-                        (this.hadShowHomeAsUp ? ActionBar.DISPLAY_HOME_AS_UP : 0));
+                isDrawerOpened = false;
+                actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+                        | ActionBar.DISPLAY_SHOW_CUSTOM
+                        | ActionBar.DISPLAY_USE_LOGO
+                        | (this.hadShowHomeAsUp ? ActionBar.DISPLAY_HOME_AS_UP
+                                : 0));
                 if (bookmarksAdapter.isModified()) {
-                    Settings.saveBookmarks(getApplicationContext(), bookmarksAdapter.getData());
+                    Settings.saveBookmarks(getApplicationContext(),
+                            bookmarksAdapter.getData());
                 }
+                invalidateOptionsMenu();
             }
 
             @Override
@@ -131,40 +148,77 @@ public final class BrowserActivity extends FragmentActivity {
             @Override
             public void onDrawerStateChanged(int arg0) {
             }
-            
+
         });
-        
-        final ListView drawerList = (ListView) this.findViewById(R.id.drawerList);
-        drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(
-                this,Settings.getBookmarks(getApplicationContext())));
+
+        final ListView drawerList = (ListView) this
+                .findViewById(R.id.drawerList);
+        drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(this,
+                Settings.getBookmarks(getApplicationContext())));
     }
 
     public void invalidateList() {
         this.pagerAdapter.notifyDataSetChanged();
     }
-    
+
     public SequentalTextView getTitleView() {
         return this.title;
     }
-    
+
+    public boolean isDrawerOpened() {
+        return isDrawerOpened;
+    }
+
+    public void updateCurrentlyDisplayedFragment(final BrowserFragment fragment) {
+        synchronized (this.currentlyDisplayedFragmentLock) {
+            this.currentlyDisplayedFragment = fragment;
+        }
+    }
+
     public OnNavigateListener getOnNavagationListener() {
         return new OnNavigateListener() {
-            
+
             private final File root = File.listRoots()[0];
-            
+
             @Override
             public void onNavigate(GenericFile path) {
                 invalidateOptionsMenu();
             }
-            
+
             @Override
             public void onNavigationCompleted(GenericFile path) {
+                currentPath = path;
                 title.setFile(path.toFile());
-                actionBar.setDisplayHomeAsUpEnabled(!path.toFile().equals(this.root));
+                actionBar.setDisplayHomeAsUpEnabled(!path.toFile().equals(
+                        this.root));
                 invalidateOptionsMenu();
             }
-            
+
         };
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        if (this.isDrawerOpened) {
+            this.getMenuInflater().inflate(R.menu.activity_bookmarks, menu);
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_bookmarks_new:
+            final String path = this.currentPath.getAbsolutePath();
+            if (path != null) {
+                this.bookmarksAdapter.addItem(path);
+            }
+            return true;
+
+        default:
+            return super.onMenuItemSelected(featureId, item);
+        }
     }
 
     @Override
@@ -173,18 +227,20 @@ public final class BrowserActivity extends FragmentActivity {
         this.checkIntentAction(newIntent);
         this.checkForPath(newIntent);
     }
-    
+
     private void setCurrentMimeType() {
-        BrowserFragment f = pagerAdapter.getActiveFragment(pager, pager.getCurrentItem());
-        if (f != null) {
-            f.setMimeType(mimeType);
+        synchronized (this.currentlyDisplayedFragmentLock) {
+            if (this.currentlyDisplayedFragment != null) {
+                this.currentlyDisplayedFragment.setMimeType(mimeType);
+            }
         }
     }
-    
+
     private void setCurrentPath(GenericFile path) {
-        BrowserFragment f = pagerAdapter.getActiveFragment(pager, pager.getCurrentItem());
-        if (f != null) {
-            f.getBrowser().navigate(path, true);
+        synchronized (this.currentlyDisplayedFragmentLock) {
+            if (this.currentlyDisplayedFragment != null) {
+                this.currentlyDisplayedFragment.getBrowser().navigate(path, true);
+            }
         }
     }
 
@@ -202,47 +258,52 @@ public final class BrowserActivity extends FragmentActivity {
     private void checkForPath(Intent intent) {
         final Bundle extras = intent.getExtras();
         if (extras != null && extras.containsKey(EXTRA_REQUESTED_PATH)) {
-            final GenericFile requested = PureFMFileUtils.newFile(extras.getString(EXTRA_REQUESTED_PATH));
-            //if (requested.exists() && requested.isDirectory()) {
-                this.setCurrentPath(requested);
-            //}
+            final GenericFile requested = PureFMFileUtils.newFile(extras
+                    .getString(EXTRA_REQUESTED_PATH));
+            // if (requested.exists() && requested.isDirectory()) {
+            this.setCurrentPath(requested);
+            // }
         }
     }
-    
+
     @Override
     public void onBackPressed() {
-        final BrowserFragment f = pagerAdapter.getActiveFragment(pager, pager.getCurrentItem());
-        if (f != null) {
-            if (!f.onBackPressed()) {
-                final AlertDialog.Builder b = new AlertDialog.Builder(this);
-                b.setMessage(R.string.dialog_quit_message);
-                b.setCancelable(true);
-                b.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        PreviewHolder.recycle();
-                        finish();
-                    }
-                });
-                b.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                b.create().show();
-            }
+        final boolean onFragmentBackPressed;
+        synchronized (this.currentlyDisplayedFragmentLock) {
+            onFragmentBackPressed = this.currentlyDisplayedFragment != null
+                    && this.currentlyDisplayedFragment.onBackPressed();
+        }
+        if (!onFragmentBackPressed) {
+            final AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setMessage(R.string.dialog_quit_message);
+            b.setCancelable(true);
+            b.setPositiveButton(R.string.yes,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            PreviewHolder.recycle();
+                            finish();
+                        }
+                    });
+            b.setNegativeButton(R.string.no,
+                    new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            b.create().show();
         }
     }
-    
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         this.title.fullScrollRight();
     }
-    
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_SETTINGS) {
