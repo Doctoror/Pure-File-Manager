@@ -28,14 +28,10 @@ import com.docd.purefm.browser.BrowserFragment;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.view.SequentalTextView;
 
 public final class BrowserActivity extends FragmentActivity {
-
-    public static final String EXTRA_REQUESTED_PATH = BookmarksActivity.class
-            .getName() + "REQUESTED_PATH";
 
     public static final String TAG_DIALOG = "dialog";
 
@@ -43,8 +39,10 @@ public final class BrowserActivity extends FragmentActivity {
 
     private ActionBar actionBar;
     private SequentalTextView title;
-    private boolean isDrawerOpened;
 
+    private boolean isDrawerOpened;
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
     BookmarksAdapter bookmarksAdapter;
     GenericFile currentPath;
 
@@ -70,7 +68,6 @@ public final class BrowserActivity extends FragmentActivity {
         this.checkIntentAction(getIntent());
         this.initActiobBar();
         this.initView();
-        this.checkForPath(getIntent());
     }
 
     @Override
@@ -109,9 +106,9 @@ public final class BrowserActivity extends FragmentActivity {
         this.pager.setAdapter(this.pagerAdapter);
         this.pager.setOffscreenPageLimit(2);
 
-        final DrawerLayout drawerLayout = (DrawerLayout) this
+        this.drawerLayout = (DrawerLayout) this
                 .findViewById(R.id.drawer);
-        drawerLayout.setDrawerListener(new DrawerListener() {
+        this.drawerLayout.setDrawerListener(new DrawerListener() {
 
             private boolean hadShowHomeAsUp;
 
@@ -151,9 +148,8 @@ public final class BrowserActivity extends FragmentActivity {
 
         });
 
-        final ListView drawerList = (ListView) this
-                .findViewById(R.id.drawerList);
-        drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(this,
+        this.drawerList = (ListView) this.findViewById(R.id.drawerList);
+        this.drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(this,
                 Settings.getBookmarks(getApplicationContext())));
     }
 
@@ -202,6 +198,8 @@ public final class BrowserActivity extends FragmentActivity {
         if (this.isDrawerOpened) {
             this.getMenuInflater().inflate(R.menu.activity_bookmarks, menu);
             return true;
+        } else {
+            this.getMenuInflater().inflate(R.menu.activity_browser, menu);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -215,6 +213,10 @@ public final class BrowserActivity extends FragmentActivity {
                 this.bookmarksAdapter.addItem(path);
             }
             return true;
+            
+        case R.id.menu_drawer:
+            this.drawerLayout.openDrawer(this.drawerList);
+            return true;
 
         default:
             return super.onMenuItemSelected(featureId, item);
@@ -225,7 +227,6 @@ public final class BrowserActivity extends FragmentActivity {
     protected void onNewIntent(Intent newIntent) {
         super.onNewIntent(newIntent);
         this.checkIntentAction(newIntent);
-        this.checkForPath(newIntent);
     }
 
     private void setCurrentMimeType() {
@@ -236,7 +237,13 @@ public final class BrowserActivity extends FragmentActivity {
         }
     }
 
-    private void setCurrentPath(GenericFile path) {
+    /**
+     * Should be called by BookmarksAdapter to set current path and close the Drawer
+     */
+    public void setCurrentPath(GenericFile path) {
+        if (this.drawerLayout.isDrawerOpen(this.drawerList)) {
+            this.drawerLayout.closeDrawer(this.drawerList);
+        }
         synchronized (this.currentlyDisplayedFragmentLock) {
             if (this.currentlyDisplayedFragment != null) {
                 this.currentlyDisplayedFragment.getBrowser().navigate(path, true);
@@ -252,17 +259,6 @@ public final class BrowserActivity extends FragmentActivity {
                 mimeType = "*/*";
             }
             this.setCurrentMimeType();
-        }
-    }
-
-    private void checkForPath(Intent intent) {
-        final Bundle extras = intent.getExtras();
-        if (extras != null && extras.containsKey(EXTRA_REQUESTED_PATH)) {
-            final GenericFile requested = PureFMFileUtils.newFile(extras
-                    .getString(EXTRA_REQUESTED_PATH));
-            // if (requested.exists() && requested.isDirectory()) {
-            this.setCurrentPath(requested);
-            // }
         }
     }
 

@@ -8,9 +8,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.docd.purefm.R;
 import com.docd.purefm.activities.BrowserActivity;
+import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.utils.PureFMFileUtils;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.view.LayoutInflater;
@@ -25,13 +25,13 @@ public final class BookmarksAdapter implements ListAdapter {
     private final List<String> bookmarks;
     private final DataSetObservable mDataSetObservable;
     private final LayoutInflater inflater;
-    private final Activity activity;
+    private final BrowserActivity activity;
     
     private final Set<String> data;
     
     private boolean modified;
     
-    public BookmarksAdapter(Activity activity, Set<String> data) {
+    public BookmarksAdapter(final BrowserActivity activity, final Set<String> data) {
         this.activity = activity;
         this.mDataSetObservable = new DataSetObservable();
         this.inflater = activity.getLayoutInflater();
@@ -98,10 +98,8 @@ public final class BookmarksAdapter implements ListAdapter {
             
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(activity, BrowserActivity.class);
-                intent.putExtra(BrowserActivity.EXTRA_REQUESTED_PATH, cur);
-                activity.startActivity(intent);
-                activity.finish();
+                final GenericFile path = PureFMFileUtils.newFile(cur);
+                activity.setCurrentPath(path);
             }
         });
         

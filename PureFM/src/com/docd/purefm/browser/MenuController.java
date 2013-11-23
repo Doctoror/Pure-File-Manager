@@ -2,7 +2,6 @@ package com.docd.purefm.browser;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.activities.BookmarksActivity;
 import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.activities.SearchActivity;
 import com.docd.purefm.activities.SettingsActivity;
@@ -84,16 +83,6 @@ final class MenuController {
         case R.id.menu_partition:
             final DialogFragment pid = PartitionInfoDialog.instantiate(browser.getPath());
             pid.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
-            return true;
-
-        case R.id.menu_bookmarks:
-            final Intent book = new Intent(activity, BookmarksActivity.class);
-            String path = browser.getPath().getCanonicalPath();
-            if (path == null) {
-                path = browser.getPath().getAbsolutePath();
-            }
-            book.putExtra(Extras.EXTRA_PATH, path);
-            activity.startActivity(book);
             return true;
             
         case R.id.menu_sort_name_asc:
