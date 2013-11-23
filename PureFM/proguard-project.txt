@@ -20,15 +20,8 @@
 #}
 
 -injars      bin/classes
-#-injars      libs
+-injars      libs
 -outjars     bin/classes-processed.jar
-#-libraryjars /usr/local/java/android-sdk/platforms/android-9/android.jar
-
--dontpreverify
--repackageclasses ''
--allowaccessmodification
--optimizations !code/simplification/arithmetic
--keepattributes *Annotation*
 
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Application
@@ -54,13 +47,5 @@
 -keepclassmembers class * extends android.content.Context {
    public void *(android.view.View);
    public void *(android.view.MenuItem);
-}
-
--keepclassmembers class * implements android.os.Parcelable {
-    static android.os.Parcelable$Creator CREATOR;
-}
-
--keepclassmembers class **.R$* {
-    public static <fields>;
 }
 

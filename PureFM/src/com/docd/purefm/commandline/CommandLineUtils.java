@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.Permissions;
+import com.docd.purefm.settings.Environment;
 import com.docd.purefm.settings.Settings;
 
 public final class CommandLineUtils {
@@ -65,8 +66,9 @@ public final class CommandLineUtils {
     
     public static boolean applyPermissions(boolean su, Permissions p, CommandLineFile target) {
         final String permission = toOctalPermission(p);
-        final StringBuilder command = new StringBuilder();        
-        command.append("busybox chmod ");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" chmod ");
         command.append(permission);
         command.append(' ');
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
@@ -74,15 +76,17 @@ public final class CommandLineUtils {
     }
     
     public static boolean canAccessRecursively(CommandLineFile target) {
-        final StringBuilder command = new StringBuilder();        
-        command.append("busybox ls -AR ");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" ls -AR ");
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
         return CommandLine.execute(new Command(false, command.toString()));
     }
     
     public static boolean exists(File target) {
-        final StringBuilder command = new StringBuilder();
-        command.append("busybox test -e ");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" test -e ");
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
         command.append(" && echo exists");
         
@@ -97,9 +101,9 @@ public final class CommandLineUtils {
         
         coms.add(new Touch(su, target.toFile()));
         
-        final StringBuilder command = new StringBuilder();        
-        
-        command.append("busybox ls -lApedn ");
+        final StringBuilder command = new StringBuilder(50);        
+        command.append(Environment.busybox);
+        command.append(" ls -lApedn ");
         command.append(CommandLineUtils.getCommandLineString(path));
         coms.add(new Command(su, command.toString()));
         
@@ -115,13 +119,17 @@ public final class CommandLineUtils {
         final List<Command> coms = new LinkedList<Command>();
         final String path = target.getAbsolutePath();
         
-        final StringBuilder command = new StringBuilder("busybox mkdir ");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" mkdir ");
         command.append(CommandLineUtils.getCommandLineString(path));
         
         coms.add(new Command(su, command.toString()));
         
         command.setLength(0);
-        command.append("busybox ls -lApedn ");
+        command.setLength(50);
+        command.append(Environment.busybox);
+        command.append(" ls -lApedn ");
         command.append(CommandLineUtils.getCommandLineString(path));
         coms.add(new Command(su, command.toString()));
         
@@ -137,13 +145,17 @@ public final class CommandLineUtils {
         final List<Command> coms = new LinkedList<Command>();
         final String path = target.getAbsolutePath();
         
-        final StringBuilder command = new StringBuilder("busybox mkdir -p ");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" mkdir -p ");
         command.append(CommandLineUtils.getCommandLineString(path));
         
         coms.add(new Command(su, command.toString()));
         
         command.setLength(0);
-        command.append("busybox ls -lnAped ");
+        command.setLength(50);
+        command.append(Environment.busybox);
+        command.append(" ls -lnAped ");
         command.append(CommandLineUtils.getCommandLineString(path));
         coms.add(new Command(su, command.toString()));
         
@@ -155,7 +167,9 @@ public final class CommandLineUtils {
     }
     
     public static List<String> ls(boolean su, final File dir) {
-        final StringBuilder command = new StringBuilder("busybox ls -n");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" ls -n");
         if (Settings.showHidden) {
             command.append('A');
         }
@@ -168,7 +182,9 @@ public final class CommandLineUtils {
     }
     
     public static List<String> lsl(boolean su, final File dir) {
-        final StringBuilder command = new StringBuilder("busybox ls -lnpe");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" ls -lnpe");
         if (Settings.showHidden) {
             command.append('A');
         }
@@ -181,7 +197,9 @@ public final class CommandLineUtils {
     }
     
     public static List<String> lsld(boolean su, final File dir) {
-        final StringBuilder command = new StringBuilder("busybox ls -lnped");
+        final StringBuilder command = new StringBuilder(50);
+        command.append(Environment.busybox);
+        command.append(" ls -lnped");
         if (Settings.showHidden) {
             command.append('A');
         }
@@ -215,7 +233,9 @@ public final class CommandLineUtils {
 //    }
     
     public static String getFSType(File file) {
-        final StringBuilder command = new StringBuilder("busybox stat -f -c \"%T\" ");
+        final StringBuilder command = new StringBuilder(80);
+        command.append(Environment.busybox);
+        command.append(" stat -f -c \"%T\" ");
         command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
         final List<String> res = CommandLine.executeForResult(false, command.toString());
         return res == null || res.isEmpty() ? "" : res.get(0);
