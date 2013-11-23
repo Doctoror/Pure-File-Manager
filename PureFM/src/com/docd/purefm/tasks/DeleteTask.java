@@ -20,6 +20,7 @@ import com.docd.purefm.commandline.Remove;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 public final class DeleteTask extends
@@ -93,6 +94,7 @@ public final class DeleteTask extends
         }
         
         if (!filesAffected.isEmpty()) {
+            MediaStoreUtils.deleteFiles(activity.getApplicationContext(), filesAffected);
             LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
             PureFMFileUtils.requestMediaScanner(activity, filesAffected);
         }

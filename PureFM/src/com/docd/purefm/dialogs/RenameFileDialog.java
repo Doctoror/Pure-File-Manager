@@ -1,7 +1,7 @@
 package com.docd.purefm.dialogs;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 public final class RenameFileDialog extends DialogFragment {
@@ -83,11 +84,13 @@ public final class RenameFileDialog extends DialogFragment {
                     final File target = new File(currentDir, newname);
                     final File source = file.toFile();
                     if (file.renameTo(target)) {
-                        final List<File> filesAffected = new LinkedList<File>();
-                        filesAffected.add(source);
-                        filesAffected.add(target);
+                        final List<File> filesCreated = new ArrayList<File>(1);
+                        final List<File> filesDeleted = new ArrayList<File>(1);
+                        filesDeleted.add(source);
+                        filesCreated.add(target);
                         LocalBroadcastManager.getInstance(a).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
-                        PureFMFileUtils.requestMediaScanner(a, filesAffected);
+                        MediaStoreUtils.deleteFiles(a.getApplicationContext(), filesDeleted);
+                        PureFMFileUtils.requestMediaScanner(a, filesCreated);
                     }
                     if (mode != null) {
                         mode.finish();
