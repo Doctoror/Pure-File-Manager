@@ -1,0 +1,384 @@
+android.support.v4.app.BackStackState
+android.support.v4.app.BackStackState: android.os.Parcelable$Creator CREATOR
+android.support.v4.app.Fragment$SavedState
+android.support.v4.app.Fragment$SavedState: android.os.Parcelable$Creator CREATOR
+android.support.v4.app.FragmentActivity
+android.support.v4.app.FragmentActivity: FragmentActivity()
+android.support.v4.app.FragmentManagerState
+android.support.v4.app.FragmentManagerState: android.os.Parcelable$Creator CREATOR
+android.support.v4.app.FragmentState
+android.support.v4.app.FragmentState: android.os.Parcelable$Creator CREATOR
+android.support.v4.app.FragmentTabHost
+android.support.v4.app.FragmentTabHost: FragmentTabHost(android.content.Context)
+android.support.v4.app.FragmentTabHost: FragmentTabHost(android.content.Context,android.util.AttributeSet)
+android.support.v4.app.FragmentTabHost: void setup()
+android.support.v4.app.FragmentTabHost: void setup(android.content.Context,android.support.v4.app.FragmentManager)
+android.support.v4.app.FragmentTabHost: void setup(android.content.Context,android.support.v4.app.FragmentManager,int)
+android.support.v4.app.FragmentTabHost: void setOnTabChangedListener(android.widget.TabHost$OnTabChangeListener)
+android.support.v4.app.FragmentTabHost$SavedState
+android.support.v4.app.FragmentTabHost$SavedState: android.os.Parcelable$Creator CREATOR
+android.support.v4.content.FileProvider
+android.support.v4.content.ModernAsyncTask$Status: android.support.v4.content.ModernAsyncTask$Status[] values()
+android.support.v4.content.ModernAsyncTask$Status: android.support.v4.content.ModernAsyncTask$Status valueOf(java.lang.String)
+android.support.v4.content.WakefulBroadcastReceiver
+android.support.v4.view.PagerTabStrip
+android.support.v4.view.PagerTabStrip: PagerTabStrip(android.content.Context)
+android.support.v4.view.PagerTabStrip: PagerTabStrip(android.content.Context,android.util.AttributeSet)
+android.support.v4.view.PagerTabStrip: void setTabIndicatorColor(int)
+android.support.v4.view.PagerTabStrip: void setTabIndicatorColorResource(int)
+android.support.v4.view.PagerTabStrip: int getTabIndicatorColor()
+android.support.v4.view.PagerTabStrip: void setPadding(int,int,int,int)
+android.support.v4.view.PagerTabStrip: void setTextSpacing(int)
+android.support.v4.view.PagerTabStrip: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+android.support.v4.view.PagerTabStrip: void setBackgroundColor(int)
+android.support.v4.view.PagerTabStrip: void setBackgroundResource(int)
+android.support.v4.view.PagerTabStrip: void setDrawFullUnderline(boolean)
+android.support.v4.view.PagerTabStrip: boolean getDrawFullUnderline()
+android.support.v4.view.PagerTabStrip: int getMinHeight()
+android.support.v4.view.PagerTitleStrip
+android.support.v4.view.PagerTitleStrip: void setSingleLineAllCaps(android.widget.TextView)
+android.support.v4.view.PagerTitleStrip: PagerTitleStrip(android.content.Context)
+android.support.v4.view.PagerTitleStrip: PagerTitleStrip(android.content.Context,android.util.AttributeSet)
+android.support.v4.view.PagerTitleStrip: void setTextSpacing(int)
+android.support.v4.view.PagerTitleStrip: int getTextSpacing()
+android.support.v4.view.PagerTitleStrip: void setNonPrimaryAlpha(float)
+android.support.v4.view.PagerTitleStrip: void setTextColor(int)
+android.support.v4.view.PagerTitleStrip: void setTextSize(int,float)
+android.support.v4.view.PagerTitleStrip: void setGravity(int)
+android.support.v4.view.PagerTitleStrip: int getMinHeight()
+android.support.v4.view.ViewPager
+android.support.v4.view.ViewPager: ViewPager(android.content.Context)
+android.support.v4.view.ViewPager: ViewPager(android.content.Context,android.util.AttributeSet)
+android.support.v4.view.ViewPager: void setScrollState(int)
+android.support.v4.view.ViewPager: void setAdapter(android.support.v4.view.PagerAdapter)
+android.support.v4.view.ViewPager: android.support.v4.view.PagerAdapter getAdapter()
+android.support.v4.view.ViewPager: void setOnAdapterChangeListener(android.support.v4.view.ViewPager$OnAdapterChangeListener)
+android.support.v4.view.ViewPager: int getClientWidth()
+android.support.v4.view.ViewPager: void setCurrentItem(int)
+android.support.v4.view.ViewPager: void setCurrentItem(int,boolean)
+android.support.v4.view.ViewPager: int getCurrentItem()
+android.support.v4.view.ViewPager: void setOnPageChangeListener(android.support.v4.view.ViewPager$OnPageChangeListener)
+android.support.v4.view.ViewPager: void setPageTransformer(boolean,android.support.v4.view.ViewPager$PageTransformer)
+android.support.v4.view.ViewPager: void setChildrenDrawingOrderEnabledCompat(boolean)
+android.support.v4.view.ViewPager: int getOffscreenPageLimit()
+android.support.v4.view.ViewPager: void setOffscreenPageLimit(int)
+android.support.v4.view.ViewPager: void setPageMargin(int)
+android.support.v4.view.ViewPager: int getPageMargin()
+android.support.v4.view.ViewPager: void setPageMarginDrawable(android.graphics.drawable.Drawable)
+android.support.v4.view.ViewPager: void setPageMarginDrawable(int)
+android.support.v4.view.ViewPager: void setScrollingCacheEnabled(boolean)
+android.support.v4.view.ViewPager$LayoutParams
+android.support.v4.view.ViewPager$LayoutParams: ViewPager$LayoutParams(android.content.Context,android.util.AttributeSet)
+android.support.v4.view.ViewPager$SavedState
+android.support.v4.view.ViewPager$SavedState: android.os.Parcelable$Creator CREATOR
+android.support.v4.widget.ContentLoadingProgressBar
+android.support.v4.widget.ContentLoadingProgressBar: ContentLoadingProgressBar(android.content.Context)
+android.support.v4.widget.ContentLoadingProgressBar: ContentLoadingProgressBar(android.content.Context,android.util.AttributeSet)
+android.support.v4.widget.DrawerLayout
+android.support.v4.widget.DrawerLayout: DrawerLayout(android.content.Context)
+android.support.v4.widget.DrawerLayout: DrawerLayout(android.content.Context,android.util.AttributeSet)
+android.support.v4.widget.DrawerLayout: DrawerLayout(android.content.Context,android.util.AttributeSet,int)
+android.support.v4.widget.DrawerLayout: void setDrawerShadow(android.graphics.drawable.Drawable,int)
+android.support.v4.widget.DrawerLayout: void setDrawerShadow(int,int)
+android.support.v4.widget.DrawerLayout: void setScrimColor(int)
+android.support.v4.widget.DrawerLayout: void setDrawerListener(android.support.v4.widget.DrawerLayout$DrawerListener)
+android.support.v4.widget.DrawerLayout: void setDrawerLockMode(int)
+android.support.v4.widget.DrawerLayout: void setDrawerLockMode(int,int)
+android.support.v4.widget.DrawerLayout: void setDrawerLockMode(int,android.view.View)
+android.support.v4.widget.DrawerLayout$LayoutParams
+android.support.v4.widget.DrawerLayout$LayoutParams: DrawerLayout$LayoutParams(android.content.Context,android.util.AttributeSet)
+android.support.v4.widget.DrawerLayout$SavedState
+android.support.v4.widget.DrawerLayout$SavedState: android.os.Parcelable$Creator CREATOR
+android.support.v4.widget.SearchViewCompatIcs$MySearchView
+android.support.v4.widget.SearchViewCompatIcs$MySearchView: SearchViewCompatIcs$MySearchView(android.content.Context)
+android.support.v4.widget.SlidingPaneLayout
+android.support.v4.widget.SlidingPaneLayout: SlidingPaneLayout(android.content.Context)
+android.support.v4.widget.SlidingPaneLayout: SlidingPaneLayout(android.content.Context,android.util.AttributeSet)
+android.support.v4.widget.SlidingPaneLayout: SlidingPaneLayout(android.content.Context,android.util.AttributeSet,int)
+android.support.v4.widget.SlidingPaneLayout: void setParallaxDistance(int)
+android.support.v4.widget.SlidingPaneLayout: int getParallaxDistance()
+android.support.v4.widget.SlidingPaneLayout: void setSliderFadeColor(int)
+android.support.v4.widget.SlidingPaneLayout: int getSliderFadeColor()
+android.support.v4.widget.SlidingPaneLayout: void setCoveredFadeColor(int)
+android.support.v4.widget.SlidingPaneLayout: int getCoveredFadeColor()
+android.support.v4.widget.SlidingPaneLayout: void setPanelSlideListener(android.support.v4.widget.SlidingPaneLayout$PanelSlideListener)
+android.support.v4.widget.SlidingPaneLayout: void setShadowDrawable(android.graphics.drawable.Drawable)
+android.support.v4.widget.SlidingPaneLayout: void setShadowResource(int)
+android.support.v4.widget.SlidingPaneLayout$LayoutParams
+android.support.v4.widget.SlidingPaneLayout$LayoutParams: SlidingPaneLayout$LayoutParams(android.content.Context,android.util.AttributeSet)
+android.support.v4.widget.SlidingPaneLayout$SavedState
+android.support.v4.widget.SlidingPaneLayout$SavedState: android.os.Parcelable$Creator CREATOR
+com.docd.purefm.PureFM
+com.docd.purefm.PureFM: PureFM()
+com.docd.purefm.R$array: int appearance_types
+com.docd.purefm.R$array: int appearance_types_values
+com.docd.purefm.R$color: int holo_light_background
+com.docd.purefm.R$color: int holo_light_selected
+com.docd.purefm.R$dimen: int preview_width
+com.docd.purefm.R$drawable: int action_bookmarks
+com.docd.purefm.R$drawable: int action_copy
+com.docd.purefm.R$drawable: int action_cut
+com.docd.purefm.R$drawable: int action_edit
+com.docd.purefm.R$drawable: int action_file_new
+com.docd.purefm.R$drawable: int action_folder_new
+com.docd.purefm.R$drawable: int action_info
+com.docd.purefm.R$drawable: int action_paste
+com.docd.purefm.R$drawable: int action_refresh
+com.docd.purefm.R$drawable: int action_remove
+com.docd.purefm.R$drawable: int action_search
+com.docd.purefm.R$drawable: int action_settings
+com.docd.purefm.R$drawable: int action_sort
+com.docd.purefm.R$drawable: int action_view_as_grid
+com.docd.purefm.R$drawable: int action_view_as_list
+com.docd.purefm.R$drawable: int ic_fso_default
+com.docd.purefm.R$drawable: int ic_fso_folder
+com.docd.purefm.R$drawable: int ic_fso_symlink
+com.docd.purefm.R$drawable: int ic_fso_type_app
+com.docd.purefm.R$drawable: int ic_fso_type_audio
+com.docd.purefm.R$drawable: int ic_fso_type_binary
+com.docd.purefm.R$drawable: int ic_fso_type_calendar
+com.docd.purefm.R$drawable: int ic_fso_type_cdimage
+com.docd.purefm.R$drawable: int ic_fso_type_compress
+com.docd.purefm.R$drawable: int ic_fso_type_contact
+com.docd.purefm.R$drawable: int ic_fso_type_database
+com.docd.purefm.R$drawable: int ic_fso_type_document
+com.docd.purefm.R$drawable: int ic_fso_type_ebook
+com.docd.purefm.R$drawable: int ic_fso_type_email
+com.docd.purefm.R$drawable: int ic_fso_type_executable
+com.docd.purefm.R$drawable: int ic_fso_type_font
+com.docd.purefm.R$drawable: int ic_fso_type_image
+com.docd.purefm.R$drawable: int ic_fso_type_markup_document
+com.docd.purefm.R$drawable: int ic_fso_type_pdf
+com.docd.purefm.R$drawable: int ic_fso_type_presentation
+com.docd.purefm.R$drawable: int ic_fso_type_shell
+com.docd.purefm.R$drawable: int ic_fso_type_spreadsheet
+com.docd.purefm.R$drawable: int ic_fso_type_text
+com.docd.purefm.R$drawable: int ic_fso_type_video
+com.docd.purefm.R$drawable: int selector_list
+com.docd.purefm.R$drawable: int tab_selected
+com.docd.purefm.R$drawable: int tab_shadow
+com.docd.purefm.R$drawable: int tab_unselected
+com.docd.purefm.R$drawable: int tabs_bg
+com.docd.purefm.R$id: int available
+com.docd.purefm.R$id: int block_size
+com.docd.purefm.R$id: int button4
+com.docd.purefm.R$id: int button5
+com.docd.purefm.R$id: int filesystem
+com.docd.purefm.R$id: int filesystem_row
+com.docd.purefm.R$id: int flipper
+com.docd.purefm.R$id: int fragment
+com.docd.purefm.R$id: int free
+com.docd.purefm.R$id: int gexecute
+com.docd.purefm.R$id: int gread
+com.docd.purefm.R$id: int grid
+com.docd.purefm.R$id: int group
+com.docd.purefm.R$id: int gwrite
+com.docd.purefm.R$id: int location
+com.docd.purefm.R$id: int menu_bookmarks
+com.docd.purefm.R$id: int menu_bookmarks_new
+com.docd.purefm.R$id: int menu_delete
+com.docd.purefm.R$id: int menu_file_new
+com.docd.purefm.R$id: int menu_folder_new
+com.docd.purefm.R$id: int menu_partition
+com.docd.purefm.R$id: int menu_search
+com.docd.purefm.R$id: int menu_settings
+com.docd.purefm.R$id: int menu_sort_date_asc
+com.docd.purefm.R$id: int menu_sort_date_desc
+com.docd.purefm.R$id: int menu_sort_name_asc
+com.docd.purefm.R$id: int menu_sort_name_desc
+com.docd.purefm.R$id: int menu_sort_size_asc
+com.docd.purefm.R$id: int menu_sort_size_desc
+com.docd.purefm.R$id: int menu_sort_type_asc
+com.docd.purefm.R$id: int menu_sort_type_desc
+com.docd.purefm.R$id: int mime
+com.docd.purefm.R$id: int modified
+com.docd.purefm.R$id: int name
+com.docd.purefm.R$id: int oexecute
+com.docd.purefm.R$id: int oread
+com.docd.purefm.R$id: int owner
+com.docd.purefm.R$id: int owrite
+com.docd.purefm.R$id: int properties
+com.docd.purefm.R$id: int refresh
+com.docd.purefm.R$id: int scroll
+com.docd.purefm.R$id: int search
+com.docd.purefm.R$id: int select_all
+com.docd.purefm.R$id: int size
+com.docd.purefm.R$id: int tab1
+com.docd.purefm.R$id: int tab2
+com.docd.purefm.R$id: int total
+com.docd.purefm.R$id: int type
+com.docd.purefm.R$id: int uexecute
+com.docd.purefm.R$id: int uread
+com.docd.purefm.R$id: int used
+com.docd.purefm.R$id: int uwrite
+com.docd.purefm.R$layout: int activity_bookmarks
+com.docd.purefm.R$layout: int activity_browser
+com.docd.purefm.R$layout: int activity_browser_actionbar
+com.docd.purefm.R$layout: int activity_search
+com.docd.purefm.R$layout: int activity_search_actionbar
+com.docd.purefm.R$layout: int activity_settings
+com.docd.purefm.R$layout: int browser_gridview
+com.docd.purefm.R$layout: int browser_listview
+com.docd.purefm.R$layout: int dialog_delete
+com.docd.purefm.R$layout: int dialog_exists
+com.docd.purefm.R$layout: int dialog_partition_info
+com.docd.purefm.R$layout: int dialog_permissions
+com.docd.purefm.R$layout: int dialog_properties
+com.docd.purefm.R$layout: int dialog_properties_container
+com.docd.purefm.R$layout: int fragment_browser
+com.docd.purefm.R$layout: int grid_item_file
+com.docd.purefm.R$layout: int list_item_bookmark
+com.docd.purefm.R$layout: int list_item_file
+com.docd.purefm.R$layout: int text_field_filename
+com.docd.purefm.R$menu: int activity_bookmarks
+com.docd.purefm.R$menu: int browser
+com.docd.purefm.R$menu: int browser_contextual
+com.docd.purefm.R$raw: int aid
+com.docd.purefm.R$string: int _files
+com.docd.purefm.R$string: int _selected
+com.docd.purefm.R$string: int app_name
+com.docd.purefm.R$string: int applying_failed
+com.docd.purefm.R$string: int available
+com.docd.purefm.R$string: int block_size
+com.docd.purefm.R$string: int bookmark_added
+com.docd.purefm.R$string: int bookmark_exists
+com.docd.purefm.R$string: int bookmark_not_added
+com.docd.purefm.R$string: int cancel
+com.docd.purefm.R$string: int close
+com.docd.purefm.R$string: int copied_
+com.docd.purefm.R$string: int could_not_create_dir
+com.docd.purefm.R$string: int could_not_create_file
+com.docd.purefm.R$string: int could_not_open_file_
+com.docd.purefm.R$string: int create
+com.docd.purefm.R$string: int cut_
+com.docd.purefm.R$string: int dialog_delete_title
+com.docd.purefm.R$string: int dialog_new_file_title
+com.docd.purefm.R$string: int dialog_new_folder_title
+com.docd.purefm.R$string: int dialog_overwrite_abort
+com.docd.purefm.R$string: int dialog_overwrite_destination
+com.docd.purefm.R$string: int dialog_overwrite_message
+com.docd.purefm.R$string: int dialog_overwrite_replace
+com.docd.purefm.R$string: int dialog_overwrite_replace_all
+com.docd.purefm.R$string: int dialog_overwrite_skip
+com.docd.purefm.R$string: int dialog_overwrite_skip_all
+com.docd.purefm.R$string: int dialog_overwrite_source
+com.docd.purefm.R$string: int dialog_overwrite_title
+com.docd.purefm.R$string: int dialog_quit_message
+com.docd.purefm.R$string: int empty
+com.docd.purefm.R$string: int execute
+com.docd.purefm.R$string: int file_exists
+com.docd.purefm.R$string: int filesystem
+com.docd.purefm.R$string: int free
+com.docd.purefm.R$string: int group
+com.docd.purefm.R$string: int info
+com.docd.purefm.R$string: int invalid_filename
+com.docd.purefm.R$string: int key_preference_allow_root
+com.docd.purefm.R$string: int key_preference_appearance
+com.docd.purefm.R$string: int key_preference_home_directory
+com.docd.purefm.R$string: int key_preference_show_hidden
+com.docd.purefm.R$string: int key_preference_show_modified
+com.docd.purefm.R$string: int key_preference_show_permissions
+com.docd.purefm.R$string: int key_preference_show_preview
+com.docd.purefm.R$string: int key_preference_show_size
+com.docd.purefm.R$string: int key_preference_use_commandline
+com.docd.purefm.R$string: int location
+com.docd.purefm.R$string: int menu_bookmarks
+com.docd.purefm.R$string: int menu_bookmarks_new
+com.docd.purefm.R$string: int menu_copy
+com.docd.purefm.R$string: int menu_cut
+com.docd.purefm.R$string: int menu_delete
+com.docd.purefm.R$string: int menu_new_file
+com.docd.purefm.R$string: int menu_new_folder
+com.docd.purefm.R$string: int menu_partition
+com.docd.purefm.R$string: int menu_paste
+com.docd.purefm.R$string: int menu_properties
+com.docd.purefm.R$string: int menu_refresh
+com.docd.purefm.R$string: int menu_rename
+com.docd.purefm.R$string: int menu_search
+com.docd.purefm.R$string: int menu_select_all
+com.docd.purefm.R$string: int menu_settings
+com.docd.purefm.R$string: int menu_sort
+com.docd.purefm.R$string: int menu_sort_by_date_asc
+com.docd.purefm.R$string: int menu_sort_by_date_desc
+com.docd.purefm.R$string: int menu_sort_by_name_asc
+com.docd.purefm.R$string: int menu_sort_by_name_desc
+com.docd.purefm.R$string: int menu_sort_by_size_asc
+com.docd.purefm.R$string: int menu_sort_by_size_desc
+com.docd.purefm.R$string: int menu_sort_by_type_asc
+com.docd.purefm.R$string: int menu_sort_by_type_desc
+com.docd.purefm.R$string: int menu_view_as_grid
+com.docd.purefm.R$string: int menu_view_as_list
+com.docd.purefm.R$string: int mime
+com.docd.purefm.R$string: int minus
+com.docd.purefm.R$string: int modified
+com.docd.purefm.R$string: int name
+com.docd.purefm.R$string: int name_empty
+com.docd.purefm.R$string: int new_name
+com.docd.purefm.R$string: int no
+com.docd.purefm.R$string: int no_apps_to_open
+com.docd.purefm.R$string: int no_results
+com.docd.purefm.R$string: int others
+com.docd.purefm.R$string: int owner
+com.docd.purefm.R$string: int permissions
+com.docd.purefm.R$string: int permissions_changed
+com.docd.purefm.R$string: int preference_allow_root
+com.docd.purefm.R$string: int preference_appearance
+com.docd.purefm.R$string: int preference_category_performance
+com.docd.purefm.R$string: int preference_category_startup
+com.docd.purefm.R$string: int preference_category_view
+com.docd.purefm.R$string: int preference_home_directory
+com.docd.purefm.R$string: int preference_show_hidden
+com.docd.purefm.R$string: int preference_show_modified
+com.docd.purefm.R$string: int preference_show_permissions
+com.docd.purefm.R$string: int preference_show_preview
+com.docd.purefm.R$string: int preference_show_size
+com.docd.purefm.R$string: int preference_use_commandline
+com.docd.purefm.R$string: int progress_copying
+com.docd.purefm.R$string: int progress_deleting_files
+com.docd.purefm.R$string: int progress_moving
+com.docd.purefm.R$string: int read
+com.docd.purefm.R$string: int remove
+com.docd.purefm.R$string: int rename
+com.docd.purefm.R$string: int search_denied_message
+com.docd.purefm.R$string: int search_files
+com.docd.purefm.R$string: int size
+com.docd.purefm.R$string: int total
+com.docd.purefm.R$string: int type
+com.docd.purefm.R$string: int type_directory
+com.docd.purefm.R$string: int type_file
+com.docd.purefm.R$string: int type_symlink
+com.docd.purefm.R$string: int used
+com.docd.purefm.R$string: int write
+com.docd.purefm.R$string: int yes
+com.docd.purefm.R$style: int NavigationText
+com.docd.purefm.R$style: int ThemeLight
+com.docd.purefm.R$style: int browser_text_medium
+com.docd.purefm.R$style: int browser_text_small
+com.docd.purefm.R$xml: int settings
+com.docd.purefm.activities.BookmarksActivity
+com.docd.purefm.activities.BookmarksActivity: BookmarksActivity()
+com.docd.purefm.activities.BrowserActivity
+com.docd.purefm.activities.BrowserActivity: BrowserActivity()
+com.docd.purefm.activities.SearchActivity
+com.docd.purefm.activities.SearchActivity: SearchActivity()
+com.docd.purefm.activities.SettingsActivity
+com.docd.purefm.activities.SettingsActivity: SettingsActivity()
+com.docd.purefm.settings.SettingsFragment
+com.docd.purefm.settings.SettingsFragment: SettingsFragment()
+com.docd.purefm.utils.FileSortType: com.docd.purefm.utils.FileSortType[] values()
+com.docd.purefm.utils.FileSortType: com.docd.purefm.utils.FileSortType valueOf(java.lang.String)
+com.docd.purefm.view.CheckableRelativeLayout
+com.docd.purefm.view.CheckableRelativeLayout: CheckableRelativeLayout(android.content.Context,android.util.AttributeSet,int)
+com.docd.purefm.view.CheckableRelativeLayout: CheckableRelativeLayout(android.content.Context,android.util.AttributeSet)
+com.docd.purefm.view.CheckableRelativeLayout: CheckableRelativeLayout(android.content.Context)
+com.docd.purefm.view.CheckableRelativeLayout: void setChecked(boolean)
+com.docd.purefm.view.SequentalTextView
+com.docd.purefm.view.SequentalTextView: SequentalTextView(android.content.Context)
+com.docd.purefm.view.SequentalTextView: SequentalTextView(android.content.Context,android.util.AttributeSet)
+com.docd.purefm.view.SequentalTextView: SequentalTextView(android.content.Context,android.util.AttributeSet,int)
+com.docd.purefm.view.SequentalTextView: void setFile(java.io.File)
+com.docd.purefm.view.SequentalTextView: void setOnSequenceClickListener(com.docd.purefm.view.SequentalTextView$OnSequenceClickListener)
+com.docd.purefm.view.SquareImageView
+com.docd.purefm.view.SquareImageView: SquareImageView(android.content.Context)
+com.docd.purefm.view.SquareImageView: SquareImageView(android.content.Context,android.util.AttributeSet)
+com.docd.purefm.view.SquareImageView: SquareImageView(android.content.Context,android.util.AttributeSet,int)

@@ -1,0 +1,9 @@
+package com.docd.purefm;
+
+public final class Extras {
+
+    private Extras() {}
+    
+    public static final String BROADCAST_REFRESH = Extras.class.getName() + ".BROADCAST_REFRESH";
+    public static final String EXTRA_PATH = Extras.class.getName() + ".EXTRA_PATH";
+}

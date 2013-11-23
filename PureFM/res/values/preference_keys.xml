@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="key_preference_appearance">key_preference_appearance</string>
+    <string name="key_preference_show_permissions">key_preference_show_permissions</string>
+    <string name="key_preference_show_hidden">key_preference_show_hidden</string>
+    <string name="key_preference_show_modified">key_preference_show_modified</string>
+    <string name="key_preference_show_size">key_preference_show_size</string>
+    <string name="key_preference_show_preview">key_preference_show_preview</string>
+    <string name="key_preference_use_commandline">key_preference_use_commandline</string>
+    <string name="key_preference_allow_root">key_preference_allow_root</string>
+    <string name="key_preference_home_directory">key_preference_home_directory</string>
+    
+</resources>

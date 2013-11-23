@@ -1,0 +1,27 @@
+package com.docd.purefm.utils;
+
+import java.util.Comparator;
+
+import com.docd.purefm.file.GenericFile;
+
+public enum FileSortType {
+
+    NAME_ASC (new FileUtils.NameComparator()),
+    NAME_DESC(new FileUtils.NameComparatorReverse()),
+    TYPE_ASC (new FileUtils.TypeComparator()),
+    TYPE_DESC(new FileUtils.TypeComparatorReverse()),
+    SIZE_ASC (new FileUtils.SizeComparatorAsc()),
+    SIZE_DESC(new FileUtils.SizeComparatorDesc()),
+    DATE_ASC (new FileUtils.DateComparatorAsc()),
+    DATE_DESC(new FileUtils.DateComparatorDesc());
+    
+    private Comparator<GenericFile> comparator;
+    
+    private FileSortType(Comparator<GenericFile> comparator) {
+        this.comparator = comparator;
+    }
+    
+    public Comparator<GenericFile> getComparator() {
+        return this.comparator;
+    }
+}
