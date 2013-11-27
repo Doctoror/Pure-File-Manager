@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.Permissions;
-import com.docd.purefm.settings.Environment;
 import com.docd.purefm.settings.Settings;
 
 public final class CommandLineUtils {

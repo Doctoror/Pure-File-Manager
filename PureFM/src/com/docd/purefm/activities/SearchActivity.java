@@ -2,13 +2,13 @@ package com.docd.purefm.activities;
 
 import java.util.List;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.settings.Environment;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.CancelableTask;
 import com.docd.purefm.tasks.SearchCommandLineTask;
@@ -16,7 +16,6 @@ import com.docd.purefm.tasks.SearchJavaTask;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -29,7 +28,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-public final class SearchActivity extends Activity {
+public final class SearchActivity extends MonitoredActivity {
 
     private AbsListView list;
     private BrowserBaseAdapter adapter;

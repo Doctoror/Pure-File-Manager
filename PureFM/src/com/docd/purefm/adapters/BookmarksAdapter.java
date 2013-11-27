@@ -1,57 +1,83 @@
 package com.docd.purefm.adapters;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.utils.BookmarksHelper;
 import com.docd.purefm.utils.PureFMFileUtils;
 
+import android.content.res.Resources;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public final class BookmarksAdapter implements ListAdapter {
-
     private final List<String> bookmarks;
+    
     private final DataSetObservable mDataSetObservable;
     private final LayoutInflater inflater;
     private final BrowserActivity activity;
     
-    private final Set<String> data;
-    
     private boolean modified;
     
-    public BookmarksAdapter(final BrowserActivity activity, final Set<String> data) {
+    private int userStart;
+    
+    private Drawable iconStorage;
+    private Drawable iconSdcard;
+    private Drawable iconUsb;
+    private Drawable iconUser;
+    
+    private String rootDisplayName;
+    
+    public BookmarksAdapter(final BrowserActivity activity, final Set<String> user) {
         this.activity = activity;
         this.mDataSetObservable = new DataSetObservable();
         this.inflater = activity.getLayoutInflater();
-        this.bookmarks = new ArrayList<String>();
-        this.data = data;
-        for (String b : data) {
-            this.bookmarks.add(b);
+        
+        final Set<String> storageSet = BookmarksHelper.getStorageBookmarks();
+        final Set<File> usb = Environment.getUsbStorageDirectories();
+                
+        this.bookmarks = new ArrayList<String>(user.size() + usb.size() + storageSet.size());
+        this.bookmarks.addAll(storageSet);
+        for (final File file : usb) {
+            this.bookmarks.add(file.getAbsolutePath());
         }
+        this.userStart = this.bookmarks.size();
+        this.bookmarks.addAll(user);
+
+        final Resources res = activity.getResources();
+        this.iconStorage = res.getDrawable(R.drawable.ic_action_storage);
+        this.iconSdcard = res.getDrawable(R.drawable.ic_sdcard);
+        this.iconUsb = res.getDrawable(R.drawable.ic_action_usb);
+        this.iconUser = res.getDrawable(R.drawable.action_bookmarks);
+        this.rootDisplayName = res.getString(R.string.root);
     }
     
     public void addItem(String path) {
-        if (data.contains(path)) {
+        if (bookmarks.contains(path)) {
             Toast.makeText(activity, R.string.bookmark_exists, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!data.add(path)) {
+        if (!bookmarks.add(path)) {
             Toast.makeText(activity, R.string.bookmark_not_added, Toast.LENGTH_SHORT).show();
             return;
-        }
-        this.bookmarks.add(path);
+        }        
         this.modified = true;
         this.notifyDataSetChanged();
     }
@@ -62,8 +88,8 @@ public final class BookmarksAdapter implements ListAdapter {
     }
 
     @Override
-    public String getItem(int arg0) {
-        return this.bookmarks.get(arg0);
+    public String getItem(final int pos) {
+        return this.bookmarks.get(pos);
     }
 
     @Override
@@ -73,17 +99,23 @@ public final class BookmarksAdapter implements ListAdapter {
 
     @Override
     public int getItemViewType(int arg0) {
-        return 0;
+        return arg0 < userStart ? 0 : 1;
     }
 
     @Override
     public View getView(int pos, View v, ViewGroup arg2) {
         
+        final int viewType = this.getItemViewType(pos);
         Holder h;
         
         if (v == null) {
-            v = this.inflater.inflate(R.layout.list_item_bookmark, null); 
+            if (viewType == 0) {
+                v = this.inflater.inflate(R.layout.list_item_bookmark, null);
+            } else {
+                v = this.inflater.inflate(R.layout.list_item_bookmark_user, null);
+            }
             h = new Holder();
+            h.icon = (ImageView) v.findViewById(android.R.id.icon);
             h.title = (TextView) v.findViewById(android.R.id.title);
             h.summary = (TextView) v.findViewById(android.R.id.summary);
             h.remove = v.findViewById(android.R.id.button1);
@@ -92,7 +124,8 @@ public final class BookmarksAdapter implements ListAdapter {
             h = (Holder) v.getTag();
         }
         
-        final String cur = this.bookmarks.get(pos);
+        final String cur = this.getItem(pos);
+        final String currentName = FilenameUtils.getName(cur);
         
         v.setOnClickListener(new View.OnClickListener() {
             
@@ -103,24 +136,43 @@ public final class BookmarksAdapter implements ListAdapter {
             }
         });
         
-        h.title.setText(FilenameUtils.getName(cur));
+        h.title.setText(currentName.equals(Environment.rootDirectory.getName()) ?
+                this.rootDisplayName : currentName);
+
         h.summary.setText(cur);
-        h.remove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                bookmarks.remove(cur);
-                data.remove(cur);
-                modified = true;
-                notifyDataSetChanged();
-            }
-        });
+        if (viewType == 1) {
+            h.remove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    bookmarks.remove(cur);
+                    modified = true;
+                    notifyDataSetChanged();
+                }
+            });
+        }
+        
+        switch (BookmarksHelper.getBookmarkType(currentName)) {
+            case SDCARD:
+                h.icon.setImageDrawable(iconSdcard);
+                break;
+            case STORAGE:
+                h.icon.setImageDrawable(iconStorage);
+                break;
+            case USB:
+                h.icon.setImageDrawable(iconUsb);
+                break;
+            case USER:
+            default:
+                h.icon.setImageDrawable(iconUser);
+                break;        
+        }
         
         return v;
     }
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -166,10 +218,18 @@ public final class BookmarksAdapter implements ListAdapter {
     }
     
     public Set<String> getData() {
-        return this.data;
+        final Set<String> user = new LinkedHashSet<String>();
+        int i = 0;
+        for (final String bookmark : this.bookmarks) {
+            if (i++ >= this.userStart) {
+                user.add(bookmark);
+            }
+        }
+        return user;
     }
     
     private static final class Holder {
+        private ImageView icon;
         private TextView title;
         private TextView summary;
         private View remove;

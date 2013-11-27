@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
@@ -31,7 +30,7 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.view.SequentalTextView;
 
-public final class BrowserActivity extends FragmentActivity {
+public final class BrowserActivity extends MonitoredActivity {
 
     public static final String TAG_DIALOG = "dialog";
 
@@ -116,10 +115,10 @@ public final class BrowserActivity extends FragmentActivity {
             public void onDrawerOpened(View arg0) {
                 isDrawerOpened = true;
                 this.hadShowHomeAsUp = (actionBar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) == ActionBar.DISPLAY_HOME_AS_UP;
-                actionBar.setTitle(R.string.menu_bookmarks);
                 actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                         | ActionBar.DISPLAY_USE_LOGO
                         | ActionBar.DISPLAY_SHOW_TITLE);
+                actionBar.setTitle(R.string.menu_bookmarks);
                 invalidateOptionsMenu();
             }
 

@@ -2,11 +2,11 @@ package com.docd.purefm.dialogs;
 
 import org.apache.commons.io.FileUtils;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.settings.Environment;
 import com.docd.purefm.utils.StatFsUtils;
 
 import android.app.AlertDialog;

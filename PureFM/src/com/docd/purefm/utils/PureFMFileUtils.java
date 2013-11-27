@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
-import com.docd.purefm.settings.Environment;
 import com.docd.purefm.settings.Settings;
 
 import android.content.Context;

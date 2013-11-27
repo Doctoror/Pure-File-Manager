@@ -1,6 +1,5 @@
 package com.docd.purefm;
 
-import com.docd.purefm.settings.Environment;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.TextUtil;
@@ -12,7 +11,8 @@ public final class PureFM extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Environment.init();
+        ActivityMonitor.init(this);
+        Environment.init(this);
         Settings.init(this, this.getResources());
         PreviewHolder.initialize(this);
         TextUtil.init(this);

@@ -3,6 +3,7 @@
 
     <string name="app_name">PureFM</string>
     
+    <string name="root">root</string>
     <string name="empty">Empty</string>
     <string name="minus">-</string>
     

@@ -7,7 +7,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-public final class SettingsActivity extends Activity {
+public final class SettingsActivity extends MonitoredActivity {
 
     private boolean needInvalidate;
     
