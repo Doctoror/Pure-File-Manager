@@ -25,6 +25,7 @@ import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
 import com.docd.purefm.browser.BrowserFragment;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
+import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
@@ -51,8 +52,11 @@ public final class BrowserActivity extends MonitoredActivity {
     private final Object currentlyDisplayedFragmentLock;
     private BrowserFragment currentlyDisplayedFragment;
 
+    public final FileObserverCache observerCache;
+
     public BrowserActivity() {
         this.currentlyDisplayedFragmentLock = new Object();
+        this.observerCache = new FileObserverCache();
     }
 
     /**

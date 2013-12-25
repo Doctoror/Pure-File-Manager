@@ -5,18 +5,27 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import android.content.Context;
 import android.os.Environment;
 
 import android.os.FileObserver;
 import android.os.Handler;
 
+import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.Cache;
 
-public final class Browser {
+public final class Browser implements MultiListenerFileObserver.OnEventListener {
+
+    private static final int OBSERVER_EVENTS = FileObserver.CREATE |
+            FileObserver.DELETE |
+            FileObserver.DELETE_SELF |
+            FileObserver.MOVED_TO |
+            FileObserver.MOVED_FROM |
+            FileObserver.MOVE_SELF;
 
     private static Handler handler;
 
@@ -28,18 +37,22 @@ public final class Browser {
     private final File root;
     private final Deque<GenericFile> history;
 
-    private FileObserver observer;
+    private FileObserverCache observerCache;
+    private MultiListenerFileObserver observer;
     private GenericFile path;
     private GenericFile prevPath;
     private OnNavigateListener listener;
 
-    protected Browser(Context context) {
+    private Runnable lastRunnable;
+
+    protected Browser(final BrowserActivity activity) {
         if (handler == null) {
-            handler = new Handler(context.getMainLooper());
+            handler = new Handler(activity.getMainLooper());
         }
+        this.observerCache = activity.observerCache;
         this.history = new ArrayDeque<GenericFile>(15);
         this.root = File.listRoots()[0];
-        final String home = Settings.getHomeDirectory(context);
+        final String home = Settings.getHomeDirectory(activity);
         final String state = Environment.getExternalStorageState();
         if (home != null) {
             this.path = FileFactory.newFile(home);
@@ -52,6 +65,12 @@ public final class Browser {
         }
         if (this.path == null) {
             this.path = FileFactory.newFile(this.root.getAbsolutePath());
+        }
+        if (this.path != null) {
+            this.observer = observerCache.getOrCreate(
+                    this.path.getAbsolutePath(), OBSERVER_EVENTS);
+            this.observer.addOnEventListener(this);
+            this.observer.startWatching();
         }
     }
 
@@ -70,10 +89,10 @@ public final class Browser {
         }
         if (this.observer != null) {
             this.observer.stopWatching();
+            this.observer.removeOnEventListener(this);
         }
-        this.observer = new DirectoryObserver(requested.getAbsolutePath(),
-                FileObserver.CREATE | FileObserver.DELETE | FileObserver.DELETE_SELF |
-                FileObserver.MOVED_TO | FileObserver.MOVED_FROM | FileObserver.MOVE_SELF);
+        this.observer = this.observerCache.getOrCreate(requested.getAbsolutePath(), OBSERVER_EVENTS);
+        this.observer.addOnEventListener(this);
         this.observer.startWatching();
     }
     
@@ -139,29 +158,23 @@ public final class Browser {
         return this.path.toFile().equals(this.root);
     }
 
-    private final class DirectoryObserver extends FileObserver {
+    @Override
+    public void onEvent(int event, String pathString) {
+        switch (event & FileObserver.ALL_EVENTS) {
+            case FileObserver.DELETE_SELF:
+                handler.removeCallbacks(lastRunnable);
+                handler.post(lastRunnable = new NavigateRunnable(
+                        Browser.this, path.getParentFile(), true));
+                break;
 
-        private DirectoryObserver(String path, int mask) {
-            super(path, mask);
-        }
-
-        @Override
-        public void onEvent(int event, String pathString) {
-            switch (event & FileObserver.ALL_EVENTS) {
-                case FileObserver.DELETE_SELF:
-                    handler.removeCallbacksAndMessages(null);
-                    handler.post(new NavigateRunnable(Browser.this, path.getParentFile(), true));
-                    break;
-
-                case FileObserver.MOVE_SELF:
-                case FileObserver.CREATE:
-                case FileObserver.DELETE:
-                case FileObserver.MOVED_FROM:
-                case FileObserver.MOVED_TO:
-                    handler.removeCallbacksAndMessages(null);
-                    handler.post(new InvalidateRunnable(Browser.this));
-                    break;
-            }
+            case FileObserver.MOVE_SELF:
+            case FileObserver.CREATE:
+            case FileObserver.DELETE:
+            case FileObserver.MOVED_FROM:
+            case FileObserver.MOVED_TO:
+                handler.removeCallbacks(lastRunnable);
+                handler.post(lastRunnable = new InvalidateRunnable(Browser.this));
+                break;
         }
     }
 

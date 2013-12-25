@@ -88,7 +88,11 @@ public final class BrowserFragment extends Fragment {
         super.onAttach(activity);
         this.menuProgress = new ProgressBar(activity);
 
-        this.browser = new Browser(activity);
+        if (activity instanceof BrowserActivity) {
+            this.browser = new Browser((BrowserActivity) activity);
+        } else {
+            throw new IllegalStateException("BrowserFragment should be attached only to BrowserActivity");
+        }
         this.browser.setOnNavigateListener(new OnNavigateListener() {
 
             @Override
@@ -99,7 +103,6 @@ public final class BrowserFragment extends Fragment {
                 } else {
                     startScan();
                 }
-                System.out.println("NAVIGATE: " + this);
             }
 
             @Override
