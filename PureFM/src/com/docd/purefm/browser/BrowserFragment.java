@@ -4,11 +4,7 @@ import java.io.File;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.LocalBroadcastManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -26,13 +22,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
-import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.DirectoryScanTask;
@@ -73,19 +69,6 @@ public final class BrowserFragment extends Fragment {
     private boolean firstRun;
     private boolean isVisible;
 
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (isVisible) {
-                if (browser != null) {
-                    browser.invalidate();
-                }
-            } else {
-                firstRun = true;
-            }
-        }
-    };
-
     private void ensureGridViewColumns(Configuration config) {
         if (this.list instanceof GridView) {
             ((GridView) this.list)
@@ -116,6 +99,7 @@ public final class BrowserFragment extends Fragment {
                 } else {
                     startScan();
                 }
+                System.out.println("NAVIGATE: " + this);
             }
 
             @Override
@@ -136,7 +120,7 @@ public final class BrowserFragment extends Fragment {
             public void onSequenceClick(String sequence) {
                 GenericFile target = Cache.get(sequence);
                 if (target == null) {
-                    target = PureFMFileUtils.newFile(sequence);
+                    target = FileFactory.newFile(sequence);
                 }
                 browser.navigate(target, true);
             }
@@ -152,8 +136,6 @@ public final class BrowserFragment extends Fragment {
         this.setRetainInstance(true);
         this.setHasOptionsMenu(true);
         this.firstRun = true;
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                receiver, new IntentFilter(Extras.BROADCAST_REFRESH));
         if (state != null) {
             if (state.containsKey(KEY_FILE)) {
                 this.browser.setInitialPath((File) state.get(KEY_FILE));
@@ -165,18 +147,8 @@ public final class BrowserFragment extends Fragment {
         super.onCreate(state);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(
-                receiver);
-    }
-
     public boolean onBackPressed() {
-        if (this.browser == null) {
-            return false;
-        }
-        return this.browser.back();
+        return this.browser != null && this.browser.back();
     }
 
     @Override

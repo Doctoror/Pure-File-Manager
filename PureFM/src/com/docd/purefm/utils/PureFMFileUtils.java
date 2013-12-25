@@ -62,24 +62,6 @@ public final class PureFMFileUtils {
         return p.matcher(name).matches();
     }
     
-    public static GenericFile newFile(String path) {
-        return Settings.useCommandLine && Environment.hasBusybox ?
-                CommandLineFile.fromFile(new File(path)) :
-                    new JavaFile(path);
-    }
-    
-    public static GenericFile newFile(File path) {
-        return Settings.useCommandLine && Environment.hasBusybox ?
-                CommandLineFile.fromFile(path) :
-                    new JavaFile(path);
-    }
-    
-    public static GenericFile newFile(File file, String name) {
-        return Settings.useCommandLine && Environment.hasBusybox ?
-                CommandLineFile.fromFile(new File(file, name)) :
-                    new JavaFile(file, name);
-    }
-    
     public static void requestMediaScanner(Context context, List<File> files) {
         final String[] paths = new String[files.size()];
         int i = 0;

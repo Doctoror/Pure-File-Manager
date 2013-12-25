@@ -9,8 +9,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.LocalBroadcastManager;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -29,10 +27,11 @@ public final class RenameFileDialog extends DialogFragment {
      * Instantiates the rename dialog
      * 
      * @param f File to rename
-     * @param caller LibraryFragment instance that is calling this dialog
+     * @param mode Current ActionMode instance
+     * @param currentDir Current directory
      * @return Dialog for renaming the file
      */
-    public static final DialogFragment instantiate(ActionMode mode, GenericFile f, File currentDir) {
+    public static DialogFragment instantiate(ActionMode mode, GenericFile f, File currentDir) {
         final Bundle extras = new Bundle();
         extras.putSerializable(Extras.EXTRA_FILE, f);
         extras.putSerializable(Extras.EXTRA_CURRENT_DIR, currentDir);
@@ -52,6 +51,9 @@ public final class RenameFileDialog extends DialogFragment {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         final Bundle args = this.getArguments();
+        if (args == null) {
+            throw new RuntimeException("Arguments must be supplied!");
+        }
         this.file = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
         this.currentDir = (File) args.getSerializable(Extras.EXTRA_CURRENT_DIR);
     }
@@ -79,16 +81,18 @@ public final class RenameFileDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which)
             {
                 final Activity a = getActivity();
-                final String newname = text.getText().toString();
-                if (PureFMFileUtils.isValidFileName(newname)) {
-                    final File target = new File(currentDir, newname);
+                final CharSequence newNameField = text.getText();
+                final String newName;
+                if (newNameField != null && PureFMFileUtils.isValidFileName(
+                        newName = newNameField.toString())) {
+
+                    final File target = new File(currentDir, newName);
                     final File source = file.toFile();
                     if (file.renameTo(target)) {
                         final List<File> filesCreated = new ArrayList<File>(1);
                         final List<File> filesDeleted = new ArrayList<File>(1);
                         filesDeleted.add(source);
                         filesCreated.add(target);
-                        LocalBroadcastManager.getInstance(a).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
                         MediaStoreUtils.deleteFiles(a.getApplicationContext(), filesDeleted);
                         PureFMFileUtils.requestMediaScanner(a, filesCreated);
                     }

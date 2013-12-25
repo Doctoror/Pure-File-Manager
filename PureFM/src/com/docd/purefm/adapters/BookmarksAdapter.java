@@ -11,9 +11,9 @@ import org.apache.commons.io.FilenameUtils;
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.activities.BrowserActivity;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.BookmarksHelper;
-import com.docd.purefm.utils.PureFMFileUtils;
 
 import android.content.res.Resources;
 import android.database.DataSetObservable;
@@ -131,7 +131,7 @@ public final class BookmarksAdapter implements ListAdapter {
             
             @Override
             public void onClick(View v) {
-                final GenericFile path = PureFMFileUtils.newFile(cur);
+                final GenericFile path = FileFactory.newFile(cur);
                 activity.setCurrentPath(path);
             }
         });

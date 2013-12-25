@@ -1,15 +1,12 @@
 package com.docd.purefm.controller;
 
 import com.cyanogenmod.filemanager.util.AIDHelper;
-import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.Permissions;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.LocalBroadcastManager;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -110,17 +107,13 @@ public final class FilePermissionsController {
         
         @Override
         protected Boolean doInBackground(CommandLineFile... params) {
-            return Boolean.valueOf(params[0].applyPermissions(this.target));
+            return params[0].applyPermissions(this.target);
         }
         
         @Override
         protected void onPostExecute(Boolean result) {
-            Toast.makeText(this.context, this.context.getString(result.booleanValue() ?
+            Toast.makeText(this.context, this.context.getString(result ?
                     R.string.permissions_changed : R.string.applying_failed), Toast.LENGTH_SHORT).show();
-            
-            if (result.booleanValue()) {
-                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
-            }
         }
 
     }

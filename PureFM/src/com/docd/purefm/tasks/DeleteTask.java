@@ -7,12 +7,9 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.LocalBroadcastManager;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandLine;
@@ -95,7 +92,6 @@ public final class DeleteTask extends
         
         if (!filesAffected.isEmpty()) {
             MediaStoreUtils.deleteFiles(activity.getApplicationContext(), filesAffected);
-            LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
             PureFMFileUtils.requestMediaScanner(activity, filesAffected);
         }
         
@@ -118,7 +114,6 @@ public final class DeleteTask extends
         if (this.dialog != null) {
             this.dialog.dismiss();
         }
-        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
         if (result != null) {
             Toast.makeText(activity, result.getMessage(),
                     Toast.LENGTH_SHORT).show();

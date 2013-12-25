@@ -19,9 +19,13 @@
 #   public *;
 #}
 
--injars      bin/classes
--injars      libs
--outjars     bin/classes-processed.jar
+-dontwarn org.apache.**
+
+#-injars      bin/classes
+-libraryjars      libs
+#-outjars     bin/classes-processed.jar
+
+#-libraryjars libs/commons-io-2.4.jar
 
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Application

@@ -6,8 +6,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.LocalBroadcastManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.EditText;
@@ -15,6 +13,7 @@ import android.widget.Toast;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.PureFMFileUtils;
 
@@ -54,7 +53,7 @@ public final class CreateFileDialog extends DialogFragment {
                                     Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        final GenericFile target = PureFMFileUtils.newFile(current, name);
+                        final GenericFile target = FileFactory.newFile(current, name);
                         if (target.exists()) {
                             Toast.makeText(getActivity(), R.string.file_exists,
                                     Toast.LENGTH_SHORT).show();
@@ -81,9 +80,7 @@ public final class CreateFileDialog extends DialogFragment {
     }
 
     private void createFile(GenericFile target) {
-        if (target.createNewFile()) {
-            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
-        } else {
+        if (!target.createNewFile()) {
             Toast.makeText(getActivity(), R.string.could_not_create_file,
                     Toast.LENGTH_SHORT).show();
         }

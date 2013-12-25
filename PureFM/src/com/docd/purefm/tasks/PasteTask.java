@@ -8,12 +8,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.LocalBroadcastManager;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.browser.Browser;
 import com.docd.purefm.commandline.Command;
@@ -21,6 +18,7 @@ import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
+import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
@@ -72,12 +70,12 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
         
         final boolean isCut = ClipBoard.isCut();
         final GenericFile target = this.browser.getPath();
-        Exception result = null;
+        final Exception result;
 
         if (target instanceof JavaFile) {
-            processJavaFiles(contents, target, isCut, filesCreated, filesDeleted);
+            result = processJavaFiles(contents, target, isCut, filesCreated, filesDeleted);
         } else {
-            processCommandLineFiles(contents, target, isCut, filesCreated, filesDeleted);
+            result = processCommandLineFiles(contents, target, isCut, filesCreated, filesDeleted);
         }
         
         final Context context = activity.getApplicationContext();
@@ -88,31 +86,30 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
             PureFMFileUtils.requestMediaScanner(context, filesCreated);
         }
 
-        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
         return result;
     }
     
     private Exception processJavaFiles(GenericFile[] contents, GenericFile target, boolean isCut, List<File> filesCreated, List<File> filesDeleted) {
         Exception result = null;
-        for (int i = 0; i < contents.length; i++) {
+        for (final GenericFile current : contents) {
             if (this.isCancelled()) {
                 return result;
             }
 
-            if (contents[i] != null && contents[i].exists()) {
+            if (current != null && current.exists()) {
                 
                 if (isCut) {
-                    if (contents[i].move(target)) {
-                        filesDeleted.add(contents[i].toFile());
+                    if (current.move(target)) {
+                        filesDeleted.add(current.toFile());
                         filesCreated.add(target.toFile());
                     } else {
-                        result = new Exception("Failed to move " + contents[i].getName() + " to " + target.getName());
+                        result = new Exception("Failed to move " + current.getName() + " to " + target.getName());
                     }
                 } else {
-                    if (contents[i].copy(target)) {
+                    if (current.copy(target)) {
                         filesCreated.add(target.toFile());
                     } else {
-                        result = new Exception("Failed to copy " + contents[i].getName() + " to " + target.getName());
+                        result = new Exception("Failed to copy " + current.getName() + " to " + target.getName());
                     }
                 }
             }
@@ -124,22 +121,19 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
         Exception result = null;
         final List<Command> commands = new LinkedList<Command>();
         final CommandLineFile[] cont = new CommandLineFile[contents.length];
-        for (int i = 0; i < cont.length; i++) {
-            cont[i] = (CommandLineFile) contents[i];
-        }
+        ArrayUtils.copyArrayAndCast(contents, cont);
         final CommandLineFile t = (CommandLineFile) target;
-        for (int i = 0; i < cont.length; i++) {
-            commands.add(isCut ? cont[i].getMoveCommand(t) :
-                cont[i].getCopyCommand(t));
+        for (final CommandLineFile current : cont) {
+            commands.add(isCut ? current.getMoveCommand(t) :
+                    current.getCopyCommand(t));
         }
         if (CommandLine.execute(commands)) {
-            for (int i = 0; i < contents.length; i++) {
+            for (final GenericFile current : contents) {
                 if (isCut) {
-                    filesDeleted.add(contents[i].toFile());
+                    filesDeleted.add(current.toFile());
                 }
                 filesCreated.add(target.toFile());
             }
-            LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Extras.BROADCAST_REFRESH));
         } else {
             if (isCut) {
                 result = new Exception("Failed to move selected files");
