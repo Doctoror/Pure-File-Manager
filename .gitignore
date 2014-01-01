@@ -9,6 +9,7 @@
 *.class
 
 # generated files
+proguard_logs
 proguard/
 bin/
 gen/

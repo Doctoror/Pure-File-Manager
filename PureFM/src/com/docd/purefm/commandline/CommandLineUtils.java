@@ -64,7 +64,7 @@ public final class CommandLineUtils {
         return perm.toString();
     }
     
-    public static boolean applyPermissions(boolean su, Permissions p, CommandLineFile target) {
+    public static boolean applyPermissions(final Shell shell, Permissions p, CommandLineFile target) {
         final String permission = toOctalPermission(p);
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
@@ -72,101 +72,88 @@ public final class CommandLineUtils {
         command.append(permission);
         command.append(' ');
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
-        return CommandLine.execute(new Command(su, command.toString()));
+        return CommandLine.execute(shell, new Command(command.toString()));
     }
     
-    public static boolean canAccessRecursively(CommandLineFile target) {
-        final StringBuilder command = new StringBuilder(50);
-        command.append(Environment.busybox);
-        command.append(" ls -AR ");
-        command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
-        return CommandLine.execute(new Command(false, command.toString()));
-    }
-    
-    public static boolean exists(File target) {
+    public static boolean exists(final Shell shell, File target) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
         command.append(" test -e ");
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
         command.append(" && echo exists");
         
-        final List<String> res = CommandLine.executeForResult(false, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, command.toString());
         return res != null && !res.isEmpty() && res.get(0).equals("exists");
     }
     
-    public static String touch(boolean su, CommandLineFile target) {
-        
-        final List<Command> coms = new LinkedList<Command>();
+    public static String touch(final Shell shell, final CommandLineFile target) {
         final String path = target.getAbsolutePath();
-        
-        coms.add(new Touch(su, target.toFile()));
+        if (!CommandLine.execute(shell, new Touch(target.toFile()))) {
+            return null;
+        }
         
         final StringBuilder command = new StringBuilder(50);        
         command.append(Environment.busybox);
         command.append(" ls -lApedn ");
         command.append(CommandLineUtils.getCommandLineString(path));
-        coms.add(new Command(su, command.toString()));
-        
-        final List<String> res = CommandLine.executeForResult(su, coms);
+
+        final List<String> res = CommandLine.executeForResult(shell, command.toString());
         if (res == null) {
             return null;
         }
         return res.isEmpty() ? null : res.get(0);
     }
     
-    public static String mkdir(boolean su, CommandLineFile target) {
+    public static String mkdir(final Shell shell, CommandLineFile target) {
         
-        final List<Command> coms = new LinkedList<Command>();
         final String path = target.getAbsolutePath();
         
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
         command.append(" mkdir ");
         command.append(CommandLineUtils.getCommandLineString(path));
-        
-        coms.add(new Command(su, command.toString()));
-        
+
+        if (!CommandLine.execute(shell, command.toString())) {
+            return null;
+        }
         command.setLength(0);
         command.setLength(50);
         command.append(Environment.busybox);
         command.append(" ls -lApedn ");
         command.append(CommandLineUtils.getCommandLineString(path));
-        coms.add(new Command(su, command.toString()));
         
-        final List<String> res = CommandLine.executeForResult(su, coms);
+        final List<String> res = CommandLine.executeForResult(shell, command.toString());
         if (res == null) {
             return null;
         }
         return res.isEmpty() ? null : res.get(0);
     }
     
-    public static String mkdirs(boolean su, CommandLineFile target) {
-        
-        final List<Command> coms = new LinkedList<Command>();
+    public static String mkdirs(final Shell shell, CommandLineFile target) {
         final String path = target.getAbsolutePath();
         
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
         command.append(" mkdir -p ");
         command.append(CommandLineUtils.getCommandLineString(path));
-        
-        coms.add(new Command(su, command.toString()));
-        
+
+        if (!CommandLine.execute(shell, command.toString())) {
+            return null;
+        }
         command.setLength(0);
         command.setLength(50);
         command.append(Environment.busybox);
         command.append(" ls -lnAped ");
         command.append(CommandLineUtils.getCommandLineString(path));
-        coms.add(new Command(su, command.toString()));
-        
-        final List<String> res = CommandLine.executeForResult(su, coms);
+
+        final List<String> res = CommandLine.executeForResult(shell, command.toString());
         if (res == null) {
             return null;
         }
         return res.isEmpty() ? null : res.get(0);
     }
     
-    public static List<String> ls(boolean su, final File dir) {
+    public static List<String> ls(final Shell shell, final File dir) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
         command.append(" ls -n");
@@ -178,10 +165,10 @@ public final class CommandLineUtils {
         if (dir.isDirectory() && command.charAt(command.length() - 1) != File.separatorChar) {
             command.append(File.separatorChar);
         }
-        return CommandLine.executeForResult(su, command.toString());
+        return CommandLine.executeForResult(shell, command.toString());
     }
     
-    public static List<String> lsl(boolean su, final File dir) {
+    public static List<String> lsl(final Shell shell, final File dir) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
         command.append(" ls -lnpe");
@@ -193,10 +180,10 @@ public final class CommandLineUtils {
         if (dir.isDirectory() && command.charAt(command.length() - 1) != File.separatorChar) {
             command.append(File.separatorChar);
         }
-        return CommandLine.executeForResult(su, command.toString());
+        return CommandLine.executeForResult(shell, command.toString());
     }
     
-    public static List<String> lsld(boolean su, final File dir) {
+    public static List<String> lsld(final Shell shell, final File dir) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
         command.append(" ls -lnped");
@@ -208,7 +195,12 @@ public final class CommandLineUtils {
         if (dir.isDirectory() && command.charAt(command.length() - 1) != File.separatorChar) {
             command.append(File.separatorChar);
         }
-        return CommandLine.executeForResult(su, command.toString());
+        return CommandLine.executeForResult(shell, command.toString());
+    }
+
+    public static boolean isMSDOSFS(final File file) {
+        final String res = CommandLineUtils.getFSType(ShellHolder.getShell(), file);
+        return res.equals("msdos") || res.equals("vfat");
     }
     
 //    public static String printPermission(final boolean su, final File file) {
@@ -232,12 +224,12 @@ public final class CommandLineUtils {
 //        return res == null || res.isEmpty() ? null : res.get(0);
 //    }
     
-    public static String getFSType(File file) {
+    public static String getFSType(final Shell shell, File file) {
         final StringBuilder command = new StringBuilder(80);
         command.append(Environment.busybox);
         command.append(" stat -f -c \"%T\" ");
         command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-        final List<String> res = CommandLine.executeForResult(false, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, command.toString());
         return res == null || res.isEmpty() ? "" : res.get(0);
     }
 }

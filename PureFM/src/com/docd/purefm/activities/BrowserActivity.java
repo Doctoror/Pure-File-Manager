@@ -1,6 +1,7 @@
 package com.docd.purefm.activities;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +27,9 @@ import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
 import com.docd.purefm.browser.BrowserFragment;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
+import com.docd.purefm.commandline.Shell;
+import com.docd.purefm.commandline.ShellFactory;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
@@ -57,6 +62,11 @@ public final class BrowserActivity extends MonitoredActivity {
     public BrowserActivity() {
         this.currentlyDisplayedFragmentLock = new Object();
         this.observerCache = new FileObserverCache();
+        try {
+            ShellHolder.setShell(ShellFactory.getShell());
+        } catch (IOException e) {
+            Log.w("BrowserActivity", "Could not obtain shell: " + e);
+        }
     }
 
     /**
@@ -154,6 +164,20 @@ public final class BrowserActivity extends MonitoredActivity {
         this.drawerList = (ListView) this.findViewById(R.id.drawerList);
         this.drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(this,
                 Settings.getBookmarks(getApplicationContext())));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            final Shell shell =  ShellHolder.getShell();
+            if (shell != null) {
+                shell.close();
+            }
+        } catch (IOException e) {
+            Log.w("BrowserActivity", "");
+        }
+        ShellHolder.setShell(null);
     }
 
     public void invalidateList() {

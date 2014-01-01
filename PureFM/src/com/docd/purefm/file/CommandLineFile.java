@@ -18,7 +18,7 @@ import com.docd.purefm.commandline.Constants;
 import com.docd.purefm.commandline.Copy;
 import com.docd.purefm.commandline.Move;
 import com.docd.purefm.commandline.Remove;
-import com.docd.purefm.settings.Settings;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.Cache;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.TextUtil;
@@ -90,14 +90,10 @@ public final class CommandLineFile implements GenericFile,
             f.isDirectory = true;
             f.isSymlink = false;
             f.exists = true;
-            f.isMSDOS = false;
             return f;
         }
 
-        List<String> res = CommandLineUtils.lsld(false, file);
-        if (res == null && Settings.su && CommandLineUtils.exists(file)) {
-            res = CommandLineUtils.lsld(true, file);
-        }
+        final List<String> res = CommandLineUtils.lsld(ShellHolder.getShell(), file);
 
         if (res == null || res.isEmpty()) {
             // file not yet exists
@@ -170,15 +166,15 @@ public final class CommandLineFile implements GenericFile,
             f.icon = MimeTypes.getTypeIcon(f.file);
         }
         
-        final String res = CommandLineUtils.getFSType(f.file);
-        f.isMSDOS = res.equals("msdos") || res.equals("vfat");
+        //final String res = CommandLineUtils.getFSType(ShellHolder.getShell(), f.file);
+        //f.isMSDOS = res.equals("msdos") || res.equals("vfat");
         Cache.addTo(f);
         return f;
     }
 
     private static String[] getAttrs(String string) {
         if (string.length() < 44) {
-            throw new IllegalArgumentException("Bad ls -lApe output");
+            throw new IllegalArgumentException("Bad ls -lApe output: " + string);
         }
         final char[] chars = string.toCharArray();
 
@@ -254,8 +250,8 @@ public final class CommandLineFile implements GenericFile,
             this.mimeType = MimeTypes.getMimeType(this.file);
             this.icon = MimeTypes.getTypeIcon(this.file);
         }
-        final String res = CommandLineUtils.getFSType(this.file);
-        this.isMSDOS = res.equals("msdos") || res.equals("vfat");
+        //final String res = CommandLineUtils.getFSType(ShellHolder.getShell(), this.file);
+        //this.isMSDOS = res.equals("msdos") || res.equals("vfat");
         Cache.addTo(this);
         return true;
     }
@@ -282,28 +278,21 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public boolean delete() {
-        boolean res = CommandLine.execute(new Remove(false, this.file));
-        if (!res) {
-            res = CommandLine.execute(new Remove(true, this.file));
-        }
-        if (res) {
+        if (CommandLine.execute(ShellHolder.getShell(), new Remove(this.file))) {
             this.exists = false;
             this.isDirectory = false;
             this.isSymlink = false;
             this.owner = 0;
             this.group = 0;
             this.p = null;
+            return true;
         }
-        return res;
+        return false;
     }
 
     @Override
     public CommandLineFile[] listFiles() {
-        boolean usesu = false;
-        if (Settings.su) {
-            usesu = !(this.canRead() && this.canExecute());
-        }
-        final List<String> result = CommandLineUtils.lsl(usesu, this.file);
+        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
         if (result == null) {
             return null;
         }
@@ -327,11 +316,7 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        boolean usesu = false;
-        if (Settings.su) {
-            usesu = !(this.canRead() && this.canExecute());
-        }
-        final List<String> result = CommandLineUtils.lsl(usesu, this.file);
+        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
         if (result == null) {
             return null;
         }
@@ -358,11 +343,7 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        boolean usesu = false;
-        if (Settings.su) {
-            usesu = !(this.canRead() && this.canExecute());
-        }
-        final List<String> result = CommandLineUtils.lsl(usesu, this.file);
+        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
         if (result == null) {
             return null;
         }
@@ -389,11 +370,7 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        boolean usesu = false;
-        if (Settings.su) {
-            usesu = !(this.canRead() && this.canExecute());
-        }
-        final List<String> result = CommandLineUtils.lsl(usesu, this.file);
+        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
         if (result == null) {
             return null;
         }
@@ -417,11 +394,7 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public String[] list() {
-        boolean usesu = false;
-        if (Settings.su) {
-            usesu = !(this.canRead() && this.canExecute());
-        }
-        final List<String> res = CommandLineUtils.lsl(usesu, this.file);
+        final List<String> res = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
         if (res != null) {
             final String[] resul = new String[res.size()];
             res.toArray(resul);
@@ -456,10 +429,8 @@ public final class CommandLineFile implements GenericFile,
             return false;
         }
 
-        String res = CommandLineUtils.touch(false, this);
-        if (res == null && Settings.su) {
-            res = CommandLineUtils.touch(true, this);
-        }
+        final String res = CommandLineUtils.touch(ShellHolder.getShell(), this);
+        System.out.println("touch: " + res);
         if (res == null) {
             return false;
         }
@@ -468,10 +439,7 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public boolean mkdir() {
-        String res = CommandLineUtils.mkdir(false, this);
-        if (res == null && Settings.su) {
-            res = CommandLineUtils.mkdir(true, this);
-        }
+        final String res = CommandLineUtils.mkdir(ShellHolder.getShell(), this);
         if (res == null) {
             return false;
         }
@@ -480,10 +448,7 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public boolean mkdirs() {
-        String res = CommandLineUtils.mkdirs(false, this);
-        if (res == null && Settings.su) {
-            res = CommandLineUtils.mkdir(true, this);
-        }
+        final String res = CommandLineUtils.mkdirs(ShellHolder.getShell(), this);
         if (res == null) {
             return false;
         }
@@ -568,10 +533,9 @@ public final class CommandLineFile implements GenericFile,
     }
 
     @Override
-    public boolean renameTo(File newName) {
-        final boolean suthis = !this.canWrite();
-        final Command move = new Move(suthis && Settings.su, this.file, newName);
-        final boolean result = CommandLine.execute(move);
+    public boolean renameTo(final File newName) {
+        final Command move = new Move(this, newName);
+        final boolean result = CommandLine.execute(ShellHolder.getShell(), move);
         if (result) {
             this.exists = false;
             this.isDirectory = false;
@@ -591,10 +555,7 @@ public final class CommandLineFile implements GenericFile,
         if (this.p.equals(newPerm)) {
             return true;
         }
-        boolean result = CommandLineUtils.applyPermissions(false, newPerm, this);
-        if (!result && Settings.su) {
-            result = CommandLineUtils.applyPermissions(true, newPerm, this);
-        }
+        final boolean result = CommandLineUtils.applyPermissions(ShellHolder.getShell(), newPerm, this);
         if (result) {
             this.p = newPerm;
         }
@@ -606,8 +567,8 @@ public final class CommandLineFile implements GenericFile,
         if (!this.exists) {
             return false;
         }
-        return CommandLine.execute(this
-                .getCopyCommand((CommandLineFile) target));
+        return CommandLine.execute(ShellHolder.getShell(),
+                new Copy(this, target));
     }
 
     @Override
@@ -615,8 +576,8 @@ public final class CommandLineFile implements GenericFile,
         if (!this.exists) {
             return false;
         }
-        final boolean result = CommandLine.execute(this
-                .getMoveCommand((CommandLineFile) target));
+        final boolean result = CommandLine.execute(ShellHolder.getShell(),
+                new Move(this, target));
         if (result) {
             this.exists = false;
             this.isDirectory = false;
@@ -636,9 +597,9 @@ public final class CommandLineFile implements GenericFile,
         return this.group;
     }
     
-    public boolean isMSMDOS() {
-        return this.isMSDOS;
-    }
+    //public boolean isMSMDOS() {
+    //    return this.isMSDOS;
+    //}
 
     public boolean canRead() {
         if (!this.exists) {
@@ -665,26 +626,5 @@ public final class CommandLineFile implements GenericFile,
             return this.p.gx;
         }
         return this.p.ox;
-    }
-
-    public Command getMoveCommand(CommandLineFile target) {
-        boolean su = false;
-        if (Settings.su) {
-            final boolean sutarget = !target.canExecute() || !target.canWrite();
-            final boolean suthis = !this.canWrite();
-            su = suthis || sutarget;
-        }
-        return new Move(su, this.file, target.toFile());
-    }
-
-    public Command getCopyCommand(CommandLineFile target) {
-        boolean su = false;
-        if (Settings.su) {
-            final boolean sutarget = !target.canExecute() || !target.canWrite();
-            final boolean suthis = !CommandLineUtils.canAccessRecursively(target);
-            su = sutarget || suthis;
-        }
-
-        return new Copy(su, this.file, target.toFile());
     }
 }

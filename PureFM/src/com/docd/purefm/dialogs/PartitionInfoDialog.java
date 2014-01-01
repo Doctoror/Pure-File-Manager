@@ -6,6 +6,7 @@ import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.StatFsUtils;
 
@@ -67,7 +68,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         final TextView fs = (TextView) v.findViewById(R.id.filesystem);
         String fsType = null;
         if (Environment.hasBusybox) {
-            fsType = CommandLineUtils.getFSType(file.toFile());
+            fsType = CommandLineUtils.getFSType(ShellHolder.getShell(), file.toFile());
         }
         
         if (fsType == null) {

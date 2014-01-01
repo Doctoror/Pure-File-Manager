@@ -4,8 +4,7 @@ import java.io.File;
 
 public final class Remove extends Command {
     
-    public Remove(boolean su, File file) {
-        super(su);
+    public Remove(final File file) {
         final StringBuilder command = new StringBuilder("busybox rm -rf ");
         command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
         this.command = command.toString();

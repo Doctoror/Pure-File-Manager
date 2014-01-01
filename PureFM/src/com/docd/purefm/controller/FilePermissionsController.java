@@ -2,6 +2,7 @@ package com.docd.purefm.controller;
 
 import com.cyanogenmod.filemanager.util.AIDHelper;
 import com.docd.purefm.R;
+import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.Permissions;
@@ -60,7 +61,7 @@ public final class FilePermissionsController {
             name = AIDHelper.getAIDs(table.getContext(), false).get(f.getGroup());
             group.setText(name);
             
-            if (f.isMSMDOS()) {
+            if (CommandLineUtils.isMSDOSFS(f.toFile())) {
                 this.disableBoxes();
             }
         } else {
