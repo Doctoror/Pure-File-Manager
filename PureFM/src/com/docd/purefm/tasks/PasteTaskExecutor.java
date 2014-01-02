@@ -11,6 +11,7 @@ import android.view.View.OnClickListener;
 import com.docd.purefm.R;
 import com.docd.purefm.browser.Browser;
 import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
@@ -38,25 +39,25 @@ public final class PasteTaskExecutor implements OnClickListener {
         final GenericFile target = this.browser.getPath();
 
         if (target instanceof JavaFile) {
-            for (int i = 0; i < contents.length; i++) {
+            for (final GenericFile file : contents) {
 
-                if (contents[i] != null && contents[i].exists()) {
+                if (file != null && file.exists()) {
                     
-                    final File testTarget = new File(target.toFile(), contents[i].getName());
+                    final File testTarget = new File(target.toFile(), file.getName());
                     if (testTarget.exists()) {
-                        exist.put(testTarget, contents[i]);
+                        exist.put(testTarget, file);
                     } else {
-                        toProcess.add(contents[i]);
+                        toProcess.add(file);
                     }
                 }
             }
         } else {
-            for (int i = 0; i < contents.length; i++) {
-                final File tmp = new File(target.toFile(), contents[i].getName());
-                if (CommandLineUtils.exists(tmp)) {
-                    exist.put(tmp, contents[i]);
+            for (final GenericFile file : contents) {
+                final File tmp = new File(target.toFile(), file.getName());
+                if (CommandLineUtils.exists(ShellHolder.getShell(), tmp)) {
+                    exist.put(tmp, file);
                 } else {
-                    toProcess.add(contents[i]);
+                    toProcess.add(file);
                 }
             }
         }

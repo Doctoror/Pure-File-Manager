@@ -11,12 +11,12 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.docd.purefm.R;
-import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.Remove;
+import com.docd.purefm.commandline.Shell;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
 
@@ -27,7 +27,7 @@ public final class DeleteTask extends
 
     private ProgressDialog dialog;
 
-    public DeleteTask(Activity activity) {
+    public DeleteTask(final Activity activity) {
         this.activity = activity;
     }
 
@@ -54,38 +54,22 @@ public final class DeleteTask extends
         final List<File> filesAffected = new LinkedList<File>();
         
         if (files[0] instanceof CommandLineFile) {
-            
-            final List<Command> commands = new LinkedList<Command>();
-            
-            for (GenericFile file : files) {
-                commands.add(new Remove(false, file.toFile()));
-            }
-           
-            if (CommandLine.execute(commands)) {
-                for (GenericFile file : files) {
-                    filesAffected.add(file.toFile());
-                }
-            } else if (Settings.su) {
-                commands.clear();
-                for (GenericFile file : files) {
-                    commands.add(new Remove(true, file.toFile()));
-                }
-                if (CommandLine.execute(commands)) {
-                    for (GenericFile file : files) {
-                        filesAffected.add(file.toFile());
-                    }
+
+            final Shell shell = ShellHolder.getShell();
+            for (final GenericFile file : files) {
+                final File fileFile = file.toFile();
+                if (CommandLine.execute(shell, new Remove(fileFile))) {
+                    filesAffected.add(fileFile);
                 } else {
-                    result = new Exception("Can't delete selected files");
+                    result = new Exception("Can't delete some files");
                 }
-            } else {
-                result = new Exception("Can't delete selected files");
             }
         } else {
-            for (GenericFile file : files) {
+            for (final GenericFile file : files) {
                 if (file.delete()) {
                     filesAffected.add(file.toFile());
                 } else {
-                    result = new Exception("Can't delete " + file.getName());
+                    result = new Exception("Can't delete some files");
                 }
             }
         }

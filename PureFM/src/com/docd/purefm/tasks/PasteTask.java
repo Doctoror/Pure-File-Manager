@@ -15,6 +15,10 @@ import com.docd.purefm.R;
 import com.docd.purefm.browser.Browser;
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandLine;
+import com.docd.purefm.commandline.Copy;
+import com.docd.purefm.commandline.Move;
+import com.docd.purefm.commandline.Shell;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
@@ -119,27 +123,24 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
     
     private Exception processCommandLineFiles(GenericFile[] contents, GenericFile target, boolean isCut, List<File> filesCreated, List<File> filesDeleted) {
         Exception result = null;
-        final List<Command> commands = new LinkedList<Command>();
         final CommandLineFile[] cont = new CommandLineFile[contents.length];
         ArrayUtils.copyArrayAndCast(contents, cont);
         final CommandLineFile t = (CommandLineFile) target;
+        final Shell shell = ShellHolder.getShell();
         for (final CommandLineFile current : cont) {
-            commands.add(isCut ? current.getMoveCommand(t) :
-                    current.getCopyCommand(t));
-        }
-        if (CommandLine.execute(commands)) {
-            for (final GenericFile current : contents) {
+            final Command command = (isCut ? new Move(current, t) :
+                    new Copy(current, t));
+
+            final boolean res = CommandLine.execute(shell, command);
+            if (res) {
                 if (isCut) {
                     filesDeleted.add(current.toFile());
                 }
-                filesCreated.add(target.toFile());
-            }
-        } else {
-            if (isCut) {
-                result = new Exception("Failed to move selected files");
+                filesCreated.add(current.toFile());
             } else {
-                result = new Exception("Failed to copy selected files");
+                result = new Exception("Failed to move some files");
             }
+
         }
         return result;
     }
