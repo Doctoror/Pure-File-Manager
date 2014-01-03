@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
@@ -121,6 +122,8 @@ public final class BrowserActivity extends MonitoredActivity {
 
         this.drawerLayout = (DrawerLayout) this
                 .findViewById(R.id.drawer);
+        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+				GravityCompat.START);
         this.drawerLayout.setDrawerListener(new DrawerListener() {
 
             private boolean hadShowHomeAsUp;
