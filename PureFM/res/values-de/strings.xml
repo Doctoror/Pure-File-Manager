@@ -57,7 +57,7 @@
     <string name="preference_appearance">Ansicht</string>
     <string name="preference_show_hidden">Versteckte Dateien</string>
     <string name="preference_show_permissions">Berechtigungen</string>
-    <string name="preference_show_preview">Thumbnails</string>
+    <string name="preference_show_preview">Bildvorschau</string>
     <string name="preference_show_modified">Zuletzt geändert</string>
     <string name="preference_show_size">Größe</string>
     
