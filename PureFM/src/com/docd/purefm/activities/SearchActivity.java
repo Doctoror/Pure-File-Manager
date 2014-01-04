@@ -43,7 +43,7 @@ public final class SearchActivity extends MonitoredActivity {
     private String path;
     
     private int prevId;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

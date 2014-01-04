@@ -1,5 +1,9 @@
 package com.docd.purefm.commandline;
 
+import android.util.Log;
+
+import java.io.IOException;
+
 /**
  * ShellHolder holds shared Shell instance
  */
@@ -18,6 +22,13 @@ public final class ShellHolder {
      * @return shell shared Shell instance
      */
     public static synchronized Shell getShell() {
+        if (shell == null) {
+            try {
+                shell = ShellFactory.getShell();
+            } catch (IOException e) {
+                Log.w("getShell()", e);
+            }
+        }
         return shell;
     }
 }

@@ -8,9 +8,18 @@ import java.util.Map;
 
 public final class FileObserverCache {
 
+    private static FileObserverCache instance;
+
+    public static FileObserverCache getInstance() {
+        if (instance == null) {
+            instance = new FileObserverCache();
+        }
+        return instance;
+    }
+
     private final Map<String, WeakReference<MultiListenerFileObserver>> cache;
 
-    public FileObserverCache() {
+    private FileObserverCache() {
         this.cache = new HashMap<String, WeakReference<MultiListenerFileObserver>>();
     }
 

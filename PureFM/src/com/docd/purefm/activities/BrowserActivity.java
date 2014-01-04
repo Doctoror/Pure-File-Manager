@@ -28,10 +28,8 @@ import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
 import com.docd.purefm.browser.BrowserFragment;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
-import com.docd.purefm.commandline.Shell;
 import com.docd.purefm.commandline.ShellFactory;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
@@ -58,11 +56,8 @@ public final class BrowserActivity extends MonitoredActivity {
     private final Object currentlyDisplayedFragmentLock;
     private BrowserFragment currentlyDisplayedFragment;
 
-    public final FileObserverCache observerCache;
-
     public BrowserActivity() {
         this.currentlyDisplayedFragmentLock = new Object();
-        this.observerCache = new FileObserverCache();
         try {
             ShellHolder.setShell(ShellFactory.getShell());
         } catch (IOException e) {
@@ -80,7 +75,7 @@ public final class BrowserActivity extends MonitoredActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_browser);
         this.checkIntentAction(getIntent());
-        this.initActiobBar();
+        this.initActionBar();
         this.initView();
     }
 
@@ -100,7 +95,7 @@ public final class BrowserActivity extends MonitoredActivity {
         PreviewHolder.recycle();
     }
 
-    private void initActiobBar() {
+    private void initActionBar() {
         this.actionBar = this.getActionBar();
         this.actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_USE_LOGO);
@@ -169,20 +164,6 @@ public final class BrowserActivity extends MonitoredActivity {
                 Settings.getBookmarks(getApplicationContext())));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            final Shell shell =  ShellHolder.getShell();
-            if (shell != null) {
-                shell.close();
-            }
-        } catch (IOException e) {
-            Log.w("BrowserActivity", "");
-        }
-        ShellHolder.setShell(null);
-    }
-
     public void invalidateList() {
         this.pagerAdapter.notifyDataSetChanged();
     }
@@ -201,7 +182,7 @@ public final class BrowserActivity extends MonitoredActivity {
         }
     }
 
-    public OnNavigateListener getOnNavagationListener() {
+    public OnNavigateListener createOnNavigationListener() {
         return new OnNavigateListener() {
 
             private final File root = File.listRoots()[0];

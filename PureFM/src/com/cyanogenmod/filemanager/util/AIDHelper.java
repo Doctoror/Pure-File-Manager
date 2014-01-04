@@ -49,7 +49,7 @@ public final class AIDHelper {
      *
      * @param context The current context
      * @param force Force the reload of the AIDs
-     * @return SparseArray<AID> The array of {@link AID}
+     * @return SparseArray<String> The array of AIDs
      */
     public synchronized static SparseArray<String> getAIDs(Context context, boolean force) {
         if (sAids == null || force) {

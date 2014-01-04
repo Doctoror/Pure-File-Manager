@@ -162,7 +162,7 @@ public final class BrowserFragment extends Fragment {
 
         this.actionBar = this.browserActivity.getActionBar();
         this.title = this.browserActivity.getTitleView();
-        this.parentListener = this.browserActivity.getOnNavagationListener();
+        this.parentListener = this.browserActivity.createOnNavigationListener();
         if (this.isVisible() && this.isAdded() && this.isVisible) {
             this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
             this.title.setOnSequenceClickListener(this.sequenceListener);

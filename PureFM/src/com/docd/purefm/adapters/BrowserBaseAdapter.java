@@ -11,34 +11,52 @@ import android.app.Activity;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
+import android.os.FileObserver;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 
 import com.docd.purefm.R;
+import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.file.Permissions;
 import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.PreviewHolder;
 
-public abstract class BrowserBaseAdapter implements ListAdapter {
+public abstract class BrowserBaseAdapter implements ListAdapter,
+        MultiListenerFileObserver.OnEventListener {
+
+    private static final int OBSERVER_EVENTS =
+            FileObserver.DELETE_SELF |
+            FileObserver.ATTRIB |
+            FileObserver.MODIFY |
+            FileObserver.MOVED_TO;
+
+    private final Handler handler;
 
     private final DataSetObservable mDataSetObservable;
+    private final FileObserverCache observerCache;
     
-    protected final Activity context;
+    protected final Activity activity;
     protected final LayoutInflater inflater;
     protected final List<GenericFile> files;
+    protected final List<MultiListenerFileObserver> fileObservers;
     
     protected ExecutorService executor;
     protected FileSortType comparator;
 
-    protected BrowserBaseAdapter(Activity context) {
+    protected BrowserBaseAdapter(final Activity context) {
+        this.handler = new Handler();
         this.mDataSetObservable = new DataSetObservable();
-        this.context = context;
+        this.observerCache = FileObserverCache.getInstance();
+        this.activity = context;
         this.inflater = LayoutInflater.from(context);
         this.files = new ArrayList<GenericFile>();
+        this.fileObservers = new ArrayList<MultiListenerFileObserver>();
         this.comparator = FileSortType.NAME_ASC;
     }
     
@@ -48,22 +66,36 @@ public abstract class BrowserBaseAdapter implements ListAdapter {
         }
         this.executor = Executors.newSingleThreadExecutor();
         this.files.clear();
+        this.releaseObservers();
         if (data != null) {
             Arrays.sort(data, this.comparator.getComparator());
-            for (int i = 0; i < data.length; i++) {
-                this.files.add(data[i]);
+            for (final GenericFile file : data) {
+                this.files.add(file);
+                final MultiListenerFileObserver observer = this.observerCache
+                        .getOrCreate(file.getAbsolutePath(), OBSERVER_EVENTS);
+                observer.addOnEventListener(this);
+                observer.startWatching();
+                this.fileObservers.add(observer);
             }
         }
         this.notifyDataSetChanged();
     }
+
+    public void releaseObservers() {
+        for (final MultiListenerFileObserver observer : this.fileObservers) {
+            observer.removeOnEventListener(this);
+            observer.stopWatching();
+        }
+        this.fileObservers.clear();
+    }
     
-    public void addFile(GenericFile file) {
+    public void addFile(final GenericFile file) {
         this.files.add(file);
         Collections.sort(this.files, this.comparator.getComparator());
         this.notifyDataSetChanged();
     }
     
-    public void setCompareType(FileSortType comp) {
+    public void setCompareType(final FileSortType comp) {
         this.comparator = comp;
         Collections.sort(this.files, comp.getComparator());
         this.notifyDataSetChanged();
@@ -88,9 +120,6 @@ public abstract class BrowserBaseAdapter implements ListAdapter {
     public int getItemViewType(int pos) {
         return 0;
     }
-
-    @Override
-    public abstract View getView(int pos, View v, ViewGroup arg2);
 
     @Override
     public int getViewTypeCount() {
@@ -121,7 +150,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter {
      * Notifies the attached observers that the underlying data has been changed
      * and any View reflecting the data set should refresh itself.
      */
-    protected void notifyDataSetChanged() {
+    protected synchronized final void notifyDataSetChanged() {
         this.mDataSetObservable.notifyChanged();
     }
 
@@ -134,7 +163,49 @@ public abstract class BrowserBaseAdapter implements ListAdapter {
     public boolean isEnabled(int arg0) {
         return true;
     }
-    
+
+    @Override
+    public void onEvent(final int event, final String path) {
+        handler.removeCallbacks(this.notifyDataSetChangedRunnable);
+        switch (event & FileObserver.ALL_EVENTS) {
+            case FileObserver.ATTRIB:
+            case FileObserver.MODIFY:
+                final GenericFile target = FileFactory.newFile(path);
+                this.files.remove(target);
+                final int index = this.files.indexOf(target);
+                if (index != -1) {
+                    this.files.set(index, target);
+                } else {
+                    this.files.add(target);
+                    Collections.sort(this.files, this.comparator.getComparator());
+                }
+                break;
+
+            case FileObserver.DELETE_SELF:
+            case FileObserver.MOVED_TO:
+                final int filesSize = this.files.size();
+                for (int i = 0; i < filesSize; i++) {
+                    final GenericFile file = this.files.get(i);
+                    if (file.getAbsolutePath().equals(path)) {
+                        this.files.remove(i);
+                        break;
+                    }
+                }
+
+                final int observersSize = this.fileObservers.size();
+                for (int i = 0; i < observersSize; i++) {
+                    final MultiListenerFileObserver observer = this.fileObservers.get(i);
+                    if (observer.getPath().equals(path)) {
+                        observer.stopWatching();
+                        this.fileObservers.remove(i);
+                        break;
+                    }
+                }
+                break;
+        }
+        handler.post(this.notifyDataSetChangedRunnable);
+    }
+
     protected void applyOverlay(GenericFile f, ImageView overlay) {
         final Permissions p = f.getPermissions();
         
@@ -158,6 +229,13 @@ public abstract class BrowserBaseAdapter implements ListAdapter {
             }
         }
     }
+
+    private final Runnable notifyDataSetChangedRunnable = new Runnable() {
+        @Override
+        public void run() {
+            notifyDataSetChanged();
+        }
+    };
 
     protected final class Job
             implements Runnable
@@ -183,11 +261,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter {
             final Bitmap result = PreviewHolder.get(this.file.toFile());
             
             if (result != null && logo.getTag().equals(this.file)) {
-                context.runOnUiThread(new Runnable()
-                {
+                activity.runOnUiThread(new Runnable() {
                     @Override
-                    public void run()
-                    {
+                    public void run() {
                         logo.setImageBitmap(result);
                         overlay.setImageDrawable(null);
                     }

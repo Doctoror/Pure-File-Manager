@@ -503,6 +503,11 @@ public final class CommandLineFile implements GenericFile,
     }
 
     @Override
+    public int hashCode() {
+        return this.file.hashCode();
+    }
+
+    @Override
     public long getFreeSpace() {
         return this.file.getFreeSpace();
     }

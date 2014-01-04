@@ -21,10 +21,8 @@ import com.docd.purefm.utils.Cache;
 public final class Browser implements MultiListenerFileObserver.OnEventListener {
 
     private static final int OBSERVER_EVENTS = FileObserver.CREATE |
-            FileObserver.DELETE |
             FileObserver.DELETE_SELF |
             FileObserver.MOVED_TO |
-            FileObserver.MOVED_FROM |
             FileObserver.MOVE_SELF;
 
     private static Handler handler;
@@ -49,7 +47,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         if (handler == null) {
             handler = new Handler(activity.getMainLooper());
         }
-        this.observerCache = activity.observerCache;
+        this.observerCache = FileObserverCache.getInstance();
         this.history = new ArrayDeque<GenericFile>(15);
         this.root = File.listRoots()[0];
         final String home = Settings.getHomeDirectory(activity);
@@ -169,8 +167,6 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
             case FileObserver.MOVE_SELF:
             case FileObserver.CREATE:
-            case FileObserver.DELETE:
-            case FileObserver.MOVED_FROM:
             case FileObserver.MOVED_TO:
                 handler.removeCallbacks(lastRunnable);
                 handler.post(lastRunnable = new InvalidateRunnable(Browser.this));
