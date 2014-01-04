@@ -7,10 +7,11 @@ import android.text.Layout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
-public final class SequentalTextView extends TextView {
+public class SequentalTextView extends TextView {
 
     private static final String SEQUENCE_SEPARATOR = " > ";
     private static final String ROOT = "root";
@@ -45,7 +46,7 @@ public final class SequentalTextView extends TextView {
         super(context, attrs, defStyle);
     }
     
-    public void setFile(File path) {
+    public final void setFile(File path) {
         final String[] dirs = path.getPath().split(File.separator);
         final StringBuilder p = new StringBuilder(ROOT);
         for (int i = 1; i < dirs.length; i++) {
@@ -54,16 +55,20 @@ public final class SequentalTextView extends TextView {
         }
         this.setText(p.toString());
         if (this.parent == null) {
-            this.parent = (HorizontalScrollView) this.getParent();
+            final ViewParent parent = this.getParent();
+            if (parent == null || !(parent instanceof HorizontalScrollView)) {
+                throw new RuntimeException("SequentalTextView must have HorizontalScrollView parent");
+            }
+            this.parent = (HorizontalScrollView) parent;
         }
         this.parent.postDelayed(SCROLL_RIGHT, 100L);
     }
     
-    public void setOnSequenceClickListener(OnSequenceClickListener l) {
+    public final void setOnSequenceClickListener(OnSequenceClickListener l) {
         this.listener = l;
     }
     
-    public void fullScrollRight() {
+    public final void fullScrollRight() {
         this.parent.fullScroll(View.FOCUS_RIGHT);
     }
     
@@ -89,7 +94,11 @@ public final class SequentalTextView extends TextView {
     }
     
     private void fireListenerEvent(final int offset) {
-        final String[] parts = this.getText().toString().split(SEQUENCE_SEPARATOR);
+        final CharSequence text = this.getText();
+        if (text == null) {
+            throw new IllegalStateException("fireListenerEvent called, but text is not set");
+        }
+        final String[] parts = text.toString().split(SEQUENCE_SEPARATOR);
         int length = ROOT.length() + SEQUENCE_SEPARATOR.length() - 2;
         final StringBuilder path = new StringBuilder();
         path.append(File.separatorChar);
