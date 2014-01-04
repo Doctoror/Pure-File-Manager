@@ -267,7 +267,6 @@ public final class BrowserFragment extends Fragment {
     }
 
     private void onFirstInvalidate() {
-        this.actionModeController.setBrowser(this.browser);
         this.actionModeController.setListView(this.list);
         this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
         this.browser.invalidate();

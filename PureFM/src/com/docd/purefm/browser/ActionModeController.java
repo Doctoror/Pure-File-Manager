@@ -27,12 +27,11 @@ public final class ActionModeController {
     private final MultiChoiceModeListener multiChoiceListener;
     
     private final Activity activity;
-    private Browser browser;
     private AbsListView list;
 
     private ActionMode mode;
 
-    protected ActionModeController(final Activity activity) {
+    public ActionModeController(final Activity activity) {
         this.activity = activity;
         this.multiChoiceListener = new MultiChoiceListener();
     }
@@ -43,14 +42,7 @@ public final class ActionModeController {
         }
     }
     
-    protected void setBrowser(Browser browser) {
-        if (this.mode != null) {
-            this.mode.finish();
-        }
-        this.browser = browser;
-    }
-    
-    protected void setListView(AbsListView list) {
+    public void setListView(AbsListView list) {
         if (this.mode != null) {
             this.mode.finish();
         }
@@ -99,8 +91,7 @@ public final class ActionModeController {
                     if (items.get(key)) {
                         final DialogFragment rename = RenameFileDialog
                                 .instantiate(mode, (GenericFile) list
-                                        .getAdapter().getItem(key),
-                                        browser.getPath().toFile());
+                                        .getAdapter().getItem(key));
                         rename.show(activity.getFragmentManager(),
                                 BrowserActivity.TAG_DIALOG);
                         return true;

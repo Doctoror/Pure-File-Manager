@@ -28,14 +28,12 @@ public final class RenameFileDialog extends DialogFragment {
      * 
      * @param f File to rename
      * @param mode Current ActionMode instance
-     * @param currentDir Current directory
      * @return Dialog for renaming the file
      */
-    public static DialogFragment instantiate(ActionMode mode, GenericFile f, File currentDir) {
+    public static DialogFragment instantiate(ActionMode mode, GenericFile f) {
         final Bundle extras = new Bundle();
         extras.putSerializable(Extras.EXTRA_FILE, f);
-        extras.putSerializable(Extras.EXTRA_CURRENT_DIR, currentDir);
-        
+
         final RenameFileDialog rd = new RenameFileDialog();
         rd.setArguments(extras);
         rd.mode = mode;
@@ -45,8 +43,7 @@ public final class RenameFileDialog extends DialogFragment {
     private ActionMode mode;
     
     private GenericFile file;
-    private File currentDir;
-    
+
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -55,7 +52,6 @@ public final class RenameFileDialog extends DialogFragment {
             throw new RuntimeException("Arguments must be supplied!");
         }
         this.file = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
-        this.currentDir = (File) args.getSerializable(Extras.EXTRA_CURRENT_DIR);
     }
     
     @Override
@@ -86,7 +82,8 @@ public final class RenameFileDialog extends DialogFragment {
                 if (newNameField != null && PureFMFileUtils.isValidFileName(
                         newName = newNameField.toString())) {
 
-                    final File target = new File(currentDir, newName);
+                    final GenericFile fileDir = file.getParentFile();
+                    final File target = new File(fileDir.toFile(), newName);
                     final File source = file.toFile();
                     if (file.renameTo(target)) {
                         final List<File> filesCreated = new ArrayList<File>(1);

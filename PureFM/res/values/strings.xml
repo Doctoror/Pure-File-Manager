@@ -158,7 +158,7 @@
     <string name="used">Used:</string>
     
     <!-- Search -->
-    <string name="search_denied_message">The following locations require root access. Would you like to search there?</string>
+    <string name="search_denied_message">Access denied for the following locations</string>
     
     <!-- Quit Dialog -->
     <string name="dialog_quit_message">Do you want to quit?</string>

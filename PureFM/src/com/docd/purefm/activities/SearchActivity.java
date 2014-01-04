@@ -8,6 +8,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
+import com.docd.purefm.browser.ActionModeController;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.CancelableTask;
@@ -29,6 +30,8 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 public final class SearchActivity extends MonitoredActivity {
+
+    private ActionModeController actionModeController;
 
     private AbsListView list;
     private BrowserBaseAdapter adapter;
@@ -92,6 +95,8 @@ public final class SearchActivity extends MonitoredActivity {
                 ActionBar.DISPLAY_SHOW_CUSTOM |
                 ActionBar.DISPLAY_USE_LOGO);
         bar.setCustomView(action);
+
+        this.actionModeController = new ActionModeController(this);
     }
     
     private void initView() {
@@ -123,6 +128,7 @@ public final class SearchActivity extends MonitoredActivity {
             searchTask.cancel();
         }
         this.buildSearchTask(false);
+        adapter.updateData(new GenericFile[0]);
         searchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text, path);
     }
     
@@ -134,36 +140,20 @@ public final class SearchActivity extends MonitoredActivity {
         this.progress.setVisibility(View.INVISIBLE);
         if (this.searchTask instanceof SearchCommandLineTask) {
             final List<String> denied = ((SearchCommandLineTask) this.searchTask).getDeniedLocations();
-            final String query = ((SearchCommandLineTask) this.searchTask).getSearchedQuery();
             if (!denied.isEmpty()) {
-                if (Settings.su) {
-                    final AlertDialog.Builder b = new AlertDialog.Builder(this);
-                    final StringBuilder message = new StringBuilder(getString(R.string.search_denied_message));
-                    for (int i = 0; i < denied.size(); i++) {
-                        message.append('\n').append(denied.get(i));
-                    }
-                    b.setMessage(message.toString());
-                    b.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            buildSearchTask(true);
-                            final String[] params = new String[denied.size() + 1];
-                            params[0] = query;
-                            for (int i = 0; i < params.length - 1; i++) {
-                                params[i + 1] = denied.get(i);
-                            }
-                            searchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
-                        }
-                    });
-                    b.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    b.create().show();
+                final AlertDialog.Builder b = new AlertDialog.Builder(this);
+                final StringBuilder message = new StringBuilder(getString(R.string.search_denied_message));
+                for (final String deniedItem : denied) {
+                    message.append('\n').append(deniedItem);
                 }
+                b.setMessage(message.toString());
+                b.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                b.create().show();
             }
         }
     }
@@ -199,6 +189,8 @@ public final class SearchActivity extends MonitoredActivity {
         this.list.setAdapter(this.adapter);
         this.list.getEmptyView().setVisibility(View.GONE);
         this.list.setVisibility(View.GONE);
+
+        this.actionModeController.setListView(this.list);
 
         this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
