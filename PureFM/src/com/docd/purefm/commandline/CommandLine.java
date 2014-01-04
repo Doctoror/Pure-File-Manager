@@ -78,7 +78,6 @@ public final class CommandLine {
         String line;
         while ((line = reader.readLine()) != null && !line.equals(terminationLine)) {
             target.add(line);
-            System.out.println("Read: " + line);
         }
         final String errorCode = reader.readLine();
         try {
