@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PureFM</string>
+    
+    <string name="root">root</string>
+    <string name="empty">Empty</string>
+    <string name="minus">-</string>
+    
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="close">Schließen</string>
+    
+    <string name="remove">Entfernen</string>
+    <string name="search_files">Dateien Suchen</string>
+    <string name="no_results">Keine Ergebnisse</string>
+    
+    <string name="rename">Umbenennen</string>
+    <string name="new_name">Neuer Name</string>
+    
+    <string name="no_apps_to_open">Keine App zum öffnen dieser Datei vorhanden</string>
+    <string name="could_not_open_file_">Datei konnte nicht geöffnet werden:u0020</string>
+    
+    <string name="menu_refresh">Neu Laden</string>
+    <string name="menu_partition">Speicher Info</string>
+    <string name="menu_search">Suchen</string>
+    <string name="menu_bookmarks">Lesezeichen</string>
+    <string name="menu_bookmarks_new">Aktuellen Pfad hinzufügen</string>
+    <string name="menu_new_file">Neue Datei</string>
+    <string name="menu_new_folder">Neuer Ordner</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_paste">Einfügen</string>
+    <string name="menu_view_as_list">Zeige als Liste</string>
+    <string name="menu_view_as_grid">Zeige als Raster</string>
+    <string name="menu_sort">Sortieren</string>
+    <string name="menu_sort_by_name_asc">Name aufsteigend</string>
+    <string name="menu_sort_by_name_desc">Name absteigend</string>
+    <string name="menu_sort_by_type_asc">Typ aufsteigend</string>
+    <string name="menu_sort_by_type_desc">Typ absteigend</string>
+    <string name="menu_sort_by_date_asc">Datum aufsteigend</string>
+    <string name="menu_sort_by_date_desc">Datum absteigend</string>
+    <string name="menu_sort_by_size_asc">Größe aufsteigend</string>
+    <string name="menu_sort_by_size_desc">Größe absteigend</string>
+    
+    <string name="menu_delete">Löschen</string>
+    <string name="menu_rename">Umbenennen</string>
+    <string name="menu_cut">Entfernen</string>
+    <string name="menu_copy">Kopieren</string>
+    <string name="menu_properties">Eigenschaften</string>
+    
+    <string name="menu_select_all">Alle auswählen</string>
+    
+    <string name="_selected">\u0020ausgewählt</string>
+    
+    <!-- Preferences -->
+    <string name="preference_category_view">Aussehen</string>
+    <string name="preference_appearance">Ansicht</string>
+    <string name="preference_show_hidden">Versteckte Dateien</string>
+    <string name="preference_show_permissions">Berechtigungen</string>
+    <string name="preference_show_preview">Bildvorschau</string>
+    <string name="preference_show_modified">Zuletzt geändert</string>
+    <string name="preference_show_size">Größe</string>
+    
+    <string name="preference_category_performance">Erweitert</string>
+    <string name="preference_use_commandline">Verwende Busybox</string>
+    <string name="preference_allow_root">Root-Zugriff erlauben</string>
+    
+    <string name="preference_category_startup">Startoptionen</string>
+    <string name="preference_home_directory">Startordner</string>
+    
+    <!-- Units -->
+<!--     <string name="unit_bytes">B</string> -->
+<!--     <string name="unit_kib">KiB</string> -->
+<!--     <string name="unit_mib">MiB</string> -->
+<!--     <string name="unit_gib">GiB</string> -->
+    
+    <!-- New File / Directory -->
+    <string name="name_empty">Namensfeld ist leer</string>
+    <string name="invalid_filename">Kein gültiger Name</string>
+    <string name="file_exists">Datei existiert bereits</string>
+    <string name="could_not_create_dir">Ordner konnte nicht erstellt werden</string>
+    <string name="could_not_create_file">Datei konnte nicht erstellt werden</string>
+    <string name="dialog_new_folder_title">Neuen Ordner erstellen</string>
+    <string name="dialog_new_file_title">Neue Datei erstellen</string>
+    <string name="create">Erstellen</string>
+    <string name="cancel">Abbrechen</string>
+    
+    <!-- New Bookmark -->
+    <string name="bookmark_added">Lesezeichen hinzugfügt</string>
+    <string name="bookmark_exists">Lesezeichen existiert bereits</string>
+    <string name="bookmark_not_added">Lesezeichen konnte nicht hinzugefügt werden</string>
+    
+    <!-- Progress -->
+    <string name="progress_deleting_files">Lösche Datei(en)</string>
+<!--     <string name="progress_deleted">Deleted\u0020</string> -->
+    <string name="_files">\u0020Datei(en)</string>
+<!--     <string name="_dirs">\u0020directories(s)</string> -->
+    
+    <string name="progress_moving">Verschiebe\u0020</string>
+    <string name="progress_copying">Kopiere\u0020</string>
+    
+    <!-- Copy / Cut -->
+    <string name="cut_">Entferne\u0020</string>
+    <string name="copied_">Kopiert\u0020</string>
+<!--     <string name="moved_">Moved\u0020</string> -->
+<!--     <string name="pasted_">Pasted\u0020</string> -->
+<!--     <string name="error_copying_file">Error copying file:\u0020</string> -->
+<!--     <string name="error_moving_file">Error moving file:\u0020</string> -->
+    
+    <string name="dialog_overwrite_title">Zieldatei existiert bereits</string>
+    <string name="dialog_overwrite_message">Diese Aktion überschreibt das Ziel</string>
+    <string name="dialog_overwrite_source">Quelle</string>
+    <string name="dialog_overwrite_destination">Ziel</string>
+    <string name="dialog_overwrite_abort">Abbrechen</string>
+    <string name="dialog_overwrite_skip">Überspringen</string>
+    <string name="dialog_overwrite_skip_all">Alle überspringen</string>
+    <string name="dialog_overwrite_replace">Ersetzen</string>
+    <string name="dialog_overwrite_replace_all">Alle ersetzen</string>
+    
+    <!-- Delete -->
+    <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>
+    
+    <!-- Permissions -->
+<!--     <string name="apply">Apply</string> -->
+    <string name="applying_failed">Anwenden gescheitert</string>
+    <string name="permissions_changed">Berechtigung geändert</string>
+<!--     <string name="cannot_set_msdos">Cannot change permissions on this file system</string> -->
+<!--     <string name="cannot_set_permissions_java">Can only set permissions in busybox mode</string> -->
+    
+    <string name="owner">Besitzer:</string>
+    <string name="group">Gruppe:</string>
+    <string name="others">Andere:</string>
+    
+    <string name="read">Lesen</string>
+    <string name="write">Schreiben</string>
+    <string name="execute">Ausführen</string>
+    
+    <!-- Properties -->
+    <string name="info">Info</string>
+    <string name="permissions">Berechtigung</string>
+    
+    <string name="name">Name:</string>
+    <string name="type">Typ:</string>
+    <string name="mime">Art:</string>
+    <string name="size">Größe:</string>
+    <string name="modified">Geändert:</string>
+    
+    <string name="type_file">Datei</string>
+    <string name="type_directory">Ordner</string>
+    <string name="type_symlink">Symlink</string>
+    
+    <string name="location">Ort:</string>
+    <string name="filesystem">Dateisystem:</string>
+    <string name="total">Gesamtspeicher:</string>
+    <string name="free">Freier Speicher:</string>
+    <string name="available">Verfügbarer Speicher:</string>
+    <string name="block_size">Block Größe:</string>
+    <string name="used">Verwendet:</string>
+    
+    <!-- Search -->
+    <string name="search_denied_message">Die folgende Ordner benötigen Root-Zugriff. Möchten sie dort suchen?</string>
+    
+    <!-- Quit Dialog -->
+    <string name="dialog_quit_message">Anwendung schließen?</string>
+
+</resources>

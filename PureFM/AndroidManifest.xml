@@ -41,12 +41,6 @@
         </activity>
         
         <activity
-            android:name="com.docd.purefm.activities.BookmarksActivity"
-            android:label="@string/menu_bookmarks"
-            android:logo="@drawable/action_bookmarks"
-            android:configChanges="orientation|screenSize"/>
-        
-        <activity
             android:name="com.docd.purefm.activities.SearchActivity"
             android:label="@string/menu_search"
             android:logo="@drawable/action_search"
