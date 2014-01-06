@@ -58,7 +58,6 @@ public final class CommandLineFile implements GenericFile,
     
     private boolean isSymlink;
     private boolean isDirectory;
-    private boolean isMSDOS;
 
     private CommandLineFile(File file) {
         this.file = file;
@@ -106,69 +105,27 @@ public final class CommandLineFile implements GenericFile,
     public static CommandLineFile fromLSL(File parent, String line) {
 
         if (line.isEmpty()) {
-            throw new IllegalArgumentException("Bad ls -lApe output");
+            throw new IllegalArgumentException("Bad ls -lApe output: is empty");
         }
 
-        final String[] attr = getAttrs(line);
-        for (int i = 0; i < attr.length; i++) {
-            if (attr[i] == null) {
-                throw new IllegalArgumentException("Bad ls -lApe output");
+        final String[] attrs = getAttrs(line);
+        for (final String attr : attrs) {
+            if (attr == null) {
+                throw new IllegalArgumentException("Bad ls -lApe output: attr was null");
             }
         }
 
-        String name = attr[LS_FILE];
-        String target = null;
+        String name = attrs[LS_FILE];
+        // if is symlink then resolve real path
+        //String targetName = null;
         final int index = name.indexOf("->");
         if (index != -1) {
-            target = name.substring(index + 3).trim();
+            //targetName = name.substring(index + 3).trim();
             name = name.substring(0, index).trim();
         }
         final CommandLineFile f = parent == null ? new CommandLineFile(name)
                 : new CommandLineFile(parent, name);
-        final String perm = attr[LS_PERMISSIONS];
-        f.isSymlink = perm.charAt(0) == 'l';
-        if (target == null) {
-            f.isDirectory = perm.charAt(0) == 'd';
-        } else {
-            f.isDirectory = target.endsWith("/");
-        }
-
-        f.p = new Permissions(perm);
-        f.owner = Integer.parseInt(attr[LS_USER]);
-        f.group = Integer.parseInt(attr[LS_GROUP]);
-        final String len = attr[LS_FILE_SIZE];
-        if (len != null && !len.isEmpty()) {
-            f.length = Long.parseLong(len);
-            f.readableLength = FileUtils.byteCountToDisplaySize(f.length);
-        }
-
-        final Calendar c = Calendar.getInstance(Locale.US);
-        c.set(Calendar.YEAR, Integer.parseInt(attr[LS_YEAR]));
-        c.set(Calendar.MONTH, TextUtil.stringMonthToInt(attr[LS_MONTH]));
-        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(attr[LS_DAY_OF_MONTH]));
-
-        final int index1 = attr[LS_TIME].indexOf(':');
-        final int index2 = attr[LS_TIME].lastIndexOf(':');
-        if (index1 != -1 && index2 != -1) {
-            c.set(Calendar.HOUR_OF_DAY,
-                    Integer.parseInt(attr[LS_TIME].substring(0, index1)));
-            c.set(Calendar.MINUTE,
-                    Integer.parseInt(attr[LS_TIME].substring(index1 + 1, index2)));
-            c.set(Calendar.SECOND,
-                    Integer.parseInt(attr[LS_TIME].substring(index2 + 1)));
-        }
-
-        f.lastmod = c.getTimeInMillis();
-        f.readableLastMod = TextUtil.readableDate(f.lastmod);
-        f.exists = true;
-        if (!f.isDirectory) {
-            f.mimeType = MimeTypes.getMimeType(f.file);
-            f.icon = MimeTypes.getTypeIcon(f.file);
-        }
-        
-        //final String res = CommandLineUtils.getFSType(ShellHolder.getShell(), f.file);
-        //f.isMSDOS = res.equals("msdos") || res.equals("vfat");
-        Cache.addTo(f);
+        init(f, line);
         return f;
     }
 
@@ -206,54 +163,71 @@ public final class CommandLineFile implements GenericFile,
         return results;
     }
 
-    private boolean init(String line) {
-        final String[] attr = getAttrs(line);
-        for (int i = 0; i < attr.length; i++) {
-            if (attr[i] == null) {
-                return false;
+    /**
+     * Reads parameters from line and applies them to targetFile
+     *
+     * @param targetFile CommandLineFile to initialize
+     * @param line ls -lApe output
+     */
+    private static void init(final CommandLineFile targetFile, final String line) {
+        if (line.isEmpty()) {
+            throw new IllegalArgumentException("Bad ls -lApe output: is empty");
+        }
+        final String[] attrs = getAttrs(line);
+        for (final String attr : attrs) {
+            if (attr == null) {
+                throw new IllegalArgumentException("Bad ls -lApe output: attr was null");
             }
         }
 
-        final String perm = attr[LS_PERMISSIONS];
-        this.isSymlink = perm.charAt(0) == 'l';
-        this.isDirectory = perm.charAt(0) == 'd';
+        init(targetFile, getAttrs(line));
+    }
 
-        this.p = new Permissions(perm);
-        this.owner = Integer.parseInt(attr[LS_USER]);
-        this.group = Integer.parseInt(attr[LS_GROUP]);
-        final String len = attr[LS_FILE_SIZE];
+    /**
+     * Applies attrs to targetFile
+     *
+     * @param targetFile CommandLineFile to initialize
+     * @param attrs Attributes read from ls -lApe output
+     */
+    private static void init(final CommandLineFile targetFile, String[] attrs) {
+        final String sourceName = attrs[LS_FILE];
+        final String perm = attrs[LS_PERMISSIONS];
+        targetFile.isSymlink = perm.charAt(0) == 'l';
+        targetFile.isDirectory = sourceName.endsWith(File.separator);
+
+        targetFile.p = new Permissions(perm);
+        targetFile.owner = Integer.parseInt(attrs[LS_USER]);
+        targetFile.group = Integer.parseInt(attrs[LS_GROUP]);
+        final String len = attrs[LS_FILE_SIZE];
         if (len != null && !len.isEmpty()) {
-            this.length = Long.parseLong(len);
-            this.readableLength = FileUtils.byteCountToDisplaySize(this.length);
+            targetFile.length = Long.parseLong(len);
+            targetFile.readableLength = FileUtils.byteCountToDisplaySize(targetFile.length);
         }
 
         final Calendar c = Calendar.getInstance(Locale.US);
-        c.set(Calendar.YEAR, Integer.parseInt(attr[LS_YEAR]));
-        c.set(Calendar.MONTH, TextUtil.stringMonthToInt(attr[LS_MONTH]));
-        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(attr[LS_DAY_OF_MONTH]));
+        c.set(Calendar.YEAR, Integer.parseInt(attrs[LS_YEAR]));
+        c.set(Calendar.MONTH, TextUtil.stringMonthToInt(attrs[LS_MONTH]));
+        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(attrs[LS_DAY_OF_MONTH]));
 
-        final int index1 = attr[LS_TIME].indexOf(':');
-        final int index2 = attr[LS_TIME].lastIndexOf(':');
+        final int index1 = attrs[LS_TIME].indexOf(':');
+        final int index2 = attrs[LS_TIME].lastIndexOf(':');
         if (index1 != -1 && index2 != -1) {
             c.set(Calendar.HOUR_OF_DAY,
-                    Integer.parseInt(attr[LS_TIME].substring(0, index1)));
+                    Integer.parseInt(attrs[LS_TIME].substring(0, index1)));
             c.set(Calendar.MINUTE,
-                    Integer.parseInt(attr[LS_TIME].substring(index1 + 1, index2)));
+                    Integer.parseInt(attrs[LS_TIME].substring(index1 + 1, index2)));
             c.set(Calendar.SECOND,
-                    Integer.parseInt(attr[LS_TIME].substring(index2 + 1)));
+                    Integer.parseInt(attrs[LS_TIME].substring(index2 + 1)));
         }
 
-        this.lastmod = c.getTimeInMillis();
-        this.readableLastMod = TextUtil.readableDate(this.lastmod);
-        this.exists = true;
-        if (!this.isDirectory) {
-            this.mimeType = MimeTypes.getMimeType(this.file);
-            this.icon = MimeTypes.getTypeIcon(this.file);
+        targetFile.lastmod = c.getTimeInMillis();
+        targetFile.readableLastMod = TextUtil.readableDate(targetFile.lastmod);
+        targetFile.exists = true;
+        if (!targetFile.isDirectory) {
+            targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);
+            targetFile.icon = MimeTypes.getTypeIcon(targetFile.file);
         }
-        //final String res = CommandLineUtils.getFSType(ShellHolder.getShell(), this.file);
-        //this.isMSDOS = res.equals("msdos") || res.equals("vfat");
-        Cache.addTo(this);
-        return true;
+        Cache.addTo(targetFile);
     }
 
     @Override
@@ -430,11 +404,11 @@ public final class CommandLineFile implements GenericFile,
         }
 
         final String res = CommandLineUtils.touch(ShellHolder.getShell(), this);
-        System.out.println("touch: " + res);
         if (res == null) {
             return false;
         }
-        return this.init(res);
+        init(this, res);
+        return true;
     }
 
     @Override
@@ -443,7 +417,8 @@ public final class CommandLineFile implements GenericFile,
         if (res == null) {
             return false;
         }
-        return this.init(res);
+        init(this, res);
+        return true;
     }
 
     @Override
@@ -452,7 +427,8 @@ public final class CommandLineFile implements GenericFile,
         if (res == null) {
             return false;
         }
-        return this.init(res);
+        init(this, res);
+        return true;
     }
 
     /**
@@ -568,7 +544,7 @@ public final class CommandLineFile implements GenericFile,
     }
 
     @Override
-    public boolean copy(GenericFile target) {
+    public boolean copy(final GenericFile target) {
         if (!this.exists) {
             return false;
         }
@@ -577,7 +553,7 @@ public final class CommandLineFile implements GenericFile,
     }
 
     @Override
-    public boolean move(GenericFile target) {
+    public boolean move(final GenericFile target) {
         if (!this.exists) {
             return false;
         }
@@ -601,10 +577,6 @@ public final class CommandLineFile implements GenericFile,
     public int getGroup() {
         return this.group;
     }
-    
-    //public boolean isMSMDOS() {
-    //    return this.isMSDOS;
-    //}
 
     public boolean canRead() {
         if (!this.exists) {

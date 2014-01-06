@@ -2,6 +2,7 @@ package com.docd.purefm.utils;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
@@ -364,10 +365,11 @@ public final class MimeTypes {
         String type = null;
         final String extension = FilenameUtils.getExtension(file.getName());
         if (extension != null && !extension.isEmpty()) {
+            final String extensionLowerCase = extension.toLowerCase(Locale.US);
             final MimeTypeMap mime = MimeTypeMap.getSingleton();
-            type = mime.getMimeTypeFromExtension(extension);
+            type = mime.getMimeTypeFromExtension(extensionLowerCase);
             if (type == null) {
-                type = MIME_TYPES.get(extension);
+                type = MIME_TYPES.get(extensionLowerCase);
             }
         }
         return type;
