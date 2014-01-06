@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">PureFM</string>
-    
     <string name="root">root</string>
     <string name="empty">Empty</string>
-    <string name="minus">-</string>
-    
+
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="close">Schließen</string>
@@ -159,7 +156,7 @@
     
     <!-- Search -->
     <!-- TODO Obsolete. Needs updating. Refer to default string.xml -->
-    <!--<string name="search_denied_message">Die folgende Ordner benötigen Root-Zugriff. Möchten sie dort suchen?</string>-->
+    <string name="search_denied_message">Die folgende Ordner benötigen Root-Zugriff.</string>
     
     <!-- Quit Dialog -->
     <string name="dialog_quit_message">Anwendung schließen?</string>

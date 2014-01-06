@@ -181,11 +181,11 @@ public final class BrowserFragment extends Fragment {
             if (Settings.appearance == Settings.APPEARANCE_LIST) {
                 content.setIcon(R.drawable.action_view_as_grid)
                         .setTitle(R.string.menu_view_as_grid)
-                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             } else {
                 content.setIcon(R.drawable.action_view_as_list)
                         .setTitle(R.string.menu_view_as_list)
-                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
 
             if (ClipBoard.isEmpty()) {

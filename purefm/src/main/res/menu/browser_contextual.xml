@@ -17,13 +17,13 @@
         android:id="@android:id/edit"
         android:icon="@drawable/action_edit"
         android:title="@string/menu_rename"
-        android:showAsAction="always"/>
+        android:showAsAction="ifRoom"/>
     
     <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/action_remove"
         android:title="@string/menu_delete"
-        android:showAsAction="always"/>
+        android:showAsAction="ifRoom"/>
     
     <item
         android:id="@+id/properties"

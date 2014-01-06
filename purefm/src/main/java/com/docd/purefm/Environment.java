@@ -28,8 +28,8 @@ public final class Environment {
     
     public static String busybox;
     
-    static void init(final PureFM pureFM) {
-        context = pureFM;
+    public static void init(final Context context1) {
+        context = context1;
         busybox = getUtilPath("busybox");
         if (busybox == null) {
             busybox = getUtilPath("busybox-ba");

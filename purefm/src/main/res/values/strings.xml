@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">PureFM</string>
+    <string translatable="false" name="app_name">Pure File Manager</string>
     
     <string name="root">root</string>
     <string name="empty">Empty</string>
-    <string name="minus">-</string>
+    <string translatable="false" name="minus">-</string>
     
     <string name="yes">Yes</string>
     <string name="no">No</string>

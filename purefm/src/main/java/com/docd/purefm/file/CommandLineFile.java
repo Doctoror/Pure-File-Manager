@@ -53,8 +53,8 @@ public final class CommandLineFile implements GenericFile,
     private int icon;
     
     private String mimeType;
-    private String readableLength;
-    private String readableLastMod;
+    private String humanReadableLength;
+    private String humanReadableLastMod;
     
     private boolean isSymlink;
     private boolean isDirectory;
@@ -69,10 +69,6 @@ public final class CommandLineFile implements GenericFile,
 
     private CommandLineFile(File parent, String line) {
         this.file = new File(parent, line);
-    }
-
-    public void setFileSize(long size) {
-        this.length = size;
     }
 
     @Override
@@ -201,7 +197,7 @@ public final class CommandLineFile implements GenericFile,
         final String len = attrs[LS_FILE_SIZE];
         if (len != null && !len.isEmpty()) {
             targetFile.length = Long.parseLong(len);
-            targetFile.readableLength = FileUtils.byteCountToDisplaySize(targetFile.length);
+            targetFile.humanReadableLength = FileUtils.byteCountToDisplaySize(targetFile.length);
         }
 
         final Calendar c = Calendar.getInstance(Locale.US);
@@ -221,7 +217,7 @@ public final class CommandLineFile implements GenericFile,
         }
 
         targetFile.lastmod = c.getTimeInMillis();
-        targetFile.readableLastMod = TextUtil.readableDate(targetFile.lastmod);
+        targetFile.humanReadableLastMod = TextUtil.readableDate(targetFile.lastmod);
         targetFile.exists = true;
         if (!targetFile.isDirectory) {
             targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);
@@ -384,7 +380,7 @@ public final class CommandLineFile implements GenericFile,
     
     @Override
     public String readableLength() {
-        return this.readableLength;
+        return this.humanReadableLength;
     }
 
     @Override
@@ -394,7 +390,7 @@ public final class CommandLineFile implements GenericFile,
     
     @Override
     public String readableLastModified() {
-        return this.readableLastMod;
+        return this.humanReadableLastMod;
     }
 
     @Override

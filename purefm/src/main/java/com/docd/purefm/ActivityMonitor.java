@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Application;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -40,7 +40,7 @@ public final class ActivityMonitor
         listeners.remove(l);
     }
     
-    public static void init(final Application context) {
+    public static void init(final Context context) {
         handler = new Handler();
         new LooperThread().start();
     }
