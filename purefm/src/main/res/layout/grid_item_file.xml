@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?android:attr/activatedBackgroundIndicator" >
+
+    <com.docd.purefm.view.SquareImageView
+        android:id="@android:id/icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop"/>
+    
+    <ImageView
+        android:id="@android:id/icon1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignLeft="@android:id/icon"
+        android:layout_alignRight="@android:id/icon"
+        android:layout_alignTop="@android:id/icon"
+        android:layout_alignBottom="@android:id/icon"
+        android:visibility="invisible"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textIsSelectable="false"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@android:id/icon"
+        android:gravity="top|center_horizontal"
+        android:maxLines="2"
+        android:lines="2"
+        android:ellipsize="end"
+        android:textSize="12sp"
+        android:textColor="#454545"/>
+
+</RelativeLayout>

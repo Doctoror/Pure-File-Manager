@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@android:id/input"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:singleLine="true"
+        android:inputType="textNoSuggestions"
+        android:imeOptions="actionSearch"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/search"
+        android:layout_alignTop="@+id/search"
+        android:layout_alignBottom="@+id/search"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+    
+    <ImageButton
+        android:id="@+id/search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/action_search"
+        android:contentDescription="@string/menu_search"
+        style="?android:attr/actionButtonStyle" />
+    
+    <ViewStub
+        android:id="@android:id/list"
+        android:inflatedId="@android:id/list"
+        android:layout="@layout/browser_listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@android:id/input"
+        android:layout_alignParentBottom="true"
+    	android:saveEnabled="false"/>
+    
+    <ViewStub
+        android:id="@+id/grid"
+        android:inflatedId="@+id/grid"
+        android:layout="@layout/browser_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@android:id/input"
+        android:layout_alignParentBottom="true"
+    	android:saveEnabled="false"/>
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        android:text="@string/no_results"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</RelativeLayout>

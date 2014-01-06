@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@android:id/paste"
+        android:icon="@drawable/action_paste"
+        android:showAsAction="always"
+        android:title="@string/menu_paste"/>
+    
+    <item
+        android:id="@+id/refresh"
+        android:icon="@drawable/action_refresh"
+        android:showAsAction="always"
+        android:title="@string/menu_refresh"/>
+    
+    <item
+        android:id="@android:id/content"
+        android:showAsAction="ifRoom"
+        android:title=""/>
+    
+    <item
+        android:icon="@drawable/action_sort"
+        android:title="@string/menu_sort"
+        android:showAsAction="ifRoom">
+        
+        <menu>
+        
+        	<item
+        		android:id="@+id/menu_sort_name_asc"
+        		android:title="@string/menu_sort_by_name_asc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_name_desc"
+        		android:title="@string/menu_sort_by_name_desc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_type_asc"
+        		android:title="@string/menu_sort_by_type_asc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_type_desc"
+        		android:title="@string/menu_sort_by_type_desc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_date_asc"
+        		android:title="@string/menu_sort_by_date_asc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_date_desc"
+        		android:title="@string/menu_sort_by_date_desc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_size_asc"
+        		android:title="@string/menu_sort_by_size_asc"
+        		android:showAsAction="never"/>
+        
+        	<item
+        		android:id="@+id/menu_sort_size_desc"
+        		android:title="@string/menu_sort_by_size_desc"
+        		android:showAsAction="never"/>
+        </menu>
+    </item>
+    
+    <item
+        android:id="@+id/menu_search"
+        android:icon="@drawable/action_search"
+        android:title="@string/menu_search"
+        android:showAsAction="ifRoom"/>
+	
+	<item
+        android:id="@+id/menu_file_new"
+        android:icon="@drawable/action_file_new"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_new_file"/>
+    
+    <item
+        android:id="@+id/menu_folder_new"
+        android:icon="@drawable/action_folder_new"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_new_folder"/>
+    
+    <item
+        android:id="@+id/menu_partition"
+        android:showAsAction="never"
+        android:title="@string/menu_partition"/>
+    
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/action_settings"
+        android:showAsAction="never"
+        android:title="@string/menu_settings"/>
+
+</menu>

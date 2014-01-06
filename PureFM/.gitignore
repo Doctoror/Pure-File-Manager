@@ -30,9 +30,3 @@ proguard/
 *.ipr
 *.iws
 .idea/
-
-gradle
-gradlew*
-.gradle
-/local.properties
-.DS_Store
