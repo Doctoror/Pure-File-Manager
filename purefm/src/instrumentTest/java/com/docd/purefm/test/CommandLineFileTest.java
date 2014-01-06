@@ -13,7 +13,14 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.TextUtil;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public final class CommandLineFileTest extends AndroidTestCase {
 
@@ -33,10 +40,12 @@ public final class CommandLineFileTest extends AndroidTestCase {
         if (!busybox.exists()) {
             throw new RuntimeException("before running this test copy busybox to " + busybox.getAbsolutePath());
         }
+        try {
+            FileUtils.forceDelete(testDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         testDir.mkdirs();
-
-        com.docd.purefm.Environment.hasBusybox = true;
-        Settings.useCommandLine = true;
 
         // init what application inits
         final Context context = this.getContext();
@@ -46,9 +55,16 @@ public final class CommandLineFileTest extends AndroidTestCase {
         PreviewHolder.initialize(context);
         TextUtil.init(context);
 
-        //create a non-empty file
-        if (!CommandLine.execute(ShellHolder.getShell(), "echo \"test\" >> " + test1.getAbsolutePath())) {
-            throw new RuntimeException("Failed to create test file");
+        // override settings to force our test busybox
+        com.docd.purefm.Environment.hasBusybox = true;
+        com.docd.purefm.Environment.busybox = busybox.getAbsolutePath();
+        Settings.useCommandLine = true;
+
+        // prepare a test file
+        try {
+            FileUtils.write(test1, "test");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create test file: " + e);
         }
     }
 
@@ -61,13 +77,14 @@ public final class CommandLineFileTest extends AndroidTestCase {
         assertEquals(test1.getAbsolutePath(), file1.getAbsolutePath());
         assertEquals(test1, file1.toFile());
         assertIsNormalFile(file1);
-        assertEquals(6, file1.length());
+        assertEquals(4, file1.length());
 
         file1.delete();
         assertIsEmptyFile(file1);
 
         file1.createNewFile();
         assertIsNormalFile(file1);
+        final String file1sum = md5sum(file1.toFile());
 
         final CommandLineFile file2 = (CommandLineFile) FileFactory.newFile(test2);
         assertIsEmptyFile(file2);
@@ -75,10 +92,12 @@ public final class CommandLineFileTest extends AndroidTestCase {
         file1.move(file2);
         assertIsEmptyFile(file1);
         assertIsNormalFile(file2);
+        assertEquals(file1sum, md5sum(file2.toFile()));
 
         file2.copy(file1);
         assertIsNormalFile(file1);
         assertIsNormalFile(file2);
+        assertEquals(file1sum, md5sum(file1.toFile()));
 
         file1.delete();
         file2.delete();
@@ -90,6 +109,18 @@ public final class CommandLineFileTest extends AndroidTestCase {
         assertIsEmptyFile(file3);
         file3.mkdirs();
         assertIsDirectory(file3);
+    }
+
+    private String md5sum(final File file) {
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            return new String(Hex.encodeHex(DigestUtils.md5(fis)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (fis != null) try {fis.close();} catch (Exception e) {}
+        }
     }
 
     private void assertIsDirectory(final CommandLineFile file) {
@@ -116,6 +147,10 @@ public final class CommandLineFileTest extends AndroidTestCase {
 
     @Override
     protected void tearDown() {
-        CommandLine.execute(ShellHolder.getShell(), "rm -rf " + testDir.getAbsolutePath());
+        try {
+            FileUtils.forceDelete(testDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
