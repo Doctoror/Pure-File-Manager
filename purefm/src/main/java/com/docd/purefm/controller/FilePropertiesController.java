@@ -41,10 +41,10 @@ public final class FilePropertiesController {
         
         final TextView size = (TextView) view.findViewById(R.id.size);
         if (!file.isDirectory()) {
-            size.setText(file.readableLength());
+            size.setText(file.humanReadableLength());
         }
         
         final TextView mod = (TextView) view.findViewById(R.id.modified);
-        mod.setText(file.readableLastModified());
+        mod.setText(file.humanReadableLastModified());
     }
 }

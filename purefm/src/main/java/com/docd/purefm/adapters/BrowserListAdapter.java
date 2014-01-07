@@ -48,8 +48,8 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             }
         }
         h.title.setText(f.getName());
-        h.date.setText(Settings.showLastModified ? f.readableLastModified() : "");
-        h.size.setText(f.isDirectory() || !Settings.showSize ? "" : f.readableLength());
+        h.date.setText(Settings.showLastModified ? f.humanReadableLastModified() : "");
+        h.size.setText(f.isDirectory() || !Settings.showSize ? "" : f.humanReadableLength());
         h.perm.setText(Settings.showPermissions ? f.getPermissions().toString() : "");
 
         return v;

@@ -254,6 +254,9 @@ public final class CommandLineFile implements GenericFile,
             this.isSymlink = false;
             this.owner = 0;
             this.group = 0;
+            this.length = 0;
+            this.humanReadableLength = "0";
+            this.humanReadableLastMod = "0";
             this.p = null;
             return true;
         }
@@ -379,7 +382,7 @@ public final class CommandLineFile implements GenericFile,
     }
     
     @Override
-    public String readableLength() {
+    public String humanReadableLength() {
         return this.humanReadableLength;
     }
 
@@ -389,7 +392,7 @@ public final class CommandLineFile implements GenericFile,
     }
     
     @Override
-    public String readableLastModified() {
+    public String humanReadableLastModified() {
         return this.humanReadableLastMod;
     }
 

@@ -225,12 +225,12 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     }
     
     @Override
-    public String readableLength() {
+    public String humanReadableLength() {
         return this.readableLength;
     }
 
     @Override
-    public String readableLastModified() {
+    public String humanReadableLastModified() {
         return this.readableLastMod;
     }
 

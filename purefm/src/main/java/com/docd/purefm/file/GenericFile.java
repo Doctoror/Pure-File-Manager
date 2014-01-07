@@ -30,8 +30,8 @@ public interface GenericFile extends Serializable {
     String getAbsolutePath();
     String getCanonicalPath();
     String getParent();
-    String readableLength();
-    String readableLastModified();
+    String humanReadableLength();
+    String humanReadableLastModified();
     GenericFile getParentFile();
     File toFile();
     GenericFile[] listFiles();
