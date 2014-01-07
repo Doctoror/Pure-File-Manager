@@ -8,6 +8,12 @@ import java.io.InputStreamReader;
 
 public final class Shell implements Closeable {
 
+    private static final String TERMINATION_LINE = "com.docd.purefm.commandline.Shell.TERMINATION_LINE";
+
+    public static final class NotInitializedException extends Exception {
+
+    }
+
     private final Object shellLock = new Object();
 
     public final boolean su;
@@ -20,11 +26,25 @@ public final class Shell implements Closeable {
     private boolean inputStreamLocked;
     private boolean outputStreamLocked;
 
-    Shell(final boolean su) throws IOException {
+    Shell(final boolean su) throws IOException, NotInitializedException {
         this.su = su;
         this.process = new ProcessBuilder().redirectErrorStream(false).command(su ? "su" : "sh").start();
         this.inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
         this.outputStream = new DataOutputStream(this.process.getOutputStream());
+        this.checkInitializedStatus();
+    }
+
+    private void checkInitializedStatus() throws IOException, NotInitializedException {
+        if (inputStream == null || outputStream == null) {
+            throw new NotInitializedException();
+        }
+        try {
+            outputStream.writeBytes("echo \"" + TERMINATION_LINE + "\n");
+            String line;
+            while (((line = this.inputStream.readLine()) != null && !line.equals(TERMINATION_LINE)));
+        } catch (IOException e) {
+            throw new NotInitializedException();
+        }
     }
 
     public synchronized BufferedReader obtainInputStream() {

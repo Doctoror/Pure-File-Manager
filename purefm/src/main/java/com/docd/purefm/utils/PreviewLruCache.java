@@ -47,7 +47,6 @@ public final class PreviewLruCache
     {
         if (!oldValue.isRecycled()) {
             oldValue.recycle();
-            oldValue = null;
         }
     }
 

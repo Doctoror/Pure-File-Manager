@@ -5,6 +5,7 @@ import java.util.Set;
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.activities.SettingsActivity;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.Cache;
 
 import android.os.Bundle;
@@ -15,10 +16,13 @@ import android.preference.PreferenceFragment;
 
 public final class SettingsFragment extends PreferenceFragment {
 
+    private boolean wasAllowRoot;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.addPreferencesFromResource(R.xml.settings);
+        this.wasAllowRoot = Settings.su;
         this.init();
     }
 
@@ -197,4 +201,11 @@ public final class SettingsFragment extends PreferenceFragment {
 
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (!Settings.useCommandLine || this.wasAllowRoot != Settings.su) {
+            ShellHolder.releaseShell();
+        }
+    }
 }

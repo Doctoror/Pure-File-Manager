@@ -43,5 +43,4 @@ public final class SettingsActivity extends MonitoredActivity {
     public void notifyNeedInvalidate() {
         this.needInvalidate = true;
     }
-    
 }

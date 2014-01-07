@@ -7,15 +7,16 @@ import java.io.IOException;
 public final class ShellFactory {
     private ShellFactory() {}
 
-    private static Shell shell;
-
     public static Shell getShell() throws IOException {
-        if (shell != null) {
-            if (Settings.su == shell.su) {
-                return shell;
+        try {
+            return new Shell(Settings.su);
+        } catch (Shell.NotInitializedException e) {
+            // can be thrown if superuser denied
+            try {
+                return new Shell(false);
+            } catch (Shell.NotInitializedException e1) {
+                throw new RuntimeException("Shell not initialized", e);
             }
-            shell.close();
         }
-        return new Shell(Settings.su);
     }
 }

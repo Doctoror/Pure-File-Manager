@@ -18,6 +18,11 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
 
     @Override
     public View getView(int pos, View v, ViewGroup arg2) {
+        if (pos >= this.getCount()) {
+            //workaround for indexOutOfBoundsException when deleting from adapter
+            // and notifyDataSetChanged is not yet called
+            return v;
+        }
         
         Holder h;
         

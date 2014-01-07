@@ -16,6 +16,17 @@ public final class ShellHolder {
         ShellHolder.shell = shell;
     }
 
+    public static synchronized void releaseShell() {
+        if (shell != null) {
+            try {
+                shell.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            shell = null;
+        }
+    }
+
     /**
      * The shell is set by BrowserActivity and is released when BrowserActivity is destroyed
      *
@@ -26,7 +37,7 @@ public final class ShellHolder {
             try {
                 shell = ShellFactory.getShell();
             } catch (IOException e) {
-                Log.w("getShell()", e);
+                Log.w("getShell() error:", e);
             }
         }
         return shell;
