@@ -6,7 +6,7 @@ import com.docd.purefm.utils.TextUtil;
 
 import android.app.Application;
 
-public final class PureFM extends Application {
+public final class PureFM extends Application implements ActivityMonitor.OnActivitiesOpenedListener {
 
     @Override
     public void onCreate() {
@@ -16,6 +16,11 @@ public final class PureFM extends Application {
         Settings.init(this, this.getResources());
         PreviewHolder.initialize(this);
         TextUtil.init(this);
+        ensureNoShellUsedIfNoBusybox();
+        ActivityMonitor.addOnActivitiesOpenedListener(this);
+    }
+
+    private void ensureNoShellUsedIfNoBusybox() {
         if (Settings.useCommandLine) {
             if (!Environment.hasBusybox) {
                 Settings.setUseCommandLine(this, false);
@@ -24,5 +29,17 @@ public final class PureFM extends Application {
                 }
             }
         }
+    }
+
+    @Override
+    public void onActivitiesOpen() {
+        //rescan for environment changes
+        Environment.init(this);
+        ensureNoShellUsedIfNoBusybox();
+    }
+
+    @Override
+    public void onActivitiesClosed() {
+
     }
 }

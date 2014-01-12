@@ -217,7 +217,7 @@ public final class CommandLineFile implements GenericFile,
         }
 
         targetFile.lastmod = c.getTimeInMillis();
-        targetFile.humanReadableLastMod = TextUtil.readableDate(targetFile.lastmod);
+        targetFile.humanReadableLastMod = TextUtil.humanReadableDate(targetFile.lastmod);
         targetFile.exists = true;
         if (!targetFile.isDirectory) {
             targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);

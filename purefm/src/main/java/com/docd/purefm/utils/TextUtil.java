@@ -22,7 +22,7 @@ public final class TextUtil {
         }
     }
     
-    public static String readableDate(long last) {
+    public static synchronized String humanReadableDate(long last) {
         return format.format(last);
     }
     

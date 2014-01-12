@@ -32,7 +32,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.readableDate(this.lastModified());
+        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
         Cache.addTo(this);
     }
@@ -43,7 +43,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.readableDate(this.lastModified());
+        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
         Cache.addTo(this);
     }
@@ -54,7 +54,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.readableDate(this.lastModified());
+        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
         Cache.addTo(this);
     }
@@ -65,7 +65,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.readableDate(this.lastModified());
+        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
         Cache.addTo(this);
     }
@@ -76,7 +76,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.readableDate(this.lastModified());
+        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
         Cache.addTo(this);
     }
