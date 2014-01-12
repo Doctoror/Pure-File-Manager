@@ -17,7 +17,6 @@ import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.Copy;
 import com.docd.purefm.commandline.Move;
-import com.docd.purefm.commandline.Shell;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
@@ -26,6 +25,7 @@ import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
+import com.stericson.RootTools.execution.Shell;
 
 final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
 

@@ -1,13 +1,13 @@
 package com.docd.purefm.commandline;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.Permissions;
 import com.docd.purefm.settings.Settings;
+import com.stericson.RootTools.execution.Shell;
 
 public final class CommandLineUtils {
 
@@ -82,7 +82,7 @@ public final class CommandLineUtils {
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
         command.append(" && echo exists");
         
-        final List<String> res = CommandLine.executeForResult(shell, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, new Command(command.toString()));
         return res != null && !res.isEmpty() && res.get(0).equals("exists");
     }
     
@@ -97,7 +97,7 @@ public final class CommandLineUtils {
         command.append(" ls -lApedn ");
         command.append(CommandLineUtils.getCommandLineString(path));
 
-        final List<String> res = CommandLine.executeForResult(shell, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, new Command(command.toString()));
         if (res == null) {
             return null;
         }
@@ -122,7 +122,7 @@ public final class CommandLineUtils {
         command.append(" ls -lApedn ");
         command.append(CommandLineUtils.getCommandLineString(path));
         
-        final List<String> res = CommandLine.executeForResult(shell, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, new Command(command.toString()));
         if (res == null) {
             return null;
         }
@@ -146,7 +146,7 @@ public final class CommandLineUtils {
         command.append(" ls -lnAped ");
         command.append(CommandLineUtils.getCommandLineString(path));
 
-        final List<String> res = CommandLine.executeForResult(shell, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, new Command(command.toString()));
         if (res == null) {
             return null;
         }
@@ -165,7 +165,7 @@ public final class CommandLineUtils {
         if (dir.isDirectory() && command.charAt(command.length() - 1) != File.separatorChar) {
             command.append(File.separatorChar);
         }
-        return CommandLine.executeForResult(shell, command.toString());
+        return CommandLine.executeForResult(shell, new Command(command.toString()));
     }
     
     public static List<String> lsl(final Shell shell, final File dir) {
@@ -180,7 +180,7 @@ public final class CommandLineUtils {
         if (dir.isDirectory() && command.charAt(command.length() - 1) != File.separatorChar) {
             command.append(File.separatorChar);
         }
-        return CommandLine.executeForResult(shell, command.toString());
+        return CommandLine.executeForResult(shell, new Command(command.toString()));
     }
     
     public static List<String> lsld(final Shell shell, final File dir) {
@@ -195,7 +195,7 @@ public final class CommandLineUtils {
         if (dir.isDirectory() && command.charAt(command.length() - 1) != File.separatorChar) {
             command.append(File.separatorChar);
         }
-        return CommandLine.executeForResult(shell, command.toString());
+        return CommandLine.executeForResult(shell, new Command(command.toString()));
     }
 
     public static boolean isMSDOSFS(final File file) {
@@ -229,7 +229,7 @@ public final class CommandLineUtils {
         command.append(Environment.busybox);
         command.append(" stat -f -c \"%T\" ");
         command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-        final List<String> res = CommandLine.executeForResult(shell, command.toString());
+        final List<String> res = CommandLine.executeForResult(shell, new Command(command.toString()));
         return res == null || res.isEmpty() ? "" : res.get(0);
     }
 }

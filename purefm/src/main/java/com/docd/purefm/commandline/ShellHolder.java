@@ -2,12 +2,21 @@ package com.docd.purefm.commandline;
 
 import android.util.Log;
 
+import com.stericson.RootTools.execution.Shell;
+
 import java.io.IOException;
 
 /**
  * ShellHolder holds shared Shell instance
  */
 public final class ShellHolder {
+
+    private static int commandId;
+
+    public static int getNextCommandId() {
+        return commandId++;
+    }
+
     private ShellHolder() {}
 
     private static Shell shell;

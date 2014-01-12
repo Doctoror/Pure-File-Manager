@@ -11,11 +11,14 @@ public final class Move extends Command {
     }
 
     public Move(GenericFile source, File target) {
+        super(ShellHolder.getNextCommandId(), toCommandString(source, target));
+    }
+
+    private static String toCommandString(final GenericFile source, final File target) {
         final StringBuilder command = new StringBuilder("busybox mv -f ");
         command.append(CommandLineUtils.getCommandLineString(source.getAbsolutePath()));
         command.append(' ');
         command.append(CommandLineUtils.getCommandLineString(target.getAbsolutePath()));
-        this.command = command.toString();
+        return command.toString();
     }
-    
 }

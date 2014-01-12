@@ -1,5 +1,6 @@
 package com.docd.purefm.adapters;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,7 +82,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.notifyDataSetChanged();
     }
 
-    public void releaseObservers() {
+    public final void releaseObservers() {
         for (final MultiListenerFileObserver observer : this.fileObservers) {
             observer.removeOnEventListener(this);
             observer.stopWatching();
@@ -89,7 +90,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.fileObservers.clear();
     }
     
-    public void addFile(final GenericFile file) {
+    public final void addFile(final GenericFile file) {
         this.files.add(file);
         Collections.sort(this.files, this.comparator.getComparator());
         this.notifyDataSetChanged();
@@ -166,7 +167,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     @Override
     public void onEvent(final int event, final String path) {
-        handler.removeCallbacks(this.notifyDataSetChangedRunnable);
+        handler.removeCallbacksAndMessages(null);
+        handler.post(new FileObserverEventRunnable(this, event, path));
+    }
+
+    void onEventUIThread(final int event, final String path) {
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.ATTRIB:
             case FileObserver.MODIFY:
@@ -203,7 +208,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                 }
                 break;
         }
-        handler.post(this.notifyDataSetChangedRunnable);
+        this.notifyDataSetChanged();
     }
 
     protected void applyOverlay(GenericFile f, ImageView overlay) {
@@ -230,12 +235,25 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
-    private final Runnable notifyDataSetChangedRunnable = new Runnable() {
+    private static final class FileObserverEventRunnable implements Runnable {
+        private final WeakReference<BrowserBaseAdapter> adapter;
+        private final int event;
+        private final String path;
+
+        private FileObserverEventRunnable(final BrowserBaseAdapter adapter, final int event, final String path) {
+            this.adapter = new WeakReference<BrowserBaseAdapter>(adapter);
+            this.event = event;
+            this.path = path;
+        }
+
         @Override
         public void run() {
-            notifyDataSetChanged();
+            final BrowserBaseAdapter localAdapter = this.adapter.get();
+            if (localAdapter != null) {
+                localAdapter.onEventUIThread(this.event, this.path);
+            }
         }
-    };
+    }
 
     protected final class Job
             implements Runnable

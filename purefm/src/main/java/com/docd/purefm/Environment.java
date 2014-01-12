@@ -93,13 +93,16 @@ public final class Environment {
         final File externalStorage = android.os.Environment.getExternalStorageDirectory();
         final File parent = externalStorage.getParentFile();
         if (parent != null) {
-            for (final File file : parent.listFiles()) {
-                if (!file.equals(externalStorage) && file.canRead() && file.canWrite() && file.canExecute()) {
-                    final String fileName = file.getName();
-                    if (fileName.equals("extSdCard") || fileName.equals("external_sd")) {
-                        secondaryStorageDirectory = file;
-                    } else if (fileName.contains("usb") || fileName.contains("USB") || fileName.contains("Usb")) {
-                        usbStorageDirectories.add(file);
+            final File[] files = parent.listFiles();
+            if (files != null) {
+                for (final File file : files) {
+                    if (!file.equals(externalStorage) && file.canRead() && file.canWrite() && file.canExecute()) {
+                        final String fileName = file.getName();
+                        if (fileName.equals("extSdCard") || fileName.equals("external_sd")) {
+                            secondaryStorageDirectory = file;
+                        } else if (fileName.contains("usb") || fileName.contains("USB") || fileName.contains("Usb")) {
+                            usbStorageDirectories.add(file);
+                        }
                     }
                 }
             }

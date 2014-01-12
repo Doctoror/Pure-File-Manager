@@ -5,8 +5,9 @@ import java.io.File;
 public final class Touch extends Command {
     
     public Touch(final File file) {
-        final StringBuilder command = new StringBuilder("busybox touch ");
-        command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-        this.command = command.toString();
+        super(ShellHolder.getNextCommandId(), "busybox touch "
+                .concat(CommandLineUtils.getCommandLineString(file.getAbsolutePath())));
     }
+
+
 }

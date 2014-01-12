@@ -1,12 +1,7 @@
 package com.docd.purefm.commandline;
 
-import android.util.Log;
+import com.stericson.RootTools.execution.Shell;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,77 +9,134 @@ import java.util.List;
 public final class CommandLine {
     
     private CommandLine() {}
-    
-    public static List<String> executeForResult(final Shell shell, String command) {
+
+    public static synchronized List<String> executeForResult(final Shell shell, final Command command) {
         final List<String> result = new LinkedList<String>();
+        final ExecutionStatus status = new ExecutionStatus();
+        command.setCommandListener(new Command.CommandListener() {
+            @Override
+            public void commandOutput(int i, String s) {
+                result.add(s);
+            }
+
+            @Override
+            public void commandTerminated(int i, String s) {
+                status.finished = true;
+                command.notify();
+            }
+
+            @Override
+            public void commandCompleted(int i, int i2) {
+                status.finished = true;
+                command.notify();
+            }
+        });
+
         try {
-            final String terminationLine = writeCommand(command, shell.obtainOutputStream());
-            inputStreamToStringList(shell.obtainInputStream(), terminationLine, result);
+            shell.add(command);
+            synchronized (command) {
+                if (!status.finished) {
+                    try {
+                        command.wait();
+                    } catch (InterruptedException e) {
+                        command.terminate("Interrupted");
+                    }
+                }
+            }
             return result;
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            shell.releaseOutputStream();
-            shell.releaseInputStream();
         }
         return null;
     }
 
-    public static boolean execute(final Shell shell, String command) {
+    public static synchronized boolean execute(final Shell shell, final Command command) {
+        final ExecutionStatus status = new ExecutionStatus();
+        command.setCommandListener(new Command.CommandListener() {
+            @Override
+            public void commandOutput(int id, String line) {
+
+            }
+
+            @Override
+            public void commandTerminated(int id, String reason) {
+                status.finished = true;
+                command.notify();
+            }
+
+            @Override
+            public void commandCompleted(int id, int exitCode) {
+                status.finished = true;
+                status.exitCode = exitCode;
+                command.notify();
+            }
+        });
+
         try {
-            final String terminationLine = writeCommand(command, shell.obtainOutputStream());
-            return cleanInputStream(shell.obtainInputStream(),terminationLine);
-        } catch (Exception e) {
+            shell.add(command);
+            synchronized (command) {
+                if (!status.finished) {
+                    try {
+                        command.wait();
+                    } catch (InterruptedException e) {
+                        command.terminate("Interrupted");
+                    }
+                }
+            }
+            return status.exitCode == 0;
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            shell.releaseOutputStream();
-            shell.releaseInputStream();
         }
     }
 
-    private static String writeCommand(final String command, final DataOutputStream outputStream) throws IOException {
-        /*
-         * Termination string should also contain symbols not allowed in filesystems to reduce
-         * possibility of misinterpreting the stdout output with termination string using ls command
-         */
-        final String terminationLine = "/:" + new String(Hex.encodeHex(DigestUtils.md5(command)));
-        outputStream.writeBytes(appendTerminationCommands(command, terminationLine));
-        outputStream.flush();
-        return terminationLine;
+    public static boolean execute(final Shell shell, final String command) {
+        return execute(shell, new Command(ShellHolder.getNextCommandId(), command));
     }
 
-    private static String appendTerminationCommands(final String command, final String terminationString) {
-        return command + ";echo \"" + terminationString + "\";echo $?\n";
+    private static final class ExecutionStatus {
+        int exitCode;
+        boolean finished;
     }
 
-    public static boolean execute(final Shell shell, Command command) {
-        return execute(shell, command.toString());
-    }
-
-    private static boolean cleanInputStream(final BufferedReader reader, final String terminationLine) throws IOException {
-        String line;
-        while ((line = reader.readLine()) != null && !line.equals(terminationLine));
-        final String errorCode = reader.readLine();
-        try {
-            return Integer.parseInt(errorCode) == 0;
-        } catch (NumberFormatException e) {
-            Log.w("inputStreamToStringList", "Expected error code, but received \'" + errorCode + "\'");
-            return false;
-        }
-    }
-
-    private static boolean inputStreamToStringList(final BufferedReader reader, final String terminationLine, final List<String> target) throws IOException {
-        String line;
-        while ((line = reader.readLine()) != null && !line.equals(terminationLine)) {
-            target.add(line);
-        }
-        final String errorCode = reader.readLine();
-        try {
-            return Integer.parseInt(errorCode) == 0;
-        } catch (NumberFormatException e) {
-            Log.w("inputStreamToStringList", "Expected error code, but received \'" + errorCode + "\'");
-            return false;
-        }
-    }
+//    private static String writeCommand(final String command, final DataOutputStream outputStream) throws IOException {
+//        /*
+//         * Termination string should also contain symbols not allowed in filesystems to reduce
+//         * possibility of misinterpreting the stdout output with termination string using ls command
+//         */
+//        final String terminationLine = "/:" + new String(Hex.encodeHex(DigestUtils.md5(command)));
+//        outputStream.writeBytes(appendTerminationCommands(command, terminationLine));
+//        outputStream.flush();
+//        return terminationLine;
+//    }
+//
+//    private static String appendTerminationCommands(final String command, final String terminationString) {
+//        return command + ";echo \"" + terminationString + "\";echo $?\n";
+//    }
+//
+//    private static boolean cleanInputStream(final BufferedReader reader, final String terminationLine) throws IOException {
+//        String line;
+//        while ((line = reader.readLine()) != null && !line.equals(terminationLine));
+//        final String errorCode = reader.readLine();
+//        try {
+//            return Integer.parseInt(errorCode) == 0;
+//        } catch (NumberFormatException e) {
+//            Log.w("inputStreamToStringList", "Expected error code, but received \'" + errorCode + "\'");
+//            return false;
+//        }
+//    }
+//
+//    private static boolean inputStreamToStringList(final BufferedReader reader, final String terminationLine, final List<String> target) throws IOException {
+//        String line;
+//        while ((line = reader.readLine()) != null && !line.equals(terminationLine)) {
+//            target.add(line);
+//        }
+//        final String errorCode = reader.readLine();
+//        try {
+//            return Integer.parseInt(errorCode) == 0;
+//        } catch (NumberFormatException e) {
+//            Log.w("inputStreamToStringList", "Expected error code, but received \'" + errorCode + "\'");
+//            return false;
+//        }
+//    }
 }

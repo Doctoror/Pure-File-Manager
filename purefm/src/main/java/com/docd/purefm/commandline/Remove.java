@@ -5,9 +5,10 @@ import java.io.File;
 public final class Remove extends Command {
     
     public Remove(final File file) {
-        final StringBuilder command = new StringBuilder("busybox rm -rf ");
-        command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-        this.command = command.toString();
+        super(ShellHolder.getNextCommandId(), toCommandString(file));
     }
-    
+
+    private static String toCommandString(final File file) {
+        return "busybox rm -rf ".concat(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
+    }
 }

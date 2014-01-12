@@ -13,12 +13,12 @@ import android.widget.Toast;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.Remove;
-import com.docd.purefm.commandline.Shell;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
+import com.stericson.RootTools.execution.Shell;
 
 public final class DeleteTask extends
         AsyncTask<GenericFile, Void, Exception> {
