@@ -2,6 +2,8 @@ package com.docd.purefm.utils;
 
 import com.docd.purefm.file.GenericFile;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class ClipBoard {
 
     /**
@@ -25,7 +27,8 @@ public final class ClipBoard {
         isCut = true;
         clipBoard = files;
     }
-    
+
+    @Nullable
     public static GenericFile[] getClipBoardContents() {
         return clipBoard;
     }

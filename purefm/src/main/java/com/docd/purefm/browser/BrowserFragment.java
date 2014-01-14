@@ -38,6 +38,8 @@ import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.view.SequentalTextView;
 import com.docd.purefm.view.SequentalTextView.OnSequenceClickListener;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class BrowserFragment extends Fragment {
 
     private static final String KEY_FILE = "KEY_SAVED_FILE";
@@ -347,6 +349,7 @@ public final class BrowserFragment extends Fragment {
                         : AbsListView.CHOICE_MODE_NONE);
     }
 
+    @Nullable
     public Browser getBrowser() {
         return this.browser;
     }

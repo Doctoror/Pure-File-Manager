@@ -2,6 +2,8 @@ package com.docd.purefm.commandline;
 
 import com.stericson.RootTools.execution.Shell;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +12,7 @@ public final class CommandLine {
     
     private CommandLine() {}
 
+    @Nullable
     public static synchronized List<String> executeForResult(final Shell shell, final Command command) {
         final List<String> result = new LinkedList<String>();
         final ExecutionStatus status = new ExecutionStatus();

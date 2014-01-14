@@ -17,7 +17,6 @@ public class SearchCommandLineTask extends CancelableTask<String, GenericFile, V
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
     
-    private Process process;
     private boolean su;
     
     private List<String> denied;
@@ -38,14 +37,6 @@ public class SearchCommandLineTask extends CancelableTask<String, GenericFile, V
     
     public String getSearchedQuery() {
         return this.query;
-    }
-    
-    @Override
-    public void cancel() {
-        super.cancel();
-        if (this.process != null) {
-            this.process.destroy();
-        }
     }
     
     @Override

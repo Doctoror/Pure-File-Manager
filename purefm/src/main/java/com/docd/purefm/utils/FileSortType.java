@@ -4,6 +4,8 @@ import java.util.Comparator;
 
 import com.docd.purefm.file.GenericFile;
 
+import org.jetbrains.annotations.NotNull;
+
 public enum FileSortType {
 
     NAME_ASC (new PureFMFileUtils.NameComparator()),
@@ -20,7 +22,8 @@ public enum FileSortType {
     private FileSortType(Comparator<GenericFile> comparator) {
         this.comparator = comparator;
     }
-    
+
+    @NotNull
     public Comparator<GenericFile> getComparator() {
         return this.comparator;
     }

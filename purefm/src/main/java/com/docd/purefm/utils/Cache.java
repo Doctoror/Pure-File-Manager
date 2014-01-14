@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.docd.purefm.file.GenericFile;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class Cache {
 
     private Cache() {}
@@ -18,7 +20,8 @@ public final class Cache {
     public static void addTo(GenericFile file) {
         cache.put(file.getAbsolutePath(), file);
     }
-    
+
+    @Nullable
     public static GenericFile get(String key) {
         return cache.get(key);
     }

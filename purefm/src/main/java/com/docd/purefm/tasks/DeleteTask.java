@@ -1,6 +1,7 @@
 package com.docd.purefm.tasks;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import android.widget.Toast;
 
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.Remove;
+import com.docd.purefm.commandline.RemoveCommand;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
@@ -23,28 +24,30 @@ import com.stericson.RootTools.execution.Shell;
 public final class DeleteTask extends
         AsyncTask<GenericFile, Void, Exception> {
 
-    private final Activity activity;
+    private final WeakReference<Activity> activity;
 
     private ProgressDialog dialog;
 
     public DeleteTask(final Activity activity) {
-        this.activity = activity;
+        this.activity = new WeakReference<Activity>(activity);
     }
 
     @Override
     protected void onPreExecute() {
-        this.dialog = new ProgressDialog(this.activity);
-        this.dialog.setMessage(activity
-                .getString(R.string.progress_deleting_files));
-        this.dialog.setCancelable(true);
-        this.dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                cancel(false);
+        final Activity activity = this.activity.get();
+        if (activity != null) {
+            this.dialog = new ProgressDialog(activity);
+            this.dialog.setMessage(activity.getString(R.string.progress_deleting_files));
+            this.dialog.setCancelable(true);
+            this.dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    cancel(false);
+                }
+            });
+            if (!activity.isFinishing()) {
+                this.dialog.show();
             }
-        });
-        if (!this.activity.isFinishing()) {
-            this.dialog.show();
         }
     }
 
@@ -58,7 +61,7 @@ public final class DeleteTask extends
             final Shell shell = ShellHolder.getShell();
             for (final GenericFile file : files) {
                 final File fileFile = file.toFile();
-                if (CommandLine.execute(shell, new Remove(fileFile))) {
+                if (CommandLine.execute(shell, new RemoveCommand(fileFile))) {
                     filesAffected.add(fileFile);
                 } else {
                     result = new Exception("Can't delete some files");
@@ -73,8 +76,9 @@ public final class DeleteTask extends
                 }
             }
         }
-        
-        if (!filesAffected.isEmpty()) {
+
+        final Activity activity = this.activity.get();
+        if (activity != null && !filesAffected.isEmpty()) {
             MediaStoreUtils.deleteFiles(activity.getApplicationContext(), filesAffected);
             PureFMFileUtils.requestMediaScanner(activity, filesAffected);
         }
@@ -98,7 +102,8 @@ public final class DeleteTask extends
         if (this.dialog != null) {
             this.dialog.dismiss();
         }
-        if (result != null) {
+        final Activity activity = this.activity.get();
+        if (activity != null && result != null) {
             Toast.makeText(activity, result.getMessage(),
                     Toast.LENGTH_SHORT).show();
         }

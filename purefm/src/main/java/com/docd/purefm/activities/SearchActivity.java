@@ -211,7 +211,7 @@ public final class SearchActivity extends MonitoredActivity {
     
     
     private void buildSearchTask(boolean su) {
-        if (Settings.useCommandLine && Environment.hasBusybox) {
+        if (Settings.useCommandLine && Environment.hasBusybox()) {
             searchTask = new SearchCommandLineTask(su) {
                 @Override
                 protected void onPreExecute() {

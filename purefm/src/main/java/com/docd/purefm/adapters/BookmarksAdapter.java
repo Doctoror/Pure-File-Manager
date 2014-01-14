@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
@@ -216,7 +217,8 @@ public final class BookmarksAdapter implements ListAdapter {
     public boolean isModified() {
         return this.modified;
     }
-    
+
+    @NotNull
     public Set<String> getData() {
         final Set<String> user = new LinkedHashSet<String>();
         int i = 0;

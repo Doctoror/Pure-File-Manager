@@ -1,4 +1,2 @@
-Try to replace current CommandLine with RootTools
-Handle superuser denied properly
 Change UI so user sees that superuser mode enabled
 Check for free space before file copy

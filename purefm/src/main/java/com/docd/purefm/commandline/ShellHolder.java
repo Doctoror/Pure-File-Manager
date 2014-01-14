@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.stericson.RootTools.execution.Shell;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 /**
@@ -21,10 +23,6 @@ public final class ShellHolder {
 
     private static Shell shell;
 
-    public static synchronized void setShell(final Shell shell) {
-        ShellHolder.shell = shell;
-    }
-
     public static synchronized void releaseShell() {
         if (shell != null) {
             try {
@@ -41,6 +39,7 @@ public final class ShellHolder {
      *
      * @return shell shared Shell instance
      */
+    @NotNull
     public static synchronized Shell getShell() {
         if (shell == null) {
             try {

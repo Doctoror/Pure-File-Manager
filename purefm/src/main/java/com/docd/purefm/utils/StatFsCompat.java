@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.StatFs;
 
-public final class StatFsUtils {
-    private StatFsUtils() {}
+public final class StatFsCompat {
+    private StatFsCompat() {}
     
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")

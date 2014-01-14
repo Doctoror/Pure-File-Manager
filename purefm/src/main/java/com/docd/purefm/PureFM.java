@@ -22,7 +22,7 @@ public final class PureFM extends Application implements ActivityMonitor.OnActiv
 
     private void ensureNoShellUsedIfNoBusybox() {
         if (Settings.useCommandLine) {
-            if (!Environment.hasBusybox) {
+            if (!Environment.hasBusybox()) {
                 Settings.setUseCommandLine(this, false);
                 if (Settings.su) {
                     Settings.setAllowRoot(this, false);

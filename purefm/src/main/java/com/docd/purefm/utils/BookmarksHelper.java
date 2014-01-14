@@ -6,12 +6,15 @@ import java.util.Set;
 
 import com.docd.purefm.Environment;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class BookmarksHelper {
     
     public enum Type {
         STORAGE, SDCARD, USB, USER
     }
-    
+
+    @NotNull
     public static Set<String> getStorageBookmarks() {
         final LinkedHashSet<String> storages = new LinkedHashSet<String>();
         storages.add(Environment.androidRootDirectory.getAbsolutePath());
@@ -22,7 +25,8 @@ public final class BookmarksHelper {
         }
         return storages;
     }
-    
+
+    @NotNull
     public static Type getBookmarkType(final String location) {
         if (location.equals(Environment.androidRootDirectory.getName())) {
             return Type.STORAGE;

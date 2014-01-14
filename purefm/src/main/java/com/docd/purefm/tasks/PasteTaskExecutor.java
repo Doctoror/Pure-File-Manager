@@ -1,6 +1,7 @@
 package com.docd.purefm.tasks;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -9,7 +10,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.docd.purefm.R;
-import com.docd.purefm.browser.Browser;
 import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.dialogs.FileExistsDialog;
@@ -19,24 +19,24 @@ import com.docd.purefm.utils.ClipBoard;
 
 public final class PasteTaskExecutor implements OnClickListener {
 
-    private final Activity activity;
+    private final WeakReference<Activity> activity;
     
-    private final Browser browser;
+    private final GenericFile targetPath;
     private final LinkedList<GenericFile> toProcess;
     private final HashMap<File, GenericFile> exist;
     
     private GenericFile current;
     
-    public PasteTaskExecutor(final Activity activity, final Browser browser) {
-        this.activity = activity;
-        this.browser = browser;
+    public PasteTaskExecutor(final Activity activity, final GenericFile targetPath) {
+        this.activity = new WeakReference<Activity>(activity);
+        this.targetPath = targetPath;
         this.toProcess = new LinkedList<GenericFile>();
         this.exist = new HashMap<File, GenericFile>();
     }
     
     public void start() {
         final GenericFile[] contents = ClipBoard.getClipBoardContents();
-        final GenericFile target = this.browser.getPath();
+        final GenericFile target = this.targetPath;
 
         if (target instanceof JavaFile) {
             for (final GenericFile file : contents) {
@@ -98,23 +98,27 @@ public final class PasteTaskExecutor implements OnClickListener {
         next();
     }   
     private void next() {
-        if (exist.isEmpty()) {
+        final Activity activity = this.activity.get();
+        if (activity != null) {
+            if (exist.isEmpty()) {
             
-            if (toProcess.isEmpty()) {
-                ClipBoard.clear();
+                if (toProcess.isEmpty()) {
+                    ClipBoard.clear();
+                } else {
+                    final GenericFile[] files = new GenericFile[toProcess.size()];
+                    toProcess.toArray(files);
+            
+                    final PasteTask task = new PasteTask(activity, this.targetPath);
+                    task.execute(files);
+                }
+            
             } else {
-                final GenericFile[] files = new GenericFile[toProcess.size()];
-                toProcess.toArray(files);
-            
-                final PasteTask task = new PasteTask(activity, browser);
-                task.execute(files);
+                final File key = exist.keySet().iterator().next();
+                this.current = exist.get(key);
+                exist.remove(key);
+
+                new FileExistsDialog(activity, current.getAbsolutePath(), key.getAbsolutePath(), this, this, this, this, this).show();
             }
-            
-        } else {
-            final File key = exist.keySet().iterator().next();
-            this.current = exist.get(key);
-            exist.remove(key);
-            new FileExistsDialog(activity, current.getAbsolutePath(), key.getAbsolutePath(), this, this, this, this, this).show();
         }
     }
 }

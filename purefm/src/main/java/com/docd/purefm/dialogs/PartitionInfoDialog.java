@@ -8,7 +8,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.utils.StatFsUtils;
+import com.docd.purefm.utils.StatFsCompat;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -69,15 +69,15 @@ public final class PartitionInfoDialog extends DialogFragment {
         
         final TextView fs = (TextView) v.findViewById(R.id.filesystem);
         final View fileSystemRow = v.findViewById(R.id.filesystem_row);
-        if (Environment.hasBusybox) {
+        if (Environment.hasBusybox()) {
             this.task = new GetFSTypeTask(fs, fileSystemRow);
         } else {
             fileSystemRow.setVisibility(View.GONE);
         }
 
         final StatFs stat = new StatFs(path);
-        final long valueTotal = StatFsUtils.getBlockCountLong(stat) * StatFsUtils.getBlockSizeLong(stat);
-        final long valueAvail = StatFsUtils.getAvailableBlocksLong(stat) * StatFsUtils.getBlockSizeLong(stat);
+        final long valueTotal = StatFsCompat.getBlockCountLong(stat) * StatFsCompat.getBlockSizeLong(stat);
+        final long valueAvail = StatFsCompat.getAvailableBlocksLong(stat) * StatFsCompat.getBlockSizeLong(stat);
         final long valueUsed = valueTotal - valueAvail;
         
         final TextView total = (TextView) v.findViewById(R.id.total);
@@ -86,7 +86,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         }
         
         final TextView block = (TextView) v.findViewById(R.id.block_size);
-        final long blockSize = StatFsUtils.getBlockSizeLong(stat);
+        final long blockSize = StatFsCompat.getBlockSizeLong(stat);
         if (blockSize != 0L) {
             block.setText(Long.toString(blockSize));
         }
@@ -94,7 +94,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         final TextView free = (TextView) v.findViewById(R.id.free);
         if (valueTotal != 0L) {
             free.setText(FileUtils.byteCountToDisplaySize(
-                    StatFsUtils.getFreeBlocksLong(stat) * StatFsUtils.getBlockSizeLong(stat)));
+                    StatFsCompat.getFreeBlocksLong(stat) * StatFsCompat.getBlockSizeLong(stat)));
         }
         
         final TextView avail = (TextView) v.findViewById(R.id.available);

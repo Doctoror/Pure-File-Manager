@@ -11,6 +11,8 @@ import com.docd.purefm.file.GenericFileFilter;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MimeTypes;
 
+import java.lang.ref.WeakReference;
+
 public final class DirectoryScanTask extends
         AsyncTask<GenericFile, Void, GenericFile[]> {
 
@@ -19,7 +21,7 @@ public final class DirectoryScanTask extends
     
     private final Browser browser;
     private final MenuItem item;
-    private final View actionView;
+    private final WeakReference<View> actionView;
     
     private GenericFile file;
     
@@ -29,7 +31,7 @@ public final class DirectoryScanTask extends
 
     public DirectoryScanTask(Browser browser, MenuItem item, View progress, String mimeType, BrowserBaseAdapter adapter) {
         this.browser = browser;
-        this.actionView = progress;
+        this.actionView = new WeakReference<View>(progress);
         this.adapter = adapter;
         this.item = item;
         filter.setMimeType(mimeType);
@@ -38,7 +40,10 @@ public final class DirectoryScanTask extends
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.item.setActionView(this.actionView);
+        final View actionView = this.actionView.get();
+        if (actionView != null) {
+            this.item.setActionView(actionView);
+        }
     }
 
     @Override

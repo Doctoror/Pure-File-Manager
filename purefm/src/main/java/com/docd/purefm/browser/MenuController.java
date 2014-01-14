@@ -43,7 +43,7 @@ final class MenuController {
             return false;
 
         case android.R.id.paste:
-            final PasteTaskExecutor ptc = new PasteTaskExecutor(activity, browser);
+            final PasteTaskExecutor ptc = new PasteTaskExecutor(activity, browser.getPath());
             ptc.start();
             return true;
             

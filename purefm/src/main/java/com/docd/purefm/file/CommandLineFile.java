@@ -10,14 +10,15 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.commandline.Constants;
-import com.docd.purefm.commandline.Copy;
-import com.docd.purefm.commandline.Move;
-import com.docd.purefm.commandline.Remove;
+import com.docd.purefm.commandline.CopyCommand;
+import com.docd.purefm.commandline.MoveCommand;
+import com.docd.purefm.commandline.RemoveCommand;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.Cache;
 import com.docd.purefm.utils.MimeTypes;
@@ -76,6 +77,7 @@ public final class CommandLineFile implements GenericFile,
         return this.isSymlink;
     }
 
+    @NotNull
     public static CommandLineFile fromFile(File file) {
         if (file.equals(File.listRoots()[0])) {
             final CommandLineFile f = new CommandLineFile(file);
@@ -98,6 +100,7 @@ public final class CommandLineFile implements GenericFile,
         return fromLSL(null, res.get(0));
     }
 
+    @NotNull
     public static CommandLineFile fromLSL(File parent, String line) {
 
         if (line.isEmpty()) {
@@ -248,7 +251,7 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public boolean delete() {
-        if (CommandLine.execute(ShellHolder.getShell(), new Remove(this.file))) {
+        if (CommandLine.execute(ShellHolder.getShell(), new RemoveCommand(this.file))) {
             this.exists = false;
             this.isDirectory = false;
             this.isSymlink = false;
@@ -514,7 +517,7 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public boolean renameTo(final File newName) {
-        final Command move = new Move(this, newName);
+        final Command move = new MoveCommand(this.getAbsolutePath(), newName.getAbsolutePath());
         final boolean result = CommandLine.execute(ShellHolder.getShell(), move);
         if (result) {
             this.exists = false;
@@ -548,7 +551,7 @@ public final class CommandLineFile implements GenericFile,
             return false;
         }
         return CommandLine.execute(ShellHolder.getShell(),
-                new Copy(this, target));
+                new CopyCommand(this, target));
     }
 
     @Override
@@ -557,7 +560,7 @@ public final class CommandLineFile implements GenericFile,
             return false;
         }
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
-                new Move(this, target));
+                new MoveCommand(this, target));
         if (result) {
             this.exists = false;
             this.isDirectory = false;

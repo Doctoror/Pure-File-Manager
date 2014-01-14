@@ -8,6 +8,8 @@ import java.util.Locale;
 import android.content.Context;
 import android.text.format.DateFormat;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class TextUtil {
 
     private TextUtil() {}
@@ -21,7 +23,8 @@ public final class TextUtil {
             format = new SimpleDateFormat("dd/MM/yyyy KK:mm aa", Locale.getDefault());
         }
     }
-    
+
+    @NotNull
     public static synchronized String humanReadableDate(long last) {
         return format.format(last);
     }

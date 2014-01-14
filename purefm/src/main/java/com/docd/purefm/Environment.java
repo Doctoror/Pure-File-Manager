@@ -6,7 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import com.docd.purefm.commandline.BusyboxListCommand;
+import com.docd.purefm.commandline.CommandLine;
+import com.docd.purefm.commandline.ShellHolder;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,16 +22,15 @@ public final class Environment {
     
     private Environment() {}
     
-    private static final Set<File> usbStorageDirectories = new TreeSet<File>();
     public static final File rootDirectory = File.listRoots()[0];
     public static final File externalStorageDirectory = android.os.Environment.getExternalStorageDirectory();
     public static final File androidRootDirectory = android.os.Environment.getRootDirectory();
+
+    private static final Set<File> usbStorageDirectories = new TreeSet<File>();
     private static File secondaryStorageDirectory;
     private static boolean isExternalStorageMounted;
     
     private static Context context;
-
-    public static boolean hasBusybox;
     public static boolean hasRoot;
     
     public static String busybox;
@@ -34,25 +41,36 @@ public final class Environment {
         if (busybox == null) {
             busybox = getUtilPath("busybox-ba");
         }
-        hasBusybox = busybox != null;
         hasRoot = isUtilAvailable("su");
         updateExternalStorageState();
         ActivityMonitor.addOnActivitiesOpenedListener(new ActivityMonitorListener());
+    }
+
+    public static boolean hasBusybox() {
+        return busybox != null;
+    }
+
+    @Nullable
+    public static String getBusybox() {
+        return busybox;
     }
     
     public static boolean isExternalStorageMounted() {
         return isExternalStorageMounted;
     }
-    
+
+    @Nullable
     public static File getSecondaryStorageDirectory() {
         return secondaryStorageDirectory;
     }
-    
+
+    @NotNull
     public static Set<File> getUsbStorageDirectories() {
         return usbStorageDirectories;
     }
     
     @SuppressLint("SdCardPath")
+    @Nullable
     public static String getUtilPath(String utilname) {
         final String[] places = { "/sbin/", "/system/bin/", "/system/xbin/", "/data/local/xbin/",
                 "/data/local/bin/", "/system/sd/xbin/", "/system/bin/failsafe/", "/data/local/", "/data/data/burrows.apps.busybox/app_busybox/", "/data/data/burrows.apps.busybox.paid/app_busybox/"};
@@ -88,6 +106,22 @@ public final class Environment {
         }
         return false;
     }
+
+    public static boolean isBusyboxUtilAvailable(final String util) {
+        if (busybox == null) {
+            return false;
+        }
+
+        final List<String> result = CommandLine.executeForResult(ShellHolder.getShell(),
+                new BusyboxListCommand());
+
+        for (final String resultLine : result) {
+            if (resultLine.equals(util)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     private static void resolveStorages() {
         final File externalStorage = android.os.Environment.getExternalStorageDirectory();
@@ -98,7 +132,7 @@ public final class Environment {
                 for (final File file : files) {
                     if (!file.equals(externalStorage) && file.canRead() && file.canWrite() && file.canExecute()) {
                         final String fileName = file.getName();
-                        if (fileName.equals("extSdCard") || fileName.equals("external_sd")) {
+                        if (fileName.equalsIgnoreCase("extSdCard") || fileName.equalsIgnoreCase("external_sd")) {
                             secondaryStorageDirectory = file;
                         } else if (fileName.contains("usb") || fileName.contains("USB") || fileName.contains("Usb")) {
                             usbStorageDirectories.add(file);

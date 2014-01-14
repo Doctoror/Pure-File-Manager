@@ -143,8 +143,8 @@ public final class SettingsFragment extends PreferenceFragment {
         size.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
         modif.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
         
-        command.setEnabled(Environment.hasBusybox);
-        root.setEnabled(Environment.hasRoot && Environment.hasBusybox);
+        command.setEnabled(Environment.hasBusybox());
+        root.setEnabled(Environment.hasRoot && Environment.hasBusybox());
         
         final Set<String> options = Settings.getBookmarks(parent.getApplicationContext());
         final String defaultHome = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();

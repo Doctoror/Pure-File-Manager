@@ -7,7 +7,11 @@ import com.docd.purefm.Environment;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.Permissions;
 import com.docd.purefm.settings.Settings;
+import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class CommandLineUtils {
 
@@ -20,7 +24,8 @@ public final class CommandLineUtils {
                 .replace("`", "\\`")
                 .replace(" ", "\\ ");
     }
-    
+
+    @NotNull
     protected static String toOctalPermission(Permissions p) {
         byte user = 00;
         byte group = 00;
@@ -85,10 +90,11 @@ public final class CommandLineUtils {
         final List<String> res = CommandLine.executeForResult(shell, new Command(command.toString()));
         return res != null && !res.isEmpty() && res.get(0).equals("exists");
     }
-    
+
+    @Nullable
     public static String touch(final Shell shell, final CommandLineFile target) {
         final String path = target.getAbsolutePath();
-        if (!CommandLine.execute(shell, new Touch(target.toFile()))) {
+        if (!CommandLine.execute(shell, new TouchCommand(target.toFile()))) {
             return null;
         }
         
@@ -103,7 +109,8 @@ public final class CommandLineUtils {
         }
         return res.isEmpty() ? null : res.get(0);
     }
-    
+
+    @Nullable
     public static String mkdir(final Shell shell, CommandLineFile target) {
         
         final String path = target.getAbsolutePath();
@@ -128,7 +135,8 @@ public final class CommandLineUtils {
         }
         return res.isEmpty() ? null : res.get(0);
     }
-    
+
+    @Nullable
     public static String mkdirs(final Shell shell, CommandLineFile target) {
         final String path = target.getAbsolutePath();
         
@@ -152,7 +160,8 @@ public final class CommandLineUtils {
         }
         return res.isEmpty() ? null : res.get(0);
     }
-    
+
+    @Nullable
     public static List<String> ls(final Shell shell, final File dir) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
@@ -167,7 +176,8 @@ public final class CommandLineUtils {
         }
         return CommandLine.executeForResult(shell, new Command(command.toString()));
     }
-    
+
+    @Nullable
     public static List<String> lsl(final Shell shell, final File dir) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
@@ -182,7 +192,8 @@ public final class CommandLineUtils {
         }
         return CommandLine.executeForResult(shell, new Command(command.toString()));
     }
-    
+
+    @Nullable
     public static List<String> lsld(final Shell shell, final File dir) {
         final StringBuilder command = new StringBuilder(50);
         command.append(Environment.busybox);
@@ -196,6 +207,21 @@ public final class CommandLineUtils {
             command.append(File.separatorChar);
         }
         return CommandLine.executeForResult(shell, new Command(command.toString()));
+    }
+
+    public static boolean copyRecursively(final Shell shell, final CopyCommand command) {
+        final boolean wasRemounted;
+        if (command.target.startsWith(Environment.androidRootDirectory.getAbsolutePath())) {
+            RootTools.remount(command.target, "RW");
+            wasRemounted = true;
+        } else {
+            wasRemounted = false;
+        }
+        final boolean result = CommandLine.execute(shell, command);
+        if (wasRemounted) {
+            RootTools.remount(command.target, "RO");
+        }
+        return result;
     }
 
     public static boolean isMSDOSFS(final File file) {

@@ -5,6 +5,8 @@ import java.io.File;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class PreviewHolder {
 
     public static void initialize(Context context) {
@@ -12,7 +14,8 @@ public final class PreviewHolder {
     }
     
     private static PreviewLruCache previews;
-    
+
+    @Nullable
     public static Bitmap get(File key) {
         return previews.get(key);
     }

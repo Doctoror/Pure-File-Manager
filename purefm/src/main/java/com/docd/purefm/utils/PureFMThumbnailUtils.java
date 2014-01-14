@@ -11,6 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class PureFMThumbnailUtils extends ThumbnailUtils {
     
     private PureFMThumbnailUtils() {}
@@ -31,16 +33,21 @@ public final class PureFMThumbnailUtils extends ThumbnailUtils {
         
         return BitmapFactory.decodeFile(target.getAbsolutePath(), o);
     }
-    
+
+    @Nullable
     public static Bitmap extractApkIcon(PackageManager pm, File file) {
         final String filePath = file.getPath();
         final PackageInfo packageInfo = pm.getPackageArchiveInfo(filePath, PackageManager.GET_ACTIVITIES);
         if(packageInfo != null) {
             final ApplicationInfo appInfo = packageInfo.applicationInfo;
-            appInfo.sourceDir = filePath;
-            appInfo.publicSourceDir = filePath;
-            final Drawable icon = appInfo.loadIcon(pm);
-            return ((BitmapDrawable) icon).getBitmap();
+            if (appInfo != null) {
+                appInfo.sourceDir = filePath;
+                appInfo.publicSourceDir = filePath;
+                final Drawable icon = appInfo.loadIcon(pm);
+                if (icon != null) {
+                    return ((BitmapDrawable) icon).getBitmap();
+                }
+            }
         }
         return null;
     }

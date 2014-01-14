@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Pair;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class MediaStoreUtils {
 
     private MediaStoreUtils() {}
@@ -31,7 +33,8 @@ public final class MediaStoreUtils {
         }
         c.close();
     }
-    
+
+    @NotNull
     private static Pair<String, String[]> filesToSelectionAndPaths(final List<File> files) {
         final StringBuilder selection = new StringBuilder();
         final int size = files.size();

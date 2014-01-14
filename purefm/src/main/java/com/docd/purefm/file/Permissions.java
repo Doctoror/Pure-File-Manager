@@ -115,4 +115,18 @@ public final class Permissions implements Serializable {
                 this.gr == p.gr && this.gw == p.gw && this.gx == p.gx &&
                 this.or == p.or && this.ow == p.ow && this.ox == p.ox;
     }
+
+    @Override
+    public int hashCode() {
+        int result = (ur ? 1 : 0);
+        result = 31 * result + (uw ? 1 : 0);
+        result = 31 * result + (ux ? 1 : 0);
+        result = 31 * result + (gr ? 1 : 0);
+        result = 31 * result + (gw ? 1 : 0);
+        result = 31 * result + (gx ? 1 : 0);
+        result = 31 * result + (or ? 1 : 0);
+        result = 31 * result + (ow ? 1 : 0);
+        result = 31 * result + (ox ? 1 : 0);
+        return result;
+    }
 }

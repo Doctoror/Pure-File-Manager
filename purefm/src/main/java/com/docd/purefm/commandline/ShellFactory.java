@@ -5,12 +5,15 @@ import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.exceptions.RootDeniedException;
 import com.stericson.RootTools.execution.Shell;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public final class ShellFactory {
     private ShellFactory() {}
 
+    @NotNull
     public static Shell getShell() throws IOException {
         RootTools.handlerEnabled = false;
         try {

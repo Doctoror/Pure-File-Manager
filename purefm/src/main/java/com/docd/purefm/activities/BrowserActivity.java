@@ -35,6 +35,8 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.view.SequentalTextView;
 
+import org.jetbrains.annotations.Nullable;
+
 public final class BrowserActivity extends MonitoredActivity {
 
     public static final String TAG_DIALOG = "dialog";
@@ -58,11 +60,6 @@ public final class BrowserActivity extends MonitoredActivity {
 
     public BrowserActivity() {
         this.currentlyDisplayedFragmentLock = new Object();
-        try {
-            ShellHolder.setShell(ShellFactory.getShell());
-        } catch (IOException e) {
-            Log.w("BrowserActivity", "Could not obtain shell: " + e);
-        }
     }
 
     /**
@@ -168,6 +165,7 @@ public final class BrowserActivity extends MonitoredActivity {
         this.pagerAdapter.notifyDataSetChanged();
     }
 
+    @Nullable
     public SequentalTextView getTitleView() {
         return this.title;
     }
