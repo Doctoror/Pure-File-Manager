@@ -177,6 +177,12 @@ public final class ActionModeController {
                 }
                 return true;
 
+            case R.id.deselect_all:
+                for (int i = 0; i < list.getCount(); i++) {
+                    list.setItemChecked(i, false);
+                }
+                return true;
+
             default:
                 return false;
             }

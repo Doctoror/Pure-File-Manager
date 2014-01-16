@@ -36,4 +36,9 @@
         android:title="@string/menu_select_all"
         android:showAsAction="never"/>
 
+    <item
+        android:id="@+id/deselect_all"
+        android:title="@string/menu_deselect_all"
+        android:showAsAction="never"/>
+
 </menu>
