@@ -46,6 +46,7 @@
     <string name="menu_properties">Eigenschaften</string>
     
     <string name="menu_select_all">Alle auswählen</string>
+    <string name="menu_deselect_all">Alle abwählen</string>
     
     <string name="_selected">\u0020ausgewählt</string>
     

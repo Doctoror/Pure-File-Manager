@@ -49,6 +49,7 @@
     <string name="menu_properties">Properties</string>
     
     <string name="menu_select_all">Select all</string>
+    <string name="menu_deselect_all">Deselect all</string>
     
     <string name="_selected">\u0020selected</string>
     
