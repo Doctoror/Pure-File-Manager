@@ -6,7 +6,6 @@ import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.activities.SettingsActivity;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.utils.Cache;
 
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -112,7 +111,6 @@ public final class SettingsFragment extends PreferenceFragment {
                         Settings.setAllowRoot(parent, false);
                     }
                 }
-                Cache.clear();
                 parent.notifyNeedInvalidate();
                 return true;
             }
@@ -129,7 +127,6 @@ public final class SettingsFragment extends PreferenceFragment {
                         command.setChecked(true);
                         Settings.setUseCommandLine(parent, true);
                         Settings.useCommandLine = true;
-                        Cache.clear();
                     }
                 }
                 

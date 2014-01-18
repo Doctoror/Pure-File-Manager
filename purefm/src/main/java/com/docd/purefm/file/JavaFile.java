@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import com.docd.purefm.utils.Cache;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.TextUtil;
 
@@ -34,7 +33,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.icon = MimeTypes.getTypeIcon(file);
         this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
-        Cache.addTo(this);
     }
     
     public JavaFile(File dir, String name) {
@@ -45,7 +43,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.icon = MimeTypes.getTypeIcon(file);
         this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
-        Cache.addTo(this);
     }
 
     public JavaFile(String dirPath, String name) {
@@ -56,7 +53,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.icon = MimeTypes.getTypeIcon(file);
         this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
-        Cache.addTo(this);
     }
 
     public JavaFile(String path) {
@@ -67,7 +63,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.icon = MimeTypes.getTypeIcon(file);
         this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
-        Cache.addTo(this);
     }
 
     public JavaFile(URI uri) {
@@ -78,7 +73,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.icon = MimeTypes.getTypeIcon(file);
         this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
         this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
-        Cache.addTo(this);
     }
     
     private Permissions readPermissions() {

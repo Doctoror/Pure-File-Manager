@@ -6,7 +6,7 @@
     android:gravity="center_vertical"
     android:background="?android:attr/activatedBackgroundIndicator">
 
-    <ImageView
+    <com.docd.purefm.view.OverlayRecyclingImageView
         android:id="@android:id/icon"
         android:layout_width="@dimen/preview_width"
         android:layout_height="@dimen/preview_width"
@@ -16,18 +16,6 @@
         android:cropToPadding="true"
         android:padding="5dp"
         android:src="@drawable/ic_fso_default"
-        tools:ignore="contentDescription"/>
-    
-    <ImageView
-        android:id="@android:id/icon1"
-        android:layout_width="@dimen/preview_width"
-        android:layout_height="@dimen/preview_width"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:scaleType="centerCrop"
-        android:cropToPadding="true"
-        android:visibility="invisible"
-        android:padding="5dp"
         tools:ignore="contentDescription"/>
 
     <TextView

@@ -32,7 +32,6 @@ import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.DirectoryScanTask;
-import com.docd.purefm.utils.Cache;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.view.SequentalTextView;
@@ -123,10 +122,7 @@ public final class BrowserFragment extends Fragment {
         this.sequenceListener = new OnSequenceClickListener() {
             @Override
             public void onSequenceClick(String sequence) {
-                GenericFile target = Cache.get(sequence);
-                if (target == null) {
-                    target = FileFactory.newFile(sequence);
-                }
+                final GenericFile target = FileFactory.newFile(sequence);
                 browser.navigate(target, true);
             }
         };

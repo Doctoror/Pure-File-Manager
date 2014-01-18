@@ -9,14 +9,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 
 import com.docd.purefm.R;
@@ -27,6 +26,8 @@ import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.file.Permissions;
 import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.PreviewHolder;
+import com.docd.purefm.utils.ResourcesLruCache;
+import com.docd.purefm.view.OverlayRecyclingImageView;
 
 public abstract class BrowserBaseAdapter implements ListAdapter,
         MultiListenerFileObserver.OnEventListener {
@@ -41,8 +42,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     private final DataSetObservable mDataSetObservable;
     private final FileObserverCache observerCache;
+    private final ResourcesLruCache resourcesLruCache;
     
     protected final Activity activity;
+    protected final Resources res;
     protected final LayoutInflater inflater;
     protected final List<GenericFile> files;
     protected final List<MultiListenerFileObserver> fileObservers;
@@ -52,9 +55,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     protected BrowserBaseAdapter(final Activity context) {
         this.handler = new Handler();
+        this.activity = context;
+        this.res = context.getResources();
         this.mDataSetObservable = new DataSetObservable();
         this.observerCache = FileObserverCache.getInstance();
-        this.activity = context;
+        this.resourcesLruCache = ResourcesLruCache.getInstance(this.res);
         this.inflater = LayoutInflater.from(context);
         this.files = new ArrayList<GenericFile>();
         this.fileObservers = new ArrayList<MultiListenerFileObserver>();
@@ -211,14 +216,13 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.notifyDataSetChanged();
     }
 
-    protected void applyOverlay(GenericFile f, ImageView overlay) {
+    protected void applyOverlay(GenericFile f, OverlayRecyclingImageView overlay) {
         final Permissions p = f.getPermissions();
         
         if (f.isSymlink()) {
-            overlay.setImageResource(R.drawable.ic_fso_symlink);
-            overlay.setVisibility(View.VISIBLE);
+            overlay.setOverlay(this.resourcesLruCache.get(R.drawable.ic_fso_symlink));
         } else if (f.isDirectory()) {
-            overlay.setVisibility(View.INVISIBLE);
+            overlay.setOverlay(null);
         } else {
             int icon = f.getTypeIcon();
             if (icon == 0) {
@@ -227,10 +231,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                 }
             }
             if (icon == 0) {
-                overlay.setVisibility(View.INVISIBLE);
+                overlay.setOverlay(null);
             } else {
-                overlay.setVisibility(View.VISIBLE);
-                overlay.setImageResource(icon);
+                overlay.setOverlay(this.resourcesLruCache.get(icon));
             }
         }
     }
@@ -259,15 +262,13 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             implements Runnable
     {
 
-        private final ImageView logo;
-        private final ImageView overlay;
+        private final OverlayRecyclingImageView logo;
         private final GenericFile file;
 
-        protected Job(GenericFile file, ImageView logo, ImageView overlay)
+        protected Job(GenericFile file, OverlayRecyclingImageView logo)
         {
             this.file = file;
             this.logo = logo;
-            this.overlay = overlay;
         }
 
         @Override
@@ -276,14 +277,13 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             final Thread t = Thread.currentThread();
             t.setPriority(Thread.NORM_PRIORITY - 1);
             
-            final Bitmap result = PreviewHolder.get(this.file.toFile());
-            
+            final Drawable result = PreviewHolder.get(this.file.toFile());
             if (result != null && logo.getTag().equals(this.file)) {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        logo.setImageBitmap(result);
-                        overlay.setImageDrawable(null);
+                        logo.setImageDrawable(result);
+                        logo.setOverlay(null);
                     }
                 });
             }

@@ -16,7 +16,6 @@ import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.Cache;
 
 public final class Browser implements MultiListenerFileObserver.OnEventListener {
 
@@ -131,14 +130,9 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
         final String parent = this.path.getParent();
         if (parent != null) {
-            GenericFile p = Cache.get(parent);
-            if (p == null) {
-                p = this.path.getParentFile();
-            }
-            if (p != null) {
-                this.history.push(p);
-                this.navigate(p, true);
-            }
+            final GenericFile p = FileFactory.newFile(parent);
+            this.history.push(p);
+            this.navigate(p, true);
         }
     }
     

@@ -3,11 +3,11 @@ package com.docd.purefm.adapters;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.view.OverlayRecyclingImageView;
 
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public final class BrowserListAdapter extends BrowserBaseAdapter {
@@ -30,8 +30,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             v = this.inflater
                     .inflate(R.layout.list_item_file, null);
             h = new Holder();
-            h.icon = (ImageView) v.findViewById(android.R.id.icon);
-            h.overlay = (ImageView) v.findViewById(android.R.id.icon1);
+            h.icon = (OverlayRecyclingImageView) v.findViewById(android.R.id.icon);
             h.title = (TextView) v.findViewById(android.R.id.title);
             h.date = (TextView) v.findViewById(android.R.id.text1);
             h.perm = (TextView) v.findViewById(android.R.id.text2);
@@ -43,12 +42,12 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         
         final GenericFile f = this.files.get(pos);
         h.icon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder : R.drawable.ic_fso_default);
-        this.applyOverlay(f, h.overlay);
+        this.applyOverlay(f, h.icon);
 
         if (Settings.showPreviews) {
             h.icon.setTag(f);
             try {
-                this.executor.submit(new Job(f, h.icon, h.overlay));
+                this.executor.submit(new Job(f, h.icon));
             } catch (Exception e) {
             }
         }
@@ -64,8 +63,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         
         private Holder() {}
         
-        protected ImageView icon;
-        protected ImageView overlay;
+        protected OverlayRecyclingImageView icon;
         protected TextView title;
         protected TextView size;
         protected TextView date;

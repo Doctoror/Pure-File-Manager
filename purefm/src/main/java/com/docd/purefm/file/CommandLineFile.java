@@ -20,7 +20,6 @@ import com.docd.purefm.commandline.CopyCommand;
 import com.docd.purefm.commandline.MoveCommand;
 import com.docd.purefm.commandline.RemoveCommand;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.utils.Cache;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.TextUtil;
 
@@ -226,7 +225,6 @@ public final class CommandLineFile implements GenericFile,
             targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);
             targetFile.icon = MimeTypes.getTypeIcon(targetFile.file);
         }
-        Cache.addTo(targetFile);
     }
 
     @Override
