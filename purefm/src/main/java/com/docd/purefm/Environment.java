@@ -21,6 +21,8 @@ import java.util.TreeSet;
 public final class Environment {
     
     private Environment() {}
+
+    private static final ActivityMonitorListener activityMonitorListener = new ActivityMonitorListener();
     
     public static final File rootDirectory = File.listRoots()[0];
     public static final File externalStorageDirectory = android.os.Environment.getExternalStorageDirectory();
@@ -43,7 +45,7 @@ public final class Environment {
         }
         hasRoot = isUtilAvailable("su");
         updateExternalStorageState();
-        ActivityMonitor.addOnActivitiesOpenedListener(new ActivityMonitorListener());
+        ActivityMonitor.addOnActivitiesOpenedListener(activityMonitorListener);
     }
 
     public static boolean hasBusybox() {
@@ -114,10 +116,11 @@ public final class Environment {
 
         final List<String> result = CommandLine.executeForResult(ShellHolder.getShell(),
                 new BusyboxListCommand());
-
-        for (final String resultLine : result) {
-            if (resultLine.equals(util)) {
-                return true;
+        if (result != null) {
+            for (final String resultLine : result) {
+                if (resultLine.equals(util)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -180,14 +183,27 @@ public final class Environment {
 
     private static final class ActivityMonitorListener implements ActivityMonitor.OnActivitiesOpenedListener {
 
+        private final Object lock = new Object();
+        private volatile boolean isRegistered;
+
         @Override
         public void onActivitiesOpen() {
-            context.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
+            synchronized (this.lock) {
+                if (!this.isRegistered) {
+                    context.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
+                    this.isRegistered = true;
+                }
+            }
         }
 
         @Override
         public void onActivitiesClosed() {
-            context.unregisterReceiver(externalStorageStateReceiver);
+            synchronized (this.lock) {
+                if (this.isRegistered) {
+                    context.unregisterReceiver(externalStorageStateReceiver);
+                    this.isRegistered = false;
+                }
+            }
         }
     }
 }
