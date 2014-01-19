@@ -27,7 +27,7 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
         Holder h;
         
         if (v == null) {
-            v = this.inflater.inflate(R.layout.grid_item_file, null);
+            v = this.mLayoutInflater.inflate(R.layout.grid_item_file, null);
             h = new Holder();
             h.icon = (OverlayRecyclingImageView) v.findViewById(android.R.id.icon);
             h.title = (TextView) v.findViewById(android.R.id.title);
@@ -36,17 +36,12 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
             h = (Holder) v.getTag();
         }
         
-        final GenericFile f = this.files.get(pos);
+        final GenericFile f = this.getItem(pos);
         h.icon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder : R.drawable.ic_fso_default);
         this.applyOverlay(f, h.icon);
         
         if (Settings.showPreviews) {
-            h.icon.setTag(f);
-            try {
-                this.executor.submit(new Job(f, h.icon));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            loadPreview(f, h.icon);
         }
         h.title.setText(f.getName());
         

@@ -232,22 +232,22 @@ public final class CommandLineUtils {
 //    public static String printPermission(final boolean su, final File file) {
 //        final StringBuilder command = new StringBuilder("busybox stat -c %A ");
 //        command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-//        final List<String> res = CommandLine.executeForResult(su, command.toString());
-//        return res == null || res.isEmpty() ? null : res.get(0);
+//        final List<String> mResources = CommandLine.executeForResult(su, command.toString());
+//        return mResources == null || mResources.isEmpty() ? null : mResources.get(0);
 //    }
 //    
 //    public static String printOwner(final boolean su, final File file) {
 //        final StringBuilder command = new StringBuilder("busybox stat -c %U ");
 //        command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-//        final List<String> res = CommandLine.executeForResult(su, command.toString());
-//        return res == null || res.isEmpty() ? null : res.get(0);
+//        final List<String> mResources = CommandLine.executeForResult(su, command.toString());
+//        return mResources == null || mResources.isEmpty() ? null : mResources.get(0);
 //    }
 //    
 //    public static String readlink(final boolean su, final File file) {
 //        final StringBuilder command = new StringBuilder("readlink ");
 //        command.append(CommandLineUtils.getCommandLineString(file.getAbsolutePath()));
-//        final List<String> res = CommandLine.executeForResult(su, command.toString());
-//        return res == null || res.isEmpty() ? null : res.get(0);
+//        final List<String> mResources = CommandLine.executeForResult(su, command.toString());
+//        return mResources == null || mResources.isEmpty() ? null : mResources.get(0);
 //    }
     
     public static String getFSType(final Shell shell, File file) {

@@ -27,7 +27,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         Holder h;
         
         if (v == null) {
-            v = this.inflater
+            v = this.mLayoutInflater
                     .inflate(R.layout.list_item_file, null);
             h = new Holder();
             h.icon = (OverlayRecyclingImageView) v.findViewById(android.R.id.icon);
@@ -40,16 +40,12 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h = (Holder) v.getTag();
         }
         
-        final GenericFile f = this.files.get(pos);
+        final GenericFile f = this.getItem(pos);
         h.icon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder : R.drawable.ic_fso_default);
         this.applyOverlay(f, h.icon);
 
         if (Settings.showPreviews) {
-            h.icon.setTag(f);
-            try {
-                this.executor.submit(new Job(f, h.icon));
-            } catch (Exception e) {
-            }
+            loadPreview(f, h.icon);
         }
         h.title.setText(f.getName());
         h.date.setText(Settings.showLastModified ? f.humanReadableLastModified() : "");
