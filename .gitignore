@@ -32,7 +32,7 @@ proguard/
 *.iws
 .idea/
 
-# Android Studio
-\build
-\gradle
+# Gradle
+build
+gradle
 .gradle
