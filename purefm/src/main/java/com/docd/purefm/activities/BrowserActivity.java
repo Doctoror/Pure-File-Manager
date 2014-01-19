@@ -35,6 +35,7 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.view.SequentialTextView;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
@@ -87,6 +88,12 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             fm.beginTransaction().remove(f).commit();
             fm.executePendingTransactions();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.invalidateOptionsMenu();
     }
 
     @Override
@@ -204,7 +211,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
+    public boolean onKeyUp(int keyCode, @NotNull KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_SEARCH) {
             final Intent searchIntent = new Intent(this, SearchActivity.class);
             searchIntent.putExtra(Extras.EXTRA_PATH, currentPath.getAbsolutePath());

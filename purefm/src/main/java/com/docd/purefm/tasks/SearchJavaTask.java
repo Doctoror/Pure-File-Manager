@@ -7,21 +7,20 @@ import java.io.File;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 
-public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
+public final class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-        final File target = new File(params[0]);
         try {
-            this.search(target, params[1]);
+            this.search(new File(params[1]), params[0]);
         } catch (Throwable e) {
             e.printStackTrace();
         }
         return null;
     }
     
-    private void search(final File source, final String name) {
-        final File[] files = source.listFiles();
+    private void search(final File location, final String name) {
+        final File[] files = location.listFiles();
         if (files != null) {
             for (final File file : files) {
                 if (this.isCancelled()) {
