@@ -7,7 +7,7 @@
     android:scrollbars="none"
     android:overScrollMode="never" >
 
-    <com.docd.purefm.view.SequentalTextView
+    <com.docd.purefm.view.SequentialTextView
         android:id="@android:id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

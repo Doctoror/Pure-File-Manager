@@ -34,8 +34,8 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.DirectoryScanTask;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
-import com.docd.purefm.view.SequentalTextView;
-import com.docd.purefm.view.SequentalTextView.OnSequenceClickListener;
+import com.docd.purefm.view.SequentialTextView;
+import com.docd.purefm.view.SequentialTextView.OnSequenceClickListener;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +53,7 @@ public final class BrowserFragment extends Fragment {
     private BrowserBaseAdapter adapter;
     private OnNavigateListener parentListener;
 
-    private SequentalTextView title;
+    private SequentialTextView title;
     private OnSequenceClickListener sequenceListener;
 
     private AbsListView list;

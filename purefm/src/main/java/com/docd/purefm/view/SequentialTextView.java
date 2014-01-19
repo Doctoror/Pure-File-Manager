@@ -11,7 +11,7 @@ import android.view.ViewParent;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
-public class SequentalTextView extends TextView {
+public class SequentialTextView extends TextView {
 
     private static final String SEQUENCE_SEPARATOR = " > ";
     private static final String ROOT = "root";
@@ -30,18 +30,18 @@ public class SequentalTextView extends TextView {
     private OnSequenceClickListener listener;
     private HorizontalScrollView parent;
     
-    public SequentalTextView(Context context)
+    public SequentialTextView(Context context)
     {
         super(context);
     }
 
-    public SequentalTextView(Context context, AttributeSet attrs)
+    public SequentialTextView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
     }
 
-    public SequentalTextView(Context context, AttributeSet attrs,
-            int defStyle)
+    public SequentialTextView(Context context, AttributeSet attrs,
+                              int defStyle)
     {
         super(context, attrs, defStyle);
     }

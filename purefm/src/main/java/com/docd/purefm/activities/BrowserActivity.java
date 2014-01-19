@@ -31,7 +31,7 @@ import com.docd.purefm.browser.Browser.OnNavigateListener;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.view.SequentalTextView;
+import com.docd.purefm.view.SequentialTextView;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +42,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     public static final int REQUEST_CODE_SETTINGS = 0;
 
     private ActionBar actionBar;
-    private SequentalTextView title;
+    private SequentialTextView title;
 
     private boolean isDrawerOpened;
     private DrawerLayout drawerLayout;
@@ -101,7 +101,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
                 R.layout.activity_browser_actionbar, null);
         this.actionBar.setCustomView(custom);
 
-        this.title = (SequentalTextView) custom
+        this.title = (SequentialTextView) custom
                 .findViewById(android.R.id.title);
     }
 
@@ -166,7 +166,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     @Nullable
-    public SequentalTextView getTitleView() {
+    public SequentialTextView getTitleView() {
         return this.title;
     }
 
