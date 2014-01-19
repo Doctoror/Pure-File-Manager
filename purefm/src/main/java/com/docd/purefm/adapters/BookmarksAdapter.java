@@ -28,6 +28,10 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * ListAdapter of Bookmarks (Sliding drawer content)
+ * @author Doctoror
+ */
 public final class BookmarksAdapter implements ListAdapter {
     private final List<String> bookmarks;
     
