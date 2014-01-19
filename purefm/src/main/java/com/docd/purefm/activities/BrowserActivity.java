@@ -35,7 +35,7 @@ import com.docd.purefm.view.SequentalTextView;
 
 import org.jetbrains.annotations.Nullable;
 
-public final class BrowserActivity extends MonitoredActivity {
+public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
     public static final String TAG_DIALOG = "dialog";
 

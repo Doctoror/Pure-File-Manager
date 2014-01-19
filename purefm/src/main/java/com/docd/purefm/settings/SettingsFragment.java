@@ -4,9 +4,9 @@ import java.util.Set;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
-import com.docd.purefm.activities.SettingsActivity;
 import com.docd.purefm.commandline.ShellHolder;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -16,6 +16,14 @@ import android.preference.PreferenceFragment;
 public final class SettingsFragment extends PreferenceFragment {
 
     private boolean wasAllowRoot;
+
+    @Override
+    public void onAttach(final Activity activity) {
+        super.onAttach(activity);
+        if (!(activity instanceof SettingsActivity)) {
+            throw new RuntimeException("Should be attached only to SettingsActivity");
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,6 +119,7 @@ public final class SettingsFragment extends PreferenceFragment {
                         Settings.setAllowRoot(parent, false);
                     }
                 }
+                parent.proxyInvalidateActionBarIcon();
                 parent.notifyNeedInvalidate();
                 return true;
             }
@@ -131,6 +140,7 @@ public final class SettingsFragment extends PreferenceFragment {
                 }
                 
                 command.setEnabled(!Settings.su);
+                parent.proxyInvalidateActionBarIcon();
                 parent.notifyNeedInvalidate();
                 return true;
             }

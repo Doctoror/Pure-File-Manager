@@ -29,7 +29,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-public final class SearchActivity extends MonitoredActivity {
+public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
 
     private ActionModeController actionModeController;
 

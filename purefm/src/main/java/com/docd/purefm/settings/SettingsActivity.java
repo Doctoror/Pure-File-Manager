@@ -1,13 +1,14 @@
-package com.docd.purefm.activities;
+package com.docd.purefm.settings;
 
 import com.docd.purefm.R;
+import com.docd.purefm.activities.SuperuserActionBarMonitoredActivity;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-public final class SettingsActivity extends MonitoredActivity {
+public final class SettingsActivity extends SuperuserActionBarMonitoredActivity {
 
     private boolean needInvalidate;
     
@@ -42,5 +43,9 @@ public final class SettingsActivity extends MonitoredActivity {
     
     public void notifyNeedInvalidate() {
         this.needInvalidate = true;
+    }
+
+    void proxyInvalidateActionBarIcon() {
+        invalidateActionBarIcon();
     }
 }

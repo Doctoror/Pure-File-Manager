@@ -47,7 +47,7 @@
             android:configChanges="orientation|screenSize"/>
 
         <activity
-            android:name="com.docd.purefm.activities.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:configChanges="orientation|screenSize"/>
 
     </application>

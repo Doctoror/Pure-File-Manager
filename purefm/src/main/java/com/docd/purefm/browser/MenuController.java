@@ -4,7 +4,7 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.activities.SearchActivity;
-import com.docd.purefm.activities.SettingsActivity;
+import com.docd.purefm.settings.SettingsActivity;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.dialogs.CreateDirectoryDialog;
 import com.docd.purefm.dialogs.CreateFileDialog;
