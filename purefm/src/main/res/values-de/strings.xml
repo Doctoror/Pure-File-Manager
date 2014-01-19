@@ -144,8 +144,7 @@
     <string name="used">Verwendet:</string>
     
     <!-- Search -->
-    <!-- TODO Obsolete. Needs updating. Refer to default string.xml -->
-    <string name="search_denied_message">Die folgende Ordner benötigen Root-Zugriff.</string>
+    <string name="search_denied_message">Zugriff für die folgende Orte verweigert.</string>
     
     <!-- Quit Dialog -->
     <string name="dialog_quit_message">Anwendung schließen?</string>
