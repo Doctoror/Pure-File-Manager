@@ -9,27 +9,81 @@ import com.docd.purefm.file.Permissions;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public final class FilePermissionsController {
-    
-    private GenericFile file;
-    
+public final class FilePermissionsController implements CompoundButton.OnCheckedChangeListener {
+
+    /**
+     * Permissions that file had when FilePermissionsController was created
+     */
+    private final Permissions mInputPermissions;
+
+    /**
+     * Currently modified permissions
+     */
+    private Permissions mModifiedPermissions;
+
+    /**
+     * Target file
+     */
+    private final GenericFile mFile;
+
+    /**
+     * Dialog "Apply" button
+     */
+    private final View mApplyButton;
+
+    /**
+     * User: read
+     */
     private CompoundButton ur;
+
+    /**
+     * User: write
+     */
     private CompoundButton uw;
+
+    /**
+     * User: execute
+     */
     private CompoundButton ux;
+
+    /**
+     * Group: read
+     */
     private CompoundButton gr;
+
+    /**
+     * Group: write
+     */
     private CompoundButton gw;
+
+    /**
+     * Group: execute
+     */
     private CompoundButton gx;
+
+    /**
+     * Others: read
+     */
     private CompoundButton or;
+
+    /**
+     * Others: write
+     */
     private CompoundButton ow;
+
+    /**
+     * Others: execute
+     */
     private CompoundButton ox;
     
-    public FilePermissionsController(View table, GenericFile file) {
-        this.file = file;
+    public FilePermissionsController(View table, GenericFile file, final View applyButton) {
+        this.mFile = file;
         final TextView owner = (TextView) table.findViewById(R.id.owner);
         final TextView group = (TextView) table.findViewById(R.id.group);
         
@@ -43,6 +97,7 @@ public final class FilePermissionsController {
         this.or = (CompoundButton) table.findViewById(R.id.oread);
         this.ow = (CompoundButton) table.findViewById(R.id.owrite);
         this.ox = (CompoundButton) table.findViewById(R.id.oexecute);
+
         this.ur.setChecked(p.ur);
         this.uw.setChecked(p.uw);
         this.ux.setChecked(p.ux);
@@ -53,13 +108,21 @@ public final class FilePermissionsController {
         this.ow.setChecked(p.ow);
         this.ox.setChecked(p.ox);
 
+        this.ur.setOnCheckedChangeListener(this);
+        this.uw.setOnCheckedChangeListener(this);
+        this.ux.setOnCheckedChangeListener(this);
+        this.gr.setOnCheckedChangeListener(this);
+        this.gw.setOnCheckedChangeListener(this);
+        this.gx.setOnCheckedChangeListener(this);
+        this.or.setOnCheckedChangeListener(this);
+        this.ow.setOnCheckedChangeListener(this);
+        this.ox.setOnCheckedChangeListener(this);
+
         if (file instanceof CommandLineFile) {
             final CommandLineFile f = (CommandLineFile) file;
-            String name = AIDHelper.getAIDs(table.getContext(), false).get(f.getOwner());
-            owner.setText(name);
-            
-            name = AIDHelper.getAIDs(table.getContext(), false).get(f.getGroup());
-            group.setText(name);
+            final SparseArray<String> aids = AIDHelper.getAIDs(table.getContext(), false);
+            owner.setText(aids.get(f.getOwner()));
+            group.setText(aids.get(f.getGroup()));
             
             if (CommandLineUtils.isMSDOSFS(f.toFile())) {
                 this.disableBoxes();
@@ -67,8 +130,23 @@ public final class FilePermissionsController {
         } else {
             this.disableBoxes();
         }
+
+        applyButton.setVisibility(View.GONE);
+        this.mInputPermissions = p;
+        this.mModifiedPermissions = p;
+        this.mApplyButton = applyButton;
     }
-    
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        this.mModifiedPermissions = new Permissions(
+                this.ur.isChecked(), this.uw.isChecked(), this.ux.isChecked(),
+                this.gr.isChecked(), this.gw.isChecked(), this.gx.isChecked(),
+                this.or.isChecked(), this.ow.isChecked(), this.ox.isChecked());
+        mApplyButton.setVisibility(mInputPermissions.equals(mModifiedPermissions) ?
+                View.GONE : View.VISIBLE);
+    }
+
     private void disableBoxes() {
         this.ur.setEnabled(false);
         this.uw.setEnabled(false);
@@ -82,17 +160,9 @@ public final class FilePermissionsController {
     }
     
     public void applyPermissions(final Context context) {
-        if (this.ur.isEnabled() && this.file instanceof CommandLineFile) {
-            final Permissions target = new Permissions(
-                    this.ur.isChecked(), this.uw.isChecked(), this.ux.isChecked(),
-                    this.gr.isChecked(), this.gw.isChecked(), this.gx.isChecked(),
-                    this.or.isChecked(), this.ow.isChecked(), this.ox.isChecked());
-            
-            if (target.equals(file.getPermissions())) {
-                return;
-            }
-            final ApplyTask task = new ApplyTask(context, target);
-            task.execute((CommandLineFile)this.file);
+        if (!mInputPermissions.equals(mModifiedPermissions) && mFile instanceof CommandLineFile) {
+            final ApplyTask task = new ApplyTask(context, mModifiedPermissions);
+            task.execute((CommandLineFile)this.mFile);
         }
     }
     

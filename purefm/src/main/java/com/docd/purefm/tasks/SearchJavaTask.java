@@ -7,7 +7,7 @@ import java.io.File;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 
-public final class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
+public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
 
     @Override
     protected Void doInBackground(String... params) {

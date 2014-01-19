@@ -110,6 +110,8 @@
     <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>
     
     <!-- Permissions -->
+    <!-- TODO translate "apply" string to German -->
+    <string name="apply">Apply</string>
     <string name="applying_failed">Anwenden gescheitert</string>
     <string name="permissions_changed">Berechtigung geändert</string>
     

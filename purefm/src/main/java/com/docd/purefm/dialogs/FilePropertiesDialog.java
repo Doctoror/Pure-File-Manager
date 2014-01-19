@@ -13,11 +13,13 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.ViewFlipper;
+import android.widget.ViewAnimator;
+
+import org.jetbrains.annotations.NotNull;
 
 public final class FilePropertiesDialog extends DialogFragment {
     
-    public static final DialogFragment instantiate(GenericFile f) {
+    public static DialogFragment instantiate(GenericFile f) {
         final Bundle extras = new Bundle();
         extras.putSerializable(Extras.EXTRA_FILE, f);
         
@@ -27,10 +29,11 @@ public final class FilePropertiesDialog extends DialogFragment {
     }
     
     private GenericFile file;
+    private View mPermissionsView;
     
     @SuppressWarnings("unused")
-    private FilePropertiesController fpc;
-    private FilePermissionsController fpermc;
+    private FilePropertiesController mFilePropertiesController;
+    private FilePermissionsController mFilePermissionsController;
     
     @Override
     public void onCreate(Bundle state) {
@@ -48,7 +51,13 @@ public final class FilePropertiesDialog extends DialogFragment {
         builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                fpermc.applyPermissions(getActivity());
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mFilePermissionsController.applyPermissions(getActivity());
                 dialog.dismiss();
             }
         });
@@ -58,9 +67,16 @@ public final class FilePropertiesDialog extends DialogFragment {
         builder.setView(content);
         return builder.create();
     }
-    
-    private void initView(View view) {
-        final ViewFlipper flipper = (ViewFlipper) view.findViewById(R.id.flipper);
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        this.mFilePermissionsController = new FilePermissionsController(mPermissionsView, this.file,
+                ((AlertDialog) this.getDialog()).getButton(AlertDialog.BUTTON_POSITIVE));
+    }
+
+    private void initView(@NotNull final View view) {
+        final ViewAnimator flipper = (ViewAnimator) view.findViewById(R.id.tabsContainer);
         final CompoundButton tab1 = (CompoundButton) view.findViewById(R.id.tab1);
         final CompoundButton tab2 = (CompoundButton) view.findViewById(R.id.tab2);
         
@@ -81,8 +97,8 @@ public final class FilePropertiesDialog extends DialogFragment {
                 flipper.setDisplayedChild(1);
             }
         });
-        
-        this.fpc = new FilePropertiesController(flipper.getChildAt(0), this.file);
-        this.fpermc = new FilePermissionsController(flipper.getChildAt(1), this.file);
+
+        this.mPermissionsView = flipper.getChildAt(1);
+        this.mFilePropertiesController = new FilePropertiesController(flipper.getChildAt(0), this.file);
     }
 }

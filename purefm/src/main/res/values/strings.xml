@@ -119,6 +119,7 @@
     <string name="dialog_delete_title">The following files will be deleted:</string>
     
     <!-- Permissions -->
+    <string name="apply">Apply</string>
     <string name="applying_failed">Applying failed</string>
     <string name="permissions_changed">Permissions changed</string>
     
