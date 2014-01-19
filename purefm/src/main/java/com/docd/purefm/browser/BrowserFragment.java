@@ -173,6 +173,11 @@ public final class BrowserFragment extends Fragment {
         if (this.browserActivity != null && !this.browserActivity.isDrawerOpened()) {
             inflater.inflate(R.menu.browser, menu);
 
+            // TODO it returns true even on devices that don't have the physical key. Find a better method to detect search hardware button
+            //if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_SEARCH)) {
+            //    menu.removeItem(R.id.menu_search);
+            //}
+
             final MenuItem content = menu.findItem(android.R.id.content);
             this.refreshItem = menu.findItem(R.id.refresh);
 

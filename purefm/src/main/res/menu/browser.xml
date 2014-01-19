@@ -17,6 +17,24 @@
         android:id="@android:id/content"
         android:showAsAction="ifRoom"
         android:title=""/>
+
+    <item
+        android:id="@+id/menu_file_new"
+        android:icon="@drawable/action_file_new"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_new_file"/>
+
+    <item
+        android:id="@+id/menu_folder_new"
+        android:icon="@drawable/action_folder_new"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_new_folder"/>
+
+    <item
+        android:id="@+id/menu_search"
+        android:icon="@drawable/action_search"
+        android:title="@string/menu_search"
+        android:showAsAction="ifRoom"/>
     
     <item
         android:icon="@drawable/action_sort"
@@ -66,24 +84,6 @@
         		android:showAsAction="never"/>
         </menu>
     </item>
-    
-    <item
-        android:id="@+id/menu_search"
-        android:icon="@drawable/action_search"
-        android:title="@string/menu_search"
-        android:showAsAction="ifRoom"/>
-	
-	<item
-        android:id="@+id/menu_file_new"
-        android:icon="@drawable/action_file_new"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_new_file"/>
-    
-    <item
-        android:id="@+id/menu_folder_new"
-        android:icon="@drawable/action_folder_new"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_new_folder"/>
     
     <item
         android:id="@+id/menu_partition"

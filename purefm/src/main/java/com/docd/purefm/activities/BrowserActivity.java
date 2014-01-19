@@ -12,16 +12,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
@@ -46,6 +49,9 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
     private boolean isDrawerOpened;
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private boolean mShowHomeAsUp;
+
     private ListView drawerList;
     BookmarksAdapter bookmarksAdapter;
     GenericFile currentPath;
@@ -95,7 +101,9 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             throw new RuntimeException("BrowserActivity should have an ActionBar");
         }
         this.actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-                | ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_USE_LOGO);
+                | ActionBar.DISPLAY_SHOW_CUSTOM
+                | ActionBar.DISPLAY_USE_LOGO
+                | ActionBar.DISPLAY_HOME_AS_UP);
 
         final View custom = LayoutInflater.from(this).inflate(
                 R.layout.activity_browser_actionbar, null);
@@ -114,52 +122,38 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
         this.drawerLayout = (DrawerLayout) this
                 .findViewById(R.id.drawer);
-        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+        this.drawerLayout.setDrawerShadow(R.drawable.holo_light_drawer_shadow,
 				GravityCompat.START);
-        this.drawerLayout.setDrawerListener(new DrawerListener() {
-
-            private boolean hadShowHomeAsUp;
-
-            @Override
-            public void onDrawerOpened(View arg0) {
-                isDrawerOpened = true;
-                this.hadShowHomeAsUp = (actionBar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) == ActionBar.DISPLAY_HOME_AS_UP;
-                actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-                        | ActionBar.DISPLAY_USE_LOGO
-                        | ActionBar.DISPLAY_SHOW_TITLE);
-                actionBar.setTitle(R.string.menu_bookmarks);
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerClosed(View arg0) {
-                isDrawerOpened = false;
-                actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-                        | ActionBar.DISPLAY_SHOW_CUSTOM
-                        | ActionBar.DISPLAY_USE_LOGO
-                        | (this.hadShowHomeAsUp ? ActionBar.DISPLAY_HOME_AS_UP
-                                : 0));
-                if (bookmarksAdapter.isModified()) {
-                    Settings.saveBookmarks(getApplicationContext(),
-                            bookmarksAdapter.getData());
-                }
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerSlide(View arg0, float arg1) {
-            }
-
-            @Override
-            public void onDrawerStateChanged(int arg0) {
-            }
-
-        });
+        this.mDrawerToggle = new BrowserActivityDrawerToggle(this, this.drawerLayout,
+                R.drawable.holo_light_ic_drawer, R.string.menu_bookmarks, R.string.app_name);
+        this.drawerLayout.setDrawerListener(this.mDrawerToggle);
 
         this.drawerList = (ListView) this.findViewById(R.id.drawerList);
         this.drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(this,
                 Settings.getBookmarks(getApplicationContext())));
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        //if (!mShowHomeAsUp) {
+            mDrawerToggle.syncState();
+        //}
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (!mShowHomeAsUp && mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     public void invalidateList() {
         this.pagerAdapter.notifyDataSetChanged();
@@ -180,6 +174,14 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         }
     }
 
+    /**
+     * Toggles between using up button or navigation drawer icon by setting the DrawerListener
+     */
+    void setActionBarDrawerListener(final boolean showUpButton) {
+        mShowHomeAsUp = showUpButton;
+        mDrawerToggle.setDrawerIndicatorEnabled(!showUpButton);
+    }
+
     public OnNavigateListener createOnNavigationListener() {
         return new OnNavigateListener() {
 
@@ -194,7 +196,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             public void onNavigationCompleted(GenericFile path) {
                 currentPath = path;
                 title.setFile(path.toFile());
-                actionBar.setDisplayHomeAsUpEnabled(!path.toFile().equals(
+                setActionBarDrawerListener(!path.toFile().equals(
                         this.root));
                 invalidateOptionsMenu();
             }
@@ -203,12 +205,21 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_SEARCH) {
+            final Intent searchIntent = new Intent(this, SearchActivity.class);
+            searchIntent.putExtra(Extras.EXTRA_PATH, currentPath.getAbsolutePath());
+            startActivity(searchIntent);
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         if (this.isDrawerOpened) {
             this.getMenuInflater().inflate(R.menu.activity_bookmarks, menu);
             return true;
-        } else {
-            this.getMenuInflater().inflate(R.menu.activity_browser, menu);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -221,10 +232,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             if (path != null) {
                 this.bookmarksAdapter.addItem(path);
             }
-            return true;
-            
-        case R.id.menu_drawer:
-            this.drawerLayout.openDrawer(this.drawerList);
             return true;
 
         default:
@@ -312,6 +319,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
         this.title.fullScrollRight();
     }
 
@@ -321,6 +329,40 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             if (resultCode == Activity.RESULT_OK) {
                 pagerAdapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    private final class BrowserActivityDrawerToggle extends ActionBarDrawerToggle {
+
+        private BrowserActivityDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes);
+        }
+
+        @Override
+        public void onDrawerOpened(final View drawerView) {
+            super.onDrawerOpened(drawerView);
+            isDrawerOpened = true;
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+                    | ActionBar.DISPLAY_HOME_AS_UP
+                    | ActionBar.DISPLAY_USE_LOGO
+                    | ActionBar.DISPLAY_SHOW_TITLE);
+            actionBar.setTitle(R.string.menu_bookmarks);
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onDrawerClosed(final View drawerView) {
+            super.onDrawerClosed(drawerView);
+            isDrawerOpened = false;
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+                    | ActionBar.DISPLAY_HOME_AS_UP
+                    | ActionBar.DISPLAY_SHOW_CUSTOM
+                    | ActionBar.DISPLAY_USE_LOGO);
+            if (bookmarksAdapter.isModified()) {
+                Settings.saveBookmarks(getApplicationContext(),
+                        bookmarksAdapter.getData());
+            }
+            invalidateOptionsMenu();
         }
     }
 }
