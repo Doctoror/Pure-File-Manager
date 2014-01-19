@@ -4,9 +4,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-
 import android.content.Context;
+import android.text.SpannableString;
 import android.text.format.DateFormat;
+
+import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.text.style.DashSpan;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -68,5 +71,17 @@ public final class TextUtil {
         }
         return 0;
     }
-    
+
+    public static SpannableString fileListToDashList(final Iterable<GenericFile> files) {
+        final StringBuilder fileList = new StringBuilder(66);
+        for (final GenericFile file : files) {
+            fileList.append(file.getName());
+            fileList.append('\n');
+        }
+        // remove last '\n'
+        fileList.deleteCharAt(fileList.length() - 1);
+        final SpannableString ss = new SpannableString(fileList.toString());
+        ss.setSpan(new DashSpan(), 0, ss.length(), 0);
+        return ss;
+    }
 }

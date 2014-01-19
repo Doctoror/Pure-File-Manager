@@ -2,15 +2,17 @@ package com.docd.purefm.tasks;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
@@ -19,6 +21,7 @@ import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CopyCommand;
 import com.docd.purefm.commandline.MoveCommand;
 import com.docd.purefm.commandline.ShellHolder;
+import com.docd.purefm.dialogs.MessageDialog;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
@@ -26,12 +29,13 @@ import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.TextUtil;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
 
-final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
+final class PasteTask extends AsyncTask<GenericFile, Void, List<GenericFile>> {
 
     private final WeakReference<Activity> activity;
     private final GenericFile targetPath;
@@ -46,14 +50,15 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
     @NotNull
     private CharSequence getTitle() {
         final Activity activity = this.activity.get();
-        if (activity != null) {
+        final GenericFile[] files = ClipBoard.getClipBoardContents();
+        if (activity != null && files != null) {
             final StringBuilder title = new StringBuilder();
-            if (ClipBoard.isCut()) {
+            if (ClipBoard.isMove()) {
                 title.append(activity.getString(R.string.progress_moving));
             } else {
                 title.append(activity.getString(R.string.progress_copying));
             }
-            title.append(ClipBoard.getClipBoardContents().length);
+            title.append(files.length);
             title.append(activity.getString(R.string._files));
             return title.toString();
         }
@@ -77,21 +82,22 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
                 this.dialog.show();
             }
         }
+        ClipBoard.lock();
     }
 
     @Override
-    protected Exception doInBackground(GenericFile... contents) {
+    protected List<GenericFile> doInBackground(GenericFile... contents) {
         final List<File> filesDeleted = new LinkedList<File>();
         final List<File> filesCreated = new LinkedList<File>();
         
-        final boolean isCut = ClipBoard.isCut();
+        final boolean isMove = ClipBoard.isMove();
         final GenericFile target = this.targetPath;
-        final Exception result;
+        final List<GenericFile> failed;
 
         if (target instanceof JavaFile) {
-            result = processJavaFiles(contents, target, isCut, filesCreated, filesDeleted);
+            failed = processJavaFiles(contents, target, isMove, filesCreated, filesDeleted);
         } else {
-            result = processCommandLineFiles(contents, target, isCut, filesCreated, filesDeleted);
+            failed = processCommandLineFiles(contents, target, isMove, filesCreated, filesDeleted);
         }
 
         final Activity activity = this.activity.get();
@@ -105,39 +111,61 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
             }
         }
 
-        return result;
+        return failed;
     }
-    
-    private Exception processJavaFiles(GenericFile[] contents, GenericFile target, boolean isCut, List<File> filesCreated, List<File> filesDeleted) {
-        Exception result = null;
+
+    /**
+     * Copies or moves the files and returns list of files that failed.
+     *
+     * @param contents files to process
+     * @param target target directory to move to
+     * @param isMove if true, means the files should be moved, otherwise they will be copied
+     * @param filesCreated the List to fill with successfully created files
+     * @param filesDeleted file List will be filled with successfully deleted files
+     * @return List of files that were failed to process
+     */
+    @NotNull
+    private List<GenericFile> processJavaFiles(GenericFile[] contents, GenericFile target, boolean isMove, List<File> filesCreated, List<File> filesDeleted) {
+        final List<GenericFile> failed = new ArrayList<GenericFile>();
         for (final GenericFile current : contents) {
             if (this.isCancelled()) {
-                return result;
+                return failed;
             }
 
             if (current != null && current.exists()) {
                 
-                if (isCut) {
+                if (isMove) {
                     if (current.move(target)) {
                         filesDeleted.add(current.toFile());
                         filesCreated.add(target.toFile());
                     } else {
-                        result = new Exception("Failed to move " + current.getName() + " to " + target.getName());
+                        failed.add(current);
                     }
                 } else {
                     if (current.copy(target)) {
                         filesCreated.add(target.toFile());
                     } else {
-                        result = new Exception("Failed to copy " + current.getName() + " to " + target.getName());
+                        failed.add(current);
                     }
                 }
             }
         }
-        return result;
+        return failed;
     }
-    
-    private Exception processCommandLineFiles(GenericFile[] contents, GenericFile target, boolean isCut, List<File> filesCreated, List<File> filesDeleted) {
-        Exception result = null;
+
+    /**
+     * Copies or moves the files and returns list of files that failed.
+     *
+     * @param contents files to process
+     * @param target target directory to move to
+     * @param isMove if true, means the files should be moved, otherwise they will be copied
+     * @param filesCreated the List to fill with successfully created files
+     * @param filesDeleted file List will be filled with successfully deleted files
+     * @return List of files that were failed to process
+     */
+    @NotNull
+    private List<GenericFile> processCommandLineFiles(GenericFile[] contents, GenericFile target, boolean isMove, List<File> filesCreated, List<File> filesDeleted) {
+        final List<GenericFile> failed = new ArrayList<GenericFile>();
         final CommandLineFile[] cont = new CommandLineFile[contents.length];
         ArrayUtils.copyArrayAndCast(contents, cont);
         final CommandLineFile t = (CommandLineFile) target;
@@ -152,50 +180,53 @@ final class PasteTask extends AsyncTask<GenericFile, Void, Exception> {
 
         final Shell shell = ShellHolder.getShell();
         for (final CommandLineFile current : cont) {
-            final Command command = (isCut ? new MoveCommand(current, t) :
+            final Command command = (isMove ? new MoveCommand(current, t) :
                     new CopyCommand(current, t));
 
             final boolean res = CommandLine.execute(shell, command);
             if (res) {
-                if (isCut) {
+                if (isMove) {
                     filesDeleted.add(current.toFile());
                 }
                 filesCreated.add(current.toFile());
             } else {
-                result = new Exception("Failed to move some files");
+                failed.add(current);
             }
 
         }
         if (wasRemounted) {
             RootTools.remount(targetPath, "RO");
         }
-        return result;
+        return failed;
     }
 
     @Override
-    protected void onPostExecute(Exception result) {
-        super.onPostExecute(result);
-        this.finish(result);
+    protected void onPostExecute(final List<GenericFile> failed) {
+        this.finish(failed);
     }
 
     @Override
-    protected void onCancelled(Exception result) {
-        super.onCancelled(result);
-        this.finish(result);
+    protected void onCancelled(final List<GenericFile> failed) {
+        this.finish(failed);
     }
 
-    private void finish(Exception result) {
+    private void finish(@NotNull final List<GenericFile> failed) {
         if (this.dialog != null) {
             this.dialog.dismiss();
         }
         final Activity activity = this.activity.get();
         if (activity != null) {
-            if (result != null) {
-                Toast.makeText(activity, result.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+            if (!failed.isEmpty()) {
+                final Dialog dialog = MessageDialog.create(activity, ClipBoard.isMove() ?
+                        R.string.dialog_move_failed : R.string.dialog_copy_failed,
+                        TextUtil.fileListToDashList(failed));
+                if (!activity.isFinishing()) {
+                    dialog.show();
+                }
             }
+            ClipBoard.unlock();
             ClipBoard.clear();
+            activity.invalidateOptionsMenu();
         }
     }
-
 }

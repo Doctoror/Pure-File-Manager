@@ -1,5 +1,8 @@
 package com.docd.purefm.tasks;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -13,7 +16,7 @@ import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 
-public class SearchCommandLineTask extends CancelableTask<String, GenericFile, Void> {
+public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> {
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
     
@@ -54,8 +57,9 @@ public class SearchCommandLineTask extends CancelableTask<String, GenericFile, V
         DataOutputStream os = null;
         BufferedReader is = null;
         BufferedReader err = null;
+        Process process = null;
         try {
-            final Process process = Runtime.getRuntime().exec(this.su ? "su" : "sh");
+            process = Runtime.getRuntime().exec(this.su ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -68,13 +72,13 @@ public class SearchCommandLineTask extends CancelableTask<String, GenericFile, V
             
             String line;
             try {
-                while ((line = is.readLine()) != null) {
+                while (!isCancelled() && (line = is.readLine()) != null) {
                     this.publishProgress(CommandLineFile.fromLSL(null, line));
                 }
             } catch (EOFException e) {}
             
             try {
-                while ((line = err.readLine()) != null) {
+                while (!isCancelled() && (line = err.readLine()) != null) {
                     final Matcher denied = DENIED.matcher(line);
                     if (denied.matches()) {
                         this.denied.add(denied.group(1));
@@ -83,10 +87,12 @@ public class SearchCommandLineTask extends CancelableTask<String, GenericFile, V
             } catch (EOFException e) {}
             process.waitFor();
         } catch (Exception e) {
+            Log.w("Exception while searching", e.toString());
         } finally {
             if (os != null) { try { os.close(); } catch (Exception e) {} }
             if (is != null) { try { is.close(); } catch (Exception e) {} }
             if (err != null) { try { err.close(); } catch (Exception e) {} }
+            if (process != null) { try { process.destroy(); } catch (Exception e) {} }
         }
         return null;
     }

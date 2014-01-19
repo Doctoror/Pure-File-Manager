@@ -65,12 +65,6 @@
     <string name="preference_category_startup">Startoptionen</string>
     <string name="preference_home_directory">Startordner</string>
     
-    <!-- Units -->
-<!--     <string name="unit_bytes">B</string> -->
-<!--     <string name="unit_kib">KiB</string> -->
-<!--     <string name="unit_mib">MiB</string> -->
-<!--     <string name="unit_gib">GiB</string> -->
-    
     <!-- New File / Directory -->
     <string name="name_empty">Namensfeld ist leer</string>
     <string name="invalid_filename">Kein gültiger Name</string>
@@ -89,20 +83,14 @@
     
     <!-- Progress -->
     <string name="progress_deleting_files">Lösche Datei(en)</string>
-<!--     <string name="progress_deleted">Deleted\u0020</string> -->
     <string name="_files">\u0020Datei(en)</string>
-<!--     <string name="_dirs">\u0020directories(s)</string> -->
-    
+
     <string name="progress_moving">Verschiebe\u0020</string>
     <string name="progress_copying">Kopiere\u0020</string>
     
     <!-- Copy / Cut -->
     <string name="cut_">Entferne\u0020</string>
     <string name="copied_">Kopiert\u0020</string>
-<!--     <string name="moved_">Moved\u0020</string> -->
-<!--     <string name="pasted_">Pasted\u0020</string> -->
-<!--     <string name="error_copying_file">Error copying file:\u0020</string> -->
-<!--     <string name="error_moving_file">Error moving file:\u0020</string> -->
     
     <string name="dialog_overwrite_title">Zieldatei existiert bereits</string>
     <string name="dialog_overwrite_message">Diese Aktion überschreibt das Ziel</string>
@@ -113,16 +101,17 @@
     <string name="dialog_overwrite_skip_all">Alle überspringen</string>
     <string name="dialog_overwrite_replace">Ersetzen</string>
     <string name="dialog_overwrite_replace_all">Alle ersetzen</string>
+    <!-- TODO translate to German -->
+    <string name="dialog_copy_failed">Failed to copy the following files</string>
+    <string name="dialog_move_failed">Failed to move the following files</string>
+    <string name="dialog_delete_failed">Failed to delete the following files</string>
     
     <!-- Delete -->
     <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>
     
     <!-- Permissions -->
-<!--     <string name="apply">Apply</string> -->
     <string name="applying_failed">Anwenden gescheitert</string>
     <string name="permissions_changed">Berechtigung geändert</string>
-<!--     <string name="cannot_set_msdos">Cannot change permissions on this file system</string> -->
-<!--     <string name="cannot_set_permissions_java">Can only set permissions in busybox mode</string> -->
     
     <string name="owner">Besitzer:</string>
     <string name="group">Gruppe:</string>

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -36,6 +37,10 @@ public final class PasteTaskExecutor implements OnClickListener {
     
     public void start() {
         final GenericFile[] contents = ClipBoard.getClipBoardContents();
+        if (contents == null) {
+            return;
+        }
+
         final GenericFile target = this.targetPath;
 
         if (target instanceof JavaFile) {
@@ -117,7 +122,11 @@ public final class PasteTaskExecutor implements OnClickListener {
                 this.current = exist.get(key);
                 exist.remove(key);
 
-                new FileExistsDialog(activity, current.getAbsolutePath(), key.getAbsolutePath(), this, this, this, this, this).show();
+                final Dialog dialog = new FileExistsDialog(activity, current.getAbsolutePath(),
+                        key.getAbsolutePath(), this, this, this, this, this);
+                if (!activity.isFinishing()) {
+                    dialog.show();
+                }
             }
         }
     }

@@ -92,20 +92,14 @@
     
     <!-- Progress -->
     <string name="progress_deleting_files">Deleting file(s)</string>
-<!--     <string name="progress_deleted">Deleted\u0020</string> -->
     <string name="_files">\u0020file(s)</string>
-<!--     <string name="_dirs">\u0020directories(s)</string> -->
-    
+
     <string name="progress_moving">Moving\u0020</string>
     <string name="progress_copying">Copying\u0020</string>
     
     <!-- Copy / Cut -->
     <string name="cut_">Cut\u0020</string>
     <string name="copied_">Copied\u0020</string>
-<!--     <string name="moved_">Moved\u0020</string> -->
-<!--     <string name="pasted_">Pasted\u0020</string> -->
-<!--     <string name="error_copying_file">Error copying file:\u0020</string> -->
-<!--     <string name="error_moving_file">Error moving file:\u0020</string> -->
     
     <string name="dialog_overwrite_title">Target file already exists</string>
     <string name="dialog_overwrite_message">This action will overwrite destination.</string>
@@ -116,16 +110,17 @@
     <string name="dialog_overwrite_skip_all">Skip all</string>
     <string name="dialog_overwrite_replace">Replace</string>
     <string name="dialog_overwrite_replace_all">Replace all</string>
+
+    <string name="dialog_copy_failed">Failed to copy the following files</string>
+    <string name="dialog_move_failed">Failed to move the following files</string>
+    <string name="dialog_delete_failed">Failed to delete the following files</string>
     
     <!-- Delete -->
     <string name="dialog_delete_title">The following files will be deleted:</string>
     
     <!-- Permissions -->
-<!--     <string name="apply">Apply</string> -->
     <string name="applying_failed">Applying failed</string>
     <string name="permissions_changed">Permissions changed</string>
-<!--     <string name="cannot_set_msdos">Cannot change permissions on this file system</string> -->
-<!--     <string name="cannot_set_permissions_java">Can only set permissions in busybox mode</string> -->
     
     <string name="owner">Owner:</string>
     <string name="group">Group:</string>

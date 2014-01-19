@@ -138,7 +138,7 @@ public final class ActionModeController {
                                 .getItem(key);
                     }
                 }
-                ClipBoard.cut(files);
+                ClipBoard.cutMove(files);
                 Toast.makeText(
                         activity,
                         activity.getString(R.string.cut_)
@@ -160,7 +160,7 @@ public final class ActionModeController {
                                 .getItem(key);
                     }
                 }
-                ClipBoard.copy(files2);
+                ClipBoard.cutCopy(files2);
                 Toast.makeText(
                         activity,
                         activity.getString(R.string.copied_)

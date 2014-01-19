@@ -1,11 +1,11 @@
 package com.docd.purefm.activities;
 
 import java.io.File;
-import java.io.IOException;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
@@ -16,7 +16,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,10 +25,9 @@ import android.widget.ListView;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
+import com.docd.purefm.browser.Browser;
 import com.docd.purefm.browser.BrowserFragment;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
-import com.docd.purefm.commandline.ShellFactory;
-import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
@@ -52,7 +50,6 @@ public final class BrowserActivity extends MonitoredActivity {
     BookmarksAdapter bookmarksAdapter;
     GenericFile currentPath;
 
-    private ViewPager pager;
     private BrowserTabsAdapter pagerAdapter;
 
     private final Object currentlyDisplayedFragmentLock;
@@ -94,6 +91,9 @@ public final class BrowserActivity extends MonitoredActivity {
 
     private void initActionBar() {
         this.actionBar = this.getActionBar();
+        if (this.actionBar == null) {
+            throw new RuntimeException("BrowserActivity should have an ActionBar");
+        }
         this.actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_USE_LOGO);
 
@@ -106,11 +106,11 @@ public final class BrowserActivity extends MonitoredActivity {
     }
 
     private void initView() {
-        this.pager = (ViewPager) this.findViewById(R.id.pager);
+        final ViewPager pager = (ViewPager) this.findViewById(R.id.pager);
         this.pagerAdapter = new BrowserTabsAdapter(
                 this.getSupportFragmentManager());
-        this.pager.setAdapter(this.pagerAdapter);
-        this.pager.setOffscreenPageLimit(2);
+        pager.setAdapter(this.pagerAdapter);
+        pager.setOffscreenPageLimit(2);
 
         this.drawerLayout = (DrawerLayout) this
                 .findViewById(R.id.drawer);
@@ -255,7 +255,10 @@ public final class BrowserActivity extends MonitoredActivity {
         }
         synchronized (this.currentlyDisplayedFragmentLock) {
             if (this.currentlyDisplayedFragment != null) {
-                this.currentlyDisplayedFragment.getBrowser().navigate(path, true);
+                final Browser browser = this.currentlyDisplayedFragment.getBrowser();
+                if (browser != null) {
+                    browser.navigate(path, true);
+                }
             }
         }
     }
@@ -299,7 +302,10 @@ public final class BrowserActivity extends MonitoredActivity {
                             dialog.dismiss();
                         }
                     });
-            b.create().show();
+            final Dialog dialog = b.create();
+            if (!this.isFinishing()) {
+                dialog.show();
+            }
         }
     }
 

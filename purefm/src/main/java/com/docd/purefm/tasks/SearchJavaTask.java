@@ -1,11 +1,13 @@
 package com.docd.purefm.tasks;
 
+import android.os.AsyncTask;
+
 import java.io.File;
 
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 
-public class SearchJavaTask extends CancelableTask<String, GenericFile, Void> {
+public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
@@ -13,6 +15,7 @@ public class SearchJavaTask extends CancelableTask<String, GenericFile, Void> {
         try {
             this.search(target, params[1]);
         } catch (Throwable e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -20,15 +23,15 @@ public class SearchJavaTask extends CancelableTask<String, GenericFile, Void> {
     private void search(final File source, final String name) {
         final File[] files = source.listFiles();
         if (files != null) {
-            for (int i = 0; i < files.length; i++) {
+            for (final File file : files) {
                 if (this.isCancelled()) {
                     return;
                 }
-                if (files[i].isDirectory()) {
-                    search(files[i], name);
+                if (file.isDirectory()) {
+                    search(file, name);
                 }
-                else if (files[i].getName().indexOf(name) != -1) {
-                    this.publishProgress(new JavaFile(files[i]));
+                else if (file.getName().contains(name)) {
+                    this.publishProgress(new JavaFile(file));
                 }
             }
         }

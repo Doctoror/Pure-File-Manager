@@ -1,5 +1,6 @@
 package com.docd.purefm.dialogs;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.docd.purefm.Extras;
@@ -7,6 +8,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.DeleteTask;
 import com.docd.purefm.text.style.DashSpan;
+import com.docd.purefm.utils.TextUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -57,17 +59,7 @@ public final class DeleteFilesDialog extends DialogFragment {
         final TextView content = (TextView) a.getLayoutInflater()
                 .inflate(R.layout.dialog_delete, null);
         content.setMovementMethod(new ScrollingMovementMethod());
-        
-        final StringBuilder fileList = new StringBuilder();
-        for (int i = 0; i < this.files.length; i++) {
-            fileList.append(this.files[i].getName());
-            if (i != this.files.length - 1) {
-                fileList.append('\n');
-            }
-        }
-        final SpannableString ss = new SpannableString(fileList.toString());
-        ss.setSpan(new DashSpan(), 0, ss.length(), 0);
-        content.setText(ss);
+        content.setText(TextUtil.fileListToDashList(Arrays.asList(this.files)));
         b.setView(content);
         
         b.setPositiveButton(R.string.menu_delete, new DialogInterface.OnClickListener() {

@@ -11,13 +11,13 @@ import com.docd.purefm.adapters.BrowserListAdapter;
 import com.docd.purefm.browser.ActionModeController;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.tasks.CancelableTask;
 import com.docd.purefm.tasks.SearchCommandLineTask;
 import com.docd.purefm.tasks.SearchJavaTask;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,7 +39,7 @@ public final class SearchActivity extends MonitoredActivity {
     private TextView input;
     private View progress;
     
-    private CancelableTask<String, GenericFile, Void> searchTask;
+    private AsyncTask<String, GenericFile, Void> searchTask;
     private String path;
     
     private int prevId;
@@ -57,7 +57,7 @@ public final class SearchActivity extends MonitoredActivity {
     protected void onStop() {
         super.onStop();
         if (searchTask != null && searchTask.getStatus() == AsyncTask.Status.RUNNING) {
-            searchTask.cancel();
+            searchTask.cancel(true);
         }
     }
     
@@ -125,7 +125,7 @@ public final class SearchActivity extends MonitoredActivity {
             return;
         }
         if (searchTask != null && searchTask.getStatus() == AsyncTask.Status.RUNNING) {
-            searchTask.cancel();
+            searchTask.cancel(true);
         }
         this.buildSearchTask(false);
         adapter.updateData(new GenericFile[0]);
@@ -153,7 +153,10 @@ public final class SearchActivity extends MonitoredActivity {
                         dialog.dismiss();
                     }
                 });
-                b.create().show();
+                final Dialog dialog = b.create();
+                if (!isFinishing()) {
+                    dialog.show();
+                }
             }
         }
     }
