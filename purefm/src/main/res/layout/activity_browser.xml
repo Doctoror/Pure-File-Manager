@@ -24,8 +24,7 @@
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/holo_light_background" />
+            android:layout_height="match_parent" />
     </FrameLayout>
 
     <ListView
@@ -33,6 +32,6 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:background="@color/holo_light_background" />
+        android:background="?android:attr/windowBackground" />
 
 </android.support.v4.widget.DrawerLayout>

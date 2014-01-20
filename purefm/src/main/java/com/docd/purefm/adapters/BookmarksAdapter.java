@@ -67,10 +67,10 @@ public final class BookmarksAdapter implements ListAdapter {
         this.bookmarks.addAll(user);
 
         final Resources res = activity.getResources();
-        this.iconStorage = res.getDrawable(R.drawable.ic_action_storage);
-        this.iconSdcard = res.getDrawable(R.drawable.ic_sdcard);
-        this.iconUsb = res.getDrawable(R.drawable.ic_action_usb);
-        this.iconUser = res.getDrawable(R.drawable.action_bookmarks);
+        this.iconStorage = res.getDrawable(R.drawable.holo_light_ic_action_storage);
+        this.iconSdcard = res.getDrawable(R.drawable.holo_light_ic_sdcard);
+        this.iconUsb = res.getDrawable(R.drawable.holo_light_ic_action_usb);
+        this.iconUser = res.getDrawable(R.drawable.holo_light_action_bookmarks);
         this.rootDisplayName = res.getString(R.string.root);
     }
     

@@ -12,9 +12,8 @@
 <!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <color name="holo_light_background">#ffe8e8e8</color>
-    <color name="holo_light_selected">#ff7cc9e5</color>
+    <attr name="browserListTextColor" format="color" />
 
 </resources>

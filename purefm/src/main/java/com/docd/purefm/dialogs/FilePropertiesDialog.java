@@ -60,7 +60,7 @@ public final class FilePropertiesDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(
                 getActivity());
-        builder.setIcon(R.drawable.action_info);
+        builder.setIcon(R.drawable.holo_light_action_info);
         builder.setTitle(file.getName());
         builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
             @Override

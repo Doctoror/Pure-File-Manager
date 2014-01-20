@@ -58,7 +58,7 @@ public final class PartitionInfoDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(
                 getActivity());
-        builder.setIcon(R.drawable.action_info);
+        builder.setIcon(R.drawable.holo_light_action_info);
         builder.setTitle(R.string.menu_partition);
         builder.setView(this.getInfoView());
         builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {

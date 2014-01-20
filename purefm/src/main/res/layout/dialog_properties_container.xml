@@ -54,7 +54,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="4.66667dp"
-        android:background="@drawable/tab_shadow" />
+        android:background="@drawable/holo_light_tab_shadow" />
 
     <ScrollView
         android:layout_width="match_parent"
