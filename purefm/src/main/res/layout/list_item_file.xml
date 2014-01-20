@@ -53,9 +53,8 @@
 
         <TextView
             android:id="@android:id/text1"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
             android:gravity="left|center_vertical"
             android:paddingRight="5dp"
             android:textIsSelectable="false"
@@ -65,18 +64,19 @@
             android:id="@android:id/text2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.25"
-            android:gravity="left|center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:textIsSelectable="false"
             style="@style/browser_text_small" />
         
         <TextView
-            android:id="@android:id/summary"
-            android:layout_width="0dp"
+            android:id="@+id/size"
+            android:layout_width="@dimen/list_item_file_size_width"
             android:layout_height="wrap_content"
-            android:layout_weight="0.25"
             android:gravity="right|center_vertical"
+            android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:textIsSelectable="false"
             style="@style/browser_text_small" />

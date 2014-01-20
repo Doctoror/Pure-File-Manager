@@ -20,6 +20,7 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.view.OverlayRecyclingImageView;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -29,9 +30,12 @@ import android.widget.TextView;
  * @author Doctoror
  */
 public final class BrowserListAdapter extends BrowserBaseAdapter {
+
+    private final Typeface mTypefaceMonospace;
     
     public BrowserListAdapter(Activity context) {
         super(context);
+        mTypefaceMonospace = Typeface.createFromAsset(context.getAssets(), "DroidSansMono.ttf");
     }
 
     @Override
@@ -52,7 +56,11 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h.title = (TextView) v.findViewById(android.R.id.title);
             h.date = (TextView) v.findViewById(android.R.id.text1);
             h.perm = (TextView) v.findViewById(android.R.id.text2);
-            h.size = (TextView) v.findViewById(android.R.id.summary);
+            h.size = (TextView) v.findViewById(R.id.size);
+
+            h.date.setTypeface(this.mTypefaceMonospace);
+            h.perm.setTypeface(this.mTypefaceMonospace);
+            h.size.setTypeface(this.mTypefaceMonospace);
             v.setTag(h);
         } else {
             h = (Holder) v.getTag();
