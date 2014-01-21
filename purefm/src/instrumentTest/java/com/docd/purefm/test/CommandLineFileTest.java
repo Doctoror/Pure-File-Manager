@@ -23,7 +23,7 @@ import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.utils.TextUtil;
+import com.docd.purefm.utils.PureFMTextUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -60,7 +60,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
         com.docd.purefm.Environment.init(context);
         Settings.init(context, context.getResources());
         PreviewHolder.initialize(context);
-        TextUtil.init(context);
+        PureFMTextUtils.init(context);
 
         // prepare a test file
         try {

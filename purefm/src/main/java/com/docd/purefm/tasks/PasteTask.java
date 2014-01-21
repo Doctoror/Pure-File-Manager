@@ -42,7 +42,7 @@ import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
-import com.docd.purefm.utils.TextUtil;
+import com.docd.purefm.utils.PureFMTextUtils;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
@@ -232,7 +232,7 @@ final class PasteTask extends AsyncTask<GenericFile, Void, List<GenericFile>> {
             if (!failed.isEmpty()) {
                 final Dialog dialog = MessageDialog.create(activity, ClipBoard.isMove() ?
                         R.string.dialog_move_failed : R.string.dialog_copy_failed,
-                        TextUtil.fileListToDashList(failed));
+                        PureFMTextUtils.fileListToDashList(failed));
                 if (!activity.isFinishing()) {
                     dialog.show();
                 }

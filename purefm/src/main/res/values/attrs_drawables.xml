@@ -36,4 +36,6 @@
     <attr name="ic_storage" format="reference" />
     <attr name="ic_usb" format="reference" />
 
+    <attr name="ic_fso_symlink" format="reference" />
+
 </resources>

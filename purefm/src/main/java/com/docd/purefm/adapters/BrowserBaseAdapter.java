@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
@@ -38,9 +39,10 @@ import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.file.Permissions;
+import com.docd.purefm.utils.DrawableLruCache;
 import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.utils.ResourcesLruCache;
+import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.view.OverlayRecyclingImageView;
 
 /**
@@ -59,9 +61,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     private final Handler mHandler;
 
+    private final Resources mResources;
+    private final Resources.Theme mTheme;
+
     private final DataSetObservable mDataSetObservable;
     private final FileObserverCache mObserverCache;
-    private final ResourcesLruCache mResourcesLruCache;
+    private final DrawableLruCache mDrawableLruCache;
     
     private final List<GenericFile> mContent;
     private final List<MultiListenerFileObserver> mFileObservers;
@@ -73,9 +78,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     protected BrowserBaseAdapter(final Activity context) {
         this.mHandler = new Handler();
+        this.mResources = context.getResources();
+        this.mTheme = context.getTheme();
         this.mDataSetObservable = new DataSetObservable();
         this.mObserverCache = FileObserverCache.getInstance();
-        this.mResourcesLruCache = ResourcesLruCache.getInstance(context.getResources());
+        this.mDrawableLruCache = DrawableLruCache.getInstance();
         this.mLayoutInflater = context.getLayoutInflater();
         this.mContent = new ArrayList<GenericFile>();
         this.mFileObservers = new ArrayList<MultiListenerFileObserver>();
@@ -254,7 +261,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         final Permissions p = f.getPermissions();
         
         if (f.isSymlink()) {
-            overlay.setOverlay(mResourcesLruCache.get(R.drawable.ic_fso_symlink));
+            Drawable symlink = mDrawableLruCache.get(R.attr.ic_fso_symlink);
+            if (symlink == null) {
+                symlink = ThemeUtils.getDrawable(mTheme, R.attr.ic_fso_symlink);
+                mDrawableLruCache.put(R.attr.ic_fso_symlink, symlink);
+            }
+            overlay.setOverlay(symlink);
         } else if (f.isDirectory()) {
             overlay.setOverlay(null);
         } else {
@@ -267,7 +279,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             if (icon == 0) {
                 overlay.setOverlay(null);
             } else {
-                overlay.setOverlay(mResourcesLruCache.get(icon));
+                Drawable iconDrawable = mDrawableLruCache.get(icon);
+                if (iconDrawable == null) {
+                    iconDrawable = mResources.getDrawable(icon);
+                    mDrawableLruCache.put(icon, iconDrawable);
+                }
+                overlay.setOverlay(iconDrawable);
             }
         }
     }

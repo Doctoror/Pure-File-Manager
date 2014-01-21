@@ -27,9 +27,9 @@ import com.docd.purefm.text.style.DashSpan;
 
 import org.jetbrains.annotations.NotNull;
 
-public final class TextUtil {
+public final class PureFMTextUtils {
 
-    private TextUtil() {}
+    private PureFMTextUtils() {}
     
     private static SimpleDateFormat format;
     

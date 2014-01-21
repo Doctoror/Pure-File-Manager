@@ -37,10 +37,14 @@
         <item name="ic_sdcard">@drawable/holo_light_ic_sdcard</item>
         <item name="ic_storage">@drawable/holo_light_ic_storage</item>
         <item name="ic_usb">@drawable/holo_light_ic_usb</item>
+        <item name="ic_fso_symlink">@drawable/holo_light_ic_fso_symlink</item>
     </style>
 
     <style name="ThemeDark" parent="android:Theme.Holo">
         <item name="themeId">2</item>
+        <item name="android:windowBackground">@color/holo_dark_window_background</item>
+        <item name="android:actionBarStyle">@style/actionBarStyleDark</item>
+
         <item name="browserListTextColor">#c5c5c5</item>
         <item name="action_copy">@drawable/holo_dark_action_copy</item>
         <item name="action_cut">@drawable/holo_dark_action_cut</item>
@@ -62,6 +66,12 @@
         <item name="ic_sdcard">@drawable/holo_dark_ic_sdcard</item>
         <item name="ic_storage">@drawable/holo_dark_ic_storage</item>
         <item name="ic_usb">@drawable/holo_dark_ic_usb</item>
+        <item name="ic_fso_symlink">@drawable/holo_dark_ic_fso_symlink</item>
+    </style>
+
+    <style name="actionBarStyleDark" parent="@android:style/Widget.ActionBar">
+        <item name="android:background">@color/holo_dark_actionbar_background</item>
+        <item name="android:backgroundSplit">@color/holo_dark_actionbar_background</item>
     </style>
 
     <style name="NavigationText">
@@ -80,7 +90,6 @@
     <style name="browser_text_small">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?attr/browserListTextColor</item>
-        <item name="android:singleLine">true</item>
         <item name="android:textIsSelectable">false</item>
     </style>
 

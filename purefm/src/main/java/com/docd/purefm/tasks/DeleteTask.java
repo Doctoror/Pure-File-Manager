@@ -35,7 +35,7 @@ import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
-import com.docd.purefm.utils.TextUtil;
+import com.docd.purefm.utils.PureFMTextUtils;
 import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
@@ -125,7 +125,7 @@ public final class DeleteTask extends
         final Activity activity = this.activity.get();
         if (activity != null && !failed.isEmpty()) {
             final Dialog dialog = MessageDialog.create(activity, R.string.dialog_delete_failed,
-                    TextUtil.fileListToDashList(failed));
+                    PureFMTextUtils.fileListToDashList(failed));
             if (!activity.isFinishing()) {
                 dialog.show();
             }

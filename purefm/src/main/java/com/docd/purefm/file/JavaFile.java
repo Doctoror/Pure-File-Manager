@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.docd.purefm.utils.MimeTypes;
-import com.docd.purefm.utils.TextUtil;
 
 public final class JavaFile implements GenericFile, Comparable<GenericFile> {
 
@@ -36,8 +35,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     private final boolean isSymlink; 
     private final String mimeType;
     private final int icon;
-    private final String readableLastMod;
-    private final String readableLength;
     
     public JavaFile(File file) {
         this.file = file;
@@ -45,8 +42,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
-        this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
     }
     
     public JavaFile(File dir, String name) {
@@ -55,8 +50,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
-        this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
     }
 
     public JavaFile(String dirPath, String name) {
@@ -65,8 +58,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
-        this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
     }
 
     public JavaFile(String path) {
@@ -75,8 +66,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
-        this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
     }
 
     public JavaFile(URI uri) {
@@ -85,8 +74,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
         this.icon = MimeTypes.getTypeIcon(file);
-        this.readableLastMod = TextUtil.humanReadableDate(this.lastModified());
-        this.readableLength = FileUtils.byteCountToDisplaySize(this.length());
     }
     
     private Permissions readPermissions() {
@@ -230,16 +217,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     @Override
     public long lastModified() {
         return this.file.lastModified();
-    }
-    
-    @Override
-    public String humanReadableLength() {
-        return this.readableLength;
-    }
-
-    @Override
-    public String humanReadableLastModified() {
-        return this.readableLastMod;
     }
 
     @Override

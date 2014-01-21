@@ -15,10 +15,12 @@
 package com.docd.purefm.utils;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.docd.purefm.R;
@@ -36,6 +38,22 @@ public final class PureFMFileUtils {
 
     private PureFMFileUtils() {
     }
+
+    public static String byteCountToDisplaySize(final BigInteger size) {
+        String displaySize;
+
+        if (size.divide(FileUtils.ONE_GB_BI).compareTo(BigInteger.ZERO) > 0) {
+            displaySize = String.valueOf(size.divide(FileUtils.ONE_GB_BI)) + " GiB";
+        } else if (size.divide(FileUtils.ONE_MB_BI).compareTo(BigInteger.ZERO) > 0) {
+            displaySize = String.valueOf(size.divide(FileUtils.ONE_MB_BI)) + " MiB";
+        } else if (size.divide(FileUtils.ONE_KB_BI).compareTo(BigInteger.ZERO) > 0) {
+            displaySize = String.valueOf(size.divide(FileUtils.ONE_KB_BI)) + " KiB";
+        } else {
+            displaySize = String.valueOf(size) + " B";
+        }
+        return displaySize;
+    }
+
     
     private static final String FORBIDDEN_CHARS = "/?<>\\:*|\"";
     

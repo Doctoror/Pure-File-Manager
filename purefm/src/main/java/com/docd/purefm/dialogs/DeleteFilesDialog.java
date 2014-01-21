@@ -21,8 +21,7 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.DeleteTask;
-import com.docd.purefm.text.style.DashSpan;
-import com.docd.purefm.utils.TextUtil;
+import com.docd.purefm.utils.PureFMTextUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,7 +29,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.SpannableString;
 import android.text.method.ScrollingMovementMethod;
 import android.view.ActionMode;
 import android.widget.TextView;
@@ -73,7 +71,7 @@ public final class DeleteFilesDialog extends DialogFragment {
         final TextView content = (TextView) a.getLayoutInflater()
                 .inflate(R.layout.dialog_delete, null);
         content.setMovementMethod(new ScrollingMovementMethod());
-        content.setText(TextUtil.fileListToDashList(Arrays.asList(this.files)));
+        content.setText(PureFMTextUtils.fileListToDashList(Arrays.asList(this.files)));
         b.setView(content);
         
         b.setPositiveButton(R.string.menu_delete, new DialogInterface.OnClickListener() {

@@ -15,50 +15,54 @@
 package com.docd.purefm.controller;
 
 import java.io.File;
+import java.math.BigInteger;
 
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PureFMTextUtils;
 
 import android.view.View;
 import android.widget.TextView;
 
 public final class FilePropertiesController {
 
-    private final View view;
-    private final GenericFile file;
+    private final View mView;
+    private final GenericFile mFile;
     
     public FilePropertiesController(View view, GenericFile file) {
-        this.view = view;
-        this.file = file;
+        this.mView = view;
+        this.mFile = file;
         this.init();
     }
     
     private void init() {
-        final TextView name = (TextView) view.findViewById(R.id.name);
-        name.setText(file.getName());
+        final TextView name = (TextView) mView.findViewById(R.id.name);
+        name.setText(mFile.getName());
         
-        final TextView parent = (TextView) view.findViewById(R.id.location);
-        String par = file.toFile().getParent();
+        final TextView parent = (TextView) mView.findViewById(R.id.location);
+        String par = mFile.toFile().getParent();
         if (par == null || par.isEmpty()) {
             par = File.listRoots()[0].getPath();
         }
         parent.setText(par);
         
-        final TextView type = (TextView) view.findViewById(R.id.type);
-        type.setText(file.isSymlink() ? R.string.type_symlink :
-                file.isDirectory() ? R.string.type_directory : R.string.type_file);
+        final TextView type = (TextView) mView.findViewById(R.id.type);
+        type.setText(mFile.isSymlink() ? R.string.type_symlink :
+                mFile.isDirectory() ? R.string.type_directory : R.string.type_file);
         
-        final TextView mime = (TextView) view.findViewById(R.id.mime);
-        if (file.getMimeType() != null) {
-           mime.setText(file.getMimeType());
+        final TextView mime = (TextView) mView.findViewById(R.id.mime);
+        if (mFile.getMimeType() != null) {
+           mime.setText(mFile.getMimeType());
         }
         
-        final TextView size = (TextView) view.findViewById(R.id.size);
-        if (!file.isDirectory()) {
-            size.setText(file.humanReadableLength());
+        final TextView size = (TextView) mView.findViewById(R.id.size);
+        if (!mFile.isDirectory()) {
+            size.setText(PureFMFileUtils.byteCountToDisplaySize(
+                    BigInteger.valueOf(mFile.length())));
         }
         
-        final TextView mod = (TextView) view.findViewById(R.id.modified);
-        mod.setText(file.humanReadableLastModified());
+        final TextView mod = (TextView) mView.findViewById(R.id.modified);
+        mod.setText(PureFMTextUtils.humanReadableDate(mFile.lastModified()));
     }
 }

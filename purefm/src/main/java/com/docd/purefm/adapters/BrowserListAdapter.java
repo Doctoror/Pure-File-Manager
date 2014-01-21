@@ -17,6 +17,8 @@ package com.docd.purefm.adapters;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PureFMTextUtils;
 import com.docd.purefm.view.OverlayRecyclingImageView;
 
 import android.app.Activity;
@@ -25,6 +27,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.math.BigInteger;
+import java.util.HashMap;
+
 /**
  * Browser adapter for ListView
  * @author Doctoror
@@ -32,10 +37,14 @@ import android.widget.TextView;
 public final class BrowserListAdapter extends BrowserBaseAdapter {
 
     private final Typeface mTypefaceMonospace;
+    private final HashMap<Long, String> mHumanReadableLastModified;
+    private final HashMap<Long, String> mHumanReadableLength;
     
     public BrowserListAdapter(Activity context) {
         super(context);
         mTypefaceMonospace = Typeface.createFromAsset(context.getAssets(), "DroidSansMono.ttf");
+        this.mHumanReadableLastModified = new HashMap<Long, String>();
+        this.mHumanReadableLength = new HashMap<Long, String>();
     }
 
     @Override
@@ -74,9 +83,36 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             loadPreview(f, h.icon);
         }
         h.title.setText(f.getName());
-        h.date.setText(Settings.showLastModified ? f.humanReadableLastModified() : "");
-        h.size.setText(f.isDirectory() || !Settings.showSize ? "" : f.humanReadableLength());
-        h.perm.setText(Settings.showPermissions ? f.getPermissions().toString() : "");
+
+        if (Settings.showLastModified) {
+            final long lastModified = f.lastModified();
+            String humanReadableLastModified = mHumanReadableLastModified.get(lastModified);
+            if (humanReadableLastModified == null) {
+                humanReadableLastModified = PureFMTextUtils.humanReadableDate(lastModified);
+                mHumanReadableLastModified.put(lastModified, humanReadableLastModified);
+            }
+            h.date.setText(humanReadableLastModified);
+        } else {
+            h.date.setText("");
+        }
+
+        if (Settings.showSize) {
+            final long fileSize = f.length();
+            String humanReadableFileSize = mHumanReadableLength.get(fileSize);
+            if (humanReadableFileSize == null) {
+                humanReadableFileSize = PureFMFileUtils.byteCountToDisplaySize(BigInteger.valueOf(fileSize));
+                mHumanReadableLength.put(fileSize, humanReadableFileSize);
+            }
+            h.size.setText(humanReadableFileSize);
+        } else {
+            h.size.setText("");
+        }
+
+        if (Settings.showPermissions) {
+            h.perm.setText(f.getPermissions().toString());
+        } else {
+            h.perm.setText("");
+        }
 
         return v;
     }

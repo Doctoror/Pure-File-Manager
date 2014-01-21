@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"
             android:paddingRight="5dp"
-            android:textIsSelectable="false"
+            android:singleLine="true"
             style="@style/browser_text_small" />
         
         <TextView
@@ -68,7 +68,7 @@
             android:gravity="center"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textIsSelectable="false"
+            android:singleLine="true"
             style="@style/browser_text_small" />
         
         <TextView
@@ -78,7 +78,7 @@
             android:gravity="right|center_vertical"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textIsSelectable="false"
+            android:singleLine="true"
             style="@style/browser_text_small" />
         
     </LinearLayout>

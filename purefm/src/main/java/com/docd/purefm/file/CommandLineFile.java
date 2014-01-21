@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.commandline.Command;
@@ -35,7 +34,7 @@ import com.docd.purefm.commandline.MoveCommand;
 import com.docd.purefm.commandline.RemoveCommand;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.MimeTypes;
-import com.docd.purefm.utils.TextUtil;
+import com.docd.purefm.utils.PureFMTextUtils;
 
 public final class CommandLineFile implements GenericFile,
         Comparable<GenericFile> {
@@ -67,8 +66,6 @@ public final class CommandLineFile implements GenericFile,
     private int icon;
     
     private String mimeType;
-    private String humanReadableLength;
-    private String humanReadableLastMod;
     
     private boolean isSymlink;
     private boolean isDirectory;
@@ -213,12 +210,11 @@ public final class CommandLineFile implements GenericFile,
         final String len = attrs[LS_FILE_SIZE];
         if (len != null && !len.isEmpty()) {
             targetFile.length = Long.parseLong(len);
-            targetFile.humanReadableLength = FileUtils.byteCountToDisplaySize(targetFile.length);
         }
 
         final Calendar c = Calendar.getInstance(Locale.US);
         c.set(Calendar.YEAR, Integer.parseInt(attrs[LS_YEAR]));
-        c.set(Calendar.MONTH, TextUtil.stringMonthToInt(attrs[LS_MONTH]));
+        c.set(Calendar.MONTH, PureFMTextUtils.stringMonthToInt(attrs[LS_MONTH]));
         c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(attrs[LS_DAY_OF_MONTH]));
 
         final int index1 = attrs[LS_TIME].indexOf(':');
@@ -233,7 +229,6 @@ public final class CommandLineFile implements GenericFile,
         }
 
         targetFile.lastmod = c.getTimeInMillis();
-        targetFile.humanReadableLastMod = TextUtil.humanReadableDate(targetFile.lastmod);
         targetFile.exists = true;
         if (!targetFile.isDirectory) {
             targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);
@@ -270,8 +265,6 @@ public final class CommandLineFile implements GenericFile,
             this.owner = 0;
             this.group = 0;
             this.length = 0;
-            this.humanReadableLength = "0";
-            this.humanReadableLastMod = "0";
             this.p = null;
             return true;
         }
@@ -395,20 +388,10 @@ public final class CommandLineFile implements GenericFile,
     public long length() {
         return this.length;
     }
-    
-    @Override
-    public String humanReadableLength() {
-        return this.humanReadableLength;
-    }
 
     @Override
     public long lastModified() {
         return this.lastmod;
-    }
-    
-    @Override
-    public String humanReadableLastModified() {
-        return this.humanReadableLastMod;
     }
 
     @Override
