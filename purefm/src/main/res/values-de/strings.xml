@@ -51,7 +51,9 @@
     <string name="menu_sort_by_date_desc">Datum absteigend</string>
     <string name="menu_sort_by_size_asc">Größe aufsteigend</string>
     <string name="menu_sort_by_size_desc">Größe absteigend</string>
-    
+
+    <!-- TODO translate menu_share to German -->
+    <string name="menu_share">Share</string>
     <string name="menu_delete">Löschen</string>
     <string name="menu_rename">Umbenennen</string>
     <string name="menu_cut">Entfernen</string>

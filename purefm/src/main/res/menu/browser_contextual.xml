@@ -18,14 +18,14 @@
         android:id="@android:id/copy"
         android:icon="?attr/action_copy"
         android:title="@string/menu_copy"
-        android:showAsAction="always"/>
+        android:showAsAction="ifRoom"/>
     
     <item
         android:id="@android:id/cut"
         android:icon="?attr/action_cut"
         android:title="@string/menu_cut"
-        android:showAsAction="always"/>
-    
+        android:showAsAction="ifRoom"/>
+
     <item
         android:id="@android:id/edit"
         android:icon="?attr/action_edit"
@@ -37,6 +37,13 @@
         android:icon="?attr/action_remove"
         android:title="@string/menu_delete"
         android:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_share"
+        android:icon="?attr/action_share"
+        android:title="@string/menu_share"
+        android:showAsAction="ifRoom"
+        android:actionProviderClass="android.widget.ShareActionProvider"/>
     
     <item
         android:id="@+id/properties"

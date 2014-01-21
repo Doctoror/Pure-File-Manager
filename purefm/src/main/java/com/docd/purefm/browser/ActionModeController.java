@@ -14,17 +14,22 @@
  */
 package com.docd.purefm.browser;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.docd.purefm.R;
@@ -35,6 +40,7 @@ import com.docd.purefm.dialogs.FilePropertiesDialog;
 import com.docd.purefm.dialogs.RenameFileDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
+import com.docd.purefm.utils.MimeTypes;
 
 /**
  * Controller that manages ActionMode for BrowserFragment
@@ -80,9 +86,38 @@ public final class ActionModeController {
             menu.clear();
             activity.getMenuInflater().inflate(
                     R.menu.browser_contextual, menu);
-            if (list.getCheckedItemCount() > 1) {
+
+
+            final int checkedCount = list.getCheckedItemCount();
+            if (checkedCount > 1) {
                 menu.removeItem(android.R.id.edit);
                 menu.removeItem(R.id.properties);
+                menu.removeItem(R.id.menu_share);
+            } else if (checkedCount == 1) {
+                GenericFile selected = null;
+                final SparseBooleanArray items = list.getCheckedItemPositions();
+                for (int i = 0; i < items.size(); i++) {
+                    final int key = items.keyAt(i);
+                    if (items.get(key)) {
+                        selected = (GenericFile) list.getAdapter().getItem(key);
+                        break;
+                    }
+                }
+                if (selected == null) {
+                    Log.w("ActionModeController", "Can't find selected file");
+                } else {
+                    if (selected.isDirectory()) {
+                        menu.removeItem(R.id.menu_share);
+                    } else {
+                        final File selectedFile = selected.toFile();
+                        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setDataAndType(Uri.fromFile(selectedFile),
+                                MimeTypes.getMimeType(selectedFile));
+                        final MenuItem share = menu.findItem(R.id.menu_share);
+                        ((ShareActionProvider) share.getActionProvider())
+                                .setShareIntent(shareIntent);
+                    }
+                }
             }
             return true;
         }

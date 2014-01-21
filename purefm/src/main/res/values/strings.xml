@@ -54,7 +54,8 @@
     <string name="menu_sort_by_date_desc">By date descending</string>
     <string name="menu_sort_by_size_asc">By size ascending</string>
     <string name="menu_sort_by_size_desc">By size descending</string>
-    
+
+    <string name="menu_share">Share</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_rename">Rename</string>
     <string name="menu_cut">Cut</string>
