@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/holo_light_action_search"
+        android:src="?attr/action_search"
         android:contentDescription="@string/menu_search"
         style="?android:attr/actionButtonStyle" />
     

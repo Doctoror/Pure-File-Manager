@@ -25,6 +25,8 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -38,6 +40,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.docd.purefm.Extras;
+import com.docd.purefm.PureFM;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
@@ -148,10 +151,18 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
         this.drawerLayout = (DrawerLayout) this
                 .findViewById(R.id.drawer);
-        this.drawerLayout.setDrawerShadow(R.drawable.holo_light_drawer_shadow,
+        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
+
+        final TypedArray array = obtainStyledAttributes(new int[]{R.attr.themeId});
+        final int themeId = array.getInteger(0, PureFM.THEME_ID_LIGHT);
+        array.recycle();
+
         this.mDrawerToggle = new BrowserActivityDrawerToggle(this, this.drawerLayout,
-                R.drawable.holo_light_ic_drawer, R.string.menu_bookmarks, R.string.app_name);
+                themeId == PureFM.THEME_ID_LIGHT ?
+                        R.drawable.holo_light_ic_drawer :
+                        R.drawable.holo_dark_ic_drawer,
+                                R.string.menu_bookmarks, R.string.app_name);
         this.drawerLayout.setDrawerListener(this.mDrawerToggle);
 
         this.drawerList = (ListView) this.findViewById(R.id.drawerList);

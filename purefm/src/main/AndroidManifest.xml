@@ -29,7 +29,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_fso_folder"
         android:label="@string/app_name"
-        android:theme="@style/ThemeLight"
+        android:theme="@style/ThemeDark"
         android:name=".PureFM">
 
         <activity
@@ -56,7 +56,7 @@
         <activity
             android:name="com.docd.purefm.activities.SearchActivity"
             android:label="@string/menu_search"
-            android:logo="@drawable/holo_light_action_search"
+            android:logo="?attr/action_search"
             android:configChanges="orientation|screenSize"/>
 
         <activity

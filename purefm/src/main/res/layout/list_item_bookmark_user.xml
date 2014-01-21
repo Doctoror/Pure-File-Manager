@@ -62,7 +62,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/remove"
-        android:src="@drawable/holo_light_action_remove"
+        android:src="?attr/action_remove"
         android:padding="5dp"
         style="?android:attr/actionButtonStyle" />
 

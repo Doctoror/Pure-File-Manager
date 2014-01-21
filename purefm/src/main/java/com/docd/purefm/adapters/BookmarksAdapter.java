@@ -15,6 +15,7 @@ import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.BookmarksHelper;
+import com.docd.purefm.utils.ThemeUtils;
 
 import android.content.res.Resources;
 import android.database.DataSetObservable;
@@ -66,12 +67,12 @@ public final class BookmarksAdapter implements ListAdapter {
         this.userStart = this.bookmarks.size();
         this.bookmarks.addAll(user);
 
-        final Resources res = activity.getResources();
-        this.iconStorage = res.getDrawable(R.drawable.holo_light_ic_storage);
-        this.iconSdcard = res.getDrawable(R.drawable.holo_light_ic_sdcard);
-        this.iconUsb = res.getDrawable(R.drawable.holo_light_ic_usb);
-        this.iconUser = res.getDrawable(R.drawable.holo_light_ic_bookmark);
-        this.rootDisplayName = res.getString(R.string.root);
+        final Resources.Theme theme = activity.getTheme();
+        this.iconStorage = ThemeUtils.getDrawable(theme, R.attr.ic_storage);
+        this.iconSdcard = ThemeUtils.getDrawable(theme, R.attr.ic_sdcard);
+        this.iconUsb = ThemeUtils.getDrawable(theme, R.attr.ic_usb);
+        this.iconUser = ThemeUtils.getDrawable(theme, R.attr.ic_bookmark);
+        this.rootDisplayName = activity.getString(R.string.root);
     }
     
     public void addItem(String path) {

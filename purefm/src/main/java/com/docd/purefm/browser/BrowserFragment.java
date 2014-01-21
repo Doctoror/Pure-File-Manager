@@ -48,6 +48,7 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.DirectoryScanTask;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.view.SequentialTextView;
 import com.docd.purefm.view.SequentialTextView.OnSequenceClickListener;
 
@@ -200,11 +201,11 @@ public final class BrowserFragment extends Fragment {
             this.refreshItem = menu.findItem(R.id.refresh);
 
             if (Settings.appearance == Settings.APPEARANCE_LIST) {
-                content.setIcon(R.drawable.holo_light_action_view_as_grid)
+                content.setIcon(ThemeUtils.getDrawable(this.browserActivity, R.attr.action_view_as_grid))
                         .setTitle(R.string.menu_view_as_grid)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             } else {
-                content.setIcon(R.drawable.holo_light_action_view_as_list)
+                content.setIcon(ThemeUtils.getDrawable(this.browserActivity, R.attr.action_view_as_list))
                         .setTitle(R.string.menu_view_as_list)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }

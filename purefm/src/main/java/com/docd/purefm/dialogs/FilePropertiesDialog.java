@@ -19,7 +19,9 @@ import com.docd.purefm.R;
 import com.docd.purefm.controller.FilePermissionsController;
 import com.docd.purefm.controller.FilePropertiesController;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.utils.ThemeUtils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -58,9 +60,9 @@ public final class FilePropertiesDialog extends DialogFragment {
     
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(
-                getActivity());
-        builder.setIcon(R.drawable.holo_light_action_info);
+        final Activity activity = getActivity();
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.action_info));
         builder.setTitle(file.getName());
         builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
             @Override
@@ -75,7 +77,7 @@ public final class FilePropertiesDialog extends DialogFragment {
                 dialog.dismiss();
             }
         });
-        final View content = this.getActivity().getLayoutInflater()
+        final View content = activity.getLayoutInflater()
                 .inflate(R.layout.dialog_properties_container, null);
         this.initView(content);
         builder.setView(content);

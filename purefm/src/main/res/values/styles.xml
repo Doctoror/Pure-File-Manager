@@ -15,26 +15,68 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="ThemeLight" parent="android:Theme.Holo.Light">
+        <item name="themeId">1</item>
         <item name="browserListTextColor">#454545</item>
+        <item name="action_copy">@drawable/holo_light_action_copy</item>
+        <item name="action_cut">@drawable/holo_light_action_cut</item>
+        <item name="action_edit">@drawable/holo_light_action_edit</item>
+        <item name="action_file_new">@drawable/holo_light_action_file_new</item>
+        <item name="action_folder_new">@drawable/holo_light_action_folder_new</item>
+        <item name="action_info">@drawable/holo_light_action_info</item>
+        <item name="action_paste">@drawable/holo_light_action_paste</item>
+        <item name="action_refresh">@drawable/holo_light_action_refresh</item>
+        <item name="action_remove">@drawable/holo_light_action_remove</item>
+        <item name="action_search">@drawable/holo_light_action_search</item>
+        <item name="action_settings">@drawable/holo_light_action_settings</item>
+        <item name="action_share">@drawable/holo_light_action_share</item>
+        <item name="action_sort">@drawable/holo_light_action_sort</item>
+        <item name="action_view_as_grid">@drawable/holo_light_action_view_as_grid</item>
+        <item name="action_view_as_list">@drawable/holo_light_action_view_as_list</item>
+        <item name="ic_bookmark">@drawable/holo_light_ic_bookmark</item>
+        <item name="ic_drawer">@drawable/holo_light_ic_drawer</item>
+        <item name="ic_sdcard">@drawable/holo_light_ic_sdcard</item>
+        <item name="ic_storage">@drawable/holo_light_ic_storage</item>
+        <item name="ic_usb">@drawable/holo_light_ic_usb</item>
     </style>
 
     <style name="ThemeDark" parent="android:Theme.Holo">
+        <item name="themeId">2</item>
         <item name="browserListTextColor">#c5c5c5</item>
+        <item name="action_copy">@drawable/holo_dark_action_copy</item>
+        <item name="action_cut">@drawable/holo_dark_action_cut</item>
+        <item name="action_edit">@drawable/holo_dark_action_edit</item>
+        <item name="action_file_new">@drawable/holo_dark_action_file_new</item>
+        <item name="action_folder_new">@drawable/holo_dark_action_folder_new</item>
+        <item name="action_info">@drawable/holo_dark_action_info</item>
+        <item name="action_paste">@drawable/holo_dark_action_paste</item>
+        <item name="action_refresh">@drawable/holo_dark_action_refresh</item>
+        <item name="action_remove">@drawable/holo_dark_action_remove</item>
+        <item name="action_search">@drawable/holo_dark_action_search</item>
+        <item name="action_settings">@drawable/holo_dark_action_settings</item>
+        <item name="action_share">@drawable/holo_dark_action_share</item>
+        <item name="action_sort">@drawable/holo_dark_action_sort</item>
+        <item name="action_view_as_grid">@drawable/holo_dark_action_view_as_grid</item>
+        <item name="action_view_as_list">@drawable/holo_dark_action_view_as_list</item>
+        <item name="ic_bookmark">@drawable/holo_dark_ic_bookmark</item>
+        <item name="ic_drawer">@drawable/holo_dark_ic_drawer</item>
+        <item name="ic_sdcard">@drawable/holo_dark_ic_sdcard</item>
+        <item name="ic_storage">@drawable/holo_dark_ic_storage</item>
+        <item name="ic_usb">@drawable/holo_dark_ic_usb</item>
     </style>
-    
+
     <style name="NavigationText">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">?attr/browserListTextColor</item>
     </style>
-    
+
     <style name="browser_text_medium">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">?attr/browserListTextColor</item>
         <item name="android:singleLine">true</item>
         <item name="android:textIsSelectable">false</item>
     </style>
-    
+
     <style name="browser_text_small">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?attr/browserListTextColor</item>

@@ -23,7 +23,9 @@ import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.StatFsCompat;
+import com.docd.purefm.utils.ThemeUtils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -56,11 +58,11 @@ public final class PartitionInfoDialog extends DialogFragment {
     }
     
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(
-                getActivity());
-        builder.setIcon(R.drawable.holo_light_action_info);
+        final Activity activity = this.getActivity();
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.action_info));
         builder.setTitle(R.string.menu_partition);
-        builder.setView(this.getInfoView());
+        builder.setView(this.getInfoView(activity));
         builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -72,8 +74,8 @@ public final class PartitionInfoDialog extends DialogFragment {
         
     }
     
-    public View getInfoView() {
-        final View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
+    public View getInfoView(final Activity activity) {
+        final View v = activity.getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
         final TextView title = (TextView) v.findViewById(R.id.location);
         String path = file.getCanonicalPath();
         if (path == null) {
