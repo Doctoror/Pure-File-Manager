@@ -21,23 +21,15 @@ import android.util.LruCache;
 /**
  * LruCache fpr Drawables
  */
-public final class DrawableLruCache extends LruCache<Integer, Drawable> {
+public final class DrawableLruCache<T> extends LruCache<T, Drawable> {
 
-    private static DrawableLruCache instance;
 
-    public static synchronized DrawableLruCache getInstance() {
-        if (instance == null) {
-            instance = new DrawableLruCache();
-        }
-        return instance;
-    }
-
-    private DrawableLruCache() {
+    public DrawableLruCache() {
         super(512 * 1024);
     }
 
     @Override
-    protected int sizeOf(Integer key, Drawable value) {
+    protected int sizeOf(T key, Drawable value) {
         if (value instanceof BitmapDrawable) {
             return ((BitmapDrawable) value).getBitmap().getByteCount() / 1024;
         } else {

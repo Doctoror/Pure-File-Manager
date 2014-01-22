@@ -63,8 +63,7 @@ public final class CommandLineFile implements GenericFile,
 
     private int owner;
     private int group;
-    private int icon;
-    
+
     private String mimeType;
     
     private boolean isSymlink;
@@ -232,18 +231,12 @@ public final class CommandLineFile implements GenericFile,
         targetFile.exists = true;
         if (!targetFile.isDirectory) {
             targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);
-            targetFile.icon = MimeTypes.getTypeIcon(targetFile.file);
         }
     }
 
     @Override
     public String getMimeType() {
         return this.mimeType;
-    }
-    
-    @Override
-    public int getTypeIcon() {
-        return this.icon;
     }
 
     @Override

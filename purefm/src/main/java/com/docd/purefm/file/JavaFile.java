@@ -34,14 +34,12 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     private final Permissions p;
     private final boolean isSymlink; 
     private final String mimeType;
-    private final int icon;
-    
+
     public JavaFile(File file) {
         this.file = file;
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
-        this.icon = MimeTypes.getTypeIcon(file);
     }
     
     public JavaFile(File dir, String name) {
@@ -49,7 +47,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
-        this.icon = MimeTypes.getTypeIcon(file);
     }
 
     public JavaFile(String dirPath, String name) {
@@ -57,7 +54,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
-        this.icon = MimeTypes.getTypeIcon(file);
     }
 
     public JavaFile(String path) {
@@ -65,7 +61,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
-        this.icon = MimeTypes.getTypeIcon(file);
     }
 
     public JavaFile(URI uri) {
@@ -73,7 +68,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
-        this.icon = MimeTypes.getTypeIcon(file);
     }
     
     private Permissions readPermissions() {
@@ -102,11 +96,6 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     @Override
     public String getMimeType() {
         return this.mimeType;
-    }
-    
-    @Override
-    public int getTypeIcon() {
-        return this.icon;
     }
     
     @Override

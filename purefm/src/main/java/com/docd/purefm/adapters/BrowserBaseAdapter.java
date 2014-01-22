@@ -41,9 +41,12 @@ import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.file.Permissions;
 import com.docd.purefm.utils.DrawableLruCache;
 import com.docd.purefm.utils.FileSortType;
+import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.view.OverlayRecyclingImageView;
+
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Base adapter for file list.
@@ -59,6 +62,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             FileObserver.MODIFY |
             FileObserver.MOVED_TO;
 
+    private static DrawableLruCache<Integer> mDrawableLruCache;
+    private static DrawableLruCache<String> mMimeTypeIconCache;
+
     private final Handler mHandler;
 
     private final Resources mResources;
@@ -66,7 +72,6 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     private final DataSetObservable mDataSetObservable;
     private final FileObserverCache mObserverCache;
-    private final DrawableLruCache mDrawableLruCache;
     
     private final List<GenericFile> mContent;
     private final List<MultiListenerFileObserver> mFileObservers;
@@ -77,12 +82,17 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     protected final LayoutInflater mLayoutInflater;
 
     protected BrowserBaseAdapter(final Activity context) {
+        if (mDrawableLruCache == null) {
+            mDrawableLruCache = new DrawableLruCache<Integer>();
+        }
+        if (mMimeTypeIconCache == null) {
+            mMimeTypeIconCache = new DrawableLruCache<String>();
+        }
         this.mHandler = new Handler();
         this.mResources = context.getResources();
         this.mTheme = context.getTheme();
         this.mDataSetObservable = new DataSetObservable();
         this.mObserverCache = FileObserverCache.getInstance();
-        this.mDrawableLruCache = DrawableLruCache.getInstance();
         this.mLayoutInflater = context.getLayoutInflater();
         this.mContent = new ArrayList<GenericFile>();
         this.mFileObservers = new ArrayList<MultiListenerFileObserver>();
@@ -270,21 +280,28 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         } else if (f.isDirectory()) {
             overlay.setOverlay(null);
         } else {
-            int icon = f.getTypeIcon();
-            if (icon == 0) {
-                if (p.gx || p.ux || p.ox) {
-                    icon = R.drawable.ic_fso_type_executable;
+            final String fileExt = FilenameUtils.getExtension(f.getName());
+            Drawable mimeIcon = mMimeTypeIconCache.get(fileExt);
+            if (mimeIcon == null) {
+                final int mimeIconId = MimeTypes.getIconForExt(fileExt);
+                if (mimeIconId != 0) {
+                    mimeIcon = mResources.getDrawable(mimeIconId);
+                    mMimeTypeIconCache.put(fileExt, mimeIcon);
                 }
             }
-            if (icon == 0) {
-                overlay.setOverlay(null);
-            } else {
+
+            if (mimeIcon != null) {
+                overlay.setOverlay(mimeIcon);
+            } else if (p.gx || p.ux || p.ox) {
+                final int icon = R.drawable.ic_fso_type_executable;
                 Drawable iconDrawable = mDrawableLruCache.get(icon);
                 if (iconDrawable == null) {
                     iconDrawable = mResources.getDrawable(icon);
                     mDrawableLruCache.put(icon, iconDrawable);
                 }
                 overlay.setOverlay(iconDrawable);
+            } else {
+                overlay.setOverlay(null);
             }
         }
     }

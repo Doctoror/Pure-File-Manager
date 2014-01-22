@@ -36,7 +36,6 @@ public interface GenericFile extends Serializable {
     long lastModified();
     long getFreeSpace();
     long getTotalSpace();
-    int getTypeIcon();
     Permissions getPermissions();
     String getPath();
     String getMimeType();
