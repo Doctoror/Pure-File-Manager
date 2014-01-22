@@ -52,8 +52,7 @@
     <string name="menu_sort_by_size_asc">Größe aufsteigend</string>
     <string name="menu_sort_by_size_desc">Größe absteigend</string>
 
-    <!-- TODO translate menu_share to German -->
-    <string name="menu_share">Share</string>
+    <string name="menu_share">Teilen</string>
     <string name="menu_delete">Löschen</string>
     <string name="menu_rename">Umbenennen</string>
     <string name="menu_cut">Entfernen</string>
@@ -116,17 +115,15 @@
     <string name="dialog_overwrite_skip_all">Alle überspringen</string>
     <string name="dialog_overwrite_replace">Ersetzen</string>
     <string name="dialog_overwrite_replace_all">Alle ersetzen</string>
-    <!-- TODO translate to German -->
-    <string name="dialog_copy_failed">Failed to copy the following files</string>
-    <string name="dialog_move_failed">Failed to move the following files</string>
-    <string name="dialog_delete_failed">Failed to delete the following files</string>
+    <string name="dialog_copy_failed">Fehler beim Kopieren folgender Dateien</string>
+    <string name="dialog_move_failed">Fehler beim Verschieben folgender Dateien</string>
+    <string name="dialog_delete_failed">Fehler beim Löschen folgender Dateien</string>
     
     <!-- Delete -->
     <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>
     
     <!-- Permissions -->
-    <!-- TODO translate "apply" string to German -->
-    <string name="apply">Apply</string>
+    <string name="apply">Anwenden</string>
     <string name="applying_failed">Anwenden gescheitert</string>
     <string name="permissions_changed">Berechtigung geändert</string>
     
