@@ -65,6 +65,8 @@
     
     <!-- Preferences -->
     <string name="preference_category_view">Aussehen</string>
+    <!-- TODO translate preference_theme to German -->
+    <string name="preference_theme">Theme</string>
     <string name="preference_appearance">Ansicht</string>
     <string name="preference_show_hidden">Versteckte Dateien</string>
     <string name="preference_show_permissions">Berechtigungen</string>
@@ -78,6 +80,9 @@
     
     <string name="preference_category_startup">Startoptionen</string>
     <string name="preference_home_directory">Startordner</string>
+
+    <!-- TODO translate theme_change_warning to German -->
+    <string name="theme_change_warning">Theme will be applied after restarting the application</string>
     
     <!-- New File / Directory -->
     <string name="name_empty">Namensfeld ist leer</string>

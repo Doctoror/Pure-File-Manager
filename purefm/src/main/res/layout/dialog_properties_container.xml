@@ -20,7 +20,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ebebeb"
         android:orientation="horizontal" >
 
         <ToggleButton
@@ -28,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/tabs_bg"
+            android:background="@drawable/tab_indicator_holo"
             android:checked="true"
             android:textAllCaps="true"
             android:textOff="@string/info"
@@ -45,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/tabs_bg"
+            android:background="@drawable/tab_indicator_holo"
             android:textAllCaps="true"
             android:textOff="@string/permissions"
             android:textOn="@string/permissions" />

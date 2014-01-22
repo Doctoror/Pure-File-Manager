@@ -68,6 +68,7 @@
     
     <!-- Preferences -->
     <string name="preference_category_view">View Settings</string>
+    <string name="preference_theme">Theme</string>
     <string name="preference_appearance">Appearance</string>
     <string name="preference_show_hidden">Show hidden files</string>
     <string name="preference_show_permissions">Show permissions</string>
@@ -81,6 +82,8 @@
     
     <string name="preference_category_startup">Startup</string>
     <string name="preference_home_directory">Home directory</string>
+
+    <string name="theme_change_warning">Theme will be applied after restarting the application</string>
     
     <!-- Units -->
 <!--     <string name="unit_bytes">B</string> -->

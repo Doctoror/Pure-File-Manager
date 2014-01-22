@@ -26,8 +26,14 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.widget.Toast;
 
 public final class SettingsFragment extends PreferenceFragment {
+
+    private static final String[] THEMES_VALUES = new String[] {
+            Integer.toString(R.style.ThemeLight),
+            Integer.toString(R.style.ThemeDark)
+    };
 
     private boolean wasAllowRoot;
 
@@ -105,6 +111,17 @@ public final class SettingsFragment extends PreferenceFragment {
             }
         });
 
+        final ListPreference theme = (ListPreference) findPreference(getString(R.string.key_preference_theme));
+        theme.setEntryValues(THEMES_VALUES);
+        theme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Settings.theme = Integer.parseInt((String) newValue);
+                Toast.makeText(getActivity(), R.string.theme_change_warning, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
         final Preference appear = findPreference(getString(R.string.key_preference_appearance));
         appear.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -159,7 +176,7 @@ public final class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
-        
+
         perm.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
         size.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
         modif.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);

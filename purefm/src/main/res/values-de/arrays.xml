@@ -13,15 +13,16 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <resources>
+
+    <!-- TODO translate to German -->
+    <string-array name="themes">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
     
     <string-array name="appearance_types">
         <item>Liste</item>
         <item>Raster</item>
-    </string-array>
-    
-    <string-array name="appearance_types_values">
-        <item>0</item>
-        <item>1</item>
     </string-array>
     
 </resources>

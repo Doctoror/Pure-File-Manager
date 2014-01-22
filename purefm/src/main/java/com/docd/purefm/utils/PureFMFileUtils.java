@@ -122,7 +122,7 @@ public final class PureFMFileUtils {
         @Override
         public int compare(final GenericFile a, final GenericFile b) {
             if (a.isDirectory() && b.isDirectory()) {
-                return a.getName().compareTo(b.getName());
+                return String.CASE_INSENSITIVE_ORDER.compare(a.getName(), b.getName());
             }
             
             if (a.isDirectory()) {
@@ -142,7 +142,7 @@ public final class PureFMFileUtils {
         @Override
         public int compare(final GenericFile a, final GenericFile b) {
             if (a.isDirectory() && b.isDirectory()) {
-                final int res = a.getName().compareTo(b.getName());
+                final int res = String.CASE_INSENSITIVE_ORDER.compare(a.getName(), b.getName());
                 if (res == 0) {
                     return 0;
                 }

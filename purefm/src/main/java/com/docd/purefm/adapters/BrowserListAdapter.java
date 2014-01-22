@@ -96,7 +96,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h.date.setText("");
         }
 
-        if (Settings.showSize) {
+        if (Settings.showSize && !f.isDirectory()) {
             final long fileSize = f.length();
             String humanReadableFileSize = mHumanReadableLength.get(fileSize);
             if (humanReadableFileSize == null) {

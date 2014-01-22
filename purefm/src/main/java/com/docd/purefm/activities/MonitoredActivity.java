@@ -15,7 +15,9 @@
 package com.docd.purefm.activities;
 
 import com.docd.purefm.ActivityMonitor;
+import com.docd.purefm.settings.Settings;
 
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 /**
@@ -23,6 +25,12 @@ import android.support.v4.app.FragmentActivity;
  * @author Doctoror
  */
 public abstract class MonitoredActivity extends FragmentActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        this.setTheme(Settings.theme);
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     protected void onStart() {

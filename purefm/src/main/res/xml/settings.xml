@@ -23,6 +23,13 @@
             android:entries="@array/appearance_types"
             android:entryValues="@array/appearance_types_values"
             android:defaultValue="0"/>
+
+        <ListPreference
+            android:title="@string/preference_theme"
+            android:key="@string/key_preference_theme"
+            android:entries="@array/themes"
+            android:entryValues="@array/appearance_types_values"
+            android:defaultValue="0"/>
         
         <CheckBoxPreference
             android:title="@string/preference_show_hidden"

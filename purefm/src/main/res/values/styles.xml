@@ -88,7 +88,7 @@
     </style>
 
     <style name="browser_text_small">
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">11.5sp</item>
         <item name="android:textColor">?attr/browserListTextColor</item>
         <item name="android:textIsSelectable">false</item>
     </style>
