@@ -31,6 +31,7 @@ import android.os.FileObserver;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 
 import com.docd.purefm.R;
@@ -47,6 +48,7 @@ import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.view.OverlayRecyclingImageView;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Base adapter for file list.
@@ -88,8 +90,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         if (mMimeTypeIconCache == null) {
             mMimeTypeIconCache = new DrawableLruCache<String>();
         }
-        this.mHandler = new Handler();
+
         this.mResources = context.getResources();
+        this.mHandler = new Handler();
         this.mTheme = context.getTheme();
         this.mDataSetObservable = new DataSetObservable();
         this.mObserverCache = FileObserverCache.getInstance();
@@ -267,20 +270,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
-    protected void applyOverlay(GenericFile f, OverlayRecyclingImageView overlay) {
-        final Permissions p = f.getPermissions();
-        
-        if (f.isSymlink()) {
-            Drawable symlink = mDrawableLruCache.get(R.attr.ic_fso_symlink);
-            if (symlink == null) {
-                symlink = ThemeUtils.getDrawable(mTheme, R.attr.ic_fso_symlink);
-                mDrawableLruCache.put(R.attr.ic_fso_symlink, symlink);
-            }
-            overlay.setOverlay(symlink);
-        } else if (f.isDirectory()) {
-            overlay.setOverlay(null);
+    protected final void setIcon(final GenericFile file, final ImageView icon) {
+        if (file.isDirectory()) {
+            icon.setImageDrawable(getDrawableForRes(mResources, R.drawable.ic_fso_folder));
         } else {
-            final String fileExt = FilenameUtils.getExtension(f.getName());
+            final String fileExt = FilenameUtils.getExtension(file.getName());
             Drawable mimeIcon = mMimeTypeIconCache.get(fileExt);
             if (mimeIcon == null) {
                 final int mimeIconId = MimeTypes.getIconForExt(fileExt);
@@ -289,21 +283,51 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                     mMimeTypeIconCache.put(fileExt, mimeIcon);
                 }
             }
-
             if (mimeIcon != null) {
-                overlay.setOverlay(mimeIcon);
-            } else if (p.gx || p.ux || p.ox) {
-                final int icon = R.drawable.ic_fso_type_executable;
-                Drawable iconDrawable = mDrawableLruCache.get(icon);
-                if (iconDrawable == null) {
-                    iconDrawable = mResources.getDrawable(icon);
-                    mDrawableLruCache.put(icon, iconDrawable);
-                }
-                overlay.setOverlay(iconDrawable);
+                icon.setImageDrawable(mimeIcon);
             } else {
-                overlay.setOverlay(null);
+                final Permissions p = file.getPermissions();
+                if (!file.isSymlink() && (p.gx || p.ux || p.ox)) {
+                    final int executableIcon = R.drawable.ic_fso_type_executable;
+                    Drawable iconDrawable = mDrawableLruCache.get(executableIcon);
+                    if (iconDrawable == null) {
+                        iconDrawable = mResources.getDrawable(executableIcon);
+                        mDrawableLruCache.put(executableIcon, iconDrawable);
+                    }
+                    icon.setImageDrawable(iconDrawable);
+                } else {
+                    icon.setImageDrawable(getDrawableForRes(mResources, R.drawable.ic_fso_default));
+                }
             }
         }
+    }
+
+    protected final void applyOverlay(GenericFile f, OverlayRecyclingImageView overlay) {
+        if (f.isSymlink()) {
+            overlay.setOverlay(getDrawableForRes(mTheme, R.attr.ic_fso_symlink));
+        } else {
+            overlay.setOverlay(null);
+        }
+    }
+
+    @NotNull
+    private static Drawable getDrawableForRes(final Resources.Theme theme, final int attrId) {
+        Drawable drawable = mDrawableLruCache.get(attrId);
+        if (drawable == null) {
+            drawable = ThemeUtils.getDrawable(theme, attrId);
+            mDrawableLruCache.put(attrId, drawable);
+        }
+        return drawable;
+    }
+
+    @NotNull
+    private static Drawable getDrawableForRes(final Resources res, final int resId) {
+        Drawable drawable = mDrawableLruCache.get(resId);
+        if (drawable == null) {
+            drawable = res.getDrawable(resId);
+            mDrawableLruCache.put(resId, drawable);
+        }
+        return drawable;
     }
 
     private static final class FileObserverEventRunnable implements Runnable {

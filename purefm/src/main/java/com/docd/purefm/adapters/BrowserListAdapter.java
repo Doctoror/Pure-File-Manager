@@ -76,7 +76,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         }
         
         final GenericFile f = this.getItem(pos);
-        h.icon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder : R.drawable.ic_fso_default);
+        this.setIcon(f, h.icon);
         this.applyOverlay(f, h.icon);
 
         if (Settings.showPreviews) {
