@@ -5,6 +5,8 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.view.ContextThemeWrapper;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class ThemeUtils {
     private ThemeUtils() {}
 
@@ -17,6 +19,7 @@ public final class ThemeUtils {
         }
     }
 
+    @NotNull
     public static Drawable getDrawable(final ContextThemeWrapper themeWrapper, final int attr) {
         final TypedArray array = themeWrapper.obtainStyledAttributes(new int[] {attr});
         try {

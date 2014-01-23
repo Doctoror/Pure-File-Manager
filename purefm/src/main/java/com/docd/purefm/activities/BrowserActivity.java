@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -62,6 +63,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
+    /**
+     * Saved fragment state. This saving mechanism is used for restoring
+     * the state when Activity is recreated because of theme change
+     */
+    private static final String EXTRA_SAVED_FRAGMENT_ADAPTER_STATE = "BrowserActivity.extras.SAVED_FRAGMENT_STATE";
+
     public static final String TAG_DIALOG = "dialog";
 
     public static final int REQUEST_CODE_SETTINGS = 0;
@@ -95,10 +102,14 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            savedInstanceState = getIntent().getBundleExtra(EXTRA_SAVED_STATE);
+        }
         this.setContentView(R.layout.activity_browser);
         this.checkIntentAction(getIntent());
         this.initActionBar();
         this.initView();
+        this.restoreSavedState(savedInstanceState);
     }
 
     @Override
@@ -116,6 +127,23 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     protected void onResume() {
         super.onResume();
         this.invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE, pagerAdapter.saveManualState());
+    }
+
+    private void restoreSavedState(final Bundle savedState) {
+        if (savedState != null) {
+            final Parcelable adapterState = savedState.getParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE);
+            if (adapterState != null) {
+                if (pagerAdapter != null) {
+                    pagerAdapter.restoreManualState(adapterState);
+                }
+            }
+        }
     }
 
     @Override
@@ -144,7 +172,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     private void initView() {
         final ViewPager pager = (ViewPager) this.findViewById(R.id.pager);
         this.pagerAdapter = new BrowserTabsAdapter(
-                this.getSupportFragmentManager());
+                this.getFragmentManager());
         pager.setAdapter(this.pagerAdapter);
         pager.setOffscreenPageLimit(2);
 
@@ -172,10 +200,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        //if (!mShowHomeAsUp) {
-            mDrawerToggle.syncState();
-        //}
+        mDrawerToggle.syncState();
     }
 
     @Override
@@ -189,6 +214,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
     public void invalidateList() {
@@ -261,7 +287,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     @Override
-    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+    public boolean onMenuItemSelected(final int featureId, @NotNull final MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_bookmarks_new:
             final String path = this.currentPath.getAbsolutePath();

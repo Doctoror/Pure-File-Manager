@@ -82,14 +82,6 @@
     
     <string name="preference_category_startup">Startup</string>
     <string name="preference_home_directory">Home directory</string>
-
-    <string name="theme_change_warning">Theme will be applied after restarting the application</string>
-    
-    <!-- Units -->
-<!--     <string name="unit_bytes">B</string> -->
-<!--     <string name="unit_kib">KiB</string> -->
-<!--     <string name="unit_mib">MiB</string> -->
-<!--     <string name="unit_gib">GiB</string> -->
     
     <!-- New File / Directory -->
     <string name="name_empty">Name field is empty</string>

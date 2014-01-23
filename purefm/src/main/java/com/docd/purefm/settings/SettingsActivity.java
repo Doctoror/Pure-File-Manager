@@ -25,10 +25,12 @@ import android.view.MenuItem;
 public final class SettingsActivity extends SuperuserActionBarMonitoredActivity {
 
     private boolean needInvalidate;
+    private int createdWithThemeId;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createdWithThemeId = Settings.theme;
         this.setContentView(R.layout.activity_settings);
         this.getActionBar().setDisplayOptions(
                 ActionBar.DISPLAY_SHOW_HOME |
@@ -38,11 +40,11 @@ public final class SettingsActivity extends SuperuserActionBarMonitoredActivity 
     }
     
     @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.onBackPressed();
-                return true;
+                this.onBeforeFinish();
+                return super.onMenuItemSelected(featureId, item);
                 
             default:
                 return false;
@@ -51,8 +53,16 @@ public final class SettingsActivity extends SuperuserActionBarMonitoredActivity 
     
     @Override
     public void onBackPressed() {
+        this.onBeforeFinish();
+        super.onBackPressed();
+    }
+
+    void proxyRestart() {
+        restart();
+    }
+
+    private void onBeforeFinish() {
         this.setResult(this.needInvalidate ? Activity.RESULT_OK : Activity.RESULT_CANCELED);
-        this.finish();
     }
     
     public void notifyNeedInvalidate() {

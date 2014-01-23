@@ -26,7 +26,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.widget.Toast;
 
 public final class SettingsFragment extends PreferenceFragment {
 
@@ -116,9 +115,13 @@ public final class SettingsFragment extends PreferenceFragment {
         theme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Settings.theme = Integer.parseInt((String) newValue);
-                Toast.makeText(getActivity(), R.string.theme_change_warning, Toast.LENGTH_SHORT).show();
-                return true;
+                final int chosenTheme = Integer.parseInt((String) newValue);
+                if (chosenTheme != Settings.theme) {
+                    Settings.theme = chosenTheme;
+                    ((SettingsActivity) getActivity()).proxyRestart();
+                    return true;
+                }
+                return false;
             }
         });
 

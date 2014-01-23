@@ -15,22 +15,12 @@
 package com.docd.purefm.activities;
 
 import com.docd.purefm.ActivityMonitor;
-import com.docd.purefm.settings.Settings;
-
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
 /**
  * Activity that sends information about it's lifecycle events to ActivityMonitor
  * @author Doctoror
  */
-public abstract class MonitoredActivity extends FragmentActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        this.setTheme(Settings.theme);
-        super.onCreate(savedInstanceState);
-    }
+public abstract class MonitoredActivity extends ThemableActivity {
 
     @Override
     protected void onStart() {

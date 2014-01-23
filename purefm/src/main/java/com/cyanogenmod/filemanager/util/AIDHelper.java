@@ -26,7 +26,9 @@ import android.util.SparseArray;
 
 import com.docd.purefm.R;
 
-import java.util.Iterator;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Properties;
 
@@ -35,7 +37,7 @@ import java.util.Properties;
  */
 public final class AIDHelper {
 
-    private static final String TAG = "AIDHelper"; //$NON-NLS-1$
+    private static final String TAG = "AIDHelper";
 
     private static SparseArray<String> sAids;
 
@@ -43,7 +45,6 @@ public final class AIDHelper {
      * Constructor of <code>AIDHelper</code>.
      */
     private AIDHelper() {
-        super();
     }
 
     /**
@@ -53,6 +54,7 @@ public final class AIDHelper {
      * @param force Force the reload of the AIDs
      * @return SparseArray<String> The array of AIDs
      */
+    @Nullable
     public synchronized static SparseArray<String> getAIDs(Context context, boolean force) {
         if (sAids == null || force) {
             Properties systemAIDs = null;
@@ -61,30 +63,27 @@ public final class AIDHelper {
                 systemAIDs = new Properties();
                 systemAIDs.load(context.getResources().openRawResource(R.raw.aid));
             } catch (Exception e) {
-                Log.e(TAG, "Fail to load AID raw file.", e); //$NON-NLS-1$
+                Log.e(TAG, "Fail to load AID raw file.", e);
                 return null;
             }
 
             // Add the default known system identifiers
             final SparseArray<String> aids = new SparseArray<String>();
-            final Iterator<Object> it = systemAIDs.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String)it.next();
-                String value = systemAIDs.getProperty(key);
-                int uid = Integer.parseInt(key);
+            for (final Object key : systemAIDs.keySet()) {
+                final String stringKey = (String) key;
+                final String value = systemAIDs.getProperty(stringKey);
+                final int uid = Integer.parseInt(stringKey);
                 aids.put(uid, value);
             }
 
             // Now, retrieve all AID of installed applications
             final PackageManager pm = context.getPackageManager();
-            List<ApplicationInfo> packages =
+            final List<ApplicationInfo> packages =
                     pm.getInstalledApplications(PackageManager.GET_META_DATA);
-            int cc = packages.size();
-            for (int i = 0; i < cc; i++) {
-                ApplicationInfo info = packages.get(i);
-                int uid = info.uid;
+            for (final ApplicationInfo info : packages) {
+                final int uid = info.uid;
                 if (aids.indexOfKey(uid) < 0) {
-                    String name = pm.getNameForUid(uid);
+                    final String name = pm.getNameForUid(uid);
                     aids.put(uid, name);
                 }
             }
@@ -103,6 +102,7 @@ public final class AIDHelper {
      * @param id The id
      * @return AID The AID, or null if not found
      */
+    @NotNull
     public static String getUserName(int id) {
         return sAids.get(id);
     }
@@ -113,6 +113,7 @@ public final class AIDHelper {
      * @param name The user identifier
      * @return AID The AID
      */
+    @NotNull
     public static String getUserName(String name) {
         final int len = sAids.size();
         for (int i = 0; i < len; i++) {

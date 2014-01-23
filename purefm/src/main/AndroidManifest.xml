@@ -13,13 +13,7 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.docd.purefm"
-    android:versionCode="1"
-    android:versionName="1.0" >
-
-    <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="19" />
+    package="com.docd.purefm">
 
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -33,7 +27,7 @@
         android:name=".PureFM">
 
         <activity
-            android:name="com.docd.purefm.activities.BrowserActivity"
+            android:name=".activities.BrowserActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:uiOptions="splitActionBarWhenNarrow"
@@ -54,14 +48,16 @@
         </activity>
 
         <activity
-            android:name="com.docd.purefm.activities.SearchActivity"
+            android:name=".activities.SearchActivity"
             android:label="@string/menu_search"
             android:logo="?attr/action_search"
+            android:parentActivityName=".activities.BrowserActivity"
             android:configChanges="orientation|screenSize"/>
 
         <activity
             android:name=".settings.SettingsActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".activities.BrowserActivity"/>
 
     </application>
 

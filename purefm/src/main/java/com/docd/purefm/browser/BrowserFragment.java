@@ -18,12 +18,12 @@ import java.io.File;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -156,15 +156,30 @@ public final class BrowserFragment extends Fragment {
         this.setRetainInstance(true);
         this.setHasOptionsMenu(true);
         this.firstRun = true;
+        restoreManualState(state);
+        super.onCreate(state);
+    }
+
+    public void restoreManualState(final Bundle state) {
         if (state != null) {
+            state.setClassLoader(getClass().getClassLoader());
             if (state.containsKey(KEY_FILE)) {
-                this.browser.setInitialPath((File) state.get(KEY_FILE));
+                final File initialPath = (File) state.get(KEY_FILE);
+                if (this.browser != null) {
+                    this.browser.setInitialPath(initialPath);
+                } else {
+                    //TODO save initial path
+                }
             }
             if (state.containsKey(KEY_PREV_ID)) {
                 this.prevId = state.getInt(KEY_PREV_ID);
             }
         }
-        super.onCreate(state);
+    }
+
+    public void saveManualState(final Bundle outState) {
+        outState.putSerializable(KEY_FILE, this.browser.getPath().toFile());
+        outState.putInt(KEY_PREV_ID, this.prevId);
     }
 
     public boolean onBackPressed() {
@@ -295,14 +310,13 @@ public final class BrowserFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(KEY_FILE, this.browser.getPath().toFile());
-        outState.putInt(KEY_PREV_ID, this.prevId);
+        saveManualState(outState);
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
+    public void setUserVisibleHint(final boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && this.isAdded()) {
             if (this.firstRun && this.isVisible()) {

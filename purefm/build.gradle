@@ -8,10 +8,10 @@ android {
     compileSdkVersion 19
     buildToolsVersion '19.0.1'
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 19
         versionCode 1
-        versionName "1.0"
+        versionName "0.1a"
     }
 
     packagingOptions {
@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.1+'
+    compile 'com.android.support:support-v13:19.0.1+'
     compile files('libs/annotations.jar')
     compile files('libs/RootTools-3.4.jar')
     compile files('libs/commons-io-2.4.jar')
