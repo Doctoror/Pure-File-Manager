@@ -33,10 +33,24 @@ import java.util.HashMap;
  */
 public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
 
+    /**
+     * Prefix for manual saved Fragment state extra
+     */
     private static final String STATE_FRAGMENT_PREFIX = "BrowserTabsAdapter.state.FRAGMENT_";
+
+    /**
+     * Currently displayed Fragment reference array
+     */
     private final BrowserFragment[] tabs;
+
+    /**
+     * Manually saved state to restore
+     */
     private Parcelable mToRestore;
 
+    /**
+     * ViewPager that uses this adapter
+     */
     private ViewPager mPager;
         
     public BrowserTabsAdapter(final FragmentManager fm) {
@@ -44,8 +58,15 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         this.tabs = new BrowserFragment[2];
     }
 
+    /**
+     * Creates and returns Fragment for the position, adding it to reference array
+     * and tries to restore manual saved state if the Fragment for last position is returned
+     *
+     * @param position position to return Fragment associated for
+     * @return new Fragment associated with a specified position.
+     */
     @Override
-    public BrowserFragment getItem(int position) {
+    public BrowserFragment getItem(final int position) {
         final BrowserFragment f = new BrowserFragment();
         this.tabs[position] = f;
         if (position == 1 && mToRestore != null) {
@@ -54,10 +75,18 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         return f;
     }
 
+    /**
+     * Sets ViewPager which uses this adapter.
+     *
+     * @param viewPager ViewPager that uses this adapter
+     */
     public void setViewPager(final ViewPager viewPager) {
         mPager = viewPager;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getCount() {
         return tabs.length;
@@ -71,6 +100,12 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
+    /**
+     * Saves manual state.
+     * This state should be manually restored by calling {@link #restoreManualState(android.os.Parcelable)}
+     *
+     * @return object holding the saved state
+     */
     public Parcelable saveManualState() {
         final BrowserTabsAdapterState state = new BrowserTabsAdapterState();
         for (int i = 0; i < tabs.length; i++) {
@@ -87,6 +122,11 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         return state;
     }
 
+    /**
+     * Restores manual-saved state
+     *
+     * @param state State saved by {@link #saveManualState()}
+     */
     private void doRestoreManualState(final Parcelable state) {
         mToRestore = null;
         final BrowserTabsAdapterState savedState = (BrowserTabsAdapterState) state;
@@ -102,6 +142,11 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         }
     }
 
+    /**
+     * Restores manual-saved state when all fragments were initialized
+     *
+     * @param state State saved by {@link #saveManualState()}
+     */
     public void restoreManualState(final Parcelable state) {
         int initedFragments = 0;
         for (final Object tab : tabs) {
@@ -116,6 +161,9 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         }
     }
 
+    /**
+     * Represents manual saved state
+     */
     private static final class BrowserTabsAdapterState implements Parcelable {
         private final HashMap<String, Bundle> fragmentStates;
         private int currentPage;
@@ -129,11 +177,17 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
             this.currentPage = source.readInt();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int describeContents() {
             return 0;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeMap(this.fragmentStates);

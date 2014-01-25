@@ -30,6 +30,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.FileObserver;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
@@ -59,29 +60,63 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BrowserBaseAdapter implements ListAdapter,
         MultiListenerFileObserver.OnEventListener {
 
+    /**
+     * Events to be monitor for every File in this Adapter
+     */
     private static final int OBSERVER_EVENTS =
             FileObserver.DELETE_SELF |
             FileObserver.ATTRIB |
             FileObserver.MODIFY |
             FileObserver.MOVED_TO;
 
+    /**
+     * Cache that holds file icons
+     */
     private static DrawableLruCache<Integer> mDrawableLruCache;
+
+    /**
+     * Cache that holds file icons
+     */
     private static DrawableLruCache<String> mMimeTypeIconCache;
 
     private final Handler mHandler;
 
+    /**
+     * Application's {@link android.content.res.Resources}
+     */
     private final Resources mResources;
+
+    /**
+     * Current {@link android.content.res.Resources.Theme}
+     */
     private final Resources.Theme mTheme;
 
     private final DataSetObservable mDataSetObservable;
     private final FileObserverCache mObserverCache;
-    
+
+    /**
+     * Adapter's content
+     */
     private final List<GenericFile> mContent;
+
+    /**
+     * Observers for Files used in this Adapter
+     */
     private final List<MultiListenerFileObserver> mFileObservers;
-    
+
+    /**
+     * Executor for loading file previews
+     */
     private ExecutorService mExecutor;
+
+    /**
+     * Current FileSortType
+     */
     private FileSortType mComparator;
 
+    /**
+     * Current LayoutInflater
+     */
     protected final LayoutInflater mLayoutInflater;
 
     protected BrowserBaseAdapter(final Activity context) {
@@ -102,7 +137,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.mFileObservers = new ArrayList<MultiListenerFileObserver>();
         this.mComparator = FileSortType.NAME_ASC;
     }
-    
+
+    /**
+     * Sets and applies new data
+     *
+     * @param data Data to apply
+     */
     public void updateData(GenericFile[] data) {
         if (mExecutor != null) {
             mExecutor.shutdownNow();
@@ -124,6 +164,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.notifyDataSetChanged();
     }
 
+    /**
+     * Removes references for all {@link android.os.FileObserver}s
+     */
     public final void releaseObservers() {
         for (final MultiListenerFileObserver observer : mFileObservers) {
             observer.removeOnEventListener(this);
@@ -131,59 +174,95 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
         mFileObservers.clear();
     }
-    
+
+    /**
+     * Inserts new item to this Adapter's data to position determined by current FileSortType
+     *
+     * @param file File to insert
+     */
     public final void addFile(final GenericFile file) {
         mContent.add(file);
         Collections.sort(mContent, mComparator.getComparator());
         notifyDataSetChanged();
     }
-    
+
+    /**
+     * Sets and applies {@link com.docd.purefm.utils.FileSortType}
+     *
+     * @param comp FileSortType to apply
+     */
     public void setCompareType(final FileSortType comp) {
         mComparator = comp;
         Collections.sort(mContent, comp.getComparator());
         notifyDataSetChanged();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getCount() {
         return this.mContent.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GenericFile getItem(int pos) {
         return this.mContent.get(pos);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getItemId(int pos) {
         return 0L;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getItemViewType(int pos) {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getViewTypeCount() {
         return 1;
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasStableIds() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEmpty() {
         return this.mContent.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerDataSetObserver(DataSetObserver arg0) {
         this.mDataSetObservable.registerObserver(arg0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void unregisterDataSetObserver(DataSetObserver arg0) {
         this.mDataSetObservable.unregisterObserver(arg0);
@@ -197,23 +276,42 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.mDataSetObservable.notifyChanged();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean areAllItemsEnabled() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEnabled(int arg0) {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onEvent(final int event, final String path) {
         mHandler.removeCallbacksAndMessages(null);
         mHandler.post(new FileObserverEventRunnable(this, event, path));
     }
 
+    /**
+     * {@link android.os.FileObserver} event that should be ran only on UI thread
+     *
+     * @param event The type of event which happened
+     * @param path The path, relative to the main monitored file or directory,
+     *             of the file or directory which triggered the event
+     */
     void onEventUIThread(final int event, final String path) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            throw new RuntimeException("");
+        }
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.ATTRIB:
             case FileObserver.MODIFY:
@@ -243,6 +341,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.notifyDataSetChanged();
     }
 
+    /**
+     * Should be called when the file at path was modified
+     *
+     * @param path of the modified file
+     */
     private void onFileModified(final String path) {
         final GenericFile affectedFile = FileFactory.newFile(path);
         mContent.remove(affectedFile);
@@ -259,6 +362,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
+    /**
+     * Removes {@link android.os.FileObserver} that monitors the path from cache
+     *
+     * @param path Path to remove FileObserver for
+     */
     private void removeObserverForPath(final String path) {
         final int observersSize = mFileObservers.size();
         for (int i = 0; i < observersSize; i++) {
@@ -271,6 +379,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
+    /**
+     * Resolves icon that should be used for the File
+     *
+     * @param file File to set icon for
+     * @param icon View to set icon
+     */
     protected final void setIcon(final GenericFile file, final ImageView icon) {
         if (file.isDirectory()) {
             icon.setImageDrawable(getDrawableForRes(mResources, R.drawable.ic_fso_folder));
@@ -303,6 +417,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
+    /**
+     * Applies overlay for File, if should be applied. Removes overlay if not.
+     *
+     * @param f File to apply overlay for
+     * @param overlay View to apply overlay to
+     */
     protected final void applyOverlay(GenericFile f, OverlayImageView overlay) {
         if (f.isSymlink()) {
             overlay.setOverlay(getDrawableForRes(mTheme, R.attr.ic_fso_symlink));
@@ -311,6 +431,14 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
+    /**
+     * Loads drawable from resources cache. If not found in cache, loads the
+     * {@link android.graphics.drawable.Drawable} from {@link android.content.res.Resources.Theme}
+     *
+     * @param theme Theme to load drawable for
+     * @param attrId attribute id of resource to load
+     * @return Drawable for Theme
+     */
     @NotNull
     private static Drawable getDrawableForRes(final Resources.Theme theme, final int attrId) {
         Drawable drawable = mDrawableLruCache.get(attrId);
@@ -321,6 +449,14 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         return drawable;
     }
 
+    /**
+     * Loads drawable from resources cache. If not found in cache, loads the
+     * {@link android.graphics.drawable.Drawable} from {@link android.content.res.Resources}
+     *
+     * @param res Resources to load drawable from
+     * @param resId Id of resource to load
+     * @return Drawable from resources
+     */
     @NotNull
     private static Drawable getDrawableForRes(final Resources res, final int resId) {
         Drawable drawable = mDrawableLruCache.get(resId);
@@ -351,14 +487,29 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
+    /**
+     * Loads preview from cache. If the preview in cache is not found it starts new
+     * {@link com.docd.purefm.adapters.BrowserBaseAdapter.Job} for loading preview from file
+     *
+     * @param file File to load preview for
+     * @param logo View to set loaded preview to
+     */
     protected final void loadPreview(final GenericFile file, OverlayImageView logo) {
-        try {
-            mExecutor.submit(new Job(mHandler, file, logo));
-        } catch (Exception e) {
-            Log.w("BrowserBaseAdapter", "Error submitting Job:" + e);
+        final Bitmap result = PreviewHolder.getCached(file.toFile());
+        if (result != null) {
+            logo.setImageBitmap(result);
+        } else {
+            try {
+                mExecutor.submit(new Job(mHandler, file, logo));
+            } catch (Exception e) {
+                Log.w("BrowserBaseAdapter", "Error submitting Job:" + e);
+            }
         }
     }
 
+    /**
+     * Executor job for loading preview from file
+     */
     private static final class Job
             implements Runnable
     {
@@ -381,7 +532,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             final Thread t = Thread.currentThread();
             t.setPriority(Thread.NORM_PRIORITY - 1);
             
-            final Bitmap result = PreviewHolder.get(this.file.toFile());
+            final Bitmap result = PreviewHolder.loadPreview(this.file.toFile());
             if (result != null && this.logo.getTag().equals(this.file)) {
                 this.handler.post(new Runnable() {
                     @Override

@@ -17,25 +17,108 @@ package com.docd.purefm.utils;
 import java.io.File;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.provider.MediaStore;
+
+import com.docd.purefm.R;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Holds preview cache and provides a method for loading previews
+ *
+ * @author Doctoror
+ */
 public final class PreviewHolder {
 
-    public static void initialize(Context context) {
-        previews = new PreviewLruCache(context);
-    }
-    
-    private static PreviewLruCache previews;
+    /**
+     * Recommended width for previews
+     */
+    private static int sWidth;
 
-    @Nullable
-    public static Bitmap get(final File key) {
-        return previews.get(key);
+    /**
+     * Application's package manager
+     */
+    private static PackageManager sPackageManager;
+
+    /**
+     * Preview cache
+     */
+    private static ReusableBitmapLruCache<File> sPreviews;
+
+    /**
+     * Initialized state flag
+     */
+    private static boolean sIsInitialized;
+
+    /**
+     * Initializes PreviewHolder
+     *
+     * @param context Application's Context
+     */
+    public static void initialize(Context context) {
+        sPreviews = new ReusableBitmapLruCache<File>();
+        sWidth = (int) context.getResources().getDimension(R.dimen.preview_width);
+        sPackageManager = context.getPackageManager();
+        sIsInitialized = true;
     }
-    
+
+    /**
+     * Loads preview from the cache
+     *
+     * @param file File to get preview for
+     * @return preview of the File, if exists in cache. Null otherwise.
+     */
+    @Nullable
+    public static Bitmap getCached(final File file) {
+        if (!sIsInitialized) {
+            throw new IllegalStateException("PreviewHolder is not initialized");
+        }
+        return sPreviews.get(file);
+    }
+
+    /**
+     * Marks all previews as removed
+     */
     public static void recycle() {
-        previews.evictAll();
+        if (!sIsInitialized) {
+            throw new IllegalStateException("PreviewHolder is not initialized");
+        }
+        sPreviews.evictAll();
+    }
+
+    /**
+     * Loads preview and puts to cache
+     *
+     * @param file File to load preview for
+     * @return preview of the File, if exists. Null otherwise
+     */
+    @Nullable
+    public static Bitmap loadPreview(final File file) {
+        if (!sIsInitialized) {
+            throw new IllegalStateException("PreviewHolder is not initialized");
+        }
+        final boolean isImage = MimeTypes.isPicture(file);
+        final boolean isVideo = MimeTypes.isVideo(file);
+        final boolean isApk = file.getName().endsWith(".apk");
+
+        final Bitmap result;
+        if (isImage) {
+            result = PureFMThumbnailUtils.createPictureThumbnail(file, sWidth);
+        } else if (isVideo) {
+            result = PureFMThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MICRO_KIND);
+        } else if (isApk) {
+            result = PureFMThumbnailUtils.extractApkIcon(sPackageManager, file);
+        } else {
+            result = null;
+        }
+
+        if (result != null) {
+            sPreviews.put(file, result);
+        }
+
+        return result;
     }
     
 }
