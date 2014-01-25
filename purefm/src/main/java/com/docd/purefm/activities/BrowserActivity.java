@@ -215,8 +215,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
     public void invalidateList() {
         this.pagerAdapter.notifyDataSetChanged();
     }

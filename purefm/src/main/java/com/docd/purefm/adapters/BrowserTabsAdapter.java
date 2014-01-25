@@ -43,11 +43,8 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public BrowserFragment getItem(int position) {
-        BrowserFragment f = this.tabs[position];
-        if (f == null) {
-            f = new BrowserFragment();
-            this.tabs[position] = f;
-        }
+        final BrowserFragment f = new BrowserFragment();
+        this.tabs[position] = f;
         if (position == 1 && mToRestore != null) {
             restoreManualState(mToRestore);
         }
