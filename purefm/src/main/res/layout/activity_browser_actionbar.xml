@@ -19,7 +19,7 @@
     android:scrollbars="none"
     android:overScrollMode="never" >
 
-    <com.docd.purefm.view.SequentialTextView
+    <com.docd.purefm.view.BreadCrumbTextView
         android:id="@android:id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

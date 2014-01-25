@@ -27,7 +27,7 @@
         android:name=".PureFM">
 
         <activity
-            android:name=".activities.BrowserActivity"
+            android:name=".browser.BrowserActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:uiOptions="splitActionBarWhenNarrow"
@@ -51,13 +51,13 @@
             android:name=".activities.SearchActivity"
             android:label="@string/menu_search"
             android:logo="?attr/action_search"
-            android:parentActivityName=".activities.BrowserActivity"
+            android:parentActivityName=".browser.BrowserActivity"
             android:configChanges="orientation|screenSize"/>
 
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".activities.BrowserActivity"/>
+            android:parentActivityName=".browser.BrowserActivity"/>
 
     </application>
 

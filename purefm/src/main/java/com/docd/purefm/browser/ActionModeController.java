@@ -33,7 +33,6 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.docd.purefm.R;
-import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.dialogs.DeleteFilesDialog;
 import com.docd.purefm.dialogs.FilePropertiesDialog;

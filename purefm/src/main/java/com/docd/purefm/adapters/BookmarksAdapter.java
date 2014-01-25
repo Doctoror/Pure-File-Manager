@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
-import com.docd.purefm.activities.BrowserActivity;
+import com.docd.purefm.browser.BrowserActivity;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.BookmarksHelper;

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.docd.purefm.activities;
+package com.docd.purefm.browser;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -41,15 +41,15 @@ import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.PureFM;
 import com.docd.purefm.R;
+import com.docd.purefm.activities.SearchActivity;
+import com.docd.purefm.activities.SuperuserActionBarMonitoredActivity;
 import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
-import com.docd.purefm.browser.Browser;
-import com.docd.purefm.browser.BrowserFragment;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.view.SequentialTextView;
+import com.docd.purefm.view.BreadCrumbTextView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +73,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     public static final int REQUEST_CODE_SETTINGS = 0;
 
     private ActionBar mActionBar;
-    private SequentialTextView title;
+    private BreadCrumbTextView mBreadCrumbView;
 
     private boolean isDrawerOpened;
     private DrawerLayout mDrawerLayout;
@@ -87,7 +87,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     private BrowserTabsAdapter mPagerAdapter;
 
     private final Object currentlyDisplayedFragmentLock;
-    private BrowserFragment currentlyDisplayedFragment;
+    private BrowserFragment mCurrentlyDisplayedFragment;
 
     public BrowserActivity() {
         this.currentlyDisplayedFragmentLock = new Object();
@@ -96,7 +96,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     /**
      * If not null it means we are in GET_CONTENT mode
      */
-    private String mimeType;
+    private String mGetContentMimeType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +129,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(final Bundle outState) {
+    protected void onSaveInstanceState(@NotNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE, mPagerAdapter.saveManualState());
     }
@@ -164,7 +164,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
                 R.layout.activity_browser_actionbar, null);
         this.mActionBar.setCustomView(custom);
 
-        this.title = (SequentialTextView) custom
+        this.mBreadCrumbView = (BreadCrumbTextView) custom
                 .findViewById(android.R.id.title);
     }
 
@@ -210,14 +210,18 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    
+    String getGetContentMimeType() {
+        return mGetContentMimeType;
+    }
 
-    public void invalidateList() {
-        this.mPagerAdapter.notifyDataSetChanged();
+    void invalidateList() {
+        mPagerAdapter.notifyDataSetChanged();
     }
 
     @Nullable
-    public SequentialTextView getTitleView() {
-        return this.title;
+    BreadCrumbTextView getTitleView() {
+        return mBreadCrumbView;
     }
 
     public boolean isDrawerOpened() {
@@ -225,8 +229,8 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     public void updateCurrentlyDisplayedFragment(final BrowserFragment fragment) {
-        synchronized (this.currentlyDisplayedFragmentLock) {
-            this.currentlyDisplayedFragment = fragment;
+        synchronized (currentlyDisplayedFragmentLock) {
+            mCurrentlyDisplayedFragment = fragment;
         }
     }
 
@@ -249,7 +253,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             @Override
             public void onNavigationCompleted(GenericFile path) {
                 currentPath = path;
-                title.setFile(path.toFile());
+                mBreadCrumbView.setFile(path.toFile());
                 setDrawerIndicatorEnabled(!path.toFile().equals(Environment.rootDirectory));
                 invalidateOptionsMenu();
             }
@@ -297,14 +301,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         this.checkIntentAction(newIntent);
     }
 
-    private void setCurrentMimeType() {
-        synchronized (this.currentlyDisplayedFragmentLock) {
-            if (this.currentlyDisplayedFragment != null) {
-                this.currentlyDisplayedFragment.setMimeType(mimeType);
-            }
-        }
-    }
-
     /**
      * Should be called by BookmarksAdapter to set current path and close the Drawer
      */
@@ -313,8 +309,8 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             this.mDrawerLayout.closeDrawer(this.mDrawerList);
         }
         synchronized (this.currentlyDisplayedFragmentLock) {
-            if (this.currentlyDisplayedFragment != null) {
-                final Browser browser = this.currentlyDisplayedFragment.getBrowser();
+            if (this.mCurrentlyDisplayedFragment != null) {
+                final Browser browser = this.mCurrentlyDisplayedFragment.getBrowser();
                 if (browser != null) {
                     browser.navigate(path, true);
                 }
@@ -325,11 +321,13 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     private void checkIntentAction(Intent intent) {
         final String action = intent.getAction();
         if (action != null && action.equals(Intent.ACTION_GET_CONTENT)) {
-            mimeType = intent.getType();
-            if (mimeType == null || mimeType.isEmpty()) {
-                mimeType = "*/*";
+            mGetContentMimeType = intent.getType();
+            if (mGetContentMimeType == null || mGetContentMimeType.isEmpty()) {
+                mGetContentMimeType = "*/*";
             }
-            this.setCurrentMimeType();
+            if (mPagerAdapter != null) {
+                mPagerAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -337,33 +335,38 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     public void onBackPressed() {
         final boolean onFragmentBackPressed;
         synchronized (this.currentlyDisplayedFragmentLock) {
-            onFragmentBackPressed = this.currentlyDisplayedFragment != null
-                    && this.currentlyDisplayedFragment.onBackPressed();
+            onFragmentBackPressed = this.mCurrentlyDisplayedFragment != null
+                    && this.mCurrentlyDisplayedFragment.onBackPressed();
         }
         if (!onFragmentBackPressed) {
-            final AlertDialog.Builder b = new AlertDialog.Builder(this);
-            b.setMessage(R.string.dialog_quit_message);
-            b.setCancelable(true);
-            b.setPositiveButton(R.string.yes,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            PreviewHolder.recycle();
-                            finish();
-                        }
-                    });
-            b.setNegativeButton(R.string.no,
-                    new DialogInterface.OnClickListener() {
+            //if we are't in ACTION_GET_CONTENT mode, show a confirm dialog, quit otherwise
+            if (mGetContentMimeType == null) {
+                final AlertDialog.Builder b = new AlertDialog.Builder(this);
+                b.setMessage(R.string.dialog_quit_message);
+                b.setCancelable(true);
+                b.setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                PreviewHolder.recycle();
+                                finish();
+                            }
+                        });
+                b.setNegativeButton(R.string.no,
+                        new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            final Dialog dialog = b.create();
-            if (!this.isFinishing()) {
-                dialog.show();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                final Dialog dialog = b.create();
+                if (!this.isFinishing()) {
+                    dialog.show();
+                }
+            } else {
+                finish();
             }
         }
     }
@@ -372,7 +375,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
-        this.title.fullScrollRight();
+        mBreadCrumbView.fullScrollRight();
     }
 
     @Override
@@ -384,6 +387,9 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         }
     }
 
+    /**
+     * ActionBarDrawerToggle that manages display options and title
+     */
     private final class BrowserActivityDrawerToggle extends ActionBarDrawerToggle {
 
         private BrowserActivityDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {

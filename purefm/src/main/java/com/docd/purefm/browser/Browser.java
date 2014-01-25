@@ -24,7 +24,6 @@ import android.os.Environment;
 import android.os.FileObserver;
 import android.os.Handler;
 
-import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;

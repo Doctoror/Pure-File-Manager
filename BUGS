@@ -2,3 +2,5 @@
 - could not delete directory from busybox non-root on emulator
 - history is cleared on appearance change
 - file picker not working
+- Sometimes can't focus to AbsListView
+- BreadCrumbTextView is vulnerable: file must not contain " > " or it will misbehave

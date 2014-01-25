@@ -36,7 +36,6 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 
 import com.docd.purefm.R;
-import com.docd.purefm.activities.BrowserActivity;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
@@ -48,8 +47,8 @@ import com.docd.purefm.tasks.DirectoryScanTask;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.ThemeUtils;
-import com.docd.purefm.view.SequentialTextView;
-import com.docd.purefm.view.SequentialTextView.OnSequenceClickListener;
+import com.docd.purefm.view.BreadCrumbTextView;
+import com.docd.purefm.view.BreadCrumbTextView.OnSequenceClickListener;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -63,24 +62,23 @@ public final class BrowserFragment extends Fragment {
     private static final String KEY_PREV_ID = "KEY_PREVIOUS_ID";
 
     //private ActionBar actionBar;
-    private BrowserActivity browserActivity;
+    private BrowserActivity mAttachedBrowserActivity;
     private ActionModeController actionModeController;
     private MenuController menuController;
 
-    private Browser browser;
+    private Browser mBrowser;
     private BrowserBaseAdapter adapter;
     private OnNavigateListener parentListener;
 
-    private SequentialTextView title;
+    private BreadCrumbTextView title;
     private OnSequenceClickListener sequenceListener;
 
-    private AbsListView list;
+    private AbsListView mListView;
     private View menuProgress;
     private View mainProgress;
 
     private DirectoryScanTask scanner;
-    private String mimeType;
-    private MenuItem refreshItem;
+    private MenuItem mRefreshMenuItem;
 
     private boolean refreshFlag;
 
@@ -94,8 +92,8 @@ public final class BrowserFragment extends Fragment {
     private boolean isVisible;
 
     private void ensureGridViewColumns(Configuration config) {
-        if (this.list instanceof GridView) {
-            ((GridView) this.list)
+        if (this.mListView instanceof GridView) {
+            ((GridView) this.mListView)
                     .setNumColumns(config.orientation == Configuration.ORIENTATION_LANDSCAPE ? 6
                             : 4);
         }
@@ -113,18 +111,18 @@ public final class BrowserFragment extends Fragment {
         this.menuProgress = new ProgressBar(activity);
 
         if (activity instanceof BrowserActivity) {
-            this.browser = new Browser((BrowserActivity) activity);
-            this.browser.setInitialPath(this.browserInitialPath);
+            this.mBrowser = new Browser((BrowserActivity) activity);
+            this.mBrowser.setInitialPath(this.browserInitialPath);
             this.browserInitialPath = null;
         } else {
             throw new IllegalStateException("BrowserFragment should be attached only to BrowserActivity");
         }
-        this.browser.setOnNavigateListener(new OnNavigateListener() {
+        this.mBrowser.setOnNavigateListener(new OnNavigateListener() {
 
             @Override
             public void onNavigate(GenericFile path) {
                 parentListener.onNavigate(path);
-                if (refreshItem == null) {
+                if (mRefreshMenuItem == null) {
                     refreshFlag = true;
                 } else {
                     startScan();
@@ -148,13 +146,13 @@ public final class BrowserFragment extends Fragment {
             @Override
             public void onSequenceClick(String sequence) {
                 final GenericFile target = FileFactory.newFile(sequence);
-                browser.navigate(target, true);
+                mBrowser.navigate(target, true);
             }
         };
 
-        this.browserActivity = (BrowserActivity) activity;
-        this.menuController = new MenuController(this.browserActivity, browser);
-        this.actionModeController = new ActionModeController(this.browserActivity);
+        this.mAttachedBrowserActivity = (BrowserActivity) activity;
+        this.menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
+        this.actionModeController = new ActionModeController(this.mAttachedBrowserActivity);
     }
 
     @Override
@@ -171,8 +169,8 @@ public final class BrowserFragment extends Fragment {
             state.setClassLoader(getClass().getClassLoader());
             if (state.containsKey(KEY_FILE)) {
                 final File initialPath = (File) state.get(KEY_FILE);
-                if (this.browser != null) {
-                    this.browser.setInitialPath(initialPath);
+                if (this.mBrowser != null) {
+                    this.mBrowser.setInitialPath(initialPath);
                 } else {
                     this.browserInitialPath = initialPath;
                 }
@@ -184,22 +182,22 @@ public final class BrowserFragment extends Fragment {
     }
 
     public void saveManualState(final Bundle outState) {
-        outState.putSerializable(KEY_FILE, this.browser.getPath().toFile());
+        outState.putSerializable(KEY_FILE, this.mBrowser.getPath().toFile());
         outState.putInt(KEY_PREV_ID, this.prevId);
     }
 
     public boolean onBackPressed() {
-        return this.browser != null && this.browser.back();
+        return this.mBrowser != null && this.mBrowser.back();
     }
 
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
         this.ensureGridViewColumns(getResources().getConfiguration());
-        this.actionModeController.setListView(list);
+        this.actionModeController.setListView(mListView);
 
-        this.title = this.browserActivity.getTitleView();
-        this.parentListener = this.browserActivity.createOnNavigationListener();
+        this.title = this.mAttachedBrowserActivity.getTitleView();
+        this.parentListener = this.mAttachedBrowserActivity.createOnNavigationListener();
         if (this.isVisible() && this.isAdded() && this.isVisible) {
             this.title.setOnSequenceClickListener(this.sequenceListener);
         }
@@ -208,7 +206,7 @@ public final class BrowserFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (this.browserActivity != null && !this.browserActivity.isDrawerOpened()) {
+        if (this.mAttachedBrowserActivity != null && !this.mAttachedBrowserActivity.isDrawerOpened()) {
             inflater.inflate(R.menu.browser, menu);
 
             // TODO it returns true even on devices that don't have the physical key. Find a better method to detect search hardware button
@@ -217,14 +215,14 @@ public final class BrowserFragment extends Fragment {
             //}
 
             final MenuItem content = menu.findItem(android.R.id.content);
-            this.refreshItem = menu.findItem(R.id.refresh);
+            this.mRefreshMenuItem = menu.findItem(R.id.refresh);
 
             if (Settings.appearance == Settings.APPEARANCE_LIST) {
-                content.setIcon(ThemeUtils.getDrawable(this.browserActivity, R.attr.action_view_as_grid))
+                content.setIcon(ThemeUtils.getDrawable(this.mAttachedBrowserActivity, R.attr.action_view_as_grid))
                         .setTitle(R.string.menu_view_as_grid)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             } else {
-                content.setIcon(ThemeUtils.getDrawable(this.browserActivity, R.attr.action_view_as_list))
+                content.setIcon(ThemeUtils.getDrawable(this.mAttachedBrowserActivity, R.attr.action_view_as_list))
                         .setTitle(R.string.menu_view_as_list)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
@@ -254,9 +252,9 @@ public final class BrowserFragment extends Fragment {
     }
 
     private void initList(View parent) {
-        if (this.list != null) {
-            this.list.getEmptyView().setVisibility(View.GONE);
-            this.list.setVisibility(View.GONE);
+        if (this.mListView != null) {
+            this.mListView.getEmptyView().setVisibility(View.GONE);
+            this.mListView.setVisibility(View.GONE);
         }
         this.mainProgress = parent.findViewById(android.R.id.progress);
 
@@ -265,51 +263,53 @@ public final class BrowserFragment extends Fragment {
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.list = (AbsListView) vs;
+            this.mListView = (AbsListView) vs;
             this.adapter = new BrowserListAdapter(this.getActivity());
         } else {
             View vs = parent.findViewById(R.id.grid);
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.list = (AbsListView) vs;
+            this.mListView = (AbsListView) vs;
             this.adapter = new BrowserGridAdapter(this.getActivity());
         }
 
         this.menuController.setAdapter(this.adapter);
 
-        this.list.setId(this.getNewId(parent));
-        this.list.setEmptyView(parent.findViewById(android.R.id.empty));
-        this.list.setAdapter(this.adapter);
-        this.list.getEmptyView().setVisibility(View.GONE);
-        this.list.setVisibility(View.GONE);
+        this.mListView.setId(this.getNewId(parent));
+        this.mListView.setEmptyView(parent.findViewById(android.R.id.empty));
+        this.mListView.setAdapter(this.adapter);
+        this.mListView.getEmptyView().setVisibility(View.GONE);
+        this.mListView.setVisibility(View.GONE);
 
-        this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        this.mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
                 final GenericFile target = (GenericFile) (av
                         .getItemAtPosition(pos));
                 if (target.isDirectory()) {
-                    browser.navigate(target, true);
+                    mBrowser.navigate(target, true);
                 } else {
-                    final Activity a = getActivity();
-                    if (mimeType == null) {
-                        PureFMFileUtils.openFile(a, target.toFile());
+                    if (mAttachedBrowserActivity.getGetContentMimeType() == null) {
+                        PureFMFileUtils.openFile(mAttachedBrowserActivity, target.toFile());
                     } else {
                         final Uri result = Uri.fromFile(target.toFile());
                         final Intent intent = new Intent();
                         intent.setData(result);
-                        a.setResult(Activity.RESULT_OK, intent);
-                        a.finish();
+                        mAttachedBrowserActivity.setResult(Activity.RESULT_OK, intent);
+                        mAttachedBrowserActivity.finish();
                     }
                 }
             }
         });
+
+        mListView.setChoiceMode(mAttachedBrowserActivity.getGetContentMimeType() == null ?
+                AbsListView.CHOICE_MODE_MULTIPLE_MODAL : AbsListView.CHOICE_MODE_NONE);
     }
 
     private void onFirstInvalidate() {
-        this.actionModeController.setListView(this.list);
-        this.browser.invalidate();
+        this.actionModeController.setListView(this.mListView);
+        this.mBrowser.invalidate();
     }
 
     @Override
@@ -325,11 +325,11 @@ public final class BrowserFragment extends Fragment {
             if (this.firstRun && this.isVisible()) {
                 this.onFirstInvalidate();
             } else {
-                this.parentListener.onNavigationCompleted(this.browser
+                this.parentListener.onNavigationCompleted(this.mBrowser
                         .getPath());
             }
             this.title.setOnSequenceClickListener(this.sequenceListener);
-            this.browserActivity.updateCurrentlyDisplayedFragment(this);
+            this.mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
         } else {
             if (this.actionModeController != null) {
                 this.actionModeController.finishActionMode();
@@ -343,7 +343,7 @@ public final class BrowserFragment extends Fragment {
         super.onStart();
         if (this.firstRun && this.isVisible) {
             if (this.isAdded()) {
-                this.browserActivity.updateCurrentlyDisplayedFragment(this);
+                this.mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
             }
             this.onFirstInvalidate();
         }
@@ -373,20 +373,13 @@ public final class BrowserFragment extends Fragment {
             this.scanner.cancel(false);
         }
 
-        this.scanner = new DirectoryScanTask(browser, refreshItem,
-                menuProgress, mimeType, adapter);
-        this.scanner.execute(this.browser.getPath());
-    }
-
-    public void setMimeType(final String type) {
-        this.mimeType = type;
-        this.list
-                .setChoiceMode(type == null ? AbsListView.CHOICE_MODE_MULTIPLE_MODAL
-                        : AbsListView.CHOICE_MODE_NONE);
+        this.scanner = new DirectoryScanTask(mBrowser, mRefreshMenuItem,
+                menuProgress, mAttachedBrowserActivity.getGetContentMimeType(), adapter);
+        this.scanner.execute(mBrowser.getPath());
     }
 
     @Nullable
     public Browser getBrowser() {
-        return this.browser;
+        return this.mBrowser;
     }
 }
