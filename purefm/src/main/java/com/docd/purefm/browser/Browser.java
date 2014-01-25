@@ -154,8 +154,10 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
     }
     
-    protected void setInitialPath(File path) {
-        this.path = FileFactory.newFile(path);
+    protected void setInitialPath(final File path) {
+        if (path != null) {
+            this.path = FileFactory.newFile(path);
+        }
     }
     
     public void invalidate() {

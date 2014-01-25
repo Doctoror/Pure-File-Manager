@@ -16,7 +16,6 @@ package com.docd.purefm.browser;
 
 import java.io.File;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -63,7 +62,7 @@ public final class BrowserFragment extends Fragment {
     private static final String KEY_FILE = "KEY_SAVED_FILE";
     private static final String KEY_PREV_ID = "KEY_PREVIOUS_ID";
 
-    private ActionBar actionBar;
+    //private ActionBar actionBar;
     private BrowserActivity browserActivity;
     private ActionModeController actionModeController;
     private MenuController menuController;
@@ -84,6 +83,11 @@ public final class BrowserFragment extends Fragment {
     private MenuItem refreshItem;
 
     private boolean refreshFlag;
+
+    /**
+     * If Browser is not yet initialized, initial path will be saved to this field
+     */
+    private File browserInitialPath;
 
     private int prevId;
     private boolean firstRun;
@@ -110,6 +114,8 @@ public final class BrowserFragment extends Fragment {
 
         if (activity instanceof BrowserActivity) {
             this.browser = new Browser((BrowserActivity) activity);
+            this.browser.setInitialPath(this.browserInitialPath);
+            this.browserInitialPath = null;
         } else {
             throw new IllegalStateException("BrowserFragment should be attached only to BrowserActivity");
         }
@@ -168,7 +174,7 @@ public final class BrowserFragment extends Fragment {
                 if (this.browser != null) {
                     this.browser.setInitialPath(initialPath);
                 } else {
-                    //TODO save initial path
+                    this.browserInitialPath = initialPath;
                 }
             }
             if (state.containsKey(KEY_PREV_ID)) {
@@ -192,11 +198,9 @@ public final class BrowserFragment extends Fragment {
         this.ensureGridViewColumns(getResources().getConfiguration());
         this.actionModeController.setListView(list);
 
-        this.actionBar = this.browserActivity.getActionBar();
         this.title = this.browserActivity.getTitleView();
         this.parentListener = this.browserActivity.createOnNavigationListener();
         if (this.isVisible() && this.isAdded() && this.isVisible) {
-            this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
             this.title.setOnSequenceClickListener(this.sequenceListener);
         }
     }
@@ -305,7 +309,6 @@ public final class BrowserFragment extends Fragment {
 
     private void onFirstInvalidate() {
         this.actionModeController.setListView(this.list);
-        this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
         this.browser.invalidate();
     }
 
@@ -325,7 +328,6 @@ public final class BrowserFragment extends Fragment {
                 this.parentListener.onNavigationCompleted(this.browser
                         .getPath());
             }
-            this.actionBar.setDisplayHomeAsUpEnabled(!browser.isRoot());
             this.title.setOnSequenceClickListener(this.sequenceListener);
             this.browserActivity.updateCurrentlyDisplayedFragment(this);
         } else {

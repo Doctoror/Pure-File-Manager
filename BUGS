@@ -1,3 +1,4 @@
 - sometimes while copy or paste you can get a fc: reported, but can't reproduce yet. Maybe already fixed?
 - could not delete directory from busybox non-root on emulator
 - history is cleared on appearance change
+- file picker not working

@@ -14,8 +14,6 @@
  */
 package com.docd.purefm.activities;
 
-import java.io.File;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.PureFM;
 import com.docd.purefm.R;
@@ -73,19 +72,19 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
     public static final int REQUEST_CODE_SETTINGS = 0;
 
-    private ActionBar actionBar;
+    private ActionBar mActionBar;
     private SequentialTextView title;
 
     private boolean isDrawerOpened;
-    private DrawerLayout drawerLayout;
+    private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mShowHomeAsUp;
 
-    private ListView drawerList;
-    BookmarksAdapter bookmarksAdapter;
+    private ListView mDrawerList;
+    BookmarksAdapter mBookmarksAdapter;
     GenericFile currentPath;
 
-    private BrowserTabsAdapter pagerAdapter;
+    private BrowserTabsAdapter mPagerAdapter;
 
     private final Object currentlyDisplayedFragmentLock;
     private BrowserFragment currentlyDisplayedFragment;
@@ -132,15 +131,15 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE, pagerAdapter.saveManualState());
+        outState.putParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE, mPagerAdapter.saveManualState());
     }
 
     private void restoreSavedState(final Bundle savedState) {
         if (savedState != null) {
             final Parcelable adapterState = savedState.getParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE);
             if (adapterState != null) {
-                if (pagerAdapter != null) {
-                    pagerAdapter.restoreManualState(adapterState);
+                if (mPagerAdapter != null) {
+                    mPagerAdapter.restoreManualState(adapterState);
                 }
             }
         }
@@ -152,18 +151,18 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     }
 
     private void initActionBar() {
-        this.actionBar = this.getActionBar();
-        if (this.actionBar == null) {
+        this.mActionBar = this.getActionBar();
+        if (this.mActionBar == null) {
             throw new RuntimeException("BrowserActivity should have an ActionBar");
         }
-        this.actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+        this.mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_SHOW_CUSTOM
                 | ActionBar.DISPLAY_USE_LOGO
                 | ActionBar.DISPLAY_HOME_AS_UP);
 
         final View custom = LayoutInflater.from(this).inflate(
                 R.layout.activity_browser_actionbar, null);
-        this.actionBar.setCustomView(custom);
+        this.mActionBar.setCustomView(custom);
 
         this.title = (SequentialTextView) custom
                 .findViewById(android.R.id.title);
@@ -171,29 +170,28 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
 
     private void initView() {
         final ViewPager pager = (ViewPager) this.findViewById(R.id.pager);
-        this.pagerAdapter = new BrowserTabsAdapter(
+        mPagerAdapter = new BrowserTabsAdapter(
                 this.getFragmentManager());
-        pager.setAdapter(this.pagerAdapter);
+        pager.setAdapter(mPagerAdapter);
+        mPagerAdapter.setViewPager(pager);
         pager.setOffscreenPageLimit(2);
 
-        this.drawerLayout = (DrawerLayout) this
-                .findViewById(R.id.drawer);
-        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-				GravityCompat.START);
+        mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         final TypedArray array = obtainStyledAttributes(new int[]{R.attr.themeId});
         final int themeId = array.getInteger(0, PureFM.THEME_ID_LIGHT);
         array.recycle();
 
-        this.mDrawerToggle = new BrowserActivityDrawerToggle(this, this.drawerLayout,
+        mDrawerToggle = new BrowserActivityDrawerToggle(this, this.mDrawerLayout,
                 themeId == PureFM.THEME_ID_LIGHT ?
                         R.drawable.holo_light_ic_drawer :
                         R.drawable.holo_dark_ic_drawer,
                                 R.string.menu_bookmarks, R.string.app_name);
-        this.drawerLayout.setDrawerListener(this.mDrawerToggle);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        this.drawerList = (ListView) this.findViewById(R.id.drawerList);
-        this.drawerList.setAdapter(bookmarksAdapter = new BookmarksAdapter(this,
+        mDrawerList = (ListView) this.findViewById(R.id.drawerList);
+        mDrawerList.setAdapter(mBookmarksAdapter = new BookmarksAdapter(this,
                 Settings.getBookmarks(getApplicationContext())));
     }
 
@@ -207,16 +205,14 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
-        if (!mShowHomeAsUp && mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle.isDrawerIndicatorEnabled() && mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle your other action bar items...
-
         return super.onOptionsItemSelected(item);
     }
 
     public void invalidateList() {
-        this.pagerAdapter.notifyDataSetChanged();
+        this.mPagerAdapter.notifyDataSetChanged();
     }
 
     @Nullable
@@ -237,15 +233,13 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     /**
      * Toggles between using up button or navigation drawer icon by setting the DrawerListener
      */
-    void setActionBarDrawerListener(final boolean showUpButton) {
+    void setDrawerIndicatorEnabled(final boolean showUpButton) {
         mShowHomeAsUp = showUpButton;
         mDrawerToggle.setDrawerIndicatorEnabled(!showUpButton);
     }
 
     public OnNavigateListener createOnNavigationListener() {
         return new OnNavigateListener() {
-
-            private final File root = File.listRoots()[0];
 
             @Override
             public void onNavigate(GenericFile path) {
@@ -256,11 +250,9 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
             public void onNavigationCompleted(GenericFile path) {
                 currentPath = path;
                 title.setFile(path.toFile());
-                setActionBarDrawerListener(!path.toFile().equals(
-                        this.root));
+                setDrawerIndicatorEnabled(!path.toFile().equals(Environment.rootDirectory));
                 invalidateOptionsMenu();
             }
-
         };
     }
 
@@ -290,7 +282,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         case R.id.menu_bookmarks_new:
             final String path = this.currentPath.getAbsolutePath();
             if (path != null) {
-                this.bookmarksAdapter.addItem(path);
+                this.mBookmarksAdapter.addItem(path);
             }
             return true;
 
@@ -317,8 +309,8 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
      * Should be called by BookmarksAdapter to set current path and close the Drawer
      */
     public void setCurrentPath(GenericFile path) {
-        if (this.drawerLayout.isDrawerOpen(this.drawerList)) {
-            this.drawerLayout.closeDrawer(this.drawerList);
+        if (this.mDrawerLayout.isDrawerOpen(this.mDrawerList)) {
+            this.mDrawerLayout.closeDrawer(this.mDrawerList);
         }
         synchronized (this.currentlyDisplayedFragmentLock) {
             if (this.currentlyDisplayedFragment != null) {
@@ -387,7 +379,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_SETTINGS) {
             if (resultCode == Activity.RESULT_OK) {
-                pagerAdapter.notifyDataSetChanged();
+                mPagerAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -402,11 +394,12 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         public void onDrawerOpened(final View drawerView) {
             super.onDrawerOpened(drawerView);
             isDrawerOpened = true;
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                     | ActionBar.DISPLAY_HOME_AS_UP
                     | ActionBar.DISPLAY_USE_LOGO
                     | ActionBar.DISPLAY_SHOW_TITLE);
-            actionBar.setTitle(R.string.menu_bookmarks);
+            mActionBar.setTitle(R.string.menu_bookmarks);
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
             invalidateOptionsMenu();
         }
 
@@ -414,14 +407,15 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         public void onDrawerClosed(final View drawerView) {
             super.onDrawerClosed(drawerView);
             isDrawerOpened = false;
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                     | ActionBar.DISPLAY_HOME_AS_UP
                     | ActionBar.DISPLAY_SHOW_CUSTOM
                     | ActionBar.DISPLAY_USE_LOGO);
-            if (bookmarksAdapter.isModified()) {
+            if (mBookmarksAdapter.isModified()) {
                 Settings.saveBookmarks(getApplicationContext(),
-                        bookmarksAdapter.getData());
+                        mBookmarksAdapter.getData());
             }
+            mDrawerToggle.setDrawerIndicatorEnabled(!mShowHomeAsUp);
             invalidateOptionsMenu();
         }
     }
