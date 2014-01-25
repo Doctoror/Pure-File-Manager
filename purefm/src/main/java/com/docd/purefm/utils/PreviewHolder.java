@@ -17,8 +17,7 @@ package com.docd.purefm.utils;
 import java.io.File;
 
 import android.content.Context;
-
-import com.docd.purefm.drawable.RecyclingBitmapDrawable;
+import android.graphics.Bitmap;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +30,7 @@ public final class PreviewHolder {
     private static PreviewLruCache previews;
 
     @Nullable
-    public static RecyclingBitmapDrawable get(final File key) {
+    public static Bitmap get(final File key) {
         return previews.get(key);
     }
     

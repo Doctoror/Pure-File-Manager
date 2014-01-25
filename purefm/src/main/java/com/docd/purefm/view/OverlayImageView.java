@@ -21,44 +21,37 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 
 import org.jetbrains.annotations.NotNull;
 
-public class OverlayRecyclingImageView extends RecyclingImageView {
+/**
+ * Can draw two drawables
+ *
+ * @author Doctoror
+ */
+public class OverlayImageView extends ImageView {
 
     private Drawable overlay;
     private boolean drawOverlay;
 
-    public OverlayRecyclingImageView(Context context) {
+    public OverlayImageView(Context context) {
         super(context);
         this.drawOverlay = true;
     }
 
-    public OverlayRecyclingImageView(Context context, AttributeSet attrs) {
+    public OverlayImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.drawOverlay = true;
     }
 
-    public OverlayRecyclingImageView(Context context, AttributeSet attrs, int defStyle) {
+    public OverlayImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.drawOverlay = true;
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        this.performAttach(this.overlay);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        this.performDetach(this.overlay);
-    }
-
     public final void setOverlay(final Drawable overlay) {
         if (this.overlay != overlay) {
-            this.onDrawableAdded(this.overlay, overlay);
             this.overlay = overlay;
             if (this.drawOverlay) {
                 this.invalidate();

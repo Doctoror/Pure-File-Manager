@@ -25,12 +25,10 @@ import android.view.MenuItem;
 public final class SettingsActivity extends SuperuserActionBarMonitoredActivity {
 
     private boolean needInvalidate;
-    private int createdWithThemeId;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        createdWithThemeId = Settings.theme;
         this.setContentView(R.layout.activity_settings);
         this.getActionBar().setDisplayOptions(
                 ActionBar.DISPLAY_SHOW_HOME |

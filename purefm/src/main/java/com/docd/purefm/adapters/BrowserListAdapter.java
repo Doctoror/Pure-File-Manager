@@ -19,7 +19,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.PureFMTextUtils;
-import com.docd.purefm.view.OverlayRecyclingImageView;
+import com.docd.purefm.view.OverlayImageView;
 
 import android.app.Activity;
 import android.graphics.Typeface;
@@ -61,7 +61,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             v = this.mLayoutInflater
                     .inflate(R.layout.list_item_file, null);
             h = new Holder();
-            h.icon = (OverlayRecyclingImageView) v.findViewById(android.R.id.icon);
+            h.icon = (OverlayImageView) v.findViewById(android.R.id.icon);
             h.title = (TextView) v.findViewById(android.R.id.title);
             h.date = (TextView) v.findViewById(android.R.id.text1);
             h.perm = (TextView) v.findViewById(android.R.id.text2);
@@ -121,7 +121,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         
         private Holder() {}
         
-        protected OverlayRecyclingImageView icon;
+        protected OverlayImageView icon;
         protected TextView title;
         protected TextView size;
         protected TextView date;

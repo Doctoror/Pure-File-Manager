@@ -19,6 +19,11 @@ android {
         exclude 'META-INF/NOTICE.txt'
     }
 
+    lintOptions {
+        checkAllWarnings true
+        enable 'IconExpectedSize','UnusedIds','TypographyQuotes','BackButton','EasterEgg'
+        xmlReport false
+    }
 
     buildTypes {
         debug {

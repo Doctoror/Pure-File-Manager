@@ -17,17 +17,22 @@ package com.docd.purefm.view;
 import android.content.Context;
 import android.util.AttributeSet;
 
-public final class SquareOverlayRecyclingImageView extends OverlayRecyclingImageView {
+/**
+ * OverlayImageView with height equal to width
+ *
+ * @author Doctoror
+ */
+public final class SquareOverlayImageView extends OverlayImageView {
 
-    public SquareOverlayRecyclingImageView(Context context) {
+    public SquareOverlayImageView(Context context) {
         super(context);
     }
 
-    public SquareOverlayRecyclingImageView(Context context, AttributeSet attrs) {
+    public SquareOverlayImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SquareOverlayRecyclingImageView(Context context, AttributeSet attrs, int defStyle) {
+    public SquareOverlayImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
     

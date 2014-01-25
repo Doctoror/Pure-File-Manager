@@ -17,7 +17,7 @@ package com.docd.purefm.adapters;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.view.OverlayRecyclingImageView;
+import com.docd.purefm.view.OverlayImageView;
 
 import android.app.Activity;
 import android.view.View;
@@ -47,7 +47,7 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
         if (v == null) {
             v = this.mLayoutInflater.inflate(R.layout.grid_item_file, null);
             h = new Holder();
-            h.icon = (OverlayRecyclingImageView) v.findViewById(android.R.id.icon);
+            h.icon = (OverlayImageView) v.findViewById(android.R.id.icon);
             h.title = (TextView) v.findViewById(android.R.id.title);
             v.setTag(h);
         } else {
@@ -70,7 +70,7 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
         
         private Holder() {}
         
-        private OverlayRecyclingImageView icon;
+        private OverlayImageView icon;
         private TextView title;
     }
 

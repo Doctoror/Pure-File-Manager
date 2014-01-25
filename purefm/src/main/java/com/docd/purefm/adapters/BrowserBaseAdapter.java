@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.FileObserver;
 import android.os.Handler;
@@ -45,7 +46,7 @@ import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.ThemeUtils;
-import com.docd.purefm.view.OverlayRecyclingImageView;
+import com.docd.purefm.view.OverlayImageView;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
@@ -302,7 +303,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
-    protected final void applyOverlay(GenericFile f, OverlayRecyclingImageView overlay) {
+    protected final void applyOverlay(GenericFile f, OverlayImageView overlay) {
         if (f.isSymlink()) {
             overlay.setOverlay(getDrawableForRes(mTheme, R.attr.ic_fso_symlink));
         } else {
@@ -350,7 +351,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
-    protected final void loadPreview(final GenericFile file, OverlayRecyclingImageView logo) {
+    protected final void loadPreview(final GenericFile file, OverlayImageView logo) {
         try {
             mExecutor.submit(new Job(mHandler, file, logo));
         } catch (Exception e) {
@@ -363,10 +364,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     {
 
         private final Handler handler;
-        private final OverlayRecyclingImageView logo;
+        private final OverlayImageView logo;
         private final GenericFile file;
 
-        Job(Handler handler, GenericFile file, OverlayRecyclingImageView logo)
+        Job(Handler handler, GenericFile file, OverlayImageView logo)
         {
             this.handler = handler;
             this.file = file;
@@ -380,12 +381,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             final Thread t = Thread.currentThread();
             t.setPriority(Thread.NORM_PRIORITY - 1);
             
-            final Drawable result = PreviewHolder.get(this.file.toFile());
+            final Bitmap result = PreviewHolder.get(this.file.toFile());
             if (result != null && this.logo.getTag().equals(this.file)) {
                 this.handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        logo.setImageDrawable(result);
+                        logo.setImageBitmap(result);
                         logo.setOverlay(null);
                     }
                 });
