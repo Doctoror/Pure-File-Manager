@@ -14,8 +14,6 @@
  */
 package com.docd.purefm.browser;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -23,6 +21,8 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +50,7 @@ import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.view.BreadCrumbTextView;
 import com.docd.purefm.view.BreadCrumbTextView.OnSequenceClickListener;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -58,8 +59,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class BrowserFragment extends Fragment {
 
-    private static final String KEY_FILE = "KEY_SAVED_FILE";
-    private static final String KEY_PREV_ID = "KEY_PREVIOUS_ID";
+    private static final String STATE_BROWSER = "BrowserFragment.state.mBrowser";
 
     //private ActionBar actionBar;
     private BrowserActivity mAttachedBrowserActivity;
@@ -83,11 +83,11 @@ public final class BrowserFragment extends Fragment {
     private boolean refreshFlag;
 
     /**
-     * If Browser is not yet initialized, initial path will be saved to this field
+     * If Browser is not yet initialized, initial state will be saved to this field
      */
-    private File browserInitialPath;
+    private Parcelable mBrowserInitialState;
 
-    private int prevId;
+    private int mPrevId;
     private boolean firstRun;
     private boolean isVisible;
 
@@ -111,9 +111,9 @@ public final class BrowserFragment extends Fragment {
         this.menuProgress = new ProgressBar(activity);
 
         if (activity instanceof BrowserActivity) {
-            this.mBrowser = new Browser((BrowserActivity) activity);
-            this.mBrowser.setInitialPath(this.browserInitialPath);
-            this.browserInitialPath = null;
+            mBrowser = new Browser((BrowserActivity) activity);
+            mBrowser.restoreState(mBrowserInitialState);
+            mBrowserInitialState = null;
         } else {
             throw new IllegalStateException("BrowserFragment should be attached only to BrowserActivity");
         }
@@ -167,23 +167,28 @@ public final class BrowserFragment extends Fragment {
     public void restoreManualState(final Bundle state) {
         if (state != null) {
             state.setClassLoader(getClass().getClassLoader());
-            if (state.containsKey(KEY_FILE)) {
-                final File initialPath = (File) state.get(KEY_FILE);
-                if (this.mBrowser != null) {
-                    this.mBrowser.setInitialPath(initialPath);
-                } else {
-                    this.browserInitialPath = initialPath;
+            final BrowserFragment.SavedState savedState = state.getParcelable(STATE_BROWSER);
+            if (savedState != null) {
+                if (savedState.mBrowserState != null) {
+                    if (mBrowser != null) {
+                        mBrowser.restoreState(savedState.mBrowserState);
+                    } else {
+                        mBrowserInitialState = savedState.mBrowserState;
+                    }
                 }
-            }
-            if (state.containsKey(KEY_PREV_ID)) {
-                this.prevId = state.getInt(KEY_PREV_ID);
+                mPrevId = savedState.mPrevId;
             }
         }
     }
 
     public void saveManualState(final Bundle outState) {
-        outState.putSerializable(KEY_FILE, this.mBrowser.getPath().toFile());
-        outState.putInt(KEY_PREV_ID, this.prevId);
+        final Parcelable browserState;
+        if (mBrowser == null) {
+            browserState = null;
+        } else {
+            browserState = mBrowser.saveInstanceState();
+        }
+        outState.putParcelable(STATE_BROWSER, new SavedState(mPrevId, browserState));
     }
 
     public boolean onBackPressed() {
@@ -326,7 +331,7 @@ public final class BrowserFragment extends Fragment {
                 this.onFirstInvalidate();
             } else {
                 this.parentListener.onNavigationCompleted(this.mBrowser
-                        .getPath());
+                        .getCurrentPath());
             }
             this.title.setOnSequenceClickListener(this.sequenceListener);
             this.mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
@@ -360,11 +365,11 @@ public final class BrowserFragment extends Fragment {
     }
 
     private int getNewId(View parent) {
-        this.prevId++;
-        while (parent.findViewById(this.prevId) != null) {
-            this.prevId++;
+        this.mPrevId++;
+        while (parent.findViewById(this.mPrevId) != null) {
+            this.mPrevId++;
         }
-        return this.prevId;
+        return this.mPrevId;
     }
 
     private void startScan() {
@@ -375,11 +380,50 @@ public final class BrowserFragment extends Fragment {
 
         this.scanner = new DirectoryScanTask(mBrowser, mRefreshMenuItem,
                 menuProgress, mAttachedBrowserActivity.getGetContentMimeType(), adapter);
-        this.scanner.execute(mBrowser.getPath());
+        this.scanner.execute(mBrowser.getCurrentPath());
     }
 
     @Nullable
     public Browser getBrowser() {
         return this.mBrowser;
+    }
+
+    private static final class SavedState implements Parcelable {
+        final int mPrevId;
+        final Parcelable mBrowserState;
+
+        SavedState(final int prevId, final Parcelable browserState) {
+            this.mPrevId = prevId;
+            this.mBrowserState = browserState;
+        }
+
+        SavedState(final Parcel source) {
+            this.mPrevId = source.readInt();
+            this.mBrowserState = source.readParcelable(Browser.class.getClassLoader());
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(this.mPrevId);
+            dest.writeParcelable(this.mBrowserState, 0);
+        }
+
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @NotNull
+            @Override
+            public SavedState createFromParcel(final Parcel source) {
+                return new SavedState(source);
+            }
+
+            @Override
+            public SavedState[] newArray(final int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }

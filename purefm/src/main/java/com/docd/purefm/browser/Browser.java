@@ -14,21 +14,23 @@
  */
 package com.docd.purefm.browser;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
-import java.util.Deque;
 
 import android.os.Environment;
 
 import android.os.FileObserver;
 import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Browser manages current path and navigation
@@ -48,90 +50,103 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         void onNavigationCompleted(GenericFile path);
     }
 
-    private final File root;
-    private final Deque<GenericFile> history;
+    private final ArrayDeque<GenericFile> mHistory;
 
-    private FileObserverCache observerCache;
-    private MultiListenerFileObserver observer;
-    private GenericFile path;
-    private GenericFile prevPath;
-    private OnNavigateListener listener;
+    private FileObserverCache mObserverCache;
+    private MultiListenerFileObserver mCurrentPathObserver;
+    private GenericFile mCurrentPath;
+    private GenericFile mPreviousPath;
+    private OnNavigateListener mNavigateListener;
 
-    private Runnable lastRunnable;
+    private Runnable mLastRunnable;
 
     protected Browser(final BrowserActivity activity) {
         if (handler == null) {
             handler = new Handler(activity.getMainLooper());
         }
-        this.observerCache = FileObserverCache.getInstance();
-        this.history = new ArrayDeque<GenericFile>(15);
-        this.root = File.listRoots()[0];
+        this.mObserverCache = FileObserverCache.getInstance();
+        this.mHistory = new ArrayDeque<GenericFile>(15);
         final String home = Settings.getHomeDirectory(activity);
         final String state = Environment.getExternalStorageState();
         if (home != null) {
-            this.path = FileFactory.newFile(home);
-            if (!this.path.exists()) {
-                this.path = null;
+            this.mCurrentPath = FileFactory.newFile(home);
+            if (!this.mCurrentPath.exists()) {
+                this.mCurrentPath = null;
             }
         }
-        if (path == null && (state.equals(Environment.MEDIA_MOUNTED) || state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
-            this.path = FileFactory.newFile(Environment.getExternalStorageDirectory());
+        if (mCurrentPath == null && (state.equals(Environment.MEDIA_MOUNTED) || state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
+            this.mCurrentPath = FileFactory.newFile(Environment.getExternalStorageDirectory());
         }
-        if (this.path == null) {
-            this.path = FileFactory.newFile(this.root.getAbsolutePath());
+        if (this.mCurrentPath == null) {
+            this.mCurrentPath = FileFactory.newFile(com.docd.purefm.Environment.rootDirectory.getAbsolutePath());
         }
-        if (this.path != null) {
-            this.observer = observerCache.getOrCreate(
-                    this.path.getAbsolutePath(), OBSERVER_EVENTS);
-            this.observer.addOnEventListener(this);
-            this.observer.startWatching();
+        if (this.mCurrentPath != null) {
+            this.mCurrentPathObserver = mObserverCache.getOrCreate(
+                    this.mCurrentPath.getAbsolutePath(), OBSERVER_EVENTS);
+            this.mCurrentPathObserver.addOnEventListener(this);
+            this.mCurrentPathObserver.startWatching();
+        }
+    }
+
+    public Parcelable saveInstanceState() {
+        return new SavedState(mHistory, mCurrentPath, mPreviousPath);
+    }
+
+    public void restoreState(final Parcelable state) {
+        final SavedState savedState = (SavedState) state;
+        if (savedState != null) {
+            mHistory.clear();
+            mHistory.addAll(savedState.mHistory);
+            mCurrentPath = savedState.mCurrentPath;
+            mPreviousPath = savedState.mPreviousPath;
+            invalidate();
         }
     }
 
     protected void setOnNavigateListener(OnNavigateListener l) {
-        this.listener = l;
+        this.mNavigateListener = l;
     }
 
-    public GenericFile getPath() {
-        return this.path;
+    public GenericFile getCurrentPath() {
+        return this.mCurrentPath;
     }
     
     public void onScanFinished(GenericFile requested) {
-        this.path = requested;
-        if (this.listener != null) {
-            this.listener.onNavigationCompleted(requested);
+        this.mCurrentPath = requested;
+        if (this.mNavigateListener != null) {
+            this.mNavigateListener.onNavigationCompleted(requested);
         }
-        if (this.observer != null) {
-            this.observer.stopWatching();
-            this.observer.removeOnEventListener(this);
+        if (this.mCurrentPathObserver != null) {
+            this.mCurrentPathObserver.stopWatching();
+            this.mCurrentPathObserver.removeOnEventListener(this);
         }
-        this.observer = this.observerCache.getOrCreate(requested.getAbsolutePath(), OBSERVER_EVENTS);
-        this.observer.addOnEventListener(this);
-        this.observer.startWatching();
+        this.mCurrentPathObserver = this.mObserverCache.getOrCreate(requested.getAbsolutePath(), OBSERVER_EVENTS);
+        this.mCurrentPathObserver.addOnEventListener(this);
+        this.mCurrentPathObserver.startWatching();
     }
     
     public void onScanCancelled() {
-        if (this.prevPath != null) {
-            this.path = this.prevPath;
+        if (this.mPreviousPath != null) {
+            this.mCurrentPath = this.mPreviousPath;
         }
     }
 
     public void navigate(final GenericFile target, boolean addToHistory) {
-        if (!this.path.equals(target)) {
-            this.prevPath = this.path;
-            this.path = target;
+        if (!this.mCurrentPath.equals(target)) {
+            this.mPreviousPath = this.mCurrentPath;
+            this.mCurrentPath = target;
             if (addToHistory) {
-                this.history.push(this.prevPath);
+                this.mHistory.push(this.mPreviousPath);
             }
             this.invalidate();
         }
     }
     
     public boolean back() {
-        if (!this.history.isEmpty()) {
-            GenericFile f = this.history.pop();
-            while (!this.history.isEmpty() && !f.exists()) {
-                f = this.history.pop();
+        if (!this.mHistory.isEmpty()) {
+            GenericFile f = this.mHistory.pop();
+            while (!this.mHistory.isEmpty() && !f.exists()) {
+                f = this.mHistory.pop();
             }
             if (f != null && f.exists() && f.isDirectory()) {
                 this.navigate(f, false);
@@ -142,49 +157,87 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
     
     protected void up() {
-        if (this.path.toFile().equals(this.root)) {
+        if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory)) {
             return;
         }
-        final String parent = this.path.getParent();
+        final String parent = this.mCurrentPath.getParent();
         if (parent != null) {
             final GenericFile p = FileFactory.newFile(parent);
-            this.history.push(p);
+            this.mHistory.push(p);
             this.navigate(p, true);
         }
     }
     
-    protected void setInitialPath(final File path) {
-        if (path != null) {
-            this.path = FileFactory.newFile(path);
-        }
-    }
-    
     public void invalidate() {
-        if (this.listener != null) {
-            this.listener.onNavigate(this.path);
+        if (this.mNavigateListener != null) {
+            this.mNavigateListener.onNavigate(this.mCurrentPath);
         }
     }
 
     protected boolean isRoot() {
-        return this.path.toFile().equals(this.root);
+        return this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory);
     }
 
     @Override
     public void onEvent(int event, String pathString) {
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.DELETE_SELF:
-                handler.removeCallbacks(lastRunnable);
-                handler.post(lastRunnable = new NavigateRunnable(
-                        Browser.this, path.getParentFile(), true));
+                handler.removeCallbacks(mLastRunnable);
+                handler.post(mLastRunnable = new NavigateRunnable(
+                        Browser.this, mCurrentPath.getParentFile(), true));
                 break;
 
             case FileObserver.MOVE_SELF:
             case FileObserver.CREATE:
             case FileObserver.MOVED_TO:
-                handler.removeCallbacks(lastRunnable);
-                handler.post(lastRunnable = new InvalidateRunnable(Browser.this));
+                handler.removeCallbacks(mLastRunnable);
+                handler.post(mLastRunnable = new InvalidateRunnable(Browser.this));
                 break;
         }
+    }
+
+    private static final class SavedState implements Parcelable {
+        final ArrayDeque<GenericFile> mHistory;
+        final GenericFile mCurrentPath;
+        final GenericFile mPreviousPath;
+
+        SavedState(ArrayDeque<GenericFile> mHistory, GenericFile mCurrentFile, GenericFile mPreviousFile) {
+            this.mHistory = mHistory;
+            this.mCurrentPath = mCurrentFile;
+            this.mPreviousPath = mPreviousFile;
+        }
+
+        @SuppressWarnings("Unchecked")
+        SavedState(final Parcel source) {
+            this.mHistory = (ArrayDeque<GenericFile>) source.readSerializable();
+            this.mCurrentPath = (GenericFile) source.readSerializable();
+            this.mPreviousPath = (GenericFile) source.readSerializable();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeSerializable(this.mHistory);
+            dest.writeSerializable(this.mCurrentPath);
+            dest.writeSerializable(this.mPreviousPath);
+        }
+
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @NotNull
+            @Override
+            public SavedState createFromParcel(Parcel source) {
+                return new SavedState(source);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 
     private static final class InvalidateRunnable implements Runnable {

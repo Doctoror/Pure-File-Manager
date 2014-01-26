@@ -56,7 +56,7 @@ final class MenuController {
             return false;
 
         case android.R.id.paste:
-            final PasteTaskExecutor ptc = new PasteTaskExecutor(activity, browser.getPath());
+            final PasteTaskExecutor ptc = new PasteTaskExecutor(activity, browser.getCurrentPath());
             ptc.start();
             return true;
             
@@ -75,7 +75,7 @@ final class MenuController {
             
         case R.id.menu_search:
             final Intent searchIntent = new Intent(activity, SearchActivity.class);
-            searchIntent.putExtra(Extras.EXTRA_PATH, browser.getPath().getAbsolutePath());
+            searchIntent.putExtra(Extras.EXTRA_PATH, browser.getCurrentPath().getAbsolutePath());
             activity.startActivity(searchIntent);
             return true;
 
@@ -84,17 +84,17 @@ final class MenuController {
             return true;
 
         case R.id.menu_folder_new:
-            final DialogFragment cd = CreateDirectoryDialog.instantiate(browser.getPath().toFile());
+            final DialogFragment cd = CreateDirectoryDialog.instantiate(browser.getCurrentPath().toFile());
             cd.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
             return true;
 
         case R.id.menu_file_new:
-            final DialogFragment cf = CreateFileDialog.instantiate(browser.getPath().toFile());
+            final DialogFragment cf = CreateFileDialog.instantiate(browser.getCurrentPath().toFile());
             cf.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
             return true;
             
         case R.id.menu_partition:
-            final DialogFragment pid = PartitionInfoDialog.instantiate(browser.getPath());
+            final DialogFragment pid = PartitionInfoDialog.instantiate(browser.getCurrentPath());
             pid.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
             return true;
             

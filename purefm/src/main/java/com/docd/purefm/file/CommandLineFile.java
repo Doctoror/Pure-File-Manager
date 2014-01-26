@@ -594,4 +594,9 @@ public final class CommandLineFile implements GenericFile,
         }
         return this.p.ox;
     }
+
+    @Override
+    public String toString() {
+        return getAbsolutePath();
+    }
 }
