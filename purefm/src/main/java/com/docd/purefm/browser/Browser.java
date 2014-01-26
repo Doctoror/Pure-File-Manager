@@ -103,8 +103,16 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         if (savedState != null) {
             mHistory.clear();
             mHistory.addAll(savedState.mHistory);
-            mCurrentPath = savedState.mCurrentPath;
-            mPreviousPath = savedState.mPreviousPath;
+            if (savedState.mCurrentPath != null &&
+                    savedState.mCurrentPath.exists() &&
+                    savedState.mCurrentPath.isDirectory()) {
+                mCurrentPath = savedState.mCurrentPath;
+            }
+            if (savedState.mPreviousPath != null &&
+                    savedState.mPreviousPath.exists() &&
+                    savedState.mPreviousPath.isDirectory()) {
+                mPreviousPath = savedState.mPreviousPath;
+            }
             invalidate();
         }
     }
@@ -118,23 +126,38 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
     
     public void onScanFinished(GenericFile requested) {
-        this.mCurrentPath = requested;
-        if (this.mNavigateListener != null) {
-            this.mNavigateListener.onNavigationCompleted(requested);
+        mCurrentPath = requested;
+        if (mNavigateListener != null) {
+            mNavigateListener.onNavigationCompleted(requested);
         }
-        if (this.mCurrentPathObserver != null) {
-            this.mCurrentPathObserver.stopWatching();
-            this.mCurrentPathObserver.removeOnEventListener(this);
+        if (mCurrentPathObserver != null) {
+            mCurrentPathObserver.stopWatching();
+            mCurrentPathObserver.removeOnEventListener(this);
         }
-        this.mCurrentPathObserver = this.mObserverCache.getOrCreate(requested.getAbsolutePath(), OBSERVER_EVENTS);
-        this.mCurrentPathObserver.addOnEventListener(this);
-        this.mCurrentPathObserver.startWatching();
+        if (requested.exists() && requested.isDirectory()) {
+            mCurrentPathObserver = mObserverCache.getOrCreate(requested.getAbsolutePath(), OBSERVER_EVENTS);
+            mCurrentPathObserver.addOnEventListener(this);
+            mCurrentPathObserver.startWatching();
+        } else {
+            mHistory.remove(requested);
+            final GenericFile parent = resolveExistingParent(requested);
+            navigate(parent, true);
+        }
     }
     
     public void onScanCancelled() {
-        if (this.mPreviousPath != null) {
-            this.mCurrentPath = this.mPreviousPath;
+        if (mPreviousPath != null) {
+            mCurrentPath = this.mPreviousPath;
         }
+    }
+
+    private GenericFile resolveExistingParent(final GenericFile file) {
+        GenericFile parent = file.getParentFile();
+        while (!parent.exists() || !parent.isDirectory()) {
+            mHistory.remove(parent);
+            parent = parent.getParentFile();
+        }
+        return parent;
     }
 
     public void navigate(final GenericFile target, boolean addToHistory) {
@@ -199,15 +222,16 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.DELETE_SELF:
                 handler.removeCallbacks(mLastRunnable);
+                final GenericFile parent = resolveExistingParent(mCurrentPath);
                 handler.post(mLastRunnable = new NavigateRunnable(
-                        Browser.this, mCurrentPath.getParentFile(), true));
+                        Browser.this, parent, true));
                 break;
 
             case FileObserver.MOVE_SELF:
             case FileObserver.CREATE:
             case FileObserver.MOVED_TO:
                 handler.removeCallbacks(mLastRunnable);
-                handler.post(mLastRunnable = new InvalidateRunnable(Browser.this));
+                handler.post(mLastRunnable = new InvalidateRunnable(this));
                 break;
         }
     }

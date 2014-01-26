@@ -28,9 +28,11 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
@@ -64,6 +66,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * Events to be monitor for every File in this Adapter
      */
     private static final int OBSERVER_EVENTS =
+            FileObserver.CREATE |
             FileObserver.DELETE_SELF |
             FileObserver.ATTRIB |
             FileObserver.MODIFY |
@@ -128,7 +131,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
 
         this.mResources = context.getResources();
-        this.mHandler = new Handler();
+        this.mHandler = new FileObserverEventHandler();
         this.mTheme = context.getTheme();
         this.mDataSetObservable = new DataSetObservable();
         this.mObserverCache = FileObserverCache.getInstance();
@@ -182,6 +185,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     public final void addFile(final GenericFile file) {
         mContent.add(file);
+        mFileObservers.add(mObserverCache.getOrCreate(file.getAbsolutePath(), OBSERVER_EVENTS));
         Collections.sort(mContent, mComparator.getComparator());
         notifyDataSetChanged();
     }
@@ -297,8 +301,14 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     @Override
     public void onEvent(final int event, final String path) {
-        mHandler.removeCallbacksAndMessages(null);
-        mHandler.post(new FileObserverEventRunnable(this, event, path));
+        //mHandler.removeCallbacksAndMessages(null);
+        final Bundle data = new Bundle();
+        data.putInt(FileObserverEventHandler.DATA_OBSERVER_EVENT, event);
+        data.putString(FileObserverEventHandler.DATA_OBSERVER_PATH, path);
+        final Message message = mHandler.obtainMessage(FileObserverEventHandler.MESSAGE_OBSERVER_EVENT);
+        message.setData(data);
+        mHandler.sendMessage(message);
+        //mHandler.post(new FileObserverEventRunnable(this, event, path));
     }
 
     /**
@@ -308,7 +318,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param path The path, relative to the main monitored file or directory,
      *             of the file or directory which triggered the event
      */
-    void onEventUIThread(final int event, final String path) {
+    synchronized void onEventUIThread(final int event, final String path) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw new RuntimeException("");
         }
@@ -331,6 +341,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                 removeObserverForPath(path);
                 break;
 
+            case FileObserver.CREATE:
+                //Do nothing. The event is handled in Browser
+                break;
+
             default:
                 //Sometimes it happens that some unknown event is delivered instead of DELETE_SELF
                 //So check what happened and perform corresponding action
@@ -338,7 +352,6 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                 break;
 
         }
-        this.notifyDataSetChanged();
     }
 
     /**
@@ -503,6 +516,27 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                 mExecutor.submit(new Job(mHandler, file, logo));
             } catch (Exception e) {
                 Log.w("BrowserBaseAdapter", "Error submitting Job:" + e);
+            }
+        }
+    }
+
+    private final class FileObserverEventHandler extends Handler {
+
+        static final int MESSAGE_OBSERVER_EVENT = 666;
+        static final String DATA_OBSERVER_EVENT = "FileObserverEventHandler.data.OBSERVER_EVENT";
+        static final String DATA_OBSERVER_PATH = "FileObserverEventHandler.data.OBSERVER_PATHT";
+
+        @Override
+        public void handleMessage(final Message msg) {
+            if (msg.what == MESSAGE_OBSERVER_EVENT) {
+                final Bundle data = msg.getData();
+                onEventUIThread(data.getInt(DATA_OBSERVER_EVENT),
+                        data.getString(DATA_OBSERVER_PATH));
+                if (!hasMessages(MESSAGE_OBSERVER_EVENT)) {
+                    notifyDataSetChanged();
+                }
+            } else {
+                super.handleMessage(msg);
             }
         }
     }
