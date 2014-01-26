@@ -33,36 +33,33 @@ public class BreadCrumbTextView extends TextView {
 
     private static final String SEQUENCE_SEPARATOR = " > ";
     private static final String ROOT = "root";
-    
+
     public interface OnSequenceClickListener {
         void onSequenceClick(String sequence);
     }
-    
+
     private final Runnable SCROLL_RIGHT = new Runnable() {
         @Override
         public void run() {
             parent.fullScroll(View.FOCUS_RIGHT);
         }
     };
-    
+
     private OnSequenceClickListener mOnSequenceClickListener;
     private HorizontalScrollView parent;
-    
-    public BreadCrumbTextView(Context context)
-    {
+
+    public BreadCrumbTextView(Context context) {
         super(context);
         init();
     }
 
-    public BreadCrumbTextView(Context context, AttributeSet attrs)
-    {
+    public BreadCrumbTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
     public BreadCrumbTextView(Context context, AttributeSet attrs,
-                              int defStyle)
-    {
+                              int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -70,7 +67,7 @@ public class BreadCrumbTextView extends TextView {
     private void init() {
         this.setMovementMethod(LinkMovementMethod.getInstance());
     }
-    
+
     public final void setFile(final File file) {
         setText(formatFilePath(file));
         if (this.parent == null) {
@@ -84,25 +81,25 @@ public class BreadCrumbTextView extends TextView {
     }
 
     private CharSequence formatFilePath(final File file) {
-        final String[] dirs = file.getPath().split(File.separator);
-        final StringBuilder p = new StringBuilder(ROOT);
-        for (int i = 1; i < dirs.length; i++) {
-            p.append(SEQUENCE_SEPARATOR);
-            p.append(dirs[i]);
+        final SpannableStringBuilder formatted = new SpannableStringBuilder(ROOT + file.getPath());
+        final int length = formatted.length();
+        if (formatted.charAt(length - 1) == File.separatorChar) {
+            formatted.delete(length - 1, length);
         }
-        final SpannableStringBuilder formatted = new SpannableStringBuilder(p);
         int prevIndex = 0;
         int index;
         do {
-            index = p.indexOf(SEQUENCE_SEPARATOR, prevIndex);
+            String currentlyFormattedString = formatted.toString();
+            index = currentlyFormattedString.indexOf(File.separatorChar, prevIndex);
             if (index == -1) {
-                formatted.setSpan(new NavigationSpan(toPathForListener(p.substring(0, p.length()))), prevIndex, p.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                //formatted.setSpan(new UnderlineSpan(), prevIndex, p.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                formatted.setSpan(new NavigationSpan(toPathForListener(currentlyFormattedString.substring(0, formatted.length()))), prevIndex, formatted.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             } else {
-                formatted.setSpan(new NavigationSpan(toPathForListener(p.substring(0, index))), prevIndex, index, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                //formatted.setSpan(new UnderlineSpan(), prevIndex, index, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                formatted.replace(index, index + 1, SEQUENCE_SEPARATOR);
+                currentlyFormattedString = formatted.toString();
+
+                formatted.setSpan(new NavigationSpan(toPathForListener(currentlyFormattedString.substring(0, index))), prevIndex, index, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                prevIndex = index + SEQUENCE_SEPARATOR.length();
             }
-            prevIndex = index + SEQUENCE_SEPARATOR.length();
         } while (index != -1);
         return formatted;
     }
@@ -110,11 +107,11 @@ public class BreadCrumbTextView extends TextView {
     private static String toPathForListener(final String withSequences) {
         return withSequences.replace(SEQUENCE_SEPARATOR, File.separator);
     }
-    
+
     public final void setOnSequenceClickListener(OnSequenceClickListener l) {
         this.mOnSequenceClickListener = l;
     }
-    
+
     public final void fullScrollRight() {
         this.parent.fullScroll(View.FOCUS_RIGHT);
     }
