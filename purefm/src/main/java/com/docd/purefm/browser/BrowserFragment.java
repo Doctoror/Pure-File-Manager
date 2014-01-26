@@ -16,6 +16,7 @@ package com.docd.purefm.browser;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -35,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
+import com.cyanogenmod.filemanager.util.MediaHelper;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
@@ -52,6 +54,8 @@ import com.docd.purefm.view.BreadCrumbTextView.OnSequenceClickListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
 
 /**
  * Fragment manages file List, menu and ActionMode.
@@ -310,11 +314,44 @@ public final class BrowserFragment extends Fragment {
                     } else {
                         final Uri result = Uri.fromFile(target.toFile());
                         final Intent intent = new Intent();
-                        intent.setData(result);
+                        intent.setData(getResultUriForFileFromIntent(mAttachedBrowserActivity.getContentResolver(),
+                                target.toFile(), mAttachedBrowserActivity.getIntent()));
                         mAttachedBrowserActivity.setResult(Activity.RESULT_OK, intent);
                         mAttachedBrowserActivity.finish();
                     }
                 }
+            }
+
+            /*
+             * Copyright (C) 2013 The CyanogenMod Project
+             *
+             * Licensed under the Apache License, Version 2.0 (the "License");
+             * you may not use this file except in compliance with the License.
+             * You may obtain a copy of the License at
+             *
+             *      http://www.apache.org/licenses/LICENSE-2.0
+             *
+             * Unless required by applicable law or agreed to in writing, software
+             * distributed under the License is distributed on an "AS IS" BASIS,
+             * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+             * See the License for the specific language governing permissions and
+             * limitations under the License.
+             */
+            private Uri getResultUriForFileFromIntent(ContentResolver cr, File src, Intent intent) {
+                // Try to find the preferred uri scheme
+                Uri result = MediaHelper.fileToContentUri(cr, src);
+                if (result == null) {
+                    result = Uri.fromFile(src);
+                }
+
+                if (Intent.ACTION_PICK.equals(intent.getAction()) && intent.getData() != null) {
+                    final String scheme = intent.getData().getScheme();
+                    if (scheme != null) {
+                        result = result.buildUpon().scheme(scheme).build();
+                    }
+                }
+
+                return result;
             }
         });
 
