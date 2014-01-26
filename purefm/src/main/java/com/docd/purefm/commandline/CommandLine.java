@@ -48,8 +48,9 @@ public final class CommandLine {
             }
 
             @Override
-            public void commandCompleted(int i, int i2) {
+            public void commandCompleted(int i, int exitCode) {
                 status.finished = true;
+                status.exitCode = exitCode;
                 command.notify();
             }
         });
@@ -65,7 +66,9 @@ public final class CommandLine {
                     }
                 }
             }
-            return result;
+            if (status.exitCode == 0) {
+                return result;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
