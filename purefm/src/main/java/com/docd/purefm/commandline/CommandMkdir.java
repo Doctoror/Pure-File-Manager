@@ -14,16 +14,19 @@
  */
 package com.docd.purefm.commandline;
 
-import java.io.File;
-
 /**
- * rm command
  * @author Doctoror
+ *
+ * mkdir - make directories
  */
-public final class RemoveCommand extends Command {
-    
-    public RemoveCommand(final File file) {
-        super(ShellHolder.getNextCommandId(), "busybox rm -rf ".concat(
-                CommandLineUtils.getCommandLineString(file.getAbsolutePath())));
+public class CommandMkdir extends BusyboxCommand {
+
+    /**
+     * Build mkdir command
+     *
+     * @param path Path to make directory at
+     */
+    public CommandMkdir(final String path) {
+        super("mkdir " + CommandLineUtils.getCommandLineString(path));
     }
 }

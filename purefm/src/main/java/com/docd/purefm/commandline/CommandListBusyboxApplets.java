@@ -14,16 +14,19 @@
  */
 package com.docd.purefm.commandline;
 
-import java.io.File;
+import com.docd.purefm.Environment;
 
 /**
- * touch command
+ * Command for listing busybox applets
+ *
  * @author Doctoror
  */
-public final class TouchCommand extends Command {
-    
-    public TouchCommand(final File file) {
-        super(ShellHolder.getNextCommandId(), "busybox touch "
-                .concat(CommandLineUtils.getCommandLineString(file.getAbsolutePath())));
+public final class CommandListBusyboxApplets extends BusyboxCommand {
+
+    /**
+     * Builds busybox list applets command
+     */
+    public CommandListBusyboxApplets() {
+        super(Environment.busybox + " --list");
     }
 }

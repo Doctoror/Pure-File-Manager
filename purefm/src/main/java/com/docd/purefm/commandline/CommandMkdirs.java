@@ -14,15 +14,15 @@
  */
 package com.docd.purefm.commandline;
 
-import com.docd.purefm.Environment;
-
 /**
- * Command for listing busybox applets
- *
  * @author Doctoror
+ *
+ * mkdir - make directories
+ * -p no error if existing, make parent directories as needed
  */
-public final class BusyboxListCommand extends Command {
-    public BusyboxListCommand() {
-        super(Environment.busybox + " --list");
+public final class CommandMkdirs extends BusyboxCommand {
+
+    public CommandMkdirs(final String path) {
+        super("mkdir -p " + CommandLineUtils.getCommandLineString(path));
     }
 }

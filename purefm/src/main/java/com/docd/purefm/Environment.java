@@ -20,7 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.docd.purefm.commandline.BusyboxListCommand;
+import com.docd.purefm.commandline.CommandListBusyboxApplets;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
 
@@ -129,7 +129,7 @@ public final class Environment {
         }
 
         final List<String> result = CommandLine.executeForResult(ShellHolder.getShell(),
-                new BusyboxListCommand());
+                new CommandListBusyboxApplets());
         if (result != null) {
             for (final String resultLine : result) {
                 if (resultLine.equals(util)) {

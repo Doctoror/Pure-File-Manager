@@ -16,7 +16,9 @@ package com.docd.purefm.controller;
 
 import com.cyanogenmod.filemanager.util.AIDHelper;
 import com.docd.purefm.R;
-import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.CommandLine;
+import com.docd.purefm.commandline.CommandStat;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.Permissions;
@@ -28,6 +30,8 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.List;
 
 public final class FilePermissionsController implements CompoundButton.OnCheckedChangeListener {
 
@@ -135,10 +139,16 @@ public final class FilePermissionsController implements CompoundButton.OnChecked
         if (file instanceof CommandLineFile) {
             final CommandLineFile f = (CommandLineFile) file;
             final SparseArray<String> aids = AIDHelper.getAIDs(table.getContext(), false);
-            owner.setText(aids.get(f.getOwner()));
-            group.setText(aids.get(f.getGroup()));
-            
-            if (CommandLineUtils.isMSDOSFS(f.toFile())) {
+            if (aids != null) {
+                owner.setText(aids.get(f.getOwner()));
+                group.setText(aids.get(f.getGroup()));
+            }
+
+            final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
+                    new CommandStat(f.getAbsolutePath()));
+            final String fsType = fsTypeResult == null || fsTypeResult.isEmpty() ?
+                    null : fsTypeResult.get(0);
+            if (fsType == null || fsType.equals("msdos") || fsType.equals("vfat")) {
                 this.disableBoxes();
             }
         } else {

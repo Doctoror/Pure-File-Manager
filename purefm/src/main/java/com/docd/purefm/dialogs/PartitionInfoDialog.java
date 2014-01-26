@@ -19,7 +19,9 @@ import org.apache.commons.io.FileUtils;
 import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
+import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.StatFsCompat;
@@ -35,6 +37,8 @@ import android.os.Bundle;
 import android.os.StatFs;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.List;
 
 public final class PartitionInfoDialog extends DialogFragment {
     
@@ -160,7 +164,10 @@ public final class PartitionInfoDialog extends DialogFragment {
 
         @Override
         protected String doInBackground(final GenericFile... params) {
-            return CommandLineUtils.getFSType(ShellHolder.getShell(), params[0].toFile());
+            final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
+                    new CommandStat(params[0].getAbsolutePath()));
+            return fsTypeResult == null || fsTypeResult.isEmpty() ?
+                    null : fsTypeResult.get(0);
         }
 
         @Override

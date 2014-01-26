@@ -16,34 +16,37 @@ package com.docd.purefm.commandline;
 
 import com.docd.purefm.file.GenericFile;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
- * mv command
+ * mv command - move or rename files
+ * -f do not prompt before overwriting
  *
  * @author Doctoror
  */
-public final class MoveCommand extends Command {
+public final class CommandMove extends BusyboxCommand {
 
     public final String source;
     public final String target;
 
-    public MoveCommand(GenericFile source, GenericFile target) {
+    /**
+     * Builds move command
+     *
+     * @param source Source file
+     * @param target Destination file
+     */
+    public CommandMove(GenericFile source, GenericFile target) {
         this(source.getAbsolutePath(), target.getAbsolutePath());
     }
 
-    public MoveCommand(String source, String target) {
-        super(ShellHolder.getNextCommandId(), toCommandString(source, target));
+    /**
+     * Builds move command
+     *
+     * @param source Source file path
+     * @param target Destination file path
+     */
+    public CommandMove(String source, String target) {
+        super("mv -f " + CommandLineUtils.getCommandLineString(
+                source) + " " + CommandLineUtils.getCommandLineString(target));
         this.source = source;
         this.target = target;
-    }
-
-    @NotNull
-    private static String toCommandString(final String source, final String target) {
-        final StringBuilder command = new StringBuilder("busybox mv -f ");
-        command.append(CommandLineUtils.getCommandLineString(source));
-        command.append(' ');
-        command.append(CommandLineUtils.getCommandLineString(target));
-        return command.toString();
     }
 }

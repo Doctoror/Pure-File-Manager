@@ -28,7 +28,7 @@ import android.os.AsyncTask;
 
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.RemoveCommand;
+import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.dialogs.MessageDialog;
 import com.docd.purefm.file.CommandLineFile;
@@ -81,7 +81,7 @@ public final class DeleteTask extends
             final Shell shell = ShellHolder.getShell();
             for (final GenericFile file : files) {
                 final File fileFile = file.toFile();
-                if (CommandLine.execute(shell, new RemoveCommand(fileFile))) {
+                if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
                     filesAffected.add(fileFile);
                 } else {
                     failed.add(file);

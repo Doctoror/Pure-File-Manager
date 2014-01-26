@@ -25,7 +25,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.docd.purefm.R;
-import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.CommandExists;
+import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
@@ -73,7 +74,7 @@ public final class PasteTaskExecutor implements OnClickListener {
         } else {
             for (final GenericFile file : contents) {
                 final File tmp = new File(target.toFile(), file.getName());
-                if (CommandLineUtils.exists(ShellHolder.getShell(), tmp)) {
+                if (CommandLine.execute(ShellHolder.getShell(), new CommandExists(tmp.getAbsolutePath()))) {
                     exist.put(tmp, file);
                 } else {
                     toProcess.add(file);

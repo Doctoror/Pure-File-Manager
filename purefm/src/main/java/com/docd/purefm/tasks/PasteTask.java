@@ -30,9 +30,9 @@ import android.os.AsyncTask;
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.Command;
+import com.docd.purefm.commandline.CommandCopyRecursively;
 import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.CopyCommand;
-import com.docd.purefm.commandline.MoveCommand;
+import com.docd.purefm.commandline.CommandMove;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.dialogs.MessageDialog;
 import com.docd.purefm.file.CommandLineFile;
@@ -193,8 +193,8 @@ final class PasteTask extends AsyncTask<GenericFile, Void, List<GenericFile>> {
 
         final Shell shell = ShellHolder.getShell();
         for (final CommandLineFile current : cont) {
-            final Command command = (isMove ? new MoveCommand(current, t) :
-                    new CopyCommand(current, t));
+            final Command command = (isMove ? new CommandMove(current, t) :
+                    new CommandCopyRecursively(current, t));
 
             final boolean res = CommandLine.execute(shell, command);
             if (res) {

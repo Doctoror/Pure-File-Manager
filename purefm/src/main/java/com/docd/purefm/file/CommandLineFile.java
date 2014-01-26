@@ -26,12 +26,18 @@ import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.commandline.Command;
+import com.docd.purefm.commandline.CommandChmod;
+import com.docd.purefm.commandline.CommandCopyRecursively;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.CommandListContents;
+import com.docd.purefm.commandline.CommandListFile;
+import com.docd.purefm.commandline.CommandMkdir;
+import com.docd.purefm.commandline.CommandMkdirs;
+import com.docd.purefm.commandline.CommandMove;
+import com.docd.purefm.commandline.CommandRemove;
+import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
-import com.docd.purefm.commandline.CopyCommand;
-import com.docd.purefm.commandline.MoveCommand;
-import com.docd.purefm.commandline.RemoveCommand;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.PureFMTextUtils;
@@ -55,51 +61,51 @@ public final class CommandLineFile implements GenericFile,
     private static final int LS_YEAR = 9;
     private static final int LS_FILE = 10;
 
-    private final File file;
-    private Permissions p;
-    private long length;
-    private long lastmod;
-    private boolean exists;
+    private final File mFile;
+    private Permissions mPermissions;
+    private long mLength;
+    private long mLastmod;
+    private boolean mExists;
 
-    private int owner;
-    private int group;
+    private int mOwner;
+    private int mGroup;
 
-    private String mimeType;
+    private String mMimeType;
     
-    private boolean isSymlink;
-    private boolean isDirectory;
+    private boolean mIsSymlink;
+    private boolean mIsDirectory;
 
     private CommandLineFile(File file) {
-        this.file = file;
+        this.mFile = file;
     }
 
     private CommandLineFile(String path) {
-        this.file = new File(path);
+        this.mFile = new File(path);
     }
 
     private CommandLineFile(File parent, String line) {
-        this.file = new File(parent, line);
+        this.mFile = new File(parent, line);
     }
 
     @Override
     public boolean isSymlink() {
-        return this.isSymlink;
+        return this.mIsSymlink;
     }
 
     @NotNull
     public static CommandLineFile fromFile(File file) {
         if (file.equals(File.listRoots()[0])) {
             final CommandLineFile f = new CommandLineFile(file);
-            f.owner = 0;
-            f.group = 0;
-            f.p = new Permissions(FS_ROOT_PERMISSIONS);
-            f.isDirectory = true;
-            f.isSymlink = false;
-            f.exists = true;
+            f.mOwner = 0;
+            f.mGroup = 0;
+            f.mPermissions = new Permissions(FS_ROOT_PERMISSIONS);
+            f.mIsDirectory = true;
+            f.mIsSymlink = false;
+            f.mExists = true;
             return f;
         }
 
-        final List<String> res = CommandLineUtils.lsld(ShellHolder.getShell(), file);
+        final List<String> res = CommandLine.executeForResult(ShellHolder.getShell(), new CommandListFile(file));
 
         if (res == null || res.isEmpty()) {
             // file not yet exists
@@ -200,15 +206,15 @@ public final class CommandLineFile implements GenericFile,
     private static void init(final CommandLineFile targetFile, String[] attrs) {
         final String sourceName = attrs[LS_FILE];
         final String perm = attrs[LS_PERMISSIONS];
-        targetFile.isSymlink = perm.charAt(0) == 'l';
-        targetFile.isDirectory = sourceName.endsWith(File.separator);
+        targetFile.mIsSymlink = perm.charAt(0) == 'l';
+        targetFile.mIsDirectory = sourceName.endsWith(File.separator);
 
-        targetFile.p = new Permissions(perm);
-        targetFile.owner = Integer.parseInt(attrs[LS_USER]);
-        targetFile.group = Integer.parseInt(attrs[LS_GROUP]);
+        targetFile.mPermissions = new Permissions(perm);
+        targetFile.mOwner = Integer.parseInt(attrs[LS_USER]);
+        targetFile.mGroup = Integer.parseInt(attrs[LS_GROUP]);
         final String len = attrs[LS_FILE_SIZE];
         if (len != null && !len.isEmpty()) {
-            targetFile.length = Long.parseLong(len);
+            targetFile.mLength = Long.parseLong(len);
         }
 
         final Calendar c = Calendar.getInstance(Locale.US);
@@ -227,38 +233,50 @@ public final class CommandLineFile implements GenericFile,
                     Integer.parseInt(attrs[LS_TIME].substring(index2 + 1)));
         }
 
-        targetFile.lastmod = c.getTimeInMillis();
-        targetFile.exists = true;
-        if (!targetFile.isDirectory) {
-            targetFile.mimeType = MimeTypes.getMimeType(targetFile.file);
+        targetFile.mLastmod = c.getTimeInMillis();
+        targetFile.mExists = true;
+        if (!targetFile.mIsDirectory) {
+            targetFile.mMimeType = MimeTypes.getMimeType(targetFile.mFile);
         }
+    }
+
+    private void apply(final CommandLineFile other) {
+        this.mPermissions = other.mPermissions;
+        this.mLength = other.mLength;
+        this.mLastmod = other.mLastmod;
+        this.mExists = other.mExists;
+        this.mOwner = other.mOwner;
+        this.mGroup = other.mGroup;
+        this.mMimeType = other.mMimeType;
+        this.mIsSymlink = other.mIsSymlink;
+        this.mIsDirectory = other.mIsDirectory;
     }
 
     @Override
     public String getMimeType() {
-        return this.mimeType;
+        return this.mMimeType;
     }
 
     @Override
     public boolean exists() {
-        return this.exists;
+        return this.mExists;
     }
 
     @Override
     public File toFile() {
-        return this.file;
+        return this.mFile;
     }
 
     @Override
     public boolean delete() {
-        if (CommandLine.execute(ShellHolder.getShell(), new RemoveCommand(this.file))) {
-            this.exists = false;
-            this.isDirectory = false;
-            this.isSymlink = false;
-            this.owner = 0;
-            this.group = 0;
-            this.length = 0;
-            this.p = null;
+        if (CommandLine.execute(ShellHolder.getShell(), new CommandRemove(this.mFile))) {
+            this.mExists = false;
+            this.mIsDirectory = false;
+            this.mIsSymlink = false;
+            this.mOwner = 0;
+            this.mGroup = 0;
+            this.mLength = 0;
+            this.mPermissions = null;
             return true;
         }
         return false;
@@ -266,7 +284,8 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public CommandLineFile[] listFiles() {
-        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
+        final List<String> result = CommandLine.executeForResult(
+                ShellHolder.getShell(), new CommandListContents(this.mFile));
         if (result == null) {
             return null;
         }
@@ -274,7 +293,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                res.add(CommandLineFile.fromLSL(this.file, f));
+                res.add(CommandLineFile.fromLSL(this.mFile, f));
             } catch (IllegalArgumentException e) {
                 //e.printStackTrace();
                 // not a valid ls -l file line
@@ -290,7 +309,8 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
+        final List<String> result = CommandLine.executeForResult(
+                ShellHolder.getShell(),new CommandListContents(mFile));
         if (result == null) {
             return null;
         }
@@ -298,8 +318,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(this.file,
-                        f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
                 if (filter.accept(tmp.toFile())) {
                     res.add(tmp);
                 }
@@ -317,7 +336,8 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
+        final List<String> result = CommandLine.executeForResult(
+                ShellHolder.getShell(), new CommandListContents(mFile));
         if (result == null) {
             return null;
         }
@@ -325,9 +345,8 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(this.file,
-                        f);
-                if (filter.accept(this.file, tmp.getName())) {
+                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
+                if (filter.accept(mFile, tmp.getName())) {
                     res.add(tmp);
                 }
             } catch (IllegalArgumentException e) {
@@ -344,7 +363,8 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        final List<String> result = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
+        final List<String> result = CommandLine.executeForResult(
+                ShellHolder.getShell(), new CommandListContents(mFile));
         if (result == null) {
             return null;
         }
@@ -352,8 +372,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(this.file,
-                        f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
                 if (filter.accept(tmp)) {
                     res.add(tmp);
                 }
@@ -368,7 +387,8 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public String[] list() {
-        final List<String> res = CommandLineUtils.lsl(ShellHolder.getShell(), this.file);
+        final List<String> res = CommandLine.executeForResult(
+                ShellHolder.getShell(), new CommandListContents(mFile));
         if (res != null) {
             final String[] resul = new String[res.size()];
             res.toArray(resul);
@@ -379,46 +399,46 @@ public final class CommandLineFile implements GenericFile,
 
     @Override
     public long length() {
-        return this.length;
+        return this.mLength;
     }
 
     @Override
     public long lastModified() {
-        return this.lastmod;
+        return this.mLastmod;
     }
 
     @Override
     public boolean createNewFile() {
-        if (this.exists) {
+        if (this.mExists) {
             return false;
         }
 
-        final String res = CommandLineUtils.touch(ShellHolder.getShell(), this);
-        if (res == null) {
-            return false;
+        final boolean result = CommandLine.execute(ShellHolder.getShell(),
+                new CommandTouch(mFile.getAbsolutePath()));
+        if (result) {
+            this.apply((CommandLineFile) FileFactory.newFile(mFile));
         }
-        init(this, res);
-        return true;
+        return result;
     }
 
     @Override
     public boolean mkdir() {
-        final String res = CommandLineUtils.mkdir(ShellHolder.getShell(), this);
-        if (res == null) {
-            return false;
+        final boolean result = CommandLine.execute(ShellHolder.getShell(),
+                new CommandMkdir(mFile.getAbsolutePath()));
+        if (result) {
+            this.apply((CommandLineFile) FileFactory.newFile(mFile));
         }
-        init(this, res);
-        return true;
+        return result;
     }
 
     @Override
     public boolean mkdirs() {
-        final String res = CommandLineUtils.mkdirs(ShellHolder.getShell(), this);
-        if (res == null) {
-            return false;
+        final boolean result = CommandLine.execute(ShellHolder.getShell(),
+                new CommandMkdirs(mFile.getAbsolutePath()));
+        if (result) {
+            this.apply((CommandLineFile) FileFactory.newFile(mFile));
         }
-        init(this, res);
-        return true;
+        return result;
     }
 
     /**
@@ -430,28 +450,28 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public int compareTo(GenericFile arg0) {
-        return this.file.compareTo(arg0.toFile());
+        return this.mFile.compareTo(arg0.toFile());
     }
 
     @Override
     public String getName() {
-        return this.file.getName();
+        return this.mFile.getName();
     }
 
     @Override
     public String getPath() {
-        return this.file.getPath();
+        return this.mFile.getPath();
     }
 
     @Override
     public String getAbsolutePath() {
-        return this.file.getAbsolutePath();
+        return this.mFile.getAbsolutePath();
     }
 
     @Override
     public String getCanonicalPath() {
         try {
-            return this.file.getCanonicalPath();
+            return this.mFile.getCanonicalPath();
         } catch (IOException e) {
             return null;
         }
@@ -463,136 +483,137 @@ public final class CommandLineFile implements GenericFile,
             return false;
         }
         if (obj instanceof CommandLineFile) {
-            return ((CommandLineFile) obj).file.equals(this.file);
+            return ((CommandLineFile) obj).mFile.equals(this.mFile);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.file.hashCode();
+        return this.mFile.hashCode();
     }
 
     @Override
     public long getFreeSpace() {
-        return this.file.getFreeSpace();
+        return this.mFile.getFreeSpace();
     }
 
     @Override
     public long getTotalSpace() {
-        return this.file.getTotalSpace();
+        return this.mFile.getTotalSpace();
     }
 
     @Override
     public String getParent() {
-        return this.file.getParent();
+        return this.mFile.getParent();
     }
 
     @Override
     public CommandLineFile getParentFile() {
-        return CommandLineFile.fromFile(this.file.getParentFile());
+        return CommandLineFile.fromFile(this.mFile.getParentFile());
     }
 
     @Override
     public boolean isDirectory() {
-        return this.isDirectory;
+        return this.mIsDirectory;
     }
     
     @Override
     public boolean isHidden() {
-        return this.file.isHidden();
+        return this.mFile.isHidden();
     }
 
     @Override
     public boolean renameTo(final File newName) {
-        final Command move = new MoveCommand(this.getAbsolutePath(), newName.getAbsolutePath());
+        final Command move = new CommandMove(this.getAbsolutePath(), newName.getAbsolutePath());
         final boolean result = CommandLine.execute(ShellHolder.getShell(), move);
         if (result) {
-            this.exists = false;
-            this.isDirectory = false;
-            this.isSymlink = false;
-            this.owner = 0;
-            this.group = 0;
+            this.mExists = false;
+            this.mIsDirectory = false;
+            this.mIsSymlink = false;
+            this.mOwner = 0;
+            this.mGroup = 0;
         }
         return result;
     }
 
     @Override
     public Permissions getPermissions() {
-        return this.p;
+        return this.mPermissions;
     }
     
     public boolean applyPermissions(Permissions newPerm) {
-        if (this.p.equals(newPerm)) {
+        if (this.mPermissions.equals(newPerm)) {
             return true;
         }
-        final boolean result = CommandLineUtils.applyPermissions(ShellHolder.getShell(), newPerm, this);
+        final boolean result = CommandLine.execute(ShellHolder.getShell(),
+                new CommandChmod(mFile.getAbsolutePath(), newPerm));
         if (result) {
-            this.p = newPerm;
+            this.mPermissions = newPerm;
         }
         return result;
     }
 
     @Override
     public boolean copy(final GenericFile target) {
-        if (!this.exists) {
+        if (!this.mExists) {
             return false;
         }
         return CommandLine.execute(ShellHolder.getShell(),
-                new CopyCommand(this, target));
+                new CommandCopyRecursively(this, target));
     }
 
     @Override
     public boolean move(final GenericFile target) {
-        if (!this.exists) {
+        if (!this.mExists) {
             return false;
         }
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
-                new MoveCommand(this, target));
+                new CommandMove(this, target));
         if (result) {
-            this.exists = false;
-            this.isDirectory = false;
-            this.isSymlink = false;
-            this.owner = 0;
-            this.group = 0;
-            this.p = null;
+            this.mExists = false;
+            this.mIsDirectory = false;
+            this.mIsSymlink = false;
+            this.mOwner = 0;
+            this.mGroup = 0;
+            this.mPermissions = null;
         }
         return result;
     }
     
     public int getOwner() {
-        return this.owner;
+        return this.mOwner;
     }
     
     public int getGroup() {
-        return this.group;
+        return this.mGroup;
     }
 
     public boolean canRead() {
-        if (!this.exists) {
+        if (!this.mExists) {
             return false;
         }
-        if (this.group == Constants.GID_SDCARD) {
-            return this.p.gr;
+        if (this.mGroup == Constants.GID_SDCARD) {
+            return this.mPermissions.gr;
         }
-        return this.p.or;
+        return this.mPermissions.or;
     }
 
     protected boolean canWrite() {
-        if (this.group == Constants.GID_SDCARD) {
-            return this.p.gw;
+        if (this.mGroup == Constants.GID_SDCARD) {
+            return this.mPermissions.gw;
         }
-        return this.p.ow;
+        return this.mPermissions.ow;
     }
 
     protected boolean canExecute() {
-        if (!this.exists) {
+        if (!this.mExists) {
             return false;
         }
-        if (this.group == Constants.GID_SDCARD) {
-            return this.p.gx;
+        if (this.mGroup == Constants.GID_SDCARD) {
+            return this.mPermissions.gx;
         }
-        return this.p.ox;
+        return this.mPermissions.ox;
     }
 
     @Override

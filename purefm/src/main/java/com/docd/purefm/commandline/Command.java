@@ -21,26 +21,69 @@ package com.docd.purefm.commandline;
  */
 public class Command extends com.stericson.RootTools.execution.Command {
 
+    /**
+     * Notifies command events
+     *
+     * @author Doctoror
+     */
     public interface CommandListener {
+        /**
+         * Called when command prints to stdout or stderr
+         *
+         * @param id command id
+         * @param line output line
+         */
         void commandOutput(int id, String line);
+
+        /**
+         * Called when command was terminated
+         *
+         * @param id command id
+         * @param reason termination reason
+         */
         void commandTerminated(int id, String reason);
+
+        /**
+         * Called when command completed
+         *
+         * @param id command id
+         * @param exitCode exit code
+         */
         void commandCompleted(int id, int exitCode);
     }
 
+    /**
+     * Listener to deliver command events to
+     */
     private CommandListener listener;
 
+    /**
+     * {@inheritDoc}
+     */
     public Command(int id, boolean handlerEnabled, String... command) {
         super(id, handlerEnabled, command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Command(int id, String... command) {
         super(id, command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Command(String... command) {
         super(ShellHolder.getNextCommandId(), command);
     }
 
+    /**
+     * Sets the listener to which the command events will be delivered.
+     * Must be set before executing if you need the output
+     *
+     * @param listener Listener to deliver command events to
+     */
     public final void setCommandListener(final CommandListener listener) {
         this.listener = listener;
     }
