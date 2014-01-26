@@ -17,13 +17,17 @@ package com.docd.purefm.browser;
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 
+import android.content.Context;
 import android.os.Environment;
 
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
@@ -44,6 +48,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             FileObserver.MOVE_SELF;
 
     private static Handler handler;
+    private Context mContext;
 
     public interface OnNavigateListener {
         void onNavigate(GenericFile path);
@@ -64,6 +69,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         if (handler == null) {
             handler = new Handler(activity.getMainLooper());
         }
+        mContext = activity;
         this.mObserverCache = FileObserverCache.getInstance();
         this.mHistory = new ArrayDeque<GenericFile>(15);
         final String home = Settings.getHomeDirectory(activity);
@@ -132,13 +138,23 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
 
     public void navigate(final GenericFile target, boolean addToHistory) {
-        if (!this.mCurrentPath.equals(target)) {
-            this.mPreviousPath = this.mCurrentPath;
-            this.mCurrentPath = target;
-            if (addToHistory) {
-                this.mHistory.push(this.mPreviousPath);
+        if (target.exists()) {
+            if (target.isDirectory()) {
+                if (!this.mCurrentPath.equals(target)) {
+                    this.mPreviousPath = this.mCurrentPath;
+                    this.mCurrentPath = target;
+                    if (addToHistory) {
+                        this.mHistory.push(this.mPreviousPath);
+                    }
+                    this.invalidate();
+                }
+            } else {
+                Log.w("Browser", "The target is not a directory");
+                Toast.makeText(mContext, R.string.target_is_not_a_directory, Toast.LENGTH_SHORT).show();
             }
-            this.invalidate();
+        } else {
+            Log.w("Browser", "Trying to navigate to non-existing directory");
+            Toast.makeText(mContext, R.string.directory_not_exists, Toast.LENGTH_SHORT).show();
         }
     }
     

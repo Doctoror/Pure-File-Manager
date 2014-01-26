@@ -14,11 +14,15 @@
  */
 package com.docd.purefm.utils;
 
+import android.content.Context;
+
 import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.docd.purefm.Environment;
+import com.docd.purefm.settings.Settings;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +30,17 @@ public final class BookmarksHelper {
     
     public enum Type {
         STORAGE, SDCARD, USB, USER
+    }
+
+    public static Set<String> getAllLocations(final Context context) {
+        final Set<String> result = new TreeSet<String>();
+        result.addAll(BookmarksHelper.getStorageBookmarks());
+        final Set<File> usb = Environment.getUsbStorageDirectories();
+        for (final File usbFile : usb) {
+            result.add(usbFile.getAbsolutePath());
+        }
+        result.addAll(Settings.getBookmarks(context));
+        return result;
     }
 
     @NotNull

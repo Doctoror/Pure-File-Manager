@@ -19,6 +19,7 @@ import java.util.Set;
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.ShellHolder;
+import com.docd.purefm.utils.BookmarksHelper;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -187,7 +188,7 @@ public final class SettingsFragment extends PreferenceFragment {
         command.setEnabled(Environment.hasBusybox());
         root.setEnabled(Environment.hasRoot && Environment.hasBusybox());
         
-        final Set<String> options = Settings.getBookmarks(parent.getApplicationContext());
+        final Set<String> options = BookmarksHelper.getAllLocations(parent.getApplicationContext());
         final String defaultHome = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         options.add(defaultHome);
         

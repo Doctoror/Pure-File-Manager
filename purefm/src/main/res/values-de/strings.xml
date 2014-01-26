@@ -20,6 +20,12 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="close">Schließen</string>
+
+    <!-- Browser -->
+    <!-- TODO translate to German -->
+    <string name="directory_not_exists">The directory does not exist</string>
+    <!-- TODO translate to German -->
+    <string name="target_is_not_a_directory">The target is not a directory</string>
     
     <string name="remove">Entfernen</string>
     <string name="search_files">Dateien Suchen</string>
