@@ -60,8 +60,10 @@ public abstract class SuperuserActionBarMonitoredActivity extends MonitoredActiv
      * Sets ActionBar icon to ic_superuser if superuser enabled.
      */
     protected final void invalidateActionBarIcon() {
-        if (Settings.useCommandLine && Settings.su) {
-            mActionBar.setIcon(R.drawable.ic_superuser);
+        if (Settings.su) {
+            mActionBar.setIcon(R.drawable.icon_root);
+        } else if (Settings.useCommandLine) {
+            mActionBar.setIcon(R.drawable.icon_shell);
         } else {
             mActionBar.setIcon(mDefaultIcon);
         }

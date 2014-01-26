@@ -68,13 +68,13 @@ public final class BrowserFragment extends Fragment {
 
     private Browser mBrowser;
     private BrowserBaseAdapter adapter;
-    private OnNavigateListener parentListener;
+    private OnNavigateListener mParentOnNavigateListener;
 
     private BreadCrumbTextView title;
     private OnSequenceClickListener sequenceListener;
 
     private AbsListView mListView;
-    private View menuProgress;
+    private View mMenuItemProgress;
     private View mainProgress;
 
     private DirectoryScanTask scanner;
@@ -108,20 +108,20 @@ public final class BrowserFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.menuProgress = new ProgressBar(activity);
+        mMenuItemProgress = new ProgressBar(activity);
 
         if (activity instanceof BrowserActivity) {
             mBrowser = new Browser((BrowserActivity) activity);
-            mBrowser.restoreState(mBrowserInitialState);
-            mBrowserInitialState = null;
         } else {
             throw new IllegalStateException("BrowserFragment should be attached only to BrowserActivity");
         }
-        this.mBrowser.setOnNavigateListener(new OnNavigateListener() {
+        mBrowser.setOnNavigateListener(new OnNavigateListener() {
 
             @Override
             public void onNavigate(GenericFile path) {
-                parentListener.onNavigate(path);
+                if (mParentOnNavigateListener != null) {
+                    mParentOnNavigateListener.onNavigate(path);
+                }
                 if (mRefreshMenuItem == null) {
                     refreshFlag = true;
                 } else {
@@ -137,9 +137,10 @@ public final class BrowserFragment extends Fragment {
                 if (firstRun && isVisible) {
                     firstRun = false;
                 }
-                parentListener.onNavigationCompleted(path);
+                if (mParentOnNavigateListener != null) {
+                    mParentOnNavigateListener.onNavigationCompleted(path);
+                }
             }
-
         });
 
         this.sequenceListener = new OnSequenceClickListener() {
@@ -153,6 +154,12 @@ public final class BrowserFragment extends Fragment {
         this.mAttachedBrowserActivity = (BrowserActivity) activity;
         this.menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
         this.actionModeController = new ActionModeController(this.mAttachedBrowserActivity);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mParentOnNavigateListener = null;
     }
 
     @Override
@@ -198,14 +205,17 @@ public final class BrowserFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
-        this.ensureGridViewColumns(getResources().getConfiguration());
-        this.actionModeController.setListView(mListView);
+        ensureGridViewColumns(getResources().getConfiguration());
+        actionModeController.setListView(mListView);
+        mParentOnNavigateListener = mAttachedBrowserActivity;
 
         this.title = this.mAttachedBrowserActivity.getTitleView();
-        this.parentListener = this.mAttachedBrowserActivity.createOnNavigationListener();
         if (this.isVisible() && this.isAdded() && this.isVisible) {
             this.title.setOnSequenceClickListener(this.sequenceListener);
         }
+
+        mBrowser.restoreState(mBrowserInitialState);
+        mBrowserInitialState = null;
     }
 
     @Override
@@ -330,7 +340,7 @@ public final class BrowserFragment extends Fragment {
             if (this.firstRun && this.isVisible()) {
                 this.onFirstInvalidate();
             } else {
-                this.parentListener.onNavigationCompleted(this.mBrowser
+                this.mParentOnNavigateListener.onNavigationCompleted(this.mBrowser
                         .getCurrentPath());
             }
             this.title.setOnSequenceClickListener(this.sequenceListener);
@@ -379,7 +389,7 @@ public final class BrowserFragment extends Fragment {
         }
 
         this.scanner = new DirectoryScanTask(mBrowser, mRefreshMenuItem,
-                menuProgress, mAttachedBrowserActivity.getGetContentMimeType(), adapter);
+                mMenuItemProgress, mAttachedBrowserActivity.getGetContentMimeType(), adapter);
         this.scanner.execute(mBrowser.getCurrentPath());
     }
 

@@ -60,7 +60,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Doctoror
  */
-public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
+public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
+        implements OnNavigateListener {
 
     /**
      * Saved fragment state. This saving mechanism is used for restoring
@@ -242,22 +243,17 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity {
         mDrawerToggle.setDrawerIndicatorEnabled(!showUpButton);
     }
 
-    public OnNavigateListener createOnNavigationListener() {
-        return new OnNavigateListener() {
+    @Override
+    public void onNavigate(GenericFile path) {
+        invalidateOptionsMenu();
+    }
 
-            @Override
-            public void onNavigate(GenericFile path) {
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onNavigationCompleted(GenericFile path) {
-                currentPath = path;
-                mBreadCrumbView.setFile(path.toFile());
-                setDrawerIndicatorEnabled(!path.toFile().equals(Environment.rootDirectory));
-                invalidateOptionsMenu();
-            }
-        };
+    @Override
+    public void onNavigationCompleted(GenericFile path) {
+        currentPath = path;
+        mBreadCrumbView.setFile(path.toFile());
+        setDrawerIndicatorEnabled(!path.toFile().equals(Environment.rootDirectory));
+        invalidateOptionsMenu();
     }
 
     @Override
