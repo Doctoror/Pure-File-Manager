@@ -31,7 +31,7 @@ public interface GenericFile extends Serializable {
     boolean isDirectory();
     boolean isHidden();
     boolean isSymlink();
-    boolean renameTo(File newName);
+    boolean renameTo(GenericFile newFile);
     long length();
     long lastModified();
     long getFreeSpace();

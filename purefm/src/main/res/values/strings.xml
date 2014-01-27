@@ -27,14 +27,16 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="close">Close</string>
-    
+
     <string name="remove">Remove</string>
     <string name="search_files">Search files</string>
     <string name="no_results">No Results</string>
-    
+
+    <!-- Rename -->
     <string name="rename">Rename</string>
     <string name="new_name">New Name</string>
-    
+    <string name="toast_rename_failed">Failed to rename &#8216;%1$s&#8217; to &#8216;%2$s&#8217;</string>
+
     <string name="no_apps_to_open">No applications installed to open this file</string>
     <string name="could_not_open_file_">Could open this file:u0020</string>
     
@@ -127,7 +129,7 @@
     <string name="dialog_copy_failed">Failed to copy the following files</string>
     <string name="dialog_move_failed">Failed to move the following files</string>
     <string name="dialog_delete_failed">Failed to delete the following files</string>
-    
+
     <!-- Delete -->
     <string name="dialog_delete_title">The following files will be deleted:</string>
     

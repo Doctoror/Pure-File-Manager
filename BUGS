@@ -1,2 +1,39 @@
 - file picker not working
 - Sometimes can't focus to AbsListView
+- Sometimes when copying (pasting) browser navigates to parent
+
+- Sometimes when switching view type
+
+    java.lang.NullPointerException
+            at android.support.v13.app.FragmentStatePagerAdapter.instantiateItem(FragmentStatePagerAdapter.java:123)
+            at android.support.v4.view.ViewPager.addNewItem(ViewPager.java:832)
+            at android.support.v4.view.ViewPager.populate(ViewPager.java:982)
+            at android.support.v4.view.ViewPager.setCurrentItemInternal(ViewPager.java:550)
+            at android.support.v4.view.ViewPager.setCurrentItemInternal(ViewPager.java:509)
+            at android.support.v4.view.ViewPager.dataSetChanged(ViewPager.java:908)
+            at android.support.v4.view.ViewPager$PagerObserver.onChanged(ViewPager.java:2819)
+            at android.database.DataSetObservable.notifyChanged(DataSetObservable.java:37)
+            at android.support.v4.view.PagerAdapter.notifyDataSetChanged(PagerAdapter.java:276)
+            at com.docd.purefm.browser.BrowserActivity.invalidateList(BrowserActivity.java:220)
+            at com.docd.purefm.browser.MenuController.onMenuItemSelected(MenuController.java:69)
+            at com.docd.purefm.browser.BrowserFragment.onOptionsItemSelected(BrowserFragment.java:262)
+            at android.app.FragmentManagerImpl.dispatchOptionsItemSelected(FragmentManager.java:1974)
+            at android.app.Activity.onMenuItemSelected(Activity.java:2540)
+            at com.docd.purefm.browser.BrowserActivity.onMenuItemSelected(BrowserActivity.java:290)
+            at com.android.internal.policy.impl.PhoneWindow.onMenuItemSelected(PhoneWindow.java:973)
+            at com.android.internal.view.menu.MenuBuilder.dispatchMenuItemSelected(MenuBuilder.java:735)
+            at com.android.internal.view.menu.MenuItemImpl.invoke(MenuItemImpl.java:149)
+            at com.android.internal.view.menu.MenuBuilder.performItemAction(MenuBuilder.java:874)
+            at com.android.internal.view.menu.ActionMenuView.invokeItem(ActionMenuView.java:540)
+            at com.android.internal.view.menu.ActionMenuItemView.onClick(ActionMenuItemView.java:103)
+            at android.view.View.performClick(View.java:4091)
+            at android.view.View$PerformClick.run(View.java:17023)
+            at android.os.Handler.handleCallback(Handler.java:615)
+            at android.os.Handler.dispatchMessage(Handler.java:92)
+            at android.os.Looper.loop(Looper.java:137)
+            at android.app.ActivityThread.main(ActivityThread.java:4967)
+            at java.lang.reflect.Method.invokeNative(Native Method)
+            at java.lang.reflect.Method.invoke(Method.java:511)
+            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:789)
+            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:556)
+            at dalvik.system.NativeStart.main(Native Method)

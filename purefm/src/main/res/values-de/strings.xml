@@ -30,9 +30,12 @@
     <string name="remove">Entfernen</string>
     <string name="search_files">Dateien Suchen</string>
     <string name="no_results">Keine Ergebnisse</string>
-    
+
+    <!-- Rename -->
     <string name="rename">Umbenennen</string>
     <string name="new_name">Neuer Name</string>
+    <!-- TODO traslate to German -->
+    <string name="toast_rename_failed">Failed to rename &#8216;%1$s&#8217; to &#8216;%2$s&#8217;</string>
     
     <string name="no_apps_to_open">Keine App zum öffnen dieser Datei vorhanden</string>
     <string name="could_not_open_file_">Datei konnte nicht geöffnet werden:u0020</string>

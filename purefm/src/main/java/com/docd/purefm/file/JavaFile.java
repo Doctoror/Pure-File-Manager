@@ -298,8 +298,8 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     }
     
     @Override
-    public boolean renameTo(File newName) {
-        return this.file.renameTo(newName);
+    public boolean renameTo(final GenericFile newName) {
+        return this.file.renameTo(newName.toFile());
     }
 
     @Override

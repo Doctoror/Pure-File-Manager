@@ -40,6 +40,11 @@ import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Doctoror
+ *
+ * Task for deleting files
+ */
 public final class DeleteTask extends
         AsyncTask<GenericFile, Void, List<GenericFile>> {
 

@@ -131,7 +131,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
 
         this.mResources = context.getResources();
-        this.mHandler = new FileObserverEventHandler();
+        this.mHandler = new FileObserverEventHandler(this);
         this.mTheme = context.getTheme();
         this.mDataSetObservable = new DataSetObservable();
         this.mObserverCache = FileObserverCache.getInstance();
@@ -520,20 +520,29 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         }
     }
 
-    private final class FileObserverEventHandler extends Handler {
+    private static final class FileObserverEventHandler extends Handler {
 
         static final int MESSAGE_OBSERVER_EVENT = 666;
         static final String DATA_OBSERVER_EVENT = "FileObserverEventHandler.data.OBSERVER_EVENT";
         static final String DATA_OBSERVER_PATH = "FileObserverEventHandler.data.OBSERVER_PATHT";
 
+        private final WeakReference<BrowserBaseAdapter> mAdapterReference;
+
+        private FileObserverEventHandler(BrowserBaseAdapter adapter) {
+            this.mAdapterReference = new WeakReference<BrowserBaseAdapter>(adapter);
+        }
+
         @Override
         public void handleMessage(final Message msg) {
             if (msg.what == MESSAGE_OBSERVER_EVENT) {
                 final Bundle data = msg.getData();
-                onEventUIThread(data.getInt(DATA_OBSERVER_EVENT),
-                        data.getString(DATA_OBSERVER_PATH));
-                if (!hasMessages(MESSAGE_OBSERVER_EVENT)) {
-                    notifyDataSetChanged();
+                final BrowserBaseAdapter adapter = mAdapterReference.get();
+                if (adapter != null) {
+                    adapter.onEventUIThread(data.getInt(DATA_OBSERVER_EVENT),
+                            data.getString(DATA_OBSERVER_PATH));
+                    if (!hasMessages(MESSAGE_OBSERVER_EVENT)) {
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             } else {
                 super.handleMessage(msg);

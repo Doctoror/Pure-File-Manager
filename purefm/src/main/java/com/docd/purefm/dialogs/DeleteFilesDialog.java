@@ -28,6 +28,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.ActionMode;
@@ -82,7 +83,7 @@ public final class DeleteFilesDialog extends DialogFragment {
                 }
                 dialog.dismiss();
                 final DeleteTask task = new DeleteTask(getActivity());
-                task.execute(files);
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, files);
             }
         });
         b.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

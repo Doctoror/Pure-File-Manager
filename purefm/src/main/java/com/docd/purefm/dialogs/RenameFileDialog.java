@@ -14,15 +14,12 @@
  */
 package com.docd.purefm.dialogs;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -31,8 +28,9 @@ import android.widget.Toast;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.utils.MediaStoreUtils;
+import com.docd.purefm.tasks.RenameFileTask;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 public final class RenameFileDialog extends DialogFragment {
@@ -50,13 +48,12 @@ public final class RenameFileDialog extends DialogFragment {
 
         final RenameFileDialog rd = new RenameFileDialog();
         rd.setArguments(extras);
-        rd.mode = mode;
+        rd.mActionMode = mode;
         return rd;
     }
     
-    private ActionMode mode;
-    
-    private GenericFile file;
+    private ActionMode mActionMode;
+    private GenericFile mSource;
 
     @Override
     public void onCreate(Bundle state) {
@@ -65,7 +62,7 @@ public final class RenameFileDialog extends DialogFragment {
         if (args == null) {
             throw new RuntimeException("Arguments must be supplied!");
         }
-        this.file = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
+        this.mSource = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
     }
     
     @Override
@@ -74,7 +71,7 @@ public final class RenameFileDialog extends DialogFragment {
         builder.setTitle(R.string.new_name);
         final EditText text = (EditText) LayoutInflater.from(
                 getActivity()).inflate(R.layout.text_field_filename, null);
-        text.setText(file.getName());
+        text.setText(mSource.getName());
         text.setFilters(PureFMFileUtils.FILENAME_FILTERS);
         builder.setView(text);
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
@@ -96,20 +93,14 @@ public final class RenameFileDialog extends DialogFragment {
                 if (newNameField != null && PureFMFileUtils.isValidFileName(
                         newName = newNameField.toString())) {
 
-                    final GenericFile fileDir = file.getParentFile();
-                    final File target = new File(fileDir.toFile(), newName);
-                    final File source = file.toFile();
-                    if (file.renameTo(target)) {
-                        final List<File> filesCreated = new ArrayList<File>(1);
-                        final List<File> filesDeleted = new ArrayList<File>(1);
-                        filesDeleted.add(source);
-                        filesCreated.add(target);
-                        MediaStoreUtils.deleteFiles(a.getApplicationContext(), filesDeleted);
-                        PureFMFileUtils.requestMediaScanner(a, filesCreated);
+                    if (mActionMode != null) {
+                        mActionMode.finish();
                     }
-                    if (mode != null) {
-                        mode.finish();
-                    }
+
+                    final GenericFile sourceDir = mSource.getParentFile();
+                    new RenameFileTask(a, mSource, FileFactory.newFile(sourceDir.toFile(), newName))
+                            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
                     dialog.dismiss();
                 } else {
                    Toast.makeText(a, R.string.invalid_filename, Toast.LENGTH_SHORT).show();

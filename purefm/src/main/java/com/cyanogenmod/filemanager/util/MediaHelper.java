@@ -12,12 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified by Yaroslav Mytkalyk 2014
  */
 package com.cyanogenmod.filemanager.util;
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.UserHandle;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
@@ -247,6 +251,14 @@ public final class MediaHelper {
     }
 
     private static int myUserId() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return myUserIdJBMR1();
+        }
+        return 0;
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private static int myUserIdJBMR1() {
         try {
             final Method myUserIdMethod = UserHandle.class.getMethod("myUserId");
             myUserIdMethod.setAccessible(true);

@@ -29,7 +29,6 @@ import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
 import com.docd.purefm.commandline.CommandCopyRecursively;
 import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.commandline.CommandListContents;
 import com.docd.purefm.commandline.CommandListFile;
 import com.docd.purefm.commandline.CommandMkdir;
@@ -524,7 +523,7 @@ public final class CommandLineFile implements GenericFile,
     }
 
     @Override
-    public boolean renameTo(final File newName) {
+    public boolean renameTo(final GenericFile newName) {
         final Command move = new CommandMove(this.getAbsolutePath(), newName.getAbsolutePath());
         final boolean result = CommandLine.execute(ShellHolder.getShell(), move);
         if (result) {
