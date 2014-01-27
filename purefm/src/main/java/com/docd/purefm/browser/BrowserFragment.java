@@ -424,7 +424,7 @@ public final class BrowserFragment extends Fragment {
 
         //Don't show progress below actionbar if loading for first time
         final View viewToPass;
-        if (mListView.getVisibility() != View.VISIBLE) {
+        if (mListView == null || mListView.getVisibility() != View.VISIBLE) {
             viewToPass = null;
         } else {
             viewToPass = mProgressBarScanningProgress;
