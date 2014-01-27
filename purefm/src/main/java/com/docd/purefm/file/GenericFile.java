@@ -163,7 +163,7 @@ public interface GenericFile extends Serializable {
      *
      * @return mime type of this file
      */
-    @NotNull
+    @Nullable
     String getMimeType();
 
     /**

@@ -245,7 +245,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @Nullable
     @Override
     public String getMimeType() {
         return this.mMimeType;

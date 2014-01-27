@@ -21,12 +21,6 @@
         android:title="@string/menu_paste"/>
     
     <item
-        android:id="@+id/refresh"
-        android:icon="?attr/action_refresh"
-        android:showAsAction="always"
-        android:title="@string/menu_refresh"/>
-    
-    <item
         android:id="@android:id/content"
         android:showAsAction="ifRoom"
         android:title=""/>
@@ -36,7 +30,6 @@
         android:icon="?attr/action_folder_new"
         android:showAsAction="ifRoom"
         android:title="@string/menu_new_folder"/>
-
 
     <item
         android:id="@+id/menu_file_new"
@@ -98,6 +91,12 @@
         		android:showAsAction="never"/>
         </menu>
     </item>
+
+    <item
+        android:id="@+id/refresh"
+        android:icon="?attr/action_refresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_refresh"/>
     
     <item
         android:id="@+id/menu_partition"

@@ -69,10 +69,6 @@ final class MenuController {
             activity.invalidateList();
             return true;
             
-        case R.id.refresh:
-            browser.invalidate();
-            return true;
-            
         case R.id.menu_search:
             final Intent searchIntent = new Intent(activity, SearchActivity.class);
             searchIntent.putExtra(Extras.EXTRA_PATH, browser.getCurrentPath().getAbsolutePath());
@@ -91,6 +87,10 @@ final class MenuController {
         case R.id.menu_file_new:
             final DialogFragment cf = CreateFileDialog.instantiate(browser.getCurrentPath().toFile());
             cf.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
+            return true;
+
+        case R.id.refresh:
+            browser.invalidate();
             return true;
             
         case R.id.menu_partition:

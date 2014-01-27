@@ -106,7 +106,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @Nullable
     @Override
     public String getMimeType() {
         return this.mimeType;

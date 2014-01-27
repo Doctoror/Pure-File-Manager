@@ -34,7 +34,6 @@ import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ProgressBar;
 
 import com.cyanogenmod.filemanager.util.MediaHelper;
 import com.docd.purefm.R;
@@ -78,11 +77,10 @@ public final class BrowserFragment extends Fragment {
     private OnSequenceClickListener sequenceListener;
 
     private AbsListView mListView;
-    private View mMenuItemProgress;
+    private View mProgressBarScanningProgress;
     private View mainProgress;
 
     private DirectoryScanTask scanner;
-    private MenuItem mRefreshMenuItem;
 
     private boolean refreshFlag;
 
@@ -112,7 +110,6 @@ public final class BrowserFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mMenuItemProgress = new ProgressBar(activity);
 
         if (activity instanceof BrowserActivity) {
             mBrowser = new Browser((BrowserActivity) activity);
@@ -126,7 +123,7 @@ public final class BrowserFragment extends Fragment {
                 if (mParentOnNavigateListener != null) {
                     mParentOnNavigateListener.onNavigate(path);
                 }
-                if (mRefreshMenuItem == null) {
+                if (getView() == null) {
                     refreshFlag = true;
                 } else {
                     startScan();
@@ -234,7 +231,6 @@ public final class BrowserFragment extends Fragment {
             //}
 
             final MenuItem content = menu.findItem(android.R.id.content);
-            this.mRefreshMenuItem = menu.findItem(R.id.refresh);
 
             if (Settings.appearance == Settings.APPEARANCE_LIST) {
                 content.setIcon(ThemeUtils.getDrawable(this.mAttachedBrowserActivity, R.attr.action_view_as_grid))
@@ -266,6 +262,7 @@ public final class BrowserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
+        this.mProgressBarScanningProgress = parent.findViewById(R.id.progress_scanning);
         this.initList(parent);
         return parent;
     }
@@ -425,8 +422,16 @@ public final class BrowserFragment extends Fragment {
             this.scanner.cancel(false);
         }
 
-        this.scanner = new DirectoryScanTask(mBrowser, mRefreshMenuItem,
-                mMenuItemProgress, mAttachedBrowserActivity.getGetContentMimeType(), adapter);
+        //Don't show progress below actionbar if loading for first time
+        final View viewToPass;
+        if (mListView.getVisibility() != View.VISIBLE) {
+            viewToPass = null;
+        } else {
+            viewToPass = mProgressBarScanningProgress;
+        }
+
+        this.scanner = new DirectoryScanTask(mBrowser, viewToPass,
+                mAttachedBrowserActivity.getGetContentMimeType(), adapter);
         this.scanner.execute(mBrowser.getCurrentPath());
     }
 
