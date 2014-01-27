@@ -1,3 +1,4 @@
 Check for free space before file copy
 Implement changing permissions for JavaFile
 Add a separate picker activity
+Remove refresh menu item and replace progressbar in menu to indeterminate progress under actionbar
