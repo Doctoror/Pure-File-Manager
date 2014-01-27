@@ -28,7 +28,9 @@ import java.util.List;
  * @author Doctoror
  */
 public final class CommandLine {
-    
+
+    private static final int EXIT_CODE_SUCCESS = 0;
+
     private CommandLine() {}
 
     @Nullable
@@ -49,8 +51,8 @@ public final class CommandLine {
 
             @Override
             public void commandCompleted(int i, int exitCode) {
-                status.finished = true;
                 status.exitCode = exitCode;
+                status.finished = true;
                 command.notify();
             }
         });
@@ -66,7 +68,7 @@ public final class CommandLine {
                     }
                 }
             }
-            if (status.exitCode == 0) {
+            if (status.exitCode == EXIT_CODE_SUCCESS) {
                 return result;
             }
         } catch (IOException e) {
@@ -91,8 +93,8 @@ public final class CommandLine {
 
             @Override
             public void commandCompleted(int id, int exitCode) {
-                status.finished = true;
                 status.exitCode = exitCode;
+                status.finished = true;
                 command.notify();
             }
         });
@@ -108,7 +110,7 @@ public final class CommandLine {
                     }
                 }
             }
-            return status.exitCode == 0;
+            return status.exitCode == EXIT_CODE_SUCCESS;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -120,7 +122,7 @@ public final class CommandLine {
     }
 
     private static final class ExecutionStatus {
-        int exitCode;
+        int exitCode = -1;
         boolean finished;
     }
 

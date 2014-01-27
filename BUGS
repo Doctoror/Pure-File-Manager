@@ -1,7 +1,5 @@
 - file picker not working
 - Sometimes can't focus to AbsListView
-- Sometimes when copying (pasting) browser navigates to parent
-
 - Sometimes when switching view type
 
     java.lang.NullPointerException

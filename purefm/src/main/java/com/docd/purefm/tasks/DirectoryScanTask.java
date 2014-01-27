@@ -77,7 +77,7 @@ public final class DirectoryScanTask extends
     @Override
     protected void onCancelled(GenericFile[] result) {
         super.onCancelled(result);
-        this.browser.onScanCancelled();
+        this.browser.onScanCancelled(false);
         this.makeVisible();
     }
 

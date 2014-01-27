@@ -48,7 +48,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             FileObserver.MOVE_SELF;
 
     private static Handler handler;
-    private Context mContext;
+    private final Context mContext;
 
     public interface OnNavigateListener {
         void onNavigate(GenericFile path);
@@ -145,10 +145,21 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
     }
     
-    public void onScanCancelled() {
-        if (mPreviousPath != null) {
+    public void onScanCancelled(final boolean navigateToPrevious) {
+        if (navigateToPrevious && mPreviousPath != null) {
             mCurrentPath = this.mPreviousPath;
         }
+    }
+
+    public boolean goBack(final boolean invalidate) {
+        if (mPreviousPath != null) {
+            mCurrentPath = this.mPreviousPath;
+            if (invalidate) {
+                invalidate();
+            }
+            return true;
+        }
+        return false;
     }
 
     private GenericFile resolveExistingParent(final GenericFile file) {
@@ -199,12 +210,9 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory)) {
             return;
         }
-        final String parent = this.mCurrentPath.getParent();
-        if (parent != null) {
-            final GenericFile p = FileFactory.newFile(parent);
-            this.mHistory.push(p);
-            this.navigate(p, true);
-        }
+        final GenericFile parent = resolveExistingParent(mCurrentPath);
+        this.mHistory.push(parent);
+        this.navigate(parent, true);
     }
     
     public void invalidate() {
@@ -220,6 +228,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     @Override
     public void onEvent(int event, String pathString) {
         switch (event & FileObserver.ALL_EVENTS) {
+            case FileObserver.MOVE_SELF:
             case FileObserver.DELETE_SELF:
                 handler.removeCallbacks(mLastRunnable);
                 final GenericFile parent = resolveExistingParent(mCurrentPath);
@@ -227,7 +236,6 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                         Browser.this, parent, true));
                 break;
 
-            case FileObserver.MOVE_SELF:
             case FileObserver.CREATE:
             case FileObserver.MOVED_TO:
                 handler.removeCallbacks(mLastRunnable);

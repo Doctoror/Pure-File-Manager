@@ -18,47 +18,54 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.StatFs;
 
+/**
+ * Backward compatible version of {@link StatFs}
+ */
 public final class StatFsCompat {
-    private StatFsCompat() {}
-    
+
+    private final StatFs mStatFs;
+
+    public StatFsCompat(final String path) {
+        this.mStatFs = new StatFs(path);
+    }
+
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")
-    public static long getAvailableBlocksLong(final StatFs statFs) {
+    public long getAvailableBlocksLong() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return statFs.getAvailableBlocksLong();
+            return mStatFs.getAvailableBlocksLong();
         } else {
-            
-            return statFs.getAvailableBlocks();
+            return mStatFs.getAvailableBlocks();
         }
     }
-    
+
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")
-    public static long getBlockCountLong(final StatFs statFs) {
+    public long getBlockCountLong() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return statFs.getBlockCountLong();
+            return mStatFs.getBlockCountLong();
         } else {
-            return statFs.getBlockCount();
+            return mStatFs.getBlockCount();
         }
     }
-    
+
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")
-    public static long getBlockSizeLong(final StatFs statFs) {
+    public long getBlockSizeLong() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return statFs.getBlockSizeLong();
+            return mStatFs.getBlockSizeLong();
         } else {
-            return statFs.getBlockSize();
+            return mStatFs.getBlockSize();
         }
     }
-    
+
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")
-    public static long getFreeBlocksLong(final StatFs statFs) {
+    public long getFreeBlocksLong() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return statFs.getFreeBlocksLong();
+            return mStatFs.getFreeBlocksLong();
         } else {
-            return statFs.getFreeBlocks();
+            return mStatFs.getFreeBlocks();
         }
     }
 }

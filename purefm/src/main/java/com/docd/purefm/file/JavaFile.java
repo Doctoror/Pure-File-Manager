@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.docd.purefm.utils.MimeTypes;
 
@@ -30,50 +32,58 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
 
     private static final long serialVersionUID = -2117911719748590982L;
     
-    private final File file;
+    private final File mFile;
     private final Permissions p;
     private final boolean isSymlink; 
     private final String mimeType;
 
     public JavaFile(File file) {
-        this.file = file;
+        this.mFile = file;
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
     }
     
     public JavaFile(File dir, String name) {
-        this.file = new File(dir, name);
+        this.mFile = new File(dir, name);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
-        this.mimeType = MimeTypes.getMimeType(file);
+        this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
     public JavaFile(String dirPath, String name) {
-        this.file = new File(dirPath, name);
+        this.mFile = new File(dirPath, name);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
-        this.mimeType = MimeTypes.getMimeType(file);
+        this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
     public JavaFile(String path) {
-        this.file = new File(path);
+        this.mFile = new File(path);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
-        this.mimeType = MimeTypes.getMimeType(file);
+        this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
     public JavaFile(URI uri) {
-        this.file = new File(uri);
+        this.mFile = new File(uri);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
-        this.mimeType = MimeTypes.getMimeType(file);
+        this.mimeType = MimeTypes.getMimeType(mFile);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     private Permissions readPermissions() {
-        return new Permissions(this.file.canRead(), this.file.canWrite(), this.file.canExecute());
+        return new Permissions(this.mFile.canRead(), this.mFile.canWrite(), this.mFile.canExecute());
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     private JavaFile[] convert(final File[] files) {
         if (files == null) {
             return null;
@@ -84,42 +94,66 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         }
         return res;
     }
-    
+
     private boolean detectSymlink() {
         try {
-            return FileUtils.isSymlink(this.file);
+            return FileUtils.isSymlink(this.mFile);
         } catch (IOException e) {
             return false;
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getMimeType() {
         return this.mimeType;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSymlink() {
         return this.isSymlink;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isHidden() {
-        return this.file.isHidden();
-    }
-    
-    @Override
-    public File toFile() {
-        return this.file;
+        return this.mFile.isHidden();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    public File toFile() {
+        return this.mFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean copy(GenericFile target) {
         try {
-            if (this.file.isDirectory()) {
-                FileUtils.copyDirectoryToDirectory(this.file, target.toFile());
+            if (this.mFile.isDirectory()) {
+                if (target.exists() && !target.isDirectory()) {
+                    return false;
+                }
+                FileUtils.copyDirectoryToDirectory(this.mFile, target.toFile());
             } else {
-                FileUtils.copyFileToDirectory(this.file, target.toFile());
+                if (target.isDirectory()) {
+                    FileUtils.copyFileToDirectory(this.mFile, target.toFile());
+                } else {
+                    FileUtils.copyFile(this.mFile, target.toFile());
+                }
             }
             return true;
         } catch (IOException e) {
@@ -127,52 +161,81 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean move(GenericFile target) {
         try {
-            if (this.file.isDirectory()) {
-                FileUtils.moveDirectoryToDirectory(this.file, target.toFile(), false);
+            if (this.mFile.isDirectory()) {
+                if (target.exists() && !target.isDirectory()) {
+                    return false;
+                }
+                FileUtils.moveDirectoryToDirectory(this.mFile, target.toFile(), false);
             } else {
-                FileUtils.moveFileToDirectory(this.file, target.toFile(), false);
+                if (target.isDirectory()) {
+                    FileUtils.moveFileToDirectory(this.mFile, target.toFile(), false);
+                } else {
+                    FileUtils.moveFile(this.mFile, target.toFile());
+                }
             }
             return true;
         } catch (IOException e) {
             return false;
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean delete() {
-        if (this.file.isDirectory()) {
+        if (this.mFile.isDirectory()) {
             try {
-                FileUtils.deleteDirectory(this.file);
+                FileUtils.deleteDirectory(this.mFile);
                 return true;
             } catch (IOException e) {
                 return false;
             }
         } else {
-            return this.file.delete();
+            return this.mFile.delete();
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public JavaFile[] listFiles() {
-        return convert(this.file.listFiles());
+        return convert(this.mFile.listFiles());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public JavaFile[] listFiles(final FileFilter filter) {
-        return convert(this.file.listFiles(filter));
+        return convert(this.mFile.listFiles(filter));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public JavaFile[] listFiles(final FilenameFilter filter) {
-        return convert(this.file.listFiles(filter));
+        return convert(this.mFile.listFiles(filter));
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public JavaFile[] listFiles(final GenericFileFilter filter) {
-        final File[] files = this.file.listFiles(); 
+        final File[] files = this.mFile.listFiles();
         if (files == null) {
             return null;
         }
@@ -193,38 +256,57 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public String[] list() {
-        return this.file.list();
+        return this.mFile.list();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long length() {
-        return this.file.length();
+        return this.mFile.length();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long lastModified() {
-        return this.file.lastModified();
+        return this.mFile.lastModified();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createNewFile() {
         try {
-            return this.file.createNewFile();
+            return this.mFile.createNewFile();
         } catch (IOException e) {
             return false;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean mkdir() {
-        return this.file.mkdir();
+        return this.mFile.mkdir();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean mkdirs() {
-        return this.file.mkdirs();
+        return this.mFile.mkdirs();
     }
 
     /**
@@ -234,82 +316,142 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      */
     @Override
     public int compareTo(GenericFile arg0) {
-        return this.file.compareTo(arg0.toFile());
+        return this.mFile.compareTo(arg0.toFile());
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getName() {
-        return this.file.getName();
+        return this.mFile.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getPath() {
-        return this.file.getPath();
+        return this.mFile.getPath();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getAbsolutePath() {
-        return this.file.getAbsolutePath();
+        return this.mFile.getAbsolutePath();
     }
-    
-    @Override
-    public String getCanonicalPath() {
-        try {
-            return this.file.getCanonicalPath();
-        } catch (IOException e) {
-            return null;
-        }
-    }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
         if (obj instanceof JavaFile) {
-            return ((JavaFile) obj).file.equals(this.file);
+            return ((JavaFile) obj).mFile.equals(this.mFile);
         }
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getFreeSpace() {
-        return this.file.getFreeSpace();
+        return this.mFile.getFreeSpace();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getTotalSpace() {
-        return this.file.getTotalSpace();
+        return this.mFile.getTotalSpace();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public String getParent() {
-        return this.file.getParent();
+        return this.mFile.getParent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public JavaFile getParentFile() {
-        return new JavaFile(this.file.getParentFile());
+        final File parent = this.mFile.getParentFile();
+        if (parent == null) {
+            return null;
+        }
+        return new JavaFile(parent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isDirectory() {
-        return this.file.isDirectory();
-    }
-    
-    @Override
-    public boolean renameTo(final GenericFile newName) {
-        return this.file.renameTo(newName.toFile());
+        return this.mFile.isDirectory();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean renameTo(final GenericFile newName) {
+        return this.mFile.renameTo(newName.toFile());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public Permissions getPermissions() {
         return this.p;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean exists() {
-        return this.file.exists();
+        return this.mFile.exists();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canRead() {
+        return this.mFile.canRead();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canWrite() {
+        return this.mFile.canWrite();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canExecute() {
+        return this.mFile.canExecute();
+    }
 }

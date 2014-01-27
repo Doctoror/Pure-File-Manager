@@ -17,13 +17,13 @@ package com.docd.purefm.file;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
@@ -45,8 +45,6 @@ public final class CommandLineFile implements GenericFile,
         Comparable<GenericFile> {
 
     private static final long serialVersionUID = -8173533665283968040L;
-
-    private static final String FS_ROOT_PERMISSIONS = "drwxr-xr-x";
 
     private static final int LS_PERMISSIONS = 0;
     // private static final int LS_NUMLINKS = 1;
@@ -86,6 +84,9 @@ public final class CommandLineFile implements GenericFile,
         this.mFile = new File(parent, line);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSymlink() {
         return this.mIsSymlink;
@@ -93,17 +94,6 @@ public final class CommandLineFile implements GenericFile,
 
     @NotNull
     public static CommandLineFile fromFile(File file) {
-        if (file.equals(File.listRoots()[0])) {
-            final CommandLineFile f = new CommandLineFile(file);
-            f.mOwner = 0;
-            f.mGroup = 0;
-            f.mPermissions = new Permissions(FS_ROOT_PERMISSIONS);
-            f.mIsDirectory = true;
-            f.mIsSymlink = false;
-            f.mExists = true;
-            return f;
-        }
-
         final List<String> res = CommandLine.executeForResult(ShellHolder.getShell(), new CommandListFile(file));
 
         if (res == null || res.isEmpty()) {
@@ -142,6 +132,7 @@ public final class CommandLineFile implements GenericFile,
         return f;
     }
 
+    @NotNull
     private static String[] getAttrs(String string) {
         if (string.length() < 44) {
             throw new IllegalArgumentException("Bad ls -lApe output: " + string);
@@ -251,21 +242,35 @@ public final class CommandLineFile implements GenericFile,
         this.mIsDirectory = other.mIsDirectory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getMimeType() {
         return this.mMimeType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean exists() {
         return this.mExists;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public File toFile() {
         return this.mFile;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean delete() {
         if (CommandLine.execute(ShellHolder.getShell(), new CommandRemove(this.mFile))) {
@@ -281,6 +286,10 @@ public final class CommandLineFile implements GenericFile,
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public CommandLineFile[] listFiles() {
         final List<String> result = CommandLine.executeForResult(
@@ -303,6 +312,10 @@ public final class CommandLineFile implements GenericFile,
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public CommandLineFile[] listFiles(final FileFilter filter) {
         if (filter == null) {
@@ -330,6 +343,10 @@ public final class CommandLineFile implements GenericFile,
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public CommandLineFile[] listFiles(final FilenameFilter filter) {
         if (filter == null) {
@@ -356,7 +373,11 @@ public final class CommandLineFile implements GenericFile,
         res.toArray(ret);
         return ret;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public CommandLineFile[] listFiles(final GenericFileFilter filter) {
         if (filter == null) {
@@ -384,28 +405,41 @@ public final class CommandLineFile implements GenericFile,
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public String[] list() {
         final List<String> res = CommandLine.executeForResult(
                 ShellHolder.getShell(), new CommandListContents(mFile));
         if (res != null) {
-            final String[] resul = new String[res.size()];
-            res.toArray(resul);
-            return resul;
+            final String[] result = new String[res.size()];
+            res.toArray(result);
+            return result;
         }
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long length() {
         return this.mLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long lastModified() {
         return this.mLastmod;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean createNewFile() {
         if (this.mExists) {
@@ -420,6 +454,9 @@ public final class CommandLineFile implements GenericFile,
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean mkdir() {
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
@@ -430,6 +467,9 @@ public final class CommandLineFile implements GenericFile,
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean mkdirs() {
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
@@ -452,30 +492,36 @@ public final class CommandLineFile implements GenericFile,
         return this.mFile.compareTo(arg0.toFile());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getName() {
         return this.mFile.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getPath() {
         return this.mFile.getPath();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public String getAbsolutePath() {
         return this.mFile.getAbsolutePath();
     }
 
-    @Override
-    public String getCanonicalPath() {
-        try {
-            return this.mFile.getCanonicalPath();
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -487,41 +533,70 @@ public final class CommandLineFile implements GenericFile,
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return this.mFile.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getFreeSpace() {
         return this.mFile.getFreeSpace();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getTotalSpace() {
         return this.mFile.getTotalSpace();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getParent() {
         return this.mFile.getParent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public CommandLineFile getParentFile() {
-        return CommandLineFile.fromFile(this.mFile.getParentFile());
+        final File parentFile = mFile.getParentFile();
+        if (parentFile == null) {
+            return null;
+        }
+        return CommandLineFile.fromFile(parentFile);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isDirectory() {
         return this.mIsDirectory;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isHidden() {
-        return this.mFile.isHidden();
+        return this.mFile.isHidden() || getName().startsWith(".");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean renameTo(final GenericFile newName) {
         final Command move = new CommandMove(this.getAbsolutePath(), newName.getAbsolutePath());
@@ -536,12 +611,22 @@ public final class CommandLineFile implements GenericFile,
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     @Override
     public Permissions getPermissions() {
         return this.mPermissions;
     }
-    
-    public boolean applyPermissions(Permissions newPerm) {
+
+    /**
+     * Applies permissions to the file
+     *
+     * @param newPerm Permissions to apply
+     * @return true, if the permissions was applied
+     */
+    public boolean applyPermissions(final Permissions newPerm) {
         if (this.mPermissions.equals(newPerm)) {
             return true;
         }
@@ -553,6 +638,9 @@ public final class CommandLineFile implements GenericFile,
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean copy(final GenericFile target) {
         if (!this.mExists) {
@@ -562,6 +650,9 @@ public final class CommandLineFile implements GenericFile,
                 new CommandCopyRecursively(this, target));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean move(final GenericFile target) {
         if (!this.mExists) {
@@ -579,15 +670,29 @@ public final class CommandLineFile implements GenericFile,
         }
         return result;
     }
-    
+
+    /**
+     * Returns owner id of this file
+     *
+     * @return owner id of this file
+     */
     public int getOwner() {
         return this.mOwner;
     }
-    
+
+    /**
+     * Returns group id of this file
+     *
+     * @return group id of this file
+     */
     public int getGroup() {
         return this.mGroup;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean canRead() {
         if (!this.mExists) {
             return false;
@@ -598,14 +703,22 @@ public final class CommandLineFile implements GenericFile,
         return this.mPermissions.or;
     }
 
-    protected boolean canWrite() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canWrite() {
         if (this.mGroup == Constants.GID_SDCARD) {
             return this.mPermissions.gw;
         }
         return this.mPermissions.ow;
     }
 
-    protected boolean canExecute() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canExecute() {
         if (!this.mExists) {
             return false;
         }
@@ -615,6 +728,9 @@ public final class CommandLineFile implements GenericFile,
         return this.mPermissions.ox;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return getAbsolutePath();
