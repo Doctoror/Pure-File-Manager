@@ -15,6 +15,7 @@
 package com.docd.purefm.browser;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -86,38 +87,47 @@ public final class ActionModeController {
             activity.getMenuInflater().inflate(
                     R.menu.browser_contextual, menu);
 
-
+            final SparseBooleanArray items = list.getCheckedItemPositions();
             final int checkedCount = list.getCheckedItemCount();
+            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+            final ArrayList<GenericFile> toShare = new ArrayList<GenericFile>(checkedCount);
+            for (int i = 0; i < items.size(); i++) {
+                final int key = items.keyAt(i);
+                if (items.get(key)) {
+                    final GenericFile selected = (GenericFile) list.getAdapter().getItem(key);
+                    if (!selected.isDirectory()) {
+                        toShare.add(selected);
+                    }
+                    break;
+                }
+            }
+
+            if (toShare.isEmpty()) {
+                menu.removeItem(R.id.menu_share);
+            } else if (toShare.size() == 1) {
+                final File selectedFile = toShare.get(0).toFile();
+                shareIntent.setDataAndType(Uri.fromFile(selectedFile),
+                        MimeTypes.getMimeType(selectedFile));
+                final MenuItem share = menu.findItem(R.id.menu_share);
+                ((ShareActionProvider) share.getActionProvider())
+                        .setShareIntent(shareIntent);
+            } else {
+                final ArrayList<Uri> uris = new ArrayList<Uri>(toShare.size());
+                for (final GenericFile file : toShare) {
+                    uris.add(Uri.fromFile(file.toFile()));
+                }
+                shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                final MenuItem share = menu.findItem(R.id.menu_share);
+                ((ShareActionProvider) share.getActionProvider())
+                        .setShareIntent(shareIntent);
+            }
+
             if (checkedCount > 1) {
                 menu.removeItem(android.R.id.edit);
                 menu.removeItem(R.id.properties);
-                menu.removeItem(R.id.menu_share);
-            } else if (checkedCount == 1) {
-                GenericFile selected = null;
-                final SparseBooleanArray items = list.getCheckedItemPositions();
-                for (int i = 0; i < items.size(); i++) {
-                    final int key = items.keyAt(i);
-                    if (items.get(key)) {
-                        selected = (GenericFile) list.getAdapter().getItem(key);
-                        break;
-                    }
-                }
-                if (selected == null) {
-                    Log.w("ActionModeController", "Can't find selected file");
-                } else {
-                    if (selected.isDirectory()) {
-                        menu.removeItem(R.id.menu_share);
-                    } else {
-                        final File selectedFile = selected.toFile();
-                        final Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                        shareIntent.setDataAndType(Uri.fromFile(selectedFile),
-                                MimeTypes.getMimeType(selectedFile));
-                        final MenuItem share = menu.findItem(R.id.menu_share);
-                        ((ShareActionProvider) share.getActionProvider())
-                                .setShareIntent(shareIntent);
-                    }
-                }
             }
+
             return true;
         }
 
