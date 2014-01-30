@@ -30,7 +30,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.dialogs.MessageDialog;
+import com.docd.purefm.ui.dialogs.MessageDialog;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;

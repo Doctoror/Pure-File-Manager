@@ -24,7 +24,6 @@
         <item name="action_folder_new">@drawable/holo_light_action_folder_new</item>
         <item name="action_info">@drawable/holo_light_action_info</item>
         <item name="action_paste">@drawable/holo_light_action_paste</item>
-        <item name="action_refresh">@drawable/holo_light_action_refresh</item>
         <item name="action_remove">@drawable/holo_light_action_remove</item>
         <item name="action_search">@drawable/holo_light_action_search</item>
         <item name="action_settings">@drawable/holo_light_action_settings</item>
@@ -53,7 +52,6 @@
         <item name="action_folder_new">@drawable/holo_dark_action_folder_new</item>
         <item name="action_info">@drawable/holo_dark_action_info</item>
         <item name="action_paste">@drawable/holo_dark_action_paste</item>
-        <item name="action_refresh">@drawable/holo_dark_action_refresh</item>
         <item name="action_remove">@drawable/holo_dark_action_remove</item>
         <item name="action_search">@drawable/holo_dark_action_search</item>
         <item name="action_settings">@drawable/holo_dark_action_settings</item>

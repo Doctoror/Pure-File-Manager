@@ -40,7 +40,6 @@
     <string name="no_apps_to_open">Keine App zum öffnen dieser Datei vorhanden</string>
     <string name="could_not_open_file_">Datei konnte nicht geöffnet werden:u0020</string>
     
-    <string name="menu_refresh">Neu Laden</string>
     <string name="menu_partition">Speicher Info</string>
     <string name="menu_search">Suchen</string>
     <string name="menu_bookmarks">Lesezeichen</string>

@@ -21,7 +21,6 @@
     <attr name="action_folder_new" format="reference" />
     <attr name="action_info" format="reference" />
     <attr name="action_paste" format="reference" />
-    <attr name="action_refresh" format="reference" />
     <attr name="action_remove" format="reference" />
     <attr name="action_search" format="reference" />
     <attr name="action_settings" format="reference" />

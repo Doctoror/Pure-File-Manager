@@ -15,7 +15,6 @@
 package com.docd.purefm.tasks;
 
 import android.os.AsyncTask;
-import android.view.View;
 
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.browser.Browser;
@@ -24,39 +23,39 @@ import com.docd.purefm.file.GenericFileFilter;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MimeTypes;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+
 public final class DirectoryScanTask extends
         AsyncTask<GenericFile, Void, GenericFile[]> {
 
-    private static final ListFileFilter filter;
+    private static final ListFileFilter sFilter;
     private final BrowserBaseAdapter mBrowserAdapter;
     
     private final Browser mBrowser;
-    private final View mProgressView;
+    private final PullToRefreshLayout mPullToRefreshLayout;
     
     private GenericFile file;
     
     static {
-        filter = new ListFileFilter();
+        sFilter = new ListFileFilter();
     }
 
-    public DirectoryScanTask(Browser browser, View progress, String mimeType, BrowserBaseAdapter adapter) {
+    public DirectoryScanTask(Browser browser, PullToRefreshLayout layout, String mimeType, BrowserBaseAdapter adapter) {
         this.mBrowser = browser;
-        this.mProgressView = progress;
+        this.mPullToRefreshLayout = layout;
         this.mBrowserAdapter = adapter;
-        filter.setMimeType(mimeType);
+        sFilter.setMimeType(mimeType);
     }
-    
+
     @Override
     protected void onPreExecute() {
-        if (mProgressView != null) {
-            mProgressView.setVisibility(View.VISIBLE);
-        }
+        mPullToRefreshLayout.setRefreshing(true);
     }
 
     @Override
     protected GenericFile[] doInBackground(GenericFile... arg0) {
         this.file = arg0[0];
-        return arg0[0].listFiles(filter);
+        return arg0[0].listFiles(sFilter);
     }
 
     @Override
@@ -64,18 +63,14 @@ public final class DirectoryScanTask extends
         super.onPostExecute(result);
         mBrowserAdapter.updateData(result);
         mBrowser.onScanFinished(this.file);
-        if (mProgressView != null) {
-            mProgressView.setVisibility(View.INVISIBLE);
-        }
+        mPullToRefreshLayout.setRefreshComplete();
     }
 
     @Override
     protected void onCancelled(GenericFile[] result) {
         super.onCancelled(result);
         mBrowser.onScanCancelled(false);
-        if (mProgressView != null) {
-            mProgressView.setVisibility(View.INVISIBLE);
-        }
+        mPullToRefreshLayout.setRefreshComplete();
     }
 
     private static final class ListFileFilter implements GenericFileFilter {

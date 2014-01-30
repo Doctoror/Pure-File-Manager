@@ -91,12 +91,6 @@
         		android:showAsAction="never"/>
         </menu>
     </item>
-
-    <item
-        android:id="@+id/refresh"
-        android:icon="?attr/action_refresh"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_refresh"/>
     
     <item
         android:id="@+id/menu_partition"

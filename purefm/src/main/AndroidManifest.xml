@@ -57,7 +57,7 @@
         </activity>
 
         <activity
-            android:name=".activities.SearchActivity"
+            android:name=".ui.activities.SearchActivity"
             android:label="@string/menu_search"
             android:logo="?attr/action_search"
             android:parentActivityName=".browser.BrowserActivity"

@@ -15,7 +15,7 @@
 package com.docd.purefm.settings;
 
 import com.docd.purefm.R;
-import com.docd.purefm.activities.SuperuserActionBarMonitoredActivity;
+import com.docd.purefm.ui.activities.SuperuserActionBarMonitoredActivity;
 
 import android.app.ActionBar;
 import android.app.Activity;

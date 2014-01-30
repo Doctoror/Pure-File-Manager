@@ -21,7 +21,6 @@ import java.util.LinkedList;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.os.AsyncTask;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -29,7 +28,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandExists;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.dialogs.FileExistsDialog;
+import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ClipBoard;

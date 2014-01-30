@@ -16,12 +16,12 @@ package com.docd.purefm.browser;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.activities.SearchActivity;
+import com.docd.purefm.ui.activities.SearchActivity;
 import com.docd.purefm.settings.SettingsActivity;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
-import com.docd.purefm.dialogs.CreateDirectoryDialog;
-import com.docd.purefm.dialogs.CreateFileDialog;
-import com.docd.purefm.dialogs.PartitionInfoDialog;
+import com.docd.purefm.ui.dialogs.CreateDirectoryDialog;
+import com.docd.purefm.ui.dialogs.CreateFileDialog;
+import com.docd.purefm.ui.dialogs.PartitionInfoDialog;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.PasteTaskExecutor;
 import com.docd.purefm.utils.FileSortType;
@@ -87,10 +87,6 @@ final class MenuController {
         case R.id.menu_file_new:
             final DialogFragment cf = CreateFileDialog.instantiate(browser.getCurrentPath().toFile());
             cf.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
-            return true;
-
-        case R.id.refresh:
-            browser.invalidate();
             return true;
             
         case R.id.menu_partition:

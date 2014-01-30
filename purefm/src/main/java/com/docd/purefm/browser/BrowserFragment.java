@@ -15,7 +15,6 @@
 package com.docd.purefm.browser;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -45,6 +44,7 @@ import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.DirectoryScanTask;
+import com.docd.purefm.ui.fragments.UserVisibleHintFragment;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.ThemeUtils;
@@ -56,11 +56,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 /**
  * Fragment manages file List, menu and ActionMode.
  * @author Doctoror
  */
-public final class BrowserFragment extends Fragment {
+public final class BrowserFragment extends UserVisibleHintFragment
+        implements OnRefreshListener {
 
     private static final String STATE_BROWSER = "BrowserFragment.state.mBrowser";
 
@@ -73,11 +78,11 @@ public final class BrowserFragment extends Fragment {
     private BrowserBaseAdapter adapter;
     private OnNavigateListener mParentOnNavigateListener;
 
-    private BreadCrumbTextView title;
+    private BreadCrumbTextView bBreadCrumbView;
     private OnSequenceClickListener sequenceListener;
 
+    private PullToRefreshLayout mPullToRefreshLayout;
     private AbsListView mListView;
-    private View mProgressBarScanningProgress;
     private View mainProgress;
 
     private DirectoryScanTask scanner;
@@ -91,7 +96,6 @@ public final class BrowserFragment extends Fragment {
 
     private int mPrevId;
     private boolean firstRun;
-    private boolean isVisible;
 
     private void ensureGridViewColumns(Configuration config) {
         if (this.mListView instanceof GridView) {
@@ -123,10 +127,10 @@ public final class BrowserFragment extends Fragment {
                 if (mParentOnNavigateListener != null) {
                     mParentOnNavigateListener.onNavigate(path);
                 }
-                if (getView() == null) {
-                    refreshFlag = true;
-                } else {
+                if (isResumedAndVisible()) {
                     startScan();
+                } else {
+                    refreshFlag = true;
                 }
             }
 
@@ -135,8 +139,11 @@ public final class BrowserFragment extends Fragment {
                 if (mainProgress.getVisibility() == View.VISIBLE) {
                     mainProgress.setVisibility(View.GONE);
                 }
-                if (firstRun && isVisible) {
+                if (firstRun) {
                     firstRun = false;
+                }
+                if (refreshFlag) {
+                    refreshFlag = false;
                 }
                 if (mParentOnNavigateListener != null) {
                     mParentOnNavigateListener.onNavigationCompleted(path);
@@ -174,7 +181,7 @@ public final class BrowserFragment extends Fragment {
 
     public void restoreManualState(final Bundle state) {
         if (state != null) {
-            state.setClassLoader(getClass().getClassLoader());
+            state.setClassLoader(BrowserFragment.class.getClassLoader());
             final BrowserFragment.SavedState savedState = state.getParcelable(STATE_BROWSER);
             if (savedState != null) {
                 if (savedState.mBrowserState != null) {
@@ -210,11 +217,7 @@ public final class BrowserFragment extends Fragment {
         actionModeController.setListView(mListView);
         mParentOnNavigateListener = mAttachedBrowserActivity;
 
-        this.title = this.mAttachedBrowserActivity.getTitleView();
-        if (this.isVisible() && this.isAdded() && this.isVisible) {
-            this.title.setOnSequenceClickListener(this.sequenceListener);
-        }
-
+        bBreadCrumbView = this.mAttachedBrowserActivity.getTitleView();
         mBrowser.restoreState(mBrowserInitialState);
         mBrowserInitialState = null;
     }
@@ -245,11 +248,6 @@ public final class BrowserFragment extends Fragment {
             if (ClipBoard.isEmpty()) {
                 menu.removeItem(android.R.id.paste);
             }
-
-            if (refreshFlag) {
-                refreshFlag = false;
-                startScan();
-            }
         }
     }
 
@@ -262,7 +260,7 @@ public final class BrowserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
-        this.mProgressBarScanningProgress = parent.findViewById(R.id.progress_scanning);
+        this.mPullToRefreshLayout = (PullToRefreshLayout) parent.findViewById(R.id.pullToRefreshLayout);
         this.initList(parent);
         return parent;
     }
@@ -368,52 +366,46 @@ public final class BrowserFragment extends Fragment {
     }
 
     @Override
-    public void setUserVisibleHint(final boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && this.isAdded()) {
-            if (this.firstRun && this.isVisible()) {
-                this.onFirstInvalidate();
-            } else {
-                this.mParentOnNavigateListener.onNavigationCompleted(this.mBrowser
-                        .getCurrentPath());
-            }
-            this.title.setOnSequenceClickListener(this.sequenceListener);
-            this.mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
+    protected void onVisible() {
+        invalidatePullToRefresh();
+        if (this.firstRun || this.refreshFlag) {
+            onFirstInvalidate();
         } else {
-            if (this.actionModeController != null) {
-                this.actionModeController.finishActionMode();
-            }
+            mParentOnNavigateListener.onNavigationCompleted(this.mBrowser
+                    .getCurrentPath());
         }
-        this.isVisible = isVisibleToUser;
+        bBreadCrumbView.setOnSequenceClickListener(this.sequenceListener);
+        mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (this.firstRun && this.isVisible) {
-            if (this.isAdded()) {
-                this.mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
-            }
-            this.onFirstInvalidate();
+    protected void onInvisible() {
+        if (this.actionModeController != null) {
+            this.actionModeController.finishActionMode();
         }
-    }
-
-    @Override
-    public void onStop() {
         if (this.scanner != null
                 && this.scanner.getStatus() == AsyncTask.Status.RUNNING) {
             this.scanner.cancel(false);
         }
-        this.actionModeController.finishActionMode();
-        super.onStop();
     }
 
-    private int getNewId(View parent) {
-        this.mPrevId++;
-        while (parent.findViewById(this.mPrevId) != null) {
-            this.mPrevId++;
+    private void invalidatePullToRefresh() {
+        if (mPullToRefreshLayout != null) {
+            ActionBarPullToRefresh.from(getActivity())
+                    .theseChildrenArePullable(mListView, mListView.getEmptyView())
+                    .listener(this)
+                    .setup(mPullToRefreshLayout);
         }
-        return this.mPrevId;
+    }
+
+    /**
+     * Called from PullToRefresh
+     */
+    @Override
+    public void onRefreshStarted(View view) {
+        if (mBrowser != null) {
+            mBrowser.invalidate();
+        }
     }
 
     private void startScan() {
@@ -422,17 +414,17 @@ public final class BrowserFragment extends Fragment {
             this.scanner.cancel(false);
         }
 
-        //Don't show progress below actionbar if loading for first time
-        final View viewToPass;
-        if (mListView == null || mListView.getVisibility() != View.VISIBLE) {
-            viewToPass = null;
-        } else {
-            viewToPass = mProgressBarScanningProgress;
-        }
-
-        this.scanner = new DirectoryScanTask(mBrowser, viewToPass,
+        this.scanner = new DirectoryScanTask(mBrowser, mPullToRefreshLayout,
                 mAttachedBrowserActivity.getGetContentMimeType(), adapter);
         this.scanner.execute(mBrowser.getCurrentPath());
+    }
+
+    private int getNewId(View parent) {
+        this.mPrevId++;
+        while (parent.findViewById(this.mPrevId) != null) {
+            this.mPrevId++;
+        }
+        return this.mPrevId;
     }
 
     @Nullable

@@ -113,7 +113,9 @@ public class BreadCrumbTextView extends TextView {
     }
 
     public final void fullScrollRight() {
-        this.parent.fullScroll(View.FOCUS_RIGHT);
+        if (this.parent != null) {
+            this.parent.fullScroll(View.FOCUS_RIGHT);
+        }
     }
 
     private final class NavigationSpan extends ClickableSpan

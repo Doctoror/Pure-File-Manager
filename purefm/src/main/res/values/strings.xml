@@ -40,7 +40,6 @@
     <string name="no_apps_to_open">No applications installed to open this file</string>
     <string name="could_not_open_file_">Could open this file:u0020</string>
     
-    <string name="menu_refresh">Refresh</string>
     <string name="menu_partition">Partition Info</string>
     <string name="menu_search">Search</string>
     <string name="menu_bookmarks">Bookmarks</string>

@@ -38,6 +38,7 @@ android {
 }
 
 dependencies {
+    compile project(':pull_to_refresh')
     compile 'com.android.support:support-v13:19.0.1+'
     compile files('libs/annotations.jar')
     compile files('libs/RootTools-3.4.jar')

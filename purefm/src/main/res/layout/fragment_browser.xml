@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--Copyright 2014 Yaroslav Mytkalyk-->
 <!--Copyright 2014 Yaroslav Mytkalyk-->
 
 <!--Licensed under the Apache License, Version 2.0 (the "License");-->
@@ -12,45 +12,39 @@
 <!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pullToRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/progress_scanning"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:indeterminate="true"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-7dp"
-        android:layout_alignParentTop="true"
-        android:padding="0dp"
-        android:visibility="invisible"/>
-    
-    <ViewStub
-        android:id="@android:id/list"
-        android:inflatedId="@android:id/list"
-        android:layout="@layout/browser_listview"
-        android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:saveEnabled="false"/>
-    
-    <ViewStub
-        android:id="@+id/grid"
-        android:inflatedId="@+id/grid"
-        android:layout="@layout/browser_gridview"
-        android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:saveEnabled="false"/>
+        android:layout_height="match_parent">
 
-    <include
-        layout="@layout/list_empty"/>
+        <ViewStub
+            android:id="@android:id/list"
+            android:inflatedId="@android:id/list"
+            android:layout="@layout/browser_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:saveEnabled="false" />
 
-    <ProgressBar
-        android:id="@android:id/progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        <ViewStub
+            android:id="@+id/grid"
+            android:inflatedId="@+id/grid"
+            android:layout="@layout/browser_gridview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:saveEnabled="false" />
 
-</RelativeLayout>
+        <include layout="@layout/list_empty" />
+
+        <ProgressBar
+            android:id="@android:id/progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+</uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
