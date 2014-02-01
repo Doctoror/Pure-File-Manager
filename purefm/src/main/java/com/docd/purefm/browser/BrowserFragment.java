@@ -40,6 +40,8 @@ import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
+import com.docd.purefm.controller.ActionModeController;
+import com.docd.purefm.controller.MenuController;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;

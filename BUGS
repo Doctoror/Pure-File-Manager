@@ -15,7 +15,7 @@
             at android.database.DataSetObservable.notifyChanged(DataSetObservable.java:37)
             at android.support.v4.view.PagerAdapter.notifyDataSetChanged(PagerAdapter.java:276)
             at com.docd.purefm.browser.BrowserActivity.invalidateList(BrowserActivity.java:220)
-            at com.docd.purefm.browser.MenuController.onMenuItemSelected(MenuController.java:69)
+            at com.docd.purefm.controller.MenuController.onMenuItemSelected(MenuController.java:69)
             at com.docd.purefm.browser.BrowserFragment.onOptionsItemSelected(BrowserFragment.java:262)
             at android.app.FragmentManagerImpl.dispatchOptionsItemSelected(FragmentManager.java:1974)
             at android.app.Activity.onMenuItemSelected(Activity.java:2540)

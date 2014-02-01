@@ -164,9 +164,16 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
     private GenericFile resolveExistingParent(final GenericFile file) {
         GenericFile parent = file.getParentFile();
+        if (parent == null) {
+            return file;
+        }
         while (!parent.exists() || !parent.isDirectory()) {
             mHistory.remove(parent);
+            final GenericFile previousParent = parent;
             parent = parent.getParentFile();
+            if (parent == null) {
+                return previousParent;
+            }
         }
         return parent;
     }
@@ -206,7 +213,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         return false;
     }
     
-    protected void up() {
+    public void up() {
         if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory)) {
             return;
         }
@@ -221,7 +228,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
     }
 
-    protected boolean isRoot() {
+    public boolean isRoot() {
         return this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory);
     }
 

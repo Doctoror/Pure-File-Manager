@@ -216,7 +216,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
         return mGetContentMimeType;
     }
 
-    void invalidateList() {
+    public void invalidateList() {
         mPagerAdapter.notifyDataSetChanged();
     }
 

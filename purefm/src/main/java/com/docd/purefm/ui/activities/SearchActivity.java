@@ -22,7 +22,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
-import com.docd.purefm.browser.ActionModeController;
+import com.docd.purefm.controller.ActionModeController;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.SearchCommandLineTask;
