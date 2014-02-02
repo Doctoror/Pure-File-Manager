@@ -13,9 +13,11 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <EditText xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:imeOptions="actionDone"
     android:inputType="textNoSuggestions"
     android:singleLine="true"
-    android:padding="10dp"/>
+    android:padding="10dp"
+    tools:text="New File"/>

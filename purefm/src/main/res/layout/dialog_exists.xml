@@ -13,9 +13,11 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:context="com.docd.purefm.browser.BrowserActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -53,7 +55,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
                     android:padding="5dp"
-                    android:textIsSelectable="false" />
+                    android:textIsSelectable="false"
+                    tools:text="/sdcard/DCIM/Camera/file.jpg"/>
             </TableRow>
 
             <TableRow
@@ -74,7 +77,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
                     android:padding="5dp"
-                    android:textIsSelectable="false" />
+                    android:textIsSelectable="false"
+                    tools:text="/sdcard/Pictures/file.jpg"/>
             </TableRow>
         </TableLayout>
     </ScrollView>

@@ -13,8 +13,10 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    tools:context="com.docd.purefm.browser.BrowserActivity">
 
     <TableLayout
         android:layout_width="match_parent"
@@ -52,7 +54,8 @@
                 android:focusable="false"
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                tools:text="/sdcard"/>
         </TableRow>
 
         <TableRow
@@ -85,7 +88,8 @@
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
                 android:textIsSelectable="false"
-                android:text="@string/minus" />
+                android:text="@string/minus"
+                tools:text="vfat"/>
         </TableRow>
         
         <TableRow
@@ -117,7 +121,8 @@
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
                 android:textIsSelectable="false"
-                android:text="@string/minus" />
+                android:text="@string/minus"
+                tools:text="4096"/>
         </TableRow>
 
         <TableRow
@@ -149,7 +154,8 @@
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
                 android:textIsSelectable="false"
-                android:text="@string/minus" />
+                android:text="@string/minus"
+                tools:text="10 GiB"/>
         </TableRow>
 
         <TableRow
@@ -181,7 +187,8 @@
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
                 android:textIsSelectable="false"
-                android:text="@string/minus" />
+                android:text="@string/minus"
+                tools:text="1 GiB"/>
         </TableRow>
 
         <TableRow
@@ -213,7 +220,8 @@
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
                 android:textIsSelectable="false"
-                android:text="@string/minus" />
+                android:text="@string/minus"
+                tools:text="1 GiB"/>
         </TableRow>
         
         <TableRow
@@ -245,7 +253,8 @@
                 android:gravity="left|center_vertical"
                 android:singleLine="true"
                 android:textIsSelectable="false"
-                android:text="@string/minus" />
+                android:text="@string/minus"
+                tools:text="9 GiB (86%)"/>
         </TableRow>
         
     </TableLayout>

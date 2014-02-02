@@ -13,10 +13,12 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.docd.purefm.browser.BrowserActivity">
 
     <TableLayout
         android:layout_width="match_parent"
@@ -43,7 +45,8 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="@string/minus"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                tools:text="root"/>
         </TableRow>
 
         <TableRow
@@ -66,7 +69,8 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="@string/minus"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                tools:text="root"/>
         </TableRow>
 
     </TableLayout>
@@ -78,7 +82,6 @@
         android:shrinkColumns="1,2,3"
         android:stretchColumns="0"
         android:gravity="center">
-
 
         <TableRow
             android:layout_width="match_parent"

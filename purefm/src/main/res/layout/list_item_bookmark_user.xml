@@ -16,7 +16,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    tools:context="com.docd.purefm.browser.BrowserActivity">
     
     <ImageView
         android:id="@android:id/icon"
@@ -39,7 +40,8 @@
         android:singleLine="true"
         android:ellipsize="marquee"
         android:textIsSelectable="false"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:text="Pictures"/>
     
     <TextView
         android:id="@android:id/summary"
@@ -53,7 +55,8 @@
         android:singleLine="true"
         android:ellipsize="marquee"
         android:textIsSelectable="false"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        tools:text="/storage/sdcard0/Pictures"/>
     
     <ImageButton
         android:id="@android:id/button1"
