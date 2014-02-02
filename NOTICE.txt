@@ -1,4 +1,7 @@
 Copyright 2014 Yaroslav Mytkalyk aka Doctoror
+This project contains some derivative work and icons of the Cyanogenmod
+FileManager
+https://github.com/CyanogenMod/android_packages_apps_CMFileManager
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
