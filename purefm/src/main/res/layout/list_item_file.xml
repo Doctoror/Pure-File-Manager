@@ -31,14 +31,13 @@
         android:src="@drawable/ic_fso_default"
         tools:ignore="contentDescription"/>
 
-    <TextView
+    <com.docd.purefm.ui.view.EdgeLimitedMarqueeTextView
         android:id="@android:id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@android:id/icon"
         android:gravity="left|center_vertical"
         android:paddingTop="8dp"
-        android:ellipsize="marquee"
         android:duplicateParentState="true"
         android:textIsSelectable="false"
         tools:text="FileName"
