@@ -29,6 +29,8 @@ import com.docd.purefm.R;
 public final class MimeTypes {
 
     private MimeTypes() {}
+
+    public static final String ALL_MIME_TYPES = "*/*";
     
     private static final HashMap<String, Integer> EXT_ICONS = new HashMap<String, Integer>();
     

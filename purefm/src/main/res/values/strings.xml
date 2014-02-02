@@ -173,4 +173,11 @@
     <!-- Quit Dialog -->
     <string name="dialog_quit_message">Do you want to quit?</string>
 
+    <!-- Sharing -->
+    <plurals name="no_applications_can_share">
+        <item quantity="one">No application can share this file</item>
+        <item quantity="other">No application can share these files</item>
+    </plurals>
+
+
 </resources>

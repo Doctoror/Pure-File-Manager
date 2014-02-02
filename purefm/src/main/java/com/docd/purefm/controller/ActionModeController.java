@@ -14,7 +14,6 @@
  */
 package com.docd.purefm.controller;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.List;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -31,6 +29,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.Toast;
 
+import com.cyanogenmod.filemanager.ui.policy.IntentsActionPolicy;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.browser.BrowserActivity;
@@ -39,7 +38,6 @@ import com.docd.purefm.ui.dialogs.FilePropertiesDialog;
 import com.docd.purefm.ui.dialogs.RenameFileDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
-import com.docd.purefm.utils.MimeTypes;
 
 /**
  * Controller that manages ActionMode for BrowserFragment
@@ -56,6 +54,7 @@ public final class ActionModeController {
 
     private ActionMode mActionMode;
     private Intent mShareIntent;
+    private int mShareItemsCount;
 
     public ActionModeController(final Activity activity) {
         this.mActivity = activity;
@@ -90,32 +89,25 @@ public final class ActionModeController {
 
             final SparseBooleanArray items = mListView.getCheckedItemPositions();
             final int checkedCount = mListView.getCheckedItemCount();
-            mShareIntent = new Intent(Intent.ACTION_SEND);
 
             final ArrayList<GenericFile> toShare = new ArrayList<GenericFile>(checkedCount);
             for (int i = 0; i < items.size(); i++) {
                 final int key = items.keyAt(i);
                 if (items.get(key)) {
-                    final GenericFile selected = (GenericFile) mListView.getAdapter().getItem(key);
-                    if (!selected.isDirectory()) {
+                    final GenericFile selected = (GenericFile) mListView.getItemAtPosition(key);
+                    if (selected != null && !selected.isDirectory()) {
                         toShare.add(selected);
                     }
-                    break;
                 }
             }
 
+            mShareItemsCount = toShare.size();
             if (toShare.isEmpty()) {
                 menu.removeItem(R.id.menu_share);
             } else if (toShare.size() == 1) {
-                final File selectedFile = toShare.get(0).toFile();
-                mShareIntent.setDataAndType(Uri.fromFile(selectedFile),
-                        MimeTypes.getMimeType(selectedFile));
+                mShareIntent = IntentsActionPolicy.createShareIntent(mActivity, toShare.get(0));
             } else {
-                final ArrayList<Uri> uris = new ArrayList<Uri>(toShare.size());
-                for (final GenericFile file : toShare) {
-                    uris.add(Uri.fromFile(file.toFile()));
-                }
-                mShareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                mShareIntent = IntentsActionPolicy.createShareIntent(mActivity, toShare);
             }
 
             if (checkedCount > 1) {
@@ -236,8 +228,13 @@ public final class ActionModeController {
                     return true;
 
                 case R.id.menu_share:
-                    mActivity.startActivity(Intent.createChooser(mShareIntent,
-                            mActivity.getText(R.string.menu_share)));
+                    if (mShareIntent != null) {
+                        mActivity.startActivity(mShareIntent);
+                    } else {
+                        Toast.makeText(mActivity, mActivity.getResources().getQuantityText(
+                                R.plurals.no_applications_can_share, mShareItemsCount),
+                                        Toast.LENGTH_SHORT).show();
+                    }
                     return true;
 
                 default:
@@ -252,6 +249,4 @@ public final class ActionModeController {
             mode.invalidate();
         }
     }
-
-    ;
 }

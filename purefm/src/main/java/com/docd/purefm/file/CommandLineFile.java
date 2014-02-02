@@ -293,7 +293,7 @@ public final class CommandLineFile implements GenericFile,
     @Override
     public CommandLineFile[] listFiles() {
         final List<String> result = CommandLine.executeForResult(
-                ShellHolder.getShell(), new CommandListContents(this.mFile));
+                ShellHolder.getShell(), new CommandListContents(this));
         if (result == null) {
             return null;
         }
@@ -322,7 +322,7 @@ public final class CommandLineFile implements GenericFile,
             return listFiles();
         }
         final List<String> result = CommandLine.executeForResult(
-                ShellHolder.getShell(),new CommandListContents(mFile));
+                ShellHolder.getShell(),new CommandListContents(this));
         if (result == null) {
             return null;
         }
@@ -353,7 +353,7 @@ public final class CommandLineFile implements GenericFile,
             return listFiles();
         }
         final List<String> result = CommandLine.executeForResult(
-                ShellHolder.getShell(), new CommandListContents(mFile));
+                ShellHolder.getShell(), new CommandListContents(this));
         if (result == null) {
             return null;
         }
@@ -384,7 +384,7 @@ public final class CommandLineFile implements GenericFile,
             return listFiles();
         }
         final List<String> result = CommandLine.executeForResult(
-                ShellHolder.getShell(), new CommandListContents(mFile));
+                ShellHolder.getShell(), new CommandListContents(this));
         if (result == null) {
             return null;
         }
@@ -412,7 +412,7 @@ public final class CommandLineFile implements GenericFile,
     @Override
     public String[] list() {
         final List<String> res = CommandLine.executeForResult(
-                ShellHolder.getShell(), new CommandListContents(mFile));
+                ShellHolder.getShell(), new CommandListContents(this));
         if (res != null) {
             final String[] result = new String[res.size()];
             res.toArray(result);

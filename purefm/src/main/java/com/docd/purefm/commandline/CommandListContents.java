@@ -15,6 +15,7 @@
 package com.docd.purefm.commandline;
 
 
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 
 import java.io.File;
@@ -32,11 +33,11 @@ import java.io.File;
  */
 public final class CommandListContents extends BusyboxCommand {
 
-    public CommandListContents(final File dir) {
+    public CommandListContents(final GenericFile dir) {
         super(buildCommand(dir));
     }
 
-    private static String buildCommand(final File file) {
+    private static String buildCommand(final GenericFile file) {
         if (!file.isDirectory()) {
             throw new RuntimeException("You should pass a directory here");
         }
