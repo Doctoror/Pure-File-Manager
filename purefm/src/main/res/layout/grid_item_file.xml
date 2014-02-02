@@ -13,12 +13,13 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?android:attr/activatedBackgroundIndicator" >
 
-    <com.docd.purefm.view.SquareOverlayImageView
+    <com.docd.purefm.ui.view.SquareOverlayImageView
         android:id="@android:id/icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,6 +38,7 @@
         android:maxLines="2"
         android:lines="2"
         android:ellipsize="end"
+        tools:text="FileName"
         style="@style/browser_text_small"/>
 
 </RelativeLayout>

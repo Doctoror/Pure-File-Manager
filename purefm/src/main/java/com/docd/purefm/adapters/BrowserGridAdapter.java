@@ -17,7 +17,7 @@ package com.docd.purefm.adapters;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.view.OverlayImageView;
+import com.docd.purefm.ui.view.OverlayImageView;
 
 import android.app.Activity;
 import android.view.View;

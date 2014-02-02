@@ -19,7 +19,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.PureFMTextUtils;
-import com.docd.purefm.view.OverlayImageView;
+import com.docd.purefm.ui.view.OverlayImageView;
 
 import android.app.Activity;
 import android.graphics.Typeface;

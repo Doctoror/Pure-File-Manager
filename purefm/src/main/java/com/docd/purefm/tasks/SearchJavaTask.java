@@ -21,6 +21,8 @@ import java.io.File;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
 
     @Override
@@ -33,7 +35,7 @@ public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
         return null;
     }
     
-    private void search(final File location, final String name) {
+    private void search(final File location, final String toFind) {
         final File[] files = location.listFiles();
         if (files != null) {
             for (final File file : files) {
@@ -41,9 +43,9 @@ public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
                     return;
                 }
                 if (file.isDirectory()) {
-                    search(file, name);
+                    search(file, toFind);
                 }
-                else if (file.getName().contains(name)) {
+                else if (StringUtils.containsIgnoreCase(file.getName(), toFind)) {
                     this.publishProgress(new JavaFile(file));
                 }
             }

@@ -54,8 +54,8 @@ public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
     private AbsListView list;
     private BrowserBaseAdapter adapter;
     
-    private TextView input;
-    private View progress;
+    private TextView mInput;
+    private View mProgress;
     
     private AsyncTask<String, GenericFile, Void> searchTask;
     private String path;
@@ -101,27 +101,27 @@ public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
     }
     
     private void initActionBar() {
-        final View action = this.getLayoutInflater().inflate(R.layout.activity_search_actionbar, null);
-        final TextView path = (TextView) action.findViewById(android.R.id.text1);
+        final View actionBarCustom = this.getLayoutInflater().inflate(R.layout.activity_search_actionbar, null);
+        final TextView path = (TextView) actionBarCustom.findViewById(android.R.id.text1);
         path.setText(this.path);
-        this.progress = action.findViewById(android.R.id.progress);
-        
+
         final ActionBar bar = this.getActionBar();
         bar.setDisplayOptions(
                 ActionBar.DISPLAY_HOME_AS_UP |
                 ActionBar.DISPLAY_SHOW_HOME |
                 ActionBar.DISPLAY_SHOW_CUSTOM |
                 ActionBar.DISPLAY_USE_LOGO);
-        bar.setCustomView(action);
+        bar.setCustomView(actionBarCustom);
 
         this.actionModeController = new ActionModeController(this);
     }
     
     private void initView() {
         this.initList();
-        this.input = (TextView) this.findViewById(android.R.id.input);
-        this.input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            
+        this.mProgress = findViewById(android.R.id.progress);
+        this.mInput = (TextView) this.findViewById(android.R.id.input);
+        this.mInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 onSearchClicked();
@@ -138,24 +138,24 @@ public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
     }
     
     private void onSearchClicked() {
-        final String text = input.getText().toString().trim();
-        if (text.length() < 3) {
+        final String text = mInput.getText().toString().trim();
+        if (text.isEmpty()) {
             return;
         }
         if (searchTask != null && searchTask.getStatus() == AsyncTask.Status.RUNNING) {
             searchTask.cancel(true);
         }
-        this.buildSearchTask(false);
+        this.buildSearchTask();
         adapter.updateData(new GenericFile[0]);
         searchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text, path);
     }
     
-    private void onPreExecute() {
-        this.progress.setVisibility(View.VISIBLE);
+    void onPreExecute() {
+        this.mProgress.setVisibility(View.VISIBLE);
     }
     
-    private void onPostExecute() {
-        this.progress.setVisibility(View.INVISIBLE);
+    void onPostExecute() {
+        this.mProgress.setVisibility(View.INVISIBLE);
         if (this.searchTask instanceof SearchCommandLineTask) {
             final List<String> denied = ((SearchCommandLineTask) this.searchTask).getDeniedLocations();
             if (!denied.isEmpty()) {
@@ -179,7 +179,7 @@ public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
         }
     }
     
-    private void onProgressUpdate(GenericFile file) {
+    void onProgressUpdate(GenericFile file) {
         adapter.addFile(file);
     }
     
@@ -231,9 +231,9 @@ public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
     }
     
     
-    private void buildSearchTask(boolean su) {
-        if (Settings.useCommandLine && Environment.hasBusybox()) {
-            searchTask = new SearchCommandLineTask(su) {
+    private void buildSearchTask() {
+        if (Settings.useCommandLine) {
+            searchTask = new SearchCommandLineTask() {
                 @Override
                 protected void onPreExecute() {
                     SearchActivity.this.onPreExecute();

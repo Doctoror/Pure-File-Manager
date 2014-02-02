@@ -49,7 +49,7 @@ import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.ThemeUtils;
-import com.docd.purefm.view.OverlayImageView;
+import com.docd.purefm.ui.view.OverlayImageView;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;

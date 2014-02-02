@@ -13,9 +13,21 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:context="com.docd.purefm.ui.activities.SearchActivity">
+
+    <ProgressBar
+        android:id="@android:id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-5dp"
+        android:layout_alignParentTop="true"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        style="?android:attr/progressBarStyleHorizontal"/>
 
     <EditText
         android:id="@android:id/input"
@@ -24,12 +36,13 @@
         android:singleLine="true"
         android:inputType="textNoSuggestions"
         android:imeOptions="actionSearch"
-        android:layout_alignParentTop="true"
+        android:layout_below="@android:id/progress"
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@+id/search"
         android:layout_alignTop="@+id/search"
         android:layout_alignBottom="@+id/search"
-        android:ems="10" >
+        android:ems="10"
+        tools:text="FileName.ext">
 
         <requestFocus />
     </EditText>
@@ -38,7 +51,7 @@
         android:id="@+id/search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@android:id/progress"
         android:layout_alignParentRight="true"
         android:src="?attr/action_search"
         android:contentDescription="@string/menu_search"
@@ -72,6 +85,7 @@
         android:layout_centerVertical="true"
         android:visibility="gone"
         android:text="@string/no_results"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        tools:visibility="visible"/>
 
 </RelativeLayout>

@@ -49,7 +49,7 @@ import com.docd.purefm.browser.Browser.OnNavigateListener;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.view.BreadCrumbTextView;
+import com.docd.purefm.ui.view.BreadCrumbTextView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

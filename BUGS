@@ -1,7 +1,7 @@
 - file picker not working
 - applying permissions not working
 - Sometimes can't focus to AbsListView
-- multi sharing has bugs
+- search results are case-sensitive
 - Sometimes when switching view type:
 
     java.lang.NullPointerException

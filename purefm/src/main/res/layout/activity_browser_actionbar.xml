@@ -13,19 +13,22 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:scrollbars="none"
-    android:overScrollMode="never" >
+    android:overScrollMode="never"
+    tools:context="com.docd.purefm.browser.BrowserActivity">
 
-    <com.docd.purefm.view.BreadCrumbTextView
+    <com.docd.purefm.ui.view.BreadCrumbTextView
         android:id="@android:id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:paddingRight="5dp"
         android:singleLine="true"
+        tools:text="root -> data -> data -> com.docd.purefm"
         style="@style/NavigationText" />
 
 </HorizontalScrollView>

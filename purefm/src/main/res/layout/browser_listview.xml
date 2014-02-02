@@ -18,4 +18,5 @@
     android:layout_height="match_parent"
     android:saveEnabled="false"
     android:choiceMode="multipleChoiceModal"
-    tools:listitem="@layout/list_item_file"/>
+    tools:listitem="@layout/list_item_file"
+    tools:context="com.docd.purefm.browser.BrowserActivity"/>

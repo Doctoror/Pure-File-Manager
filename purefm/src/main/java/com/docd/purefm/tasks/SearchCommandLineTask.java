@@ -29,12 +29,11 @@ import java.util.regex.Pattern;
 import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.settings.Settings;
 
 public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> {
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
-    
-    private boolean su;
     
     private List<String> denied;
     private String query;
@@ -43,17 +42,8 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
         this.denied = new ArrayList<String>();
     }
     
-    public SearchCommandLineTask(boolean su) {
-        this();
-        this.su = su;
-    }
-    
     public List<String> getDeniedLocations() {
         return this.denied;
-    }
-    
-    public String getSearchedQuery() {
-        return this.query;
     }
     
     @Override
@@ -73,7 +63,7 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
         BufferedReader err = null;
         Process process = null;
         try {
-            process = Runtime.getRuntime().exec(this.su ? "su" : "sh");
+            process = Runtime.getRuntime().exec(Settings.su ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -89,7 +79,9 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
                 while (!isCancelled() && (line = is.readLine()) != null) {
                     this.publishProgress(CommandLineFile.fromLSL(null, line));
                 }
-            } catch (EOFException e) {}
+            } catch (EOFException e) {
+                //ignore
+            }
             
             try {
                 while (!isCancelled() && (line = err.readLine()) != null) {
@@ -98,7 +90,9 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
                         this.denied.add(denied.group(1));
                     } 
                 }
-            } catch (EOFException e) {}
+            } catch (EOFException e) {
+                //ignore
+            }
             process.waitFor();
         } catch (Exception e) {
             Log.w("Exception while searching", e.toString());
@@ -115,7 +109,7 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
         command.setLength(0);
         command.append("find ");
         command.append(CommandLineUtils.getCommandLineString(location));
-        command.append(" -type f -name ");
+        command.append(" -type f -iname ");
         command.append('*');
         command.append(CommandLineUtils.getCommandLineString(what));
         command.append('*');

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.docd.purefm.view;
+package com.docd.purefm.ui.view;
 
 import java.io.File;
 
@@ -29,6 +29,13 @@ import android.view.ViewParent;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
+/**
+ * TextView that builds and shows clickable bread crumb links
+ * Don't use {@link #setText(char[], int, int)} method to build view.
+ * Instead, use {@link #setFile(java.io.File)}
+ *
+ * @author Doctoror
+ */
 public class BreadCrumbTextView extends TextView {
 
     private static final String SEQUENCE_SEPARATOR = " > ";

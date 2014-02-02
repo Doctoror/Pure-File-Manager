@@ -67,6 +67,24 @@
         <item name="ic_fso_symlink">@drawable/holo_dark_ic_fso_symlink</item>
     </style>
 
+    <style name="ThemeDark.Overlay" parent="@style/ThemeDark">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="ThemeLight.Overlay" parent="@style/ThemeLight">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
     <style name="actionBarStyleDark" parent="@android:style/Widget.ActionBar">
         <item name="android:background">@color/holo_dark_actionbar_background</item>
         <item name="android:backgroundSplit">@color/holo_dark_actionbar_background</item>

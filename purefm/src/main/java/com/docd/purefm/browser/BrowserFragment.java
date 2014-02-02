@@ -50,8 +50,8 @@ import com.docd.purefm.ui.fragments.UserVisibleHintFragment;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.ThemeUtils;
-import com.docd.purefm.view.BreadCrumbTextView;
-import com.docd.purefm.view.BreadCrumbTextView.OnSequenceClickListener;
+import com.docd.purefm.ui.view.BreadCrumbTextView;
+import com.docd.purefm.ui.view.BreadCrumbTextView.OnSequenceClickListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
