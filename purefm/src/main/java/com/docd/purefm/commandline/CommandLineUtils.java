@@ -30,6 +30,8 @@ public final class CommandLineUtils {
 
     private CommandLineUtils(){}
 
+    private static final String UNIX_ESCAPE_EXPRESSION = "(\\(|\\)|\\[|\\]|\\s|\'|\"|`|\\{|\\}|&|\\\\)";
+
     /**
      * Adds escaping. Used for file paths.
      *
@@ -37,11 +39,7 @@ public final class CommandLineUtils {
      * @return input string with escaped characters
      */
     public static String getCommandLineString(String input) {
-        return input.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\'", "\\\'")
-                .replace("`", "\\`")
-                .replace(" ", "\\ ");
+        return input.replaceAll(UNIX_ESCAPE_EXPRESSION, "\\\\$1");
     }
 
     /**
@@ -86,7 +84,7 @@ public final class CommandLineUtils {
             other += 01;
         }
         
-        final StringBuilder perm = new StringBuilder();
+        final StringBuilder perm = new StringBuilder(3);
         perm.append(user);
         perm.append(group);
         perm.append(other);

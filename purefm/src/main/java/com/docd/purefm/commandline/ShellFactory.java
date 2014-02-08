@@ -32,7 +32,6 @@ public final class ShellFactory {
 
     @NotNull
     public static Shell getShell() throws IOException {
-        RootTools.handlerEnabled = false;
         try {
             return RootTools.getShell(Settings.su);
         } catch (RootDeniedException e) {

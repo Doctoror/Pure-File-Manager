@@ -197,12 +197,22 @@ public final class Environment {
 
     private static final class ActivityMonitorListener implements ActivityMonitor.OnActivitiesOpenedListener {
 
-        private final Object lock = new Object();
+        private static final Object LOCK = new Object();
         private volatile boolean isRegistered;
 
         @Override
-        public void onActivitiesOpen() {
-            synchronized (this.lock) {
+        public void onActivitiesCreated() {
+
+        }
+
+        @Override
+        public void onActivitiesDestroyed() {
+
+        }
+
+        @Override
+        public void onActivitiesStarted() {
+            synchronized (LOCK) {
                 if (!this.isRegistered) {
                     context.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
                     this.isRegistered = true;
@@ -211,8 +221,8 @@ public final class Environment {
         }
 
         @Override
-        public void onActivitiesClosed() {
-            synchronized (this.lock) {
+        public void onActivitiesStopped() {
+            synchronized (LOCK) {
                 if (this.isRegistered) {
                     context.unregisterReceiver(externalStorageStateReceiver);
                     this.isRegistered = false;

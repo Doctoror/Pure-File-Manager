@@ -34,7 +34,9 @@ public abstract class ThemableActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         currentTheme = Settings.theme;
-        setTheme(currentTheme);
+        if (setThemeInOnCreate()) {
+            setTheme(currentTheme);
+        }
         super.onCreate(savedInstanceState);
     }
 
@@ -54,5 +56,9 @@ public abstract class ThemableActivity extends Activity {
         finish();
         overridePendingTransition(0, 0);
         startActivity(intent);
+    }
+
+    protected boolean setThemeInOnCreate() {
+        return true;
     }
 }

@@ -66,7 +66,7 @@ public final class Settings {
         final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
         final Editor e = p.edit();
         e.putBoolean(context.getString(R.string.key_preference_use_commandline), use);
-        e.commit();
+        e.apply();
         useCommandLine = use;
     }
     
@@ -74,7 +74,7 @@ public final class Settings {
         final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
         final Editor e = p.edit();
         e.putBoolean(context.getString(R.string.key_preference_allow_root), use);
-        e.commit();
+        e.apply();
         su = use;
     }
     
@@ -82,7 +82,7 @@ public final class Settings {
         final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
         final Editor e = p.edit();
         e.putString(context.getString(R.string.key_preference_appearance), Integer.toString(newAppearance));
-        e.commit();
+        e.apply();
         appearance = newAppearance;
     }
     
@@ -101,7 +101,7 @@ public final class Settings {
         final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
         final Editor e = p.edit();
         e.putStringSet(KEY_BOOKMARKS, bookmarks);
-        e.commit();
+        e.apply();
     }
     
     public static void addBookmark(Context context, String path) {

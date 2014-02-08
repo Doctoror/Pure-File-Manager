@@ -21,7 +21,6 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.UserHandle;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
@@ -251,24 +250,27 @@ public final class MediaHelper {
 
     private static int myUserId() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return myUserIdJBMR1();
+            return UserHandleJellyBeanMR1.myUserId();
         }
         return 0;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private static int myUserIdJBMR1() {
-        try {
-            final Method myUserIdMethod = UserHandle.class.getMethod("myUserId");
-            myUserIdMethod.setAccessible(true);
-            return (Integer) myUserIdMethod.invoke(null);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+    private static final class UserHandleJellyBeanMR1 {
+
+        static int myUserId() {
+            try {
+                final Method myUserIdMethod = android.os.UserHandle.class.getMethod("myUserId");
+                myUserIdMethod.setAccessible(true);
+                return (Integer) myUserIdMethod.invoke(null);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return 0;
         }
-        return 0;
     }
 }

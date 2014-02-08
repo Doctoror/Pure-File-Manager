@@ -335,7 +335,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
                     && this.mCurrentlyDisplayedFragment.onBackPressed();
         }
         if (!onFragmentBackPressed) {
-            //if we are't in ACTION_GET_CONTENT mode, show a confirm dialog, quit otherwise
+            //if we aren't in ACTION_GET_CONTENT mode, show a confirm dialog, quit otherwise
             if (mGetContentMimeType == null) {
                 final AlertDialog.Builder b = new AlertDialog.Builder(this);
                 b.setMessage(R.string.dialog_quit_message);

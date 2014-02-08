@@ -38,6 +38,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+        </activity>
+
+        <activity android:name=".ui.activities.PickerActivity"
+            android:theme="@android:style/Theme.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
                 <category android:name="android.intent.category.OPENABLE" />
@@ -53,7 +57,6 @@
                 <data android:scheme="folder" />
                 <data android:scheme="directory" />
             </intent-filter>
-
         </activity>
 
         <activity

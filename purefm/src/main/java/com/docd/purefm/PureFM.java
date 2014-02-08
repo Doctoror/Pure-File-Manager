@@ -17,6 +17,7 @@ package com.docd.purefm;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.PureFMTextUtils;
+import com.stericson.RootTools.RootTools;
 
 import android.app.Application;
 
@@ -28,6 +29,8 @@ public final class PureFM extends Application implements ActivityMonitor.OnActiv
     @Override
     public void onCreate() {
         super.onCreate();
+        RootTools.handlerEnabled = false;
+        RootTools.debugMode = BuildConfig.DEBUG;
         ActivityMonitor.init(this);
         Environment.init(this);
         Settings.init(this, this.getResources());
@@ -49,14 +52,24 @@ public final class PureFM extends Application implements ActivityMonitor.OnActiv
     }
 
     @Override
-    public void onActivitiesOpen() {
+    public void onActivitiesStarted() {
         //rescan for environment changes
         Environment.init(this);
         ensureNoShellUsedIfNoBusybox();
     }
 
     @Override
-    public void onActivitiesClosed() {
+    public void onActivitiesStopped() {
+
+    }
+
+    @Override
+    public void onActivitiesCreated() {
+
+    }
+
+    @Override
+    public void onActivitiesDestroyed() {
 
     }
 }

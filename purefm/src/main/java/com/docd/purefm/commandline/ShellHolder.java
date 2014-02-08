@@ -55,7 +55,7 @@ public final class ShellHolder {
      */
     @NotNull
     public static synchronized Shell getShell() {
-        if (shell == null) {
+        if (shell == null || !Shell.isAnyShellOpen()) {
             try {
                 shell = ShellFactory.getShell();
             } catch (IOException e) {

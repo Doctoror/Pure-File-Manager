@@ -14,6 +14,8 @@
  */
 package com.docd.purefm.ui.activities;
 
+import android.os.Bundle;
+
 import com.docd.purefm.ActivityMonitor;
 
 /**
@@ -22,15 +24,39 @@ import com.docd.purefm.ActivityMonitor;
  */
 public abstract class MonitoredActivity extends ThemableActivity {
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ActivityMonitor.onCreate(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onStart() {
         super.onStart();
         ActivityMonitor.onStart(this);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onStop() {
         super.onStop();
         ActivityMonitor.onStop(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ActivityMonitor.onDestroy(this);
     }
 }
