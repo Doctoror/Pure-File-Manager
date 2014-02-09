@@ -2,6 +2,7 @@
 - applying permissions not working
 - Sometimes can't focus to AbsListView
 - Sometimes when switching view type:
+- Cyrillic text from busybox is not displayed properly
 
     java.lang.NullPointerException
             at android.support.v13.app.FragmentStatePagerAdapter.instantiateItem(FragmentStatePagerAdapter.java:123)
