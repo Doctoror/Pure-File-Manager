@@ -17,6 +17,7 @@ package com.docd.purefm.utils;
 import java.io.File;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -29,23 +30,39 @@ import org.jetbrains.annotations.NotNull;
 public final class MediaStoreUtils {
 
     private MediaStoreUtils() {}
+
+    private static final Uri EXTERNAL_CONTENT_URI = MediaStore.Files.getContentUri("external");
     
     private static final String[] FIELDS = {
-        MediaStore.MediaColumns._ID,
-        MediaStore.MediaColumns.DATA,
-        MediaStore.MediaColumns.TITLE
+            MediaStore.Files.FileColumns._ID
     };
 
-    public static void deleteFiles(final Context context, final List<File> files) {
-        final Pair<String, String[]> selectionAndPaths = filesToSelectionAndPaths(files);
-        final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        final Cursor c = context.getContentResolver().query(uri, FIELDS, selectionAndPaths.first, selectionAndPaths.second, null);
-        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-            final long id = c.getLong(c.getColumnIndex(MediaStore.MediaColumns._ID));
-            final Uri tmpUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-            context.getContentResolver().delete(tmpUri, null, null);
+    public static void deleteFile(final ContentResolver contentResolver, final File file) {
+        final Cursor c = contentResolver.query(
+                EXTERNAL_CONTENT_URI,
+                FIELDS,
+                MediaStore.Files.FileColumns.DATA + "=?",
+                new String[]{file.getAbsolutePath()},
+                null);
+        if (c != null) {
+            final long id = c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns._ID));
+            System.out.println("id: " + id);
+            contentResolver.delete(ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id), null, null);
+            c.close();
         }
-        c.close();
+    }
+
+    public static void deleteFiles(final ContentResolver contentResolver, final List<File> files) {
+        final Pair<String, String[]> selectionAndPaths = filesToSelectionAndPaths(files);
+        final Cursor c = contentResolver.query(EXTERNAL_CONTENT_URI, FIELDS, selectionAndPaths.first, selectionAndPaths.second, null);
+        System.out.println("q: " + java.util.Arrays.toString(selectionAndPaths.second));
+        if (c != null) {
+            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                final long id = c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns._ID));
+                contentResolver.delete(ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id), null, null);
+            }
+            c.close();
+        }
     }
 
     @NotNull
@@ -53,13 +70,12 @@ public final class MediaStoreUtils {
         final StringBuilder selection = new StringBuilder();
         final int size = files.size();
         final String[] paths = new String[size];
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             paths[i] = files.get(i).getAbsolutePath();
             if (selection.length() != 0) {
                 selection.append(" OR ");
             }
-            selection.append(MediaStore.MediaColumns.DATA).append("=?");
+            selection.append(MediaStore.Files.FileColumns.DATA).append("=?");
         }
         return new Pair<String, String[]>(selection.toString(), paths);
     }

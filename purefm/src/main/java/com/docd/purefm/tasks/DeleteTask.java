@@ -88,6 +88,10 @@ public final class DeleteTask extends
                 final File fileFile = file.toFile();
                 if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
                     filesAffected.add(fileFile);
+                    final Activity activity = this.activity.get();
+                    if (activity != null) {
+                        //MediaStoreUtils.deleteFile(activity.getContentResolver(), fileFile);
+                    }
                 } else {
                     failed.add(file);
                 }
@@ -95,7 +99,12 @@ public final class DeleteTask extends
         } else {
             for (final GenericFile file : files) {
                 if (file.delete()) {
-                    filesAffected.add(file.toFile());
+                    final File fileFile = file.toFile();
+                    filesAffected.add(fileFile);
+                    final Activity activity = this.activity.get();
+                    if (activity != null) {
+                        //MediaStoreUtils.deleteFile(activity.getContentResolver(), fileFile);
+                    }
                 } else {
                     failed.add(file);
                 }
@@ -104,7 +113,7 @@ public final class DeleteTask extends
 
         final Activity activity = this.activity.get();
         if (activity != null && !filesAffected.isEmpty()) {
-            MediaStoreUtils.deleteFiles(activity.getApplicationContext(), filesAffected);
+            MediaStoreUtils.deleteFiles(activity.getContentResolver(), filesAffected);
             PureFMFileUtils.requestMediaScanner(activity, filesAffected);
         }
         

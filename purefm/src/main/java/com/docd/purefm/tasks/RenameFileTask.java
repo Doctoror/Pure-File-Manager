@@ -55,7 +55,7 @@ public final class RenameFileTask extends AsyncTask<Void, Void, Boolean> {
             final List<File> filesDeleted = new ArrayList<File>(1);
             filesDeleted.add(mSource.toFile());
             filesCreated.add(mTarget.toFile());
-            MediaStoreUtils.deleteFiles(mContext, filesDeleted);
+            MediaStoreUtils.deleteFiles(mContext.getContentResolver(), filesDeleted);
             PureFMFileUtils.requestMediaScanner(mContext, filesCreated);
             return Boolean.TRUE;
         }

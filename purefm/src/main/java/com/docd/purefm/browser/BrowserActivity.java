@@ -280,8 +280,8 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
     public boolean onMenuItemSelected(final int featureId, @NotNull final MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_bookmarks_new:
-            final String path = this.currentPath.getAbsolutePath();
-            if (path != null) {
+            if (currentPath != null) {
+                final String path = currentPath.getAbsolutePath();
                 this.mBookmarksAdapter.addItem(path);
             }
             return true;

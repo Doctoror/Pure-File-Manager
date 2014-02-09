@@ -35,6 +35,7 @@ import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Browser manages current path and navigation
@@ -47,7 +48,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             FileObserver.MOVED_TO |
             FileObserver.MOVE_SELF;
 
-    private static Handler handler;
+    private static Handler sHandler;
     private final Context mContext;
 
     public interface OnNavigateListener {
@@ -55,7 +56,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         void onNavigationCompleted(GenericFile path);
     }
 
-    private final ArrayDeque<GenericFile> mHistory;
+    private final ArrayDeque<String> mHistory;
 
     private FileObserverCache mObserverCache;
     private MultiListenerFileObserver mCurrentPathObserver;
@@ -66,12 +67,12 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     private Runnable mLastRunnable;
 
     protected Browser(final BrowserActivity activity) {
-        if (handler == null) {
-            handler = new Handler(activity.getMainLooper());
+        if (sHandler == null) {
+            sHandler = new Handler(activity.getMainLooper());
         }
         mContext = activity;
         this.mObserverCache = FileObserverCache.getInstance();
-        this.mHistory = new ArrayDeque<GenericFile>(15);
+        this.mHistory = new ArrayDeque<String>(15);
         final String home = Settings.getHomeDirectory(activity);
         final String state = Environment.getExternalStorageState();
         if (home != null) {
@@ -95,7 +96,9 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
 
     public Parcelable saveInstanceState() {
-        return new SavedState(mHistory, mCurrentPath, mPreviousPath);
+        return new SavedState(mHistory,
+                mCurrentPath != null ? mCurrentPath.getAbsolutePath() : null,
+                mPreviousPath != null ? mPreviousPath.getAbsolutePath() : null);
     }
 
     public void restoreState(final Parcelable state) {
@@ -103,15 +106,24 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         if (savedState != null) {
             mHistory.clear();
             mHistory.addAll(savedState.mHistory);
-            if (savedState.mCurrentPath != null &&
-                    savedState.mCurrentPath.exists() &&
-                    savedState.mCurrentPath.isDirectory()) {
-                mCurrentPath = savedState.mCurrentPath;
+
+
+            if (savedState.mCurrentPath != null) {
+                final GenericFile savedStateCurrentFile = FileFactory.newFile(
+                        savedState.mCurrentPath);
+                if (savedStateCurrentFile.exists() &&
+                        savedStateCurrentFile.isDirectory()) {
+                    mCurrentPath = savedStateCurrentFile;
+                }
             }
-            if (savedState.mPreviousPath != null &&
-                    savedState.mPreviousPath.exists() &&
-                    savedState.mPreviousPath.isDirectory()) {
-                mPreviousPath = savedState.mPreviousPath;
+
+            if (savedState.mPreviousPath != null) {
+                final GenericFile savedStatePreviousFile = FileFactory.newFile(
+                        savedState.mPreviousPath);
+                if (savedStatePreviousFile.exists() &&
+                        savedStatePreviousFile.isDirectory()) {
+                    mPreviousPath = savedStatePreviousFile;
+                }
             }
             invalidate();
         }
@@ -182,10 +194,10 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         if (target.exists()) {
             if (target.isDirectory()) {
                 if (!this.mCurrentPath.equals(target)) {
-                    this.mPreviousPath = this.mCurrentPath;
-                    this.mCurrentPath = target;
+                    mPreviousPath = this.mCurrentPath;
+                    mCurrentPath = target;
                     if (addToHistory) {
-                        this.mHistory.push(this.mPreviousPath);
+                        this.mHistory.push(mPreviousPath.getAbsolutePath());
                     }
                     this.invalidate();
                 }
@@ -201,11 +213,11 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     
     public boolean back() {
         if (!this.mHistory.isEmpty()) {
-            GenericFile f = this.mHistory.pop();
+            GenericFile f = FileFactory.newFile(mHistory.pop());
             while (!this.mHistory.isEmpty() && !f.exists()) {
-                f = this.mHistory.pop();
+                f = FileFactory.newFile(this.mHistory.pop());
             }
-            if (f != null && f.exists() && f.isDirectory()) {
+            if (f.exists() && f.isDirectory()) {
                 this.navigate(f, false);
                 return true;
             }
@@ -218,7 +230,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             return;
         }
         final GenericFile parent = resolveExistingParent(mCurrentPath);
-        this.mHistory.push(parent);
+        this.mHistory.push(parent.getAbsolutePath());
         this.navigate(parent, true);
     }
     
@@ -237,36 +249,38 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.MOVE_SELF:
             case FileObserver.DELETE_SELF:
-                handler.removeCallbacks(mLastRunnable);
+                sHandler.removeCallbacks(mLastRunnable);
                 final GenericFile parent = resolveExistingParent(mCurrentPath);
-                handler.post(mLastRunnable = new NavigateRunnable(
+                sHandler.post(mLastRunnable = new NavigateRunnable(
                         Browser.this, parent, true));
                 break;
 
             case FileObserver.CREATE:
             case FileObserver.MOVED_TO:
-                handler.removeCallbacks(mLastRunnable);
-                handler.post(mLastRunnable = new InvalidateRunnable(this));
+                sHandler.removeCallbacks(mLastRunnable);
+                sHandler.post(mLastRunnable = new InvalidateRunnable(this));
                 break;
         }
     }
 
     private static final class SavedState implements Parcelable {
-        final ArrayDeque<GenericFile> mHistory;
-        final GenericFile mCurrentPath;
-        final GenericFile mPreviousPath;
+        final ArrayDeque<String> mHistory;
+        final String mCurrentPath;
+        final String mPreviousPath;
 
-        SavedState(ArrayDeque<GenericFile> mHistory, GenericFile mCurrentFile, GenericFile mPreviousFile) {
-            this.mHistory = mHistory;
-            this.mCurrentPath = mCurrentFile;
-            this.mPreviousPath = mPreviousFile;
+        SavedState(@NotNull ArrayDeque<String> history,
+                   @Nullable final String currentPath,
+                   @Nullable final String previousPath) {
+            this.mHistory = history;
+            this.mCurrentPath = currentPath;
+            this.mPreviousPath = previousPath;
         }
 
         @SuppressWarnings("Unchecked")
         SavedState(final Parcel source) {
-            this.mHistory = (ArrayDeque<GenericFile>) source.readSerializable();
-            this.mCurrentPath = (GenericFile) source.readSerializable();
-            this.mPreviousPath = (GenericFile) source.readSerializable();
+            this.mHistory = (ArrayDeque<String>) source.readSerializable();
+            this.mCurrentPath = source.readString();
+            this.mPreviousPath = source.readString();
         }
 
         @Override
@@ -277,8 +291,8 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeSerializable(this.mHistory);
-            dest.writeSerializable(this.mCurrentPath);
-            dest.writeSerializable(this.mPreviousPath);
+            dest.writeString(this.mCurrentPath);
+            dest.writeString(this.mPreviousPath);
         }
 
         public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {

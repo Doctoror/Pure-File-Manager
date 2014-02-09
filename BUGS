@@ -1,7 +1,6 @@
 - file picker not working
 - applying permissions not working
 - Sometimes can't focus to AbsListView
-- search results are case-sensitive
 - Sometimes when switching view type:
 
     java.lang.NullPointerException
@@ -30,25 +29,6 @@
             at android.view.View$PerformClick.run(View.java:17023)
             at android.os.Handler.handleCallback(Handler.java:615)
             at android.os.Handler.dispatchMessage(Handler.java:92)
-            at android.os.Looper.loop(Looper.java:137)
-            at android.app.ActivityThread.main(ActivityThread.java:4967)
-            at java.lang.reflect.Method.invokeNative(Native Method)
-            at java.lang.reflect.Method.invoke(Method.java:511)
-            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:789)
-            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:556)
-            at dalvik.system.NativeStart.main(Native Method)
-
-- After opeining DialogActivity of another app and trying to execute commands
-
-java.lang.IllegalStateException: Unable to add commands to a closed shell
-            at com.stericson.RootTools.execution.Shell.add(Shell.java:144)
-            at com.docd.purefm.commandline.CommandLine.executeForResult(CommandLine.java:61)
-            at com.docd.purefm.file.CommandLineFile.fromFile(CommandLineFile.java:97)
-            at com.docd.purefm.file.FileFactory.newFile(FileFactory.java:30)
-            at com.docd.purefm.adapters.BrowserBaseAdapter.onFileModified(BrowserBaseAdapter.java:363)
-            at com.docd.purefm.adapters.BrowserBaseAdapter.onEventUIThread(BrowserBaseAdapter.java:351)
-            at com.docd.purefm.adapters.BrowserBaseAdapter$FileObserverEventHandler.handleMessage(BrowserBaseAdapter.java:541)
-            at android.os.Handler.dispatchMessage(Handler.java:99)
             at android.os.Looper.loop(Looper.java:137)
             at android.app.ActivityThread.main(ActivityThread.java:4967)
             at java.lang.reflect.Method.invokeNative(Native Method)

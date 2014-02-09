@@ -67,7 +67,7 @@
         <item name="ic_fso_symlink">@drawable/holo_dark_ic_fso_symlink</item>
     </style>
 
-    <style name="ThemeDark.Dialog" parent="@style/ThemeDark">
+    <style name="ThemeDark.Overlay" parent="@style/ThemeDark">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@null</item>
         <item name="android:windowContentOverlay">@null</item>

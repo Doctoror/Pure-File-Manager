@@ -117,7 +117,7 @@ final class PasteTask extends AsyncTask<GenericFile, Void, List<GenericFile>> {
         if (activity != null) {
             final Context context = activity.getApplicationContext();
             if (!filesDeleted.isEmpty()) {
-                MediaStoreUtils.deleteFiles(context, filesDeleted);
+                MediaStoreUtils.deleteFiles(context.getContentResolver(), filesDeleted);
             }
             if (!filesCreated.isEmpty()) {
                 PureFMFileUtils.requestMediaScanner(context, filesCreated);
