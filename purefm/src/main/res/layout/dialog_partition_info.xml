@@ -16,7 +16,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.docd.purefm.browser.BrowserActivity">
+    tools:context="com.docd.purefm.ui.activities.BrowserActivity">
 
     <TableLayout
         android:layout_width="match_parent"

@@ -15,14 +15,15 @@
 package com.docd.purefm.settings;
 
 import com.docd.purefm.R;
-import com.docd.purefm.ui.activities.SuperuserActionBarMonitoredActivity;
+import com.docd.purefm.ui.activities.ActionBarIconMonitoredActivity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-public final class SettingsActivity extends SuperuserActionBarMonitoredActivity {
+public final class SettingsActivity extends ActionBarIconMonitoredActivity {
 
     private boolean needInvalidate;
 
@@ -35,6 +36,11 @@ public final class SettingsActivity extends SuperuserActionBarMonitoredActivity 
                 ActionBar.DISPLAY_HOME_AS_UP |
                 ActionBar.DISPLAY_SHOW_TITLE |
                 ActionBar.DISPLAY_USE_LOGO);
+    }
+
+    @Override
+    protected void setActionBarIcon(final Drawable icon) {
+        getActionBar().setIcon(icon);
     }
     
     @Override
@@ -54,6 +60,7 @@ public final class SettingsActivity extends SuperuserActionBarMonitoredActivity 
         this.onBeforeFinish();
         super.onBackPressed();
     }
+
 
     void proxyRestart() {
         restart();

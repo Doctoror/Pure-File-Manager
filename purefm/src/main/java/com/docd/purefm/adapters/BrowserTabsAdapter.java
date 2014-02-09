@@ -14,7 +14,7 @@
  */
 package com.docd.purefm.adapters;
 
-import com.docd.purefm.browser.BrowserFragment;
+import com.docd.purefm.ui.activities.BrowserFragment;
 
 import android.app.FragmentManager;
 import android.os.Bundle;

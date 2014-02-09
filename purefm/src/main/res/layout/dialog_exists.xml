@@ -17,7 +17,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.docd.purefm.browser.BrowserActivity">
+    tools:context="com.docd.purefm.ui.activities.BrowserActivity">
 
     <TextView
         android:layout_width="match_parent"

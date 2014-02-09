@@ -33,6 +33,8 @@ import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.ui.activities.AbstractBrowserActivity;
+import com.docd.purefm.ui.activities.BrowserActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,7 +68,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
     private Runnable mLastRunnable;
 
-    protected Browser(final BrowserActivity activity) {
+    public Browser(final AbstractBrowserActivity activity) {
         if (sHandler == null) {
             sHandler = new Handler(activity.getMainLooper());
         }
@@ -129,7 +131,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
     }
 
-    protected void setOnNavigateListener(OnNavigateListener l) {
+    public void setOnNavigateListener(OnNavigateListener l) {
         this.mNavigateListener = l;
     }
 

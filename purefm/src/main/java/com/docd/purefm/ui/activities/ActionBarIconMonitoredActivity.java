@@ -25,12 +25,7 @@ import com.docd.purefm.settings.Settings;
 /**
  * Manages ActionBar icon. If superuser is enabled, the ActionBar icon is ic_superuser, default otherwise
  */
-public abstract class SuperuserActionBarMonitoredActivity extends MonitoredActivity {
-
-    /**
-     * Current ActionBar
-     */
-    private ActionBar mActionBar;
+public abstract class ActionBarIconMonitoredActivity extends MonitoredActivity {
 
     /**
      * Default Activity icon
@@ -40,13 +35,17 @@ public abstract class SuperuserActionBarMonitoredActivity extends MonitoredActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mActionBar = this.getActionBar();
         try {
             mDefaultIcon = getPackageManager().getActivityIcon(this.getComponentName());
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             mDefaultIcon = getResources().getDrawable(R.drawable.ic_fso_folder);
         }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         this.invalidateActionBarIcon();
     }
 
@@ -61,11 +60,13 @@ public abstract class SuperuserActionBarMonitoredActivity extends MonitoredActiv
      */
     protected final void invalidateActionBarIcon() {
         if (Settings.su) {
-            mActionBar.setIcon(R.drawable.icon_root);
+            setActionBarIcon(getResources().getDrawable(R.drawable.icon_root));
         } else if (Settings.useCommandLine) {
-            mActionBar.setIcon(R.drawable.icon_shell);
+            setActionBarIcon(getResources().getDrawable(R.drawable.icon_shell));
         } else {
-            mActionBar.setIcon(mDefaultIcon);
+            setActionBarIcon(mDefaultIcon);
         }
     }
+
+    protected abstract void setActionBarIcon(final Drawable icon);
 }

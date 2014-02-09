@@ -16,5 +16,11 @@
     
     <dimen name="preview_width">48dp</dimen>
     <dimen name="list_item_file_size_width">64dp</dimen>
+
+    <!-- Vertical padding around action bar icons. -->
+    <dimen name="action_bar_icon_vertical_padding">8dip</dimen>
+
+    <dimen name="picker_dialog_width">300dp</dimen>
+    <dimen name="picker_dialog_height">300dp</dimen>
     
 </resources>

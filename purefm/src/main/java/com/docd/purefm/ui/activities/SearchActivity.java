@@ -16,7 +16,6 @@ package com.docd.purefm.ui.activities;
 
 import java.util.List;
 
-import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
@@ -33,6 +32,7 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -47,7 +47,7 @@ import android.widget.TextView;
  * Activity used for Searching files.
  * @author Doctoror
  */
-public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
+public final class SearchActivity extends ActionBarIconMonitoredActivity {
 
     private ActionModeController actionModeController;
 
@@ -69,6 +69,11 @@ public final class SearchActivity extends SuperuserActionBarMonitoredActivity {
         this.path = getIntent().getStringExtra(Extras.EXTRA_PATH);
         this.initActionBar();
         this.initView();
+    }
+
+    @Override
+    protected void setActionBarIcon(final Drawable icon) {
+        getActionBar().setIcon(icon);
     }
     
     @Override

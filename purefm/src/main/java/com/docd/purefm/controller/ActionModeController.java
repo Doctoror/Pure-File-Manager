@@ -32,7 +32,7 @@ import android.widget.Toast;
 import com.cyanogenmod.filemanager.ui.policy.IntentsActionPolicy;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
-import com.docd.purefm.browser.BrowserActivity;
+import com.docd.purefm.ui.activities.BrowserActivity;
 import com.docd.purefm.ui.dialogs.DeleteFilesDialog;
 import com.docd.purefm.ui.dialogs.FilePropertiesDialog;
 import com.docd.purefm.ui.dialogs.RenameFileDialog;

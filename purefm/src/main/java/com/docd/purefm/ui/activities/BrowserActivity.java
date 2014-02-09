@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.docd.purefm.browser;
+package com.docd.purefm.ui.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -41,18 +42,15 @@ import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.PureFM;
 import com.docd.purefm.R;
-import com.docd.purefm.ui.activities.SearchActivity;
-import com.docd.purefm.ui.activities.SuperuserActionBarMonitoredActivity;
+import com.docd.purefm.browser.Browser;
 import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
-import com.docd.purefm.browser.Browser.OnNavigateListener;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Activity that holds ViewPager with BrowserFragments
@@ -60,18 +58,13 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Doctoror
  */
-public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
-        implements OnNavigateListener {
+public final class BrowserActivity extends AbstractBrowserActivity {
 
     /**
      * Saved fragment state. This saving mechanism is used for restoring
      * the state when Activity is recreated because of theme change
      */
     private static final String EXTRA_SAVED_FRAGMENT_ADAPTER_STATE = "BrowserActivity.extras.SAVED_FRAGMENT_STATE";
-
-    public static final String TAG_DIALOG = "dialog";
-
-    public static final int REQUEST_CODE_SETTINGS = 0;
 
     private ActionBar mActionBar;
     private BreadCrumbTextView mBreadCrumbView;
@@ -94,11 +87,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
         this.currentlyDisplayedFragmentLock = new Object();
     }
 
-    /**
-     * If not null it means we are in GET_CONTENT mode
-     */
-    private String mGetContentMimeType;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +94,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
             savedInstanceState = getIntent().getBundleExtra(EXTRA_SAVED_STATE);
         }
         this.setContentView(R.layout.activity_browser);
-        this.checkIntentAction(getIntent());
         this.initActionBar();
         this.initView();
         this.restoreSavedState(savedInstanceState);
@@ -127,6 +114,11 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
     protected void onResume() {
         super.onResume();
         this.invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void setActionBarIcon(Drawable icon) {
+        getActionBar().setIcon(icon);
     }
 
     @Override
@@ -166,7 +158,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
         this.mActionBar.setCustomView(custom);
 
         this.mBreadCrumbView = (BreadCrumbTextView) custom
-                .findViewById(android.R.id.title);
+                .findViewById(R.id.bread_crumb_view);
     }
 
     private void initView() {
@@ -211,25 +203,31 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
         }
         return super.onOptionsItemSelected(item);
     }
-    
-    String getGetContentMimeType() {
-        return mGetContentMimeType;
-    }
 
     public void invalidateList() {
         mPagerAdapter.notifyDataSetChanged();
     }
 
-    @Nullable
-    BreadCrumbTextView getTitleView() {
-        return mBreadCrumbView;
+    @Override
+    protected BrowserFragment getCurrentlyDisplayedFragment() {
+        return mCurrentlyDisplayedFragment;
     }
 
-    public boolean isDrawerOpened() {
-        return isDrawerOpened;
+    @Override
+    protected void setOnSequenceClickListener(BreadCrumbTextView.OnSequenceClickListener
+                                                          sequenceListener) {
+        if (mBreadCrumbView != null) {
+            mBreadCrumbView.setOnSequenceClickListener(sequenceListener);
+        }
     }
 
-    public void updateCurrentlyDisplayedFragment(final BrowserFragment fragment) {
+    @Override
+    protected boolean shouldShowBrowserFragmentMenu() {
+        return !isDrawerOpened;
+    }
+
+    @Override
+    protected void setCurrentlyDisplayedFragment(final BrowserFragment fragment) {
         synchronized (currentlyDisplayedFragmentLock) {
             mCurrentlyDisplayedFragment = fragment;
         }
@@ -291,12 +289,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
         }
     }
 
-    @Override
-    protected void onNewIntent(Intent newIntent) {
-        super.onNewIntent(newIntent);
-        this.checkIntentAction(newIntent);
-    }
-
     /**
      * Should be called by BookmarksAdapter to set current path and close the Drawer
      */
@@ -314,19 +306,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
         }
     }
 
-    private void checkIntentAction(Intent intent) {
-        final String action = intent.getAction();
-        if (action != null && action.equals(Intent.ACTION_GET_CONTENT)) {
-            mGetContentMimeType = intent.getType();
-            if (mGetContentMimeType == null || mGetContentMimeType.isEmpty()) {
-                mGetContentMimeType = "*/*";
-            }
-            if (mPagerAdapter != null) {
-                mPagerAdapter.notifyDataSetChanged();
-            }
-        }
-    }
-
     @Override
     public void onBackPressed() {
         final boolean onFragmentBackPressed;
@@ -335,8 +314,6 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
                     && this.mCurrentlyDisplayedFragment.onBackPressed();
         }
         if (!onFragmentBackPressed) {
-            //if we aren't in ACTION_GET_CONTENT mode, show a confirm dialog, quit otherwise
-            if (mGetContentMimeType == null) {
                 final AlertDialog.Builder b = new AlertDialog.Builder(this);
                 b.setMessage(R.string.dialog_quit_message);
                 b.setCancelable(true);
@@ -361,10 +338,7 @@ public final class BrowserActivity extends SuperuserActionBarMonitoredActivity
                 if (!this.isFinishing()) {
                     dialog.show();
                 }
-            } else {
-                finish();
             }
-        }
     }
 
     @Override

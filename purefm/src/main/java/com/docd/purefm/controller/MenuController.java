@@ -17,7 +17,7 @@ package com.docd.purefm.controller;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.browser.Browser;
-import com.docd.purefm.browser.BrowserActivity;
+import com.docd.purefm.ui.activities.AbstractBrowserActivity;
 import com.docd.purefm.ui.activities.SearchActivity;
 import com.docd.purefm.settings.SettingsActivity;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
@@ -39,12 +39,12 @@ import android.view.MenuItem;
  */
 public final class MenuController {
 
-    private final BrowserActivity activity;
+    private final AbstractBrowserActivity activity;
     private final Browser browser;
 
     private BrowserBaseAdapter adapter;
 
-    public MenuController(BrowserActivity activity, Browser browser) {
+    public MenuController(AbstractBrowserActivity activity, Browser browser) {
         this.activity = activity;
         this.browser = browser;
     }
@@ -83,22 +83,22 @@ public final class MenuController {
                 return true;
 
             case R.id.menu_settings:
-                activity.startActivityForResult(new Intent(activity, SettingsActivity.class), BrowserActivity.REQUEST_CODE_SETTINGS);
+                activity.startActivityForResult(new Intent(activity, SettingsActivity.class), AbstractBrowserActivity.REQUEST_CODE_SETTINGS);
                 return true;
 
             case R.id.menu_folder_new:
                 final DialogFragment cd = CreateDirectoryDialog.instantiate(browser.getCurrentPath().toFile());
-                cd.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
+                cd.show(activity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
                 return true;
 
             case R.id.menu_file_new:
                 final DialogFragment cf = CreateFileDialog.instantiate(browser.getCurrentPath().toFile());
-                cf.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
+                cf.show(activity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
                 return true;
 
             case R.id.menu_partition:
                 final DialogFragment pid = PartitionInfoDialog.instantiate(browser.getCurrentPath());
-                pid.show(activity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
+                pid.show(activity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
                 return true;
 
             case R.id.menu_sort_name_asc:

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.docd.purefm.browser;
+package com.docd.purefm.ui.activities;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -39,6 +39,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.adapters.BrowserGridAdapter;
 import com.docd.purefm.adapters.BrowserListAdapter;
+import com.docd.purefm.browser.Browser;
 import com.docd.purefm.browser.Browser.OnNavigateListener;
 import com.docd.purefm.controller.ActionModeController;
 import com.docd.purefm.controller.MenuController;
@@ -50,7 +51,6 @@ import com.docd.purefm.ui.fragments.UserVisibleHintFragment;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.ThemeUtils;
-import com.docd.purefm.ui.view.BreadCrumbTextView;
 import com.docd.purefm.ui.view.BreadCrumbTextView.OnSequenceClickListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +72,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private static final String STATE_BROWSER = "BrowserFragment.state.mBrowser";
 
     //private ActionBar actionBar;
-    private BrowserActivity mAttachedBrowserActivity;
+    private AbstractBrowserActivity mAttachedBrowserActivity;
     private ActionModeController actionModeController;
     private MenuController menuController;
 
@@ -80,8 +80,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private BrowserBaseAdapter adapter;
     private OnNavigateListener mParentOnNavigateListener;
 
-    private BreadCrumbTextView bBreadCrumbView;
-    private OnSequenceClickListener sequenceListener;
+    private OnSequenceClickListener mOnSequenceListener;
 
     private PullToRefreshLayout mPullToRefreshLayout;
     private AbsListView mListView;
@@ -117,8 +116,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        if (activity instanceof BrowserActivity) {
-            mBrowser = new Browser((BrowserActivity) activity);
+        if (activity instanceof AbstractBrowserActivity) {
+            mBrowser = new Browser((AbstractBrowserActivity) activity);
         } else {
             throw new IllegalStateException("BrowserFragment should be attached only to BrowserActivity");
         }
@@ -153,7 +152,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
             }
         });
 
-        this.sequenceListener = new OnSequenceClickListener() {
+        this.mOnSequenceListener = new OnSequenceClickListener() {
             @Override
             public void onSequenceClick(String sequence) {
                 final GenericFile target = FileFactory.newFile(sequence);
@@ -161,7 +160,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
             }
         };
 
-        this.mAttachedBrowserActivity = (BrowserActivity) activity;
+        this.mAttachedBrowserActivity = (AbstractBrowserActivity) activity;
         this.menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
         this.actionModeController = new ActionModeController(this.mAttachedBrowserActivity);
     }
@@ -219,7 +218,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
         actionModeController.setListView(mListView);
         mParentOnNavigateListener = mAttachedBrowserActivity;
 
-        bBreadCrumbView = this.mAttachedBrowserActivity.getTitleView();
         mBrowser.restoreState(mBrowserInitialState);
         mBrowserInitialState = null;
     }
@@ -227,7 +225,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (this.mAttachedBrowserActivity != null && !this.mAttachedBrowserActivity.isDrawerOpened()) {
+        if (this.mAttachedBrowserActivity != null && this.mAttachedBrowserActivity
+                .shouldShowBrowserFragmentMenu()) {
             inflater.inflate(R.menu.browser, menu);
 
             // TODO it returns true even on devices that don't have the physical key. Find a better method to detect search hardware button
@@ -373,11 +372,11 @@ public final class BrowserFragment extends UserVisibleHintFragment
         if (this.firstRun || this.refreshFlag) {
             onFirstInvalidate();
         } else {
-            mParentOnNavigateListener.onNavigationCompleted(this.mBrowser
+            mParentOnNavigateListener.onNavigationCompleted(mBrowser
                     .getCurrentPath());
         }
-        bBreadCrumbView.setOnSequenceClickListener(this.sequenceListener);
-        mAttachedBrowserActivity.updateCurrentlyDisplayedFragment(this);
+        mAttachedBrowserActivity.setOnSequenceClickListener(mOnSequenceListener);
+        mAttachedBrowserActivity.setCurrentlyDisplayedFragment(this);
     }
 
     @Override
