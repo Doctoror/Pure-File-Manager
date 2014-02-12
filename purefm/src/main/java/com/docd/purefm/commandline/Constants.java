@@ -24,8 +24,23 @@ public final class Constants {
     private Constants() {}
 
     /**
-     * Android Group id for SDCARD_RW
+     * Android user id for sdcard_rw
      */
-    public static final int GID_SDCARD = 1015;
+    public static final int SDCARD_RW = 1015;
+
+    /**
+     * Android user id for sdcard_r
+     */
+    public static final int SDCARD_R = 1028;
+
+    /**
+     * Android user id for media_rw
+     */
+    public static final int MEIDA_RW = 1023;
+
+    /**
+     * Android user id for MTP
+     */
+    public static final int MTP = 1024;
 
 }

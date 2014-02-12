@@ -411,12 +411,13 @@ public final class CommandLineFile implements GenericFile,
     @Nullable
     @Override
     public String[] list() {
-        final List<String> res = CommandLine.executeForResult(
-                ShellHolder.getShell(), new CommandListContents(this));
-        if (res != null) {
-            final String[] result = new String[res.size()];
-            res.toArray(result);
-            return result;
+        final GenericFile[] files = listFiles();
+        if (files != null) {
+            final String[] result = new String[files.length];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = files[i].getName();
+                return result;
+            }
         }
         return null;
     }
@@ -697,7 +698,16 @@ public final class CommandLineFile implements GenericFile,
         if (!this.mExists) {
             return false;
         }
-        if (this.mGroup == Constants.GID_SDCARD) {
+        if (this.mOwner == Constants.SDCARD_RW ||
+                this.mOwner == Constants.SDCARD_R ||
+                this.mOwner == Constants.MEIDA_RW ||
+                this.mOwner == Constants.MTP) {
+            return this.mPermissions.ur;
+        }
+        if (this.mGroup == Constants.SDCARD_RW ||
+                this.mGroup == Constants.SDCARD_R ||
+                this.mGroup == Constants.MEIDA_RW ||
+                this.mGroup == Constants.MTP) {
             return this.mPermissions.gr;
         }
         return this.mPermissions.or;
@@ -708,7 +718,16 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public boolean canWrite() {
-        if (this.mGroup == Constants.GID_SDCARD) {
+        if (this.mOwner == Constants.SDCARD_RW ||
+                this.mOwner == Constants.SDCARD_R || // on some devices it's still writable
+                this.mOwner == Constants.MEIDA_RW ||
+                this.mOwner == Constants.MTP) {
+            return this.mPermissions.uw;
+        }
+        if (this.mGroup == Constants.SDCARD_RW ||
+                this.mGroup == Constants.SDCARD_R || // on some devices it's still writable
+                this.mGroup == Constants.MEIDA_RW ||
+                this.mGroup == Constants.MTP) {
             return this.mPermissions.gw;
         }
         return this.mPermissions.ow;
@@ -722,7 +741,16 @@ public final class CommandLineFile implements GenericFile,
         if (!this.mExists) {
             return false;
         }
-        if (this.mGroup == Constants.GID_SDCARD) {
+        if (this.mOwner == Constants.SDCARD_RW ||
+                this.mOwner == Constants.SDCARD_R ||
+                this.mOwner == Constants.MEIDA_RW ||
+                this.mOwner == Constants.MTP) {
+            return this.mPermissions.ux;
+        }
+        if (this.mGroup == Constants.SDCARD_RW ||
+                this.mGroup == Constants.SDCARD_R ||
+                this.mGroup == Constants.MEIDA_RW ||
+                this.mGroup == Constants.MTP) {
             return this.mPermissions.gx;
         }
         return this.mPermissions.ox;

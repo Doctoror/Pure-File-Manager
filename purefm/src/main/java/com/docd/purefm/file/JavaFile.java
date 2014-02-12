@@ -454,4 +454,12 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     public boolean canExecute() {
         return this.mFile.canExecute();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return this.mFile.toString();
+    }
 }
