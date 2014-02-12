@@ -32,7 +32,7 @@ import android.widget.Toast;
 import com.cyanogenmod.filemanager.ui.policy.IntentsActionPolicy;
 import com.docd.purefm.R;
 import com.docd.purefm.adapters.BrowserBaseAdapter;
-import com.docd.purefm.ui.activities.BrowserActivity;
+import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.ui.dialogs.DeleteFilesDialog;
 import com.docd.purefm.ui.dialogs.FilePropertiesDialog;
 import com.docd.purefm.ui.dialogs.RenameFileDialog;
@@ -143,7 +143,7 @@ public final class ActionModeController {
                                     .instantiate(mode, (GenericFile) mListView
                                             .getAdapter().getItem(key));
                             rename.show(mActivity.getFragmentManager(),
-                                    BrowserActivity.TAG_DIALOG);
+                                    BrowserPagerActivity.TAG_DIALOG);
                             return true;
                         }
                     }
@@ -158,7 +158,7 @@ public final class ActionModeController {
                                             .getAdapter().getItem(key));
                             mode.finish();
                             prop.show(mActivity.getFragmentManager(),
-                                    BrowserActivity.TAG_DIALOG);
+                                    BrowserPagerActivity.TAG_DIALOG);
                             break;
                         }
                     }
@@ -174,7 +174,7 @@ public final class ActionModeController {
                         }
                     }
                     final DialogFragment dialog = DeleteFilesDialog.instantiate(mode, files1);
-                    dialog.show(mActivity.getFragmentManager(), BrowserActivity.TAG_DIALOG);
+                    dialog.show(mActivity.getFragmentManager(), BrowserPagerActivity.TAG_DIALOG);
                     return true;
 
                 case android.R.id.cut:

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 /**
- * FragmentPagerAdapter for BrowserFragments used by BrowserActivity
+ * FragmentPagerAdapter for BrowserFragments used by BrowserPagerActivity
  *
  * @author Doctoror
  */

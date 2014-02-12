@@ -19,7 +19,7 @@
     android:layout_gravity="center_vertical"
     android:scrollbars="none"
     android:overScrollMode="never"
-    tools:context="com.docd.purefm.ui.activities.BrowserActivity">
+    tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity">
 
     <com.docd.purefm.ui.view.BreadCrumbTextView
         android:id="@+id/bread_crumb_view"

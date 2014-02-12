@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
-import com.docd.purefm.ui.activities.BrowserActivity;
+import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.BookmarksHelper;
@@ -38,7 +38,7 @@ public final class BookmarksAdapter implements ListAdapter {
     
     private final DataSetObservable mDataSetObservable;
     private final LayoutInflater inflater;
-    private final BrowserActivity activity;
+    private final BrowserPagerActivity activity;
     
     private boolean modified;
     
@@ -51,7 +51,7 @@ public final class BookmarksAdapter implements ListAdapter {
     
     private String rootDisplayName;
     
-    public BookmarksAdapter(final BrowserActivity activity, final Set<String> user) {
+    public BookmarksAdapter(final BrowserPagerActivity activity, final Set<String> user) {
         this.activity = activity;
         this.mDataSetObservable = new DataSetObservable();
         this.inflater = activity.getLayoutInflater();

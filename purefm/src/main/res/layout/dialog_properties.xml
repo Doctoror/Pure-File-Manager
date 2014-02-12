@@ -20,7 +20,7 @@
     android:padding="20dp"
     android:stretchColumns="1"
     android:shrinkColumns="1"
-    tools:context="com.docd.purefm.ui.activities.BrowserActivity">
+    tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity">
 
     <TableRow
         android:layout_width="match_parent"

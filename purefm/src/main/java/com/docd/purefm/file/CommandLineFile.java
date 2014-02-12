@@ -277,10 +277,8 @@ public final class CommandLineFile implements GenericFile,
             this.mExists = false;
             this.mIsDirectory = false;
             this.mIsSymlink = false;
-            this.mOwner = 0;
-            this.mGroup = 0;
+            this.mLastmod = 0;
             this.mLength = 0;
-            this.mPermissions = null;
             return true;
         }
         return false;
@@ -718,6 +716,9 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public boolean canWrite() {
+        if (!this.mExists) {
+            return false;
+        }
         if (this.mOwner == Constants.SDCARD_RW ||
                 this.mOwner == Constants.SDCARD_R || // on some devices it's still writable
                 this.mOwner == Constants.MEIDA_RW ||

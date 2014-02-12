@@ -49,7 +49,7 @@ public final class ShellHolder {
     }
 
     /**
-     * The shell is set by BrowserActivity and is released when BrowserActivity is destroyed
+     * The shell is set by BrowserPagerActivity and is released when BrowserPagerActivity is destroyed
      *
      * @return shell shared Shell instance
      */

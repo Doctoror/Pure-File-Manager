@@ -34,7 +34,6 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.activities.AbstractBrowserActivity;
-import com.docd.purefm.ui.activities.BrowserActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

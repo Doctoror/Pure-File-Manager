@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -57,7 +56,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
         } catch (IOException e) {
 
         }
-        testDir.mkdirs();
+        assertTrue(testDir.mkdirs());
 
         // init what application inits
         final Context context = this.getContext();
@@ -96,10 +95,11 @@ public final class CommandLineFileTest extends AndroidTestCase {
     private void testAgainstJavaIoFile() {
         CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         testAgainstJavaIoFile(file1, test1);
-        file1.delete();
-        //file1 = (CommandLineFile) FileFactory.newFile(test1);
-        //testAgainstJavaIoFile(file1, test1);
-        file1.mkdir();
+        assertTrue(file1.delete());
+        testAgainstJavaIoFile(file1, test1);
+        assertTrue(file1.mkdir());
+        testAgainstJavaIoFile(file1, test1);
+        file1.createNewFile();
         testAgainstJavaIoFile(file1, test1);
 
         try {
@@ -108,6 +108,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
             throw new RuntimeException("Failed to create test file: " + e);
         }
 
+        file1 = (CommandLineFile) FileFactory.newFile(test1);
         testAgainstJavaIoFile(file1, test1);
 
         try {
@@ -127,13 +128,20 @@ public final class CommandLineFileTest extends AndroidTestCase {
         assertEquals(javaFile, genericFile.toFile());
         assertEquals(javaFile.getName(), genericFile.getName());
         assertEquals(javaFile.getAbsolutePath(), genericFile.getAbsolutePath());
+        assertEquals(javaFile.exists(), genericFile.exists());
         assertEquals(javaFile.canRead(), genericFile.canRead());
         assertEquals(javaFile.canWrite(), genericFile.canWrite());
         assertEquals(javaFile.canExecute(), genericFile.canExecute());
-        assertEquals(javaFile.exists(), genericFile.exists());
         assertEquals(javaFile.getPath(), genericFile.getPath());
         assertEquals(javaFile.getParent(), genericFile.getParent());
-        assertEquals(javaFile.getParentFile(), genericFile.getParentFile().toFile());
+        final File parentFile;
+        final GenericFile genericParentFile = genericFile.getParentFile();
+        if (genericParentFile == null) {
+            parentFile = null;
+        } else {
+            parentFile = genericParentFile.toFile();
+        }
+        assertEquals(javaFile.getParentFile(), parentFile);
         assertEquals(javaFile.length(), genericFile.length());
         try {
             assertEquals(FileUtils.isSymlink(javaFile), genericFile.isSymlink());
@@ -156,14 +164,10 @@ public final class CommandLineFileTest extends AndroidTestCase {
             return true;
         }
         if (javaIoFiles == null) {
-            if (genericFiles.length == 0) {
-                return true;
-            }
+            return genericFiles.length == 0;
         }
         if (genericFiles == null) {
-            if (javaIoFiles.length == 0) {
-                return true;
-            }
+            return javaIoFiles.length == 0;
         }
         if (javaIoFiles.length != genericFiles.length) {
             return false;
@@ -181,14 +185,10 @@ public final class CommandLineFileTest extends AndroidTestCase {
             return true;
         }
         if (javaIoFiles == null) {
-            if (genericFiles.length == 0) {
-                return true;
-            }
+            return genericFiles.length == 0;
         }
         if (genericFiles == null) {
-            if (javaIoFiles.length == 0) {
-                return true;
-            }
+            return javaIoFiles.length == 0;
         }
         if (javaIoFiles.length != genericFiles.length) {
             return false;
@@ -261,14 +261,15 @@ public final class CommandLineFileTest extends AndroidTestCase {
     private void testMkdir() {
         final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         file1.delete();
-        file1.mkdir();
+        assertIsEmptyFile(file1);
+        assertTrue(file1.mkdir());
         assertIsDirectory(file1);
     }
 
     private void testMkdirs() {
         final CommandLineFile file3 = (CommandLineFile) FileFactory.newFile(test3);
         assertIsEmptyFile(file3);
-        file3.mkdirs();
+        assertTrue(file3.mkdirs());
         assertIsDirectory(file3);
     }
 

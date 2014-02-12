@@ -19,4 +19,4 @@
     android:saveEnabled="false"
     android:choiceMode="multipleChoiceModal"
     tools:listitem="@layout/list_item_file"
-    tools:context="com.docd.purefm.ui.activities.BrowserActivity"/>
+    tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity"/>
