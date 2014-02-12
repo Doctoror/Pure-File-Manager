@@ -58,13 +58,13 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Doctoror
  */
-public final class BrowserActivity extends AbstractBrowserActivity {
+public final class BrowserPagerActivity extends AbstractBrowserActivity {
 
     /**
      * Saved fragment state. This saving mechanism is used for restoring
      * the state when Activity is recreated because of theme change
      */
-    private static final String EXTRA_SAVED_FRAGMENT_ADAPTER_STATE = "BrowserActivity.extras.SAVED_FRAGMENT_STATE";
+    private static final String EXTRA_SAVED_FRAGMENT_ADAPTER_STATE = "BrowserPagerActivity.extras.SAVED_FRAGMENT_STATE";
 
     private ActionBar mActionBar;
     private BreadCrumbTextView mBreadCrumbView;
@@ -83,7 +83,7 @@ public final class BrowserActivity extends AbstractBrowserActivity {
     private final Object currentlyDisplayedFragmentLock;
     private BrowserFragment mCurrentlyDisplayedFragment;
 
-    public BrowserActivity() {
+    public BrowserPagerActivity() {
         this.currentlyDisplayedFragmentLock = new Object();
     }
 
@@ -146,7 +146,7 @@ public final class BrowserActivity extends AbstractBrowserActivity {
     private void initActionBar() {
         this.mActionBar = this.getActionBar();
         if (this.mActionBar == null) {
-            throw new RuntimeException("BrowserActivity should have an ActionBar");
+            throw new RuntimeException("BrowserPagerActivity should have an ActionBar");
         }
         this.mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_SHOW_CUSTOM
