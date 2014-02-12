@@ -21,6 +21,7 @@ import android.test.AndroidTestCase;
 import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.PureFMTextUtils;
@@ -32,6 +33,10 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public final class CommandLineFileTest extends AndroidTestCase {
 
@@ -50,7 +55,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
         try {
             FileUtils.forceDelete(testDir);
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
         testDir.mkdirs();
 
@@ -78,18 +83,157 @@ public final class CommandLineFileTest extends AndroidTestCase {
         }
         Settings.useCommandLine = true;
 
+        testAgainstJavaIoFile();
+        testFileReading();
+        testFileDeletion();
+        testFileCreation();
+        testFileMoving();
+        testFileCopying();
+        testMkdir();
+        testMkdirs();
+    }
+
+    private void testAgainstJavaIoFile() {
         CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        testAgainstJavaIoFile(file1, test1);
+        file1.delete();
+        //file1 = (CommandLineFile) FileFactory.newFile(test1);
+        //testAgainstJavaIoFile(file1, test1);
+        file1.mkdir();
+        testAgainstJavaIoFile(file1, test1);
+
+        try {
+            FileUtils.write(new File(test1, "test more"), "test");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create test file: " + e);
+        }
+
+        testAgainstJavaIoFile(file1, test1);
+
+        try {
+            FileUtils.forceDelete(file1.toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileUtils.write(test1, "test");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create test file: " + e);
+        }
+    }
+
+    private static void testAgainstJavaIoFile(final CommandLineFile genericFile, final File javaFile) {
+        assertEquals(javaFile, genericFile.toFile());
+        assertEquals(javaFile.getName(), genericFile.getName());
+        assertEquals(javaFile.getAbsolutePath(), genericFile.getAbsolutePath());
+        assertEquals(javaFile.canRead(), genericFile.canRead());
+        assertEquals(javaFile.canWrite(), genericFile.canWrite());
+        assertEquals(javaFile.canExecute(), genericFile.canExecute());
+        assertEquals(javaFile.exists(), genericFile.exists());
+        assertEquals(javaFile.getPath(), genericFile.getPath());
+        assertEquals(javaFile.getParent(), genericFile.getParent());
+        assertEquals(javaFile.getParentFile(), genericFile.getParentFile().toFile());
+        assertEquals(javaFile.length(), genericFile.length());
+        try {
+            assertEquals(FileUtils.isSymlink(javaFile), genericFile.isSymlink());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        assertEquals(javaFile.length(), genericFile.length());
+        assertEquals(javaFile.isDirectory(), genericFile.isDirectory());
+        if (genericFile.isDirectory()) {
+            assertTrue(listedPathsEqual(javaFile.list(), genericFile.list()));
+            assertTrue(listedFilesEqual(javaFile.listFiles(), genericFile.listFiles()));
+        }
+
+        assertEquals(lasModifiedFromFormattedDateUTC(javaFile.lastModified()),
+                lasModifiedFromFormattedDate(genericFile.lastModified()));
+    }
+
+    private static boolean listedFilesEqual(final File[] javaIoFiles, final GenericFile[] genericFiles) {
+        if (javaIoFiles == null && genericFiles == null) {
+            return true;
+        }
+        if (javaIoFiles == null) {
+            if (genericFiles.length == 0) {
+                return true;
+            }
+        }
+        if (genericFiles == null) {
+            if (javaIoFiles.length == 0) {
+                return true;
+            }
+        }
+        if (javaIoFiles.length != genericFiles.length) {
+            return false;
+        }
+        for (int i = 0; i < javaIoFiles.length; i++) {
+            if (!javaIoFiles[i].getAbsolutePath().equals(genericFiles[i].getAbsolutePath())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean listedPathsEqual(final String[] javaIoFiles, final String[] genericFiles) {
+        if (javaIoFiles == null && genericFiles == null) {
+            return true;
+        }
+        if (javaIoFiles == null) {
+            if (genericFiles.length == 0) {
+                return true;
+            }
+        }
+        if (genericFiles == null) {
+            if (javaIoFiles.length == 0) {
+                return true;
+            }
+        }
+        if (javaIoFiles.length != genericFiles.length) {
+            return false;
+        }
+        for (int i = 0; i < javaIoFiles.length; i++) {
+            if (!javaIoFiles[i].equals(genericFiles[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static String lasModifiedFromFormattedDate(final long lastMod) {
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        return format.format(lastMod);
+    }
+
+    private static String lasModifiedFromFormattedDateUTC(final long lastMod) {
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format.format(lastMod);
+    }
+
+    private void testFileReading() {
+        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         assertEquals(test1.getAbsolutePath(), file1.getAbsolutePath());
         assertEquals(test1, file1.toFile());
         assertIsNormalFile(file1);
         assertEquals(4, file1.length());
+    }
 
-        System.out.println("going to delete");
+    private void testFileDeletion() {
+        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         file1.delete();
         assertIsEmptyFile(file1);
+    }
 
+    private void testFileCreation() {
+        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         file1.createNewFile();
         assertIsNormalFile(file1);
+    }
+
+    private void testFileMoving() {
+        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         final String file1sum = md5sum(file1.toFile());
 
         CommandLineFile file2 = (CommandLineFile) FileFactory.newFile(test2);
@@ -101,19 +245,27 @@ public final class CommandLineFileTest extends AndroidTestCase {
         file2 = (CommandLineFile) FileFactory.newFile(test2);
         assertIsNormalFile(file2);
         assertEquals(file1sum, md5sum(file2.toFile()));
+    }
+
+    private void testFileCopying() {
+        CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        final CommandLineFile file2 = (CommandLineFile) FileFactory.newFile(test2);
 
         file2.copy(file1);
         file1 = (CommandLineFile) FileFactory.newFile(test1);
         assertIsNormalFile(file1);
         assertIsNormalFile(file2);
-        assertEquals(file1sum, md5sum(file1.toFile()));
+        assertEquals(md5sum(file2.toFile()), md5sum(file1.toFile()));
+    }
 
+    private void testMkdir() {
+        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
         file1.delete();
-        file2.delete();
-
         file1.mkdir();
         assertIsDirectory(file1);
+    }
 
+    private void testMkdirs() {
         final CommandLineFile file3 = (CommandLineFile) FileFactory.newFile(test3);
         assertIsEmptyFile(file3);
         file3.mkdirs();
