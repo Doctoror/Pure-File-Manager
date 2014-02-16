@@ -85,11 +85,24 @@ public final class JavaFileTest extends AndroidTestCase {
         assertEquals(javaFile.exists(), genericFile.exists());
         assertEquals(javaFile.getPath(), genericFile.getPath());
         assertEquals(javaFile.getParent(), genericFile.getParent());
-        assertEquals(javaFile.getParentFile(), genericFile.getParentFile().toFile());
+        assertEquals(javaFile.length(), genericFile.length());
+        final File parentFile;
+        final GenericFile genericParentFile = genericFile.getParentFile();
+        if (genericParentFile == null) {
+            parentFile = null;
+        } else {
+            parentFile = genericParentFile.toFile();
+        }
+        assertEquals(javaFile.getParentFile(), parentFile);
         assertEquals(javaFile.length(), genericFile.length());
         try {
             assertEquals(FileUtils.isSymlink(javaFile), genericFile.isSymlink());
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            assertEquals(javaFile.getCanonicalPath(), genericFile.getCanonicalPath());
+        } catch (IOException e) {
             e.printStackTrace();
         }
         assertEquals(javaFile.length(), genericFile.length());

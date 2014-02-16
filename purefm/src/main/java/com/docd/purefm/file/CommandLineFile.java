@@ -17,6 +17,7 @@ package com.docd.purefm.file;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -59,6 +60,7 @@ public final class CommandLineFile implements GenericFile,
     private static final int LS_FILE = 10;
 
     private final File mFile;
+    private final String mCanonicalPath;
     private Permissions mPermissions;
     private long mLength;
     private long mLastmod;
@@ -72,16 +74,25 @@ public final class CommandLineFile implements GenericFile,
     private boolean mIsSymlink;
     private boolean mIsDirectory;
 
-    private CommandLineFile(File file) {
+    private CommandLineFile(@NotNull File file) {
         this.mFile = file;
+        this.mCanonicalPath = null;
     }
 
-    private CommandLineFile(String path) {
+    private CommandLineFile(@NotNull String path) {
         this.mFile = new File(path);
+        this.mCanonicalPath = null;
     }
 
-    private CommandLineFile(File parent, String line) {
-        this.mFile = new File(parent, line);
+    private CommandLineFile(@NotNull File parent, @NotNull String name) {
+        this.mFile = new File(parent, name);
+        this.mCanonicalPath = null;
+    }
+
+    private CommandLineFile(@NotNull File parent, @NotNull  String name,
+                            @NotNull String canonicalPath) {
+        this.mFile = new File(parent, name);
+        this.mCanonicalPath = canonicalPath;
     }
 
     /**
@@ -119,11 +130,12 @@ public final class CommandLineFile implements GenericFile,
         }
 
         String name = attrs[LS_FILE];
+        String canonicalPath;
         // if is symlink then resolve real path
         //String targetName = null;
         final int index = name.indexOf("->");
         if (index != -1) {
-            //targetName = name.substring(index + 3).trim();
+            canonicalPath = name.substring(index + 3).trim();
             name = name.substring(0, index).trim();
         }
         final CommandLineFile f = parent == null ? new CommandLineFile(name)
@@ -448,7 +460,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
                 new CommandTouch(mFile.getAbsolutePath()));
         if (result) {
-            this.apply((CommandLineFile) FileFactory.newFile(mFile));
+            this.apply(new CommandLineFile(mFile));
         }
         return result;
     }
@@ -461,7 +473,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
                 new CommandMkdir(mFile.getAbsolutePath()));
         if (result) {
-            this.apply((CommandLineFile) FileFactory.newFile(mFile));
+            this.apply(new CommandLineFile(mFile));
         }
         return result;
     }
@@ -474,7 +486,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
                 new CommandMkdirs(mFile.getAbsolutePath()));
         if (result) {
-            this.apply((CommandLineFile) FileFactory.newFile(mFile));
+            this.apply(new CommandLineFile(mFile));
         }
         return result;
     }
@@ -521,10 +533,25 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
+    @NotNull
+    @Override
+    public String getCanonicalPath() throws IOException {
+        if (this.mCanonicalPath != null) {
+            return this.mCanonicalPath;
+        }
+        return this.mFile.getCanonicalPath();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
+        }
+        if (obj == this) {
+            return true;
         }
         if (obj instanceof CommandLineFile) {
             return ((CommandLineFile) obj).mFile.equals(this.mFile);

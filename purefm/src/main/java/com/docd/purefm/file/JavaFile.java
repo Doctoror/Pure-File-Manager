@@ -349,6 +349,15 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
+    @NotNull
+    @Override
+    public String getCanonicalPath() throws IOException {
+        return this.mFile.getCanonicalPath();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

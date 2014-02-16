@@ -145,7 +145,12 @@ public final class CommandLineFileTest extends AndroidTestCase {
         assertEquals(javaFile.length(), genericFile.length());
         try {
             assertEquals(FileUtils.isSymlink(javaFile), genericFile.isSymlink());
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            assertEquals(javaFile.getCanonicalPath(), genericFile.getCanonicalPath());
+        } catch (IOException e) {
             e.printStackTrace();
         }
         assertEquals(javaFile.length(), genericFile.length());

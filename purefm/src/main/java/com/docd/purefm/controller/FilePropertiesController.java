@@ -14,10 +14,12 @@
  */
 package com.docd.purefm.controller;
 
-import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.PureFMTextUtils;
@@ -41,11 +43,17 @@ public final class FilePropertiesController {
         name.setText(mFile.getName());
         
         final TextView parent = (TextView) mView.findViewById(R.id.location);
-        String par = mFile.toFile().getParent();
-        if (par == null || par.isEmpty()) {
-            par = File.listRoots()[0].getPath();
+        GenericFile par = mFile.getParentFile();
+        if (par == null) {
+            par = FileFactory.newFile(Environment.rootDirectory);
         }
-        parent.setText(par);
+        String parentPath;
+        try {
+            parentPath = par.getCanonicalPath();
+        } catch (IOException e) {
+            parentPath = par.getAbsolutePath();
+        }
+        parent.setText(parentPath);
         
         final TextView type = (TextView) mView.findViewById(R.id.type);
         type.setText(mFile.isSymlink() ? R.string.type_symlink :

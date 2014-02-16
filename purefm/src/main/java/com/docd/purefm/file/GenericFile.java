@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Serializable;
 
 public interface GenericFile extends Serializable {
@@ -185,6 +186,32 @@ public interface GenericFile extends Serializable {
      */
     @NotNull
     String getAbsolutePath();
+
+    /**
+     * Returns the canonical path of this file.
+     * An <i>absolute</i> path is one that begins at the root of the file system.
+     * A <i>canonical</i> path is an absolute path with symbolic links
+     * and references to "." or ".." resolved. If a path element does not exist (or
+     * is not searchable), there is a conflict between interpreting canonicalization
+     * as a textual operation (where "a/../b" is "b" even if "a" does not exist) .
+     *
+     * <p>Most callers should use {@link #getAbsolutePath} instead. A canonical path is
+     * significantly more expensive to compute, and not generally useful. The primary
+     * use for canonical paths is determining whether two paths point to the same file by
+     * comparing the canonicalized paths.
+     *
+     * <p>It can be actively harmful to use a canonical path, specifically because
+     * canonicalization removes symbolic links. It's wise to assume that a symbolic link
+     * is present for a reason, and that that reason is because the link may need to change.
+     * Canonicalization removes this layer of indirection. Good code should generally avoid
+     * caching canonical paths.
+     *
+     * @return the canonical path of this file.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    @NotNull
+    public String getCanonicalPath() throws IOException;
 
     /**
      * Returns the pathname of the parent of this file. This is the path up to
