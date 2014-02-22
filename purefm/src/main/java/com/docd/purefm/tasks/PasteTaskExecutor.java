@@ -19,7 +19,6 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,6 +27,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandExists;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
+import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
@@ -35,16 +35,16 @@ import com.docd.purefm.utils.ClipBoard;
 
 public final class PasteTaskExecutor implements OnClickListener {
 
-    private final WeakReference<Activity> activity;
+    private final WeakReference<MonitoredActivity> activity;
     
     private final GenericFile targetPath;
     private final LinkedList<GenericFile> toProcess;
     private final HashMap<File, GenericFile> exist;
-    
+
     private GenericFile current;
     
-    public PasteTaskExecutor(final Activity activity, final GenericFile targetPath) {
-        this.activity = new WeakReference<Activity>(activity);
+    public PasteTaskExecutor(final MonitoredActivity activity, final GenericFile targetPath) {
+        this.activity = new WeakReference<MonitoredActivity>(activity);
         this.targetPath = targetPath;
         this.toProcess = new LinkedList<GenericFile>();
         this.exist = new HashMap<File, GenericFile>();
@@ -118,7 +118,7 @@ public final class PasteTaskExecutor implements OnClickListener {
         next();
     }   
     private void next() {
-        final Activity activity = this.activity.get();
+        final MonitoredActivity activity = this.activity.get();
         if (activity != null) {
             if (exist.isEmpty()) {
             
@@ -127,7 +127,7 @@ public final class PasteTaskExecutor implements OnClickListener {
                 } else {
                     final GenericFile[] files = new GenericFile[toProcess.size()];
                     toProcess.toArray(files);
-            
+
                     final PasteTask task = new PasteTask(activity, this.targetPath);
                     task.execute(files);
                 }

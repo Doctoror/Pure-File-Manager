@@ -24,6 +24,16 @@ import com.docd.purefm.ActivityMonitor;
  */
 public abstract class MonitoredActivity extends ThemableActivity {
 
+    public interface OnStopListener {
+        void onActivityStop(MonitoredActivity activity);
+    }
+
+    private OnStopListener mOnStopListener;
+
+    public void setOnStopListener(final OnStopListener l) {
+        mOnStopListener = l;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -49,6 +59,9 @@ public abstract class MonitoredActivity extends ThemableActivity {
     protected void onStop() {
         super.onStop();
         ActivityMonitor.onStop(this);
+        if (mOnStopListener != null) {
+            mOnStopListener.onActivityStop(this);
+        }
     }
 
     /**

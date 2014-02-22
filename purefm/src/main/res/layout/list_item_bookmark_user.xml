@@ -41,7 +41,8 @@
         android:ellipsize="marquee"
         android:textIsSelectable="false"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        tools:text="Pictures"/>
+        tools:text="Pictures"
+        tools:ignore="RtlSymmetry"/>
     
     <TextView
         android:id="@android:id/summary"
@@ -56,7 +57,8 @@
         android:ellipsize="marquee"
         android:textIsSelectable="false"
         android:textSize="12sp"
-        tools:text="/storage/sdcard0/Pictures"/>
+        tools:text="/storage/sdcard0/Pictures"
+        tools:ignore="RtlSymmetry"/>
     
     <ImageButton
         android:id="@android:id/button1"

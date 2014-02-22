@@ -19,7 +19,6 @@ import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -46,7 +45,6 @@ public final class MediaStoreUtils {
                 null);
         if (c != null) {
             final long id = c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns._ID));
-            System.out.println("id: " + id);
             contentResolver.delete(ContentUris.withAppendedId(EXTERNAL_CONTENT_URI, id), null, null);
             c.close();
         }
@@ -55,7 +53,6 @@ public final class MediaStoreUtils {
     public static void deleteFiles(final ContentResolver contentResolver, final List<File> files) {
         final Pair<String, String[]> selectionAndPaths = filesToSelectionAndPaths(files);
         final Cursor c = contentResolver.query(EXTERNAL_CONTENT_URI, FIELDS, selectionAndPaths.first, selectionAndPaths.second, null);
-        System.out.println("q: " + java.util.Arrays.toString(selectionAndPaths.second));
         if (c != null) {
             for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                 final long id = c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns._ID));

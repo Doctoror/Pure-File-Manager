@@ -19,8 +19,10 @@ import java.io.File;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -29,6 +31,8 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.tasks.CreateFileTask;
+import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 public final class CreateFileDialog extends DialogFragment {
@@ -42,61 +46,43 @@ public final class CreateFileDialog extends DialogFragment {
         return cd;
     }
 
-    private EditText filename;
+    private EditText mFileNameInput;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        this.buildEditText();
+        final MonitoredActivity activity = (MonitoredActivity) getActivity();
+        this.buildEditText(activity);
         final File current = (File) this.getArguments().getSerializable(Extras.EXTRA_CURRENT_DIR);
-        final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder b = new AlertDialog.Builder(activity);
         b.setTitle(R.string.dialog_new_file_title);
-        b.setView(this.filename);
+        b.setView(this.mFileNameInput);
         b.setPositiveButton(R.string.create,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (filename.getText().length() == 0) {
-                            Toast.makeText(getActivity(), R.string.name_empty,
-                                    Toast.LENGTH_SHORT).show();
-                            return;
+                        String newName = mFileNameInput.getText().toString().trim();
+                        if (newName.isEmpty()) {
+                            newName = mFileNameInput.getHint().toString();
                         }
-                        final String name = filename.getText().toString();
-                        if (!PureFMFileUtils.isValidFileName(name)) {
-                            Toast.makeText(getActivity(),
-                                    R.string.invalid_filename,
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        final GenericFile target = FileFactory.newFile(current, name);
+                        final GenericFile target = FileFactory.newFile(current, newName);
                         if (target.exists()) {
-                            Toast.makeText(getActivity(), R.string.file_exists,
+                            Toast.makeText(activity, R.string.file_exists,
                                     Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        createFile(target);
-                        dialog.dismiss();
+                        new CreateFileTask(activity).execute(target);
                     }
                 });
-        b.setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        b.setNegativeButton(R.string.cancel, null);
         return b.create();
     }
 
-    private void buildEditText() {
-        this.filename = (EditText) LayoutInflater.from(
-                getActivity()).inflate(R.layout.text_field_filename, null);
-        this.filename.setHint(R.string.menu_new_file);
-    }
-
-    private void createFile(GenericFile target) {
-        if (!target.createNewFile()) {
-            Toast.makeText(getActivity(), R.string.could_not_create_file,
-                    Toast.LENGTH_SHORT).show();
-        }
+    private void buildEditText(final Context context) {
+        mFileNameInput = (EditText) LayoutInflater.from(
+                context).inflate(R.layout.text_field_filename, null);
+        mFileNameInput.setHint(R.string.menu_new_file);
+        mFileNameInput.setFilters(new InputFilter[] {
+                new PureFMFileUtils.FileNameFilter(),
+                new InputFilter.LengthFilter(PureFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
     }
 }

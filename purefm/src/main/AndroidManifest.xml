@@ -71,6 +71,8 @@
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".ui.activities.BrowserPagerActivity"/>
 
+        <service android:name=".operations.OperationsService"/>
+
     </application>
 
 </manifest>

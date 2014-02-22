@@ -24,44 +24,39 @@ import com.docd.purefm.ui.activities.MonitoredActivity;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Doctoror
+ * Task for creating new file
  *
- * Task for renaming file
+ * @author Doctoror
  */
-public final class RenameFileTask extends OperationTask<Void, Boolean> {
+public final class CreateFileTask extends OperationTask<GenericFile, Boolean> {
 
-    private final GenericFile mSource;
-    private final GenericFile mTarget;
-
-    public RenameFileTask(@NotNull final MonitoredActivity activity,
-                          @NotNull final GenericFile source,
-                          @NotNull final GenericFile target) {
+    public CreateFileTask(@NotNull MonitoredActivity activity) {
         super(activity);
-        this.mSource = source;
-        this.mTarget = target;
     }
 
     @NotNull
     @Override
     protected String getServiceAction() {
-        return OperationsService.ACTION_RENAME;
+        return OperationsService.ACTION_CREATE_FILE;
     }
 
     @Override
-    protected void startService(@NotNull Void... voids) {
-        OperationsService.rename(mActivity, mSource, mTarget);
-    }
-
-    @Override
-    protected void cancel() {
-
+    protected void startService(@NotNull GenericFile... files) {
+        for (final GenericFile file : files) {
+            OperationsService.createFile(mActivity, file);
+        }
     }
 
     @Override
     protected void onPostExecute(final Boolean result) {
+        super.onPostExecute(result);
         if (!result) {
-            Toast.makeText(mActivity, mActivity.getString(R.string.toast_rename_failed,
-                    mSource.getName(), mTarget.getName()), Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, R.string.could_not_create_file,
+                    Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void cancel() {
     }
 }

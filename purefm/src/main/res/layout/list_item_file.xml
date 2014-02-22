@@ -60,7 +60,8 @@
             android:singleLine="true"
             android:textIsSelectable="false"
             tools:text="02/02/2014 14:19"
-            style="@style/browser_text_small" />
+            style="@style/browser_text_small"
+            tools:ignore="RtlSymmetry"/>
         
         <TextView
             android:id="@android:id/text2"

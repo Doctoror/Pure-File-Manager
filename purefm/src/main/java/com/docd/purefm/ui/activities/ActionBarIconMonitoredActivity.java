@@ -14,7 +14,6 @@
  */
 package com.docd.purefm.ui.activities;
 
-import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -23,7 +22,11 @@ import com.docd.purefm.R;
 import com.docd.purefm.settings.Settings;
 
 /**
- * Manages ActionBar icon. If superuser is enabled, the ActionBar icon is ic_superuser, default otherwise
+ * Manages ActionBar icon. If superuser is enabled, the ActionBar
+ * icon is ic_superuser, default otherwise
+ *
+ *
+ * @author Doctoror
  */
 public abstract class ActionBarIconMonitoredActivity extends MonitoredActivity {
 

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -123,6 +124,29 @@ public final class Environment {
         return false;
     }
 
+    public static boolean needsRemount(final @NotNull String path) {
+        if (path.equals(rootDirectory.getAbsolutePath())) {
+            return true;
+        }
+        if (path.startsWith(androidRootDirectory.getAbsolutePath())) {
+            return true;
+        }
+        if (path.startsWith(externalStorageDirectory.getAbsolutePath())) {
+            return false;
+        }
+        if (secondaryStorageDirectory != null) {
+            if (path.startsWith(secondaryStorageDirectory.getAbsolutePath())) {
+                return false;
+            }
+        }
+        for (final File file : usbStorageDirectories) {
+            if (path.startsWith(file.getAbsolutePath())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean isBusyboxUtilAvailable(final String util) {
         if (busybox == null) {
             return false;
@@ -141,10 +165,24 @@ public final class Environment {
     }
     
     private static void resolveStorages() {
-        final File externalStorage = android.os.Environment.getExternalStorageDirectory();
-        final File parent = externalStorage.getParentFile();
-        if (parent != null) {
-            final File[] files = parent.listFiles();
+        File externalStorage = android.os.Environment.getExternalStorageDirectory();
+        File externalStorageParent;
+        try {
+            externalStorage = android.os.Environment.getExternalStorageDirectory()
+                    .getCanonicalFile();
+        } catch (IOException e) {
+            //ignored
+        }
+        externalStorageParent = externalStorage.getParentFile();
+        if (externalStorageParent != null) {
+            try {
+                externalStorageParent = externalStorage.getCanonicalFile();
+            } catch (IOException e) {
+                //ignored
+            }
+        }
+        if (externalStorageParent != null) {
+            final File[] files = externalStorageParent.listFiles();
             if (files != null) {
                 for (final File file : files) {
                     if (!file.equals(externalStorage) && file.canRead() && file.canWrite() && file.canExecute()) {

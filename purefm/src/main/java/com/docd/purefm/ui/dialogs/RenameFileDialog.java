@@ -14,13 +14,13 @@
  */
 package com.docd.purefm.ui.dialogs;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.widget.EditText;
@@ -31,6 +31,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.RenameFileTask;
+import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMFileUtils;
 
 public final class RenameFileDialog extends DialogFragment {
@@ -71,42 +72,44 @@ public final class RenameFileDialog extends DialogFragment {
         builder.setTitle(R.string.new_name);
         final EditText text = (EditText) LayoutInflater.from(
                 getActivity()).inflate(R.layout.text_field_filename, null);
+        text.setFilters(new InputFilter[] {
+                new PureFMFileUtils.FileNameFilter(),
+                new InputFilter.LengthFilter(PureFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
         text.setText(mSource.getName());
-        text.setFilters(PureFMFileUtils.FILENAME_FILTERS);
+        text.setHint(mSource.getName());
         builder.setView(text);
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
-        {            
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.setPositiveButton(R.string.rename, new DialogInterface.OnClickListener()
         {            
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                final Activity a = getActivity();
-                final CharSequence newNameField = text.getText();
-                final String newName;
-                if (newNameField != null && PureFMFileUtils.isValidFileName(
-                        newName = newNameField.toString())) {
-
+                final MonitoredActivity a = (MonitoredActivity) getActivity();
+                CharSequence newNameField = text.getText();
+                String newName = newNameField.toString().trim();
+                if (newName.isEmpty()) {
+                    newName = text.getHint().toString();
+                }
+                if (!newName.equals(mSource.getName())) {
                     if (mActionMode != null) {
                         mActionMode.finish();
                     }
 
                     final GenericFile sourceDir = mSource.getParentFile();
-                    new RenameFileTask(a, mSource, FileFactory.newFile(sourceDir.toFile(), newName))
-                            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    if (sourceDir != null) {
+                        new RenameFileTask(a, mSource, FileFactory.newFile(sourceDir.toFile(),
+                                newName)).execute();
 
-                    dialog.dismiss();
-                } else {
-                   Toast.makeText(a, R.string.invalid_filename, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.wtf("RenameFileDialog","Parent directory of " +
+                                mSource + " is null");
+                        Toast.makeText(getActivity(), "Could not resolve parent directory for: "
+                                + mSource, Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
         return builder.create();
     }
+
 }

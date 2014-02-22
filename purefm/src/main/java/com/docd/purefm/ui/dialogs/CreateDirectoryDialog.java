@@ -20,14 +20,16 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.tasks.CreateDirectoryTask;
+import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMFileUtils;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -42,51 +44,37 @@ public final class CreateDirectoryDialog extends DialogFragment {
         return cd;
     }
     
-    private EditText filename;
+    private EditText mFileNameInput;
     
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Activity activity = this.getActivity();
-        this.filename = (EditText) activity.getLayoutInflater().inflate(R.layout.text_field_filename, null);
-        this.filename.setHint(R.string.menu_new_folder);
+        final MonitoredActivity activity = (MonitoredActivity) this.getActivity();
+        mFileNameInput = (EditText) activity.getLayoutInflater().inflate(
+                R.layout.text_field_filename, null);
+        mFileNameInput.setHint(R.string.menu_new_folder);
+        mFileNameInput.setFilters(new InputFilter[] {
+                new PureFMFileUtils.FileNameFilter(),
+                new InputFilter.LengthFilter(PureFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
         final File current = (File) this.getArguments().getSerializable(Extras.EXTRA_CURRENT_DIR);
-        final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder b = new AlertDialog.Builder(activity);
         b.setTitle(R.string.dialog_new_folder_title);
-        b.setView(this.filename);
+        b.setView(this.mFileNameInput);
         b.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                final CharSequence text = filename.getText();
-                if (text == null || text.length() == 0) {
-                    Toast.makeText(getActivity(), R.string.name_empty, Toast.LENGTH_SHORT).show();
-                    return;
+                String newName = mFileNameInput.getText().toString().trim();
+                if (newName.isEmpty()) {
+                    newName = mFileNameInput.getHint().toString();
                 }
-                final String name = text.toString();
-                if (!PureFMFileUtils.isValidFileName(name)) {
-                    Toast.makeText(getActivity(), R.string.invalid_filename, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                final GenericFile target = FileFactory.newFile(current, name);
+                final GenericFile target = FileFactory.newFile(current, newName);
                 if (target.exists()) {
-                    Toast.makeText(getActivity(), R.string.file_exists, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, R.string.file_exists, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                createDirectory(target);
-                dialog.dismiss();
+                new CreateDirectoryTask(activity).execute(target);
             }
         });
-        b.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        b.setNegativeButton(R.string.cancel, null);
         return b.create();
-    }
-    
-    private void createDirectory(GenericFile target) {
-        if (!target.mkdir()) {
-            Toast.makeText(getActivity(), R.string.could_not_create_dir, Toast.LENGTH_SHORT).show();
-        }
     }
 }

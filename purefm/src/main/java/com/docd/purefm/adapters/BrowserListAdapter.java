@@ -23,12 +23,12 @@ import com.docd.purefm.ui.view.OverlayImageView;
 
 import android.app.Activity;
 import android.graphics.Typeface;
+import android.support.v4.util.LongSparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 
 /**
  * Browser adapter for ListView
@@ -37,14 +37,14 @@ import java.util.HashMap;
 public final class BrowserListAdapter extends BrowserBaseAdapter {
 
     private final Typeface mTypefaceMonospace;
-    private final HashMap<Long, String> mHumanReadableLastModified;
-    private final HashMap<Long, String> mHumanReadableLength;
+    private final LongSparseArray<String> mHumanReadableLastModified;
+    private final LongSparseArray<String> mHumanReadableLength;
     
     public BrowserListAdapter(Activity context) {
         super(context);
         mTypefaceMonospace = Typeface.createFromAsset(context.getAssets(), "DroidSansMono.ttf");
-        this.mHumanReadableLastModified = new HashMap<Long, String>();
-        this.mHumanReadableLength = new HashMap<Long, String>();
+        mHumanReadableLastModified = new LongSparseArray<String>();
+        mHumanReadableLength = new LongSparseArray<String>();
     }
 
     @Override

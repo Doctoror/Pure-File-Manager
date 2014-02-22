@@ -89,8 +89,6 @@
     <string name="preference_home_directory">Home directory</string>
     
     <!-- New File / Directory -->
-    <string name="name_empty">Name field is empty</string>
-    <string name="invalid_filename">Not a valid file name</string>
     <string name="file_exists">File already exists</string>
     <string name="could_not_create_dir">Could not create directory</string>
     <string name="could_not_create_file">Could not create file</string>

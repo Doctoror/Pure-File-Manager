@@ -29,6 +29,7 @@
         android:paddingRight="5dp"
         android:singleLine="true"
         tools:text="root -> data -> data -> com.docd.purefm"
+        tools:ignore="RtlSymmetry"
         style="@style/NavigationText" />
 
 </HorizontalScrollView>

@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
@@ -39,6 +40,21 @@ public final class PureFMFileUtils {
     private PureFMFileUtils() {
     }
 
+    public static final class FileNameFilter implements InputFilter {
+
+        public static final int MAX_FILENAME_LENGTH = 255;
+
+        private static final String FILENAME_PATTERN =
+                "\\\\|/|:|\\*|\\?|\"|<|>|\r|\n";
+
+        @Nullable
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end,
+                                   Spanned dest, int dstart, int dend) {
+            return source.subSequence(start, end).toString().replaceAll(FILENAME_PATTERN, "");
+        }
+    }
+
     public static String byteCountToDisplaySize(final BigInteger size) {
         String displaySize;
 
@@ -52,42 +68,6 @@ public final class PureFMFileUtils {
             displaySize = String.valueOf(size) + " B";
         }
         return displaySize;
-    }
-
-    
-    private static final String FORBIDDEN_CHARS = "/?<>\\:*|\"";
-    
-    private static final InputFilter FILENAME_FILTER = new InputFilter() {
-
-        @Override
-        public CharSequence filter(CharSequence source, int start, int end, 
-                Spanned dest, int dstart, int dend)
-        {
-            for (int i = start; i < end; i++) { 
-                if (FORBIDDEN_CHARS.indexOf(source.charAt(i)) != -1) {
-                    return "";
-                }
-            }
-            return source;
-        }
-    };
-    
-    public static InputFilter[] FILENAME_FILTERS = new InputFilter[] {
-        FILENAME_FILTER
-    };
-    
-    /**
-     * Determines if a given filename is valid
-     *  
-     * @param name Name to test
-     * @return true, if given name is a valid file name
-     */
-    public static boolean isValidFileName(String name) {
-        if (name.length() == 0 || name.startsWith(".")) {
-            return false;
-        }
-        final Pattern p = Pattern.compile("[^\\\\/:*?\"<>|\\r\\n]*");
-        return p.matcher(name).matches();
     }
     
     public static void requestMediaScanner(Context context, List<File> files) {

@@ -21,6 +21,7 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.DeleteTask;
+import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMTextUtils;
 
 import android.app.Activity;
@@ -28,7 +29,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.ActionMode;
@@ -65,7 +65,7 @@ public final class DeleteFilesDialog extends DialogFragment {
     
     @Override
     public Dialog onCreateDialog(Bundle state) {
-        final Activity a = getActivity();
+        final MonitoredActivity a = (MonitoredActivity) getActivity();
         final AlertDialog.Builder b = new AlertDialog.Builder(a);
         b.setTitle(R.string.dialog_delete_title);
         
@@ -81,17 +81,11 @@ public final class DeleteFilesDialog extends DialogFragment {
                 if (mode != null) {
                     mode.finish();
                 }
-                dialog.dismiss();
-                final DeleteTask task = new DeleteTask(getActivity());
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, files);
+                final DeleteTask task = new DeleteTask(a);
+                task.execute(files);
             }
         });
-        b.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        b.setNegativeButton(R.string.cancel, null);
         return b.create();
     }
 }

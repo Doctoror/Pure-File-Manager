@@ -90,8 +90,6 @@
     <string name="preference_home_directory">Startordner</string>
     
     <!-- New File / Directory -->
-    <string name="name_empty">Namensfeld ist leer</string>
-    <string name="invalid_filename">Kein gültiger Name</string>
     <string name="file_exists">Datei existiert bereits</string>
     <string name="could_not_create_dir">Ordner konnte nicht erstellt werden</string>
     <string name="could_not_create_file">Datei konnte nicht erstellt werden</string>
