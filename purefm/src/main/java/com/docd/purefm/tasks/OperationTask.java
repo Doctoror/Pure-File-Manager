@@ -27,6 +27,7 @@ import com.docd.purefm.ui.activities.MonitoredActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 
 /**
  * OperationTask looks similar to AsyncTask, but the difference is that subclasses must start an {@link com.docd.purefm.operations.OperationsService} in

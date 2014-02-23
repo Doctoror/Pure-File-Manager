@@ -220,7 +220,7 @@ public final class OperationsService extends IntentService {
             @NotNull final String action, @Nullable T result, final boolean wasCanceled) {
         final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
         broadcast.putExtra(EXTRA_RESULT, result);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcastSync(broadcast);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(broadcast);
     }
 
     private Intent createOperationCompletedIntent(
