@@ -33,9 +33,6 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public final class CommandLineFileTest extends AndroidTestCase {
 
@@ -58,14 +55,6 @@ public final class CommandLineFileTest extends AndroidTestCase {
         }
         assertTrue(testDir.mkdirs());
 
-        // init what application inits
-        final Context context = this.getContext();
-        ActivityMonitor.init(context);
-        com.docd.purefm.Environment.init(context);
-        Settings.init(context, context.getResources());
-        PreviewHolder.initialize(context);
-        PureFMTextUtils.init(context);
-
         // prepare a test file
         try {
             FileUtils.write(test1, "test");
@@ -76,6 +65,15 @@ public final class CommandLineFileTest extends AndroidTestCase {
 
     @Override
     protected void runTest() {
+
+        // init what application inits
+        final Context context = this.getContext();
+        ActivityMonitor.init(context);
+        com.docd.purefm.Environment.init(context);
+        Settings.init(context, context.getResources());
+        PreviewHolder.initialize(context);
+        PureFMTextUtils.init(context);
+
         // override settings to force our test busybox
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");

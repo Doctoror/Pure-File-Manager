@@ -18,7 +18,6 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;

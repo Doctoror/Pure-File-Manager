@@ -35,15 +35,7 @@ public final class JavaFileTest extends AndroidTestCase {
         } catch (IOException e) {
 
         }
-        testDir.mkdirs();
-
-        // init what application inits
-        final Context context = this.getContext();
-        ActivityMonitor.init(context);
-        com.docd.purefm.Environment.init(context);
-        Settings.init(context, context.getResources());
-        PreviewHolder.initialize(context);
-        PureFMTextUtils.init(context);
+        assertTrue(testDir.mkdirs());
 
         // prepare a test file
         try {
@@ -55,6 +47,13 @@ public final class JavaFileTest extends AndroidTestCase {
 
     @Override
     protected void runTest() {
+        // init what application inits
+        final Context context = this.getContext();
+        ActivityMonitor.init(context);
+        com.docd.purefm.Environment.init(context);
+        Settings.init(context, context.getResources());
+        PreviewHolder.initialize(context);
+        PureFMTextUtils.init(context);
         Settings.useCommandLine = false;
         test();
         test1.delete();

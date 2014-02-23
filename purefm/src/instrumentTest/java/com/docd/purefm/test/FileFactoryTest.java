@@ -47,9 +47,13 @@ public final class FileFactoryTest extends AndroidTestCase {
         try {
             FileUtils.forceDelete(testDir);
         } catch (IOException e) {
-
+            //ignore
         }
-        testDir.mkdirs();
+        assertTrue(testDir.mkdirs());
+    }
+
+    @Override
+    protected void runTest() {
 
         // init what application inits
         final Context context = this.getContext();
@@ -58,10 +62,7 @@ public final class FileFactoryTest extends AndroidTestCase {
         Settings.init(context, context.getResources());
         PreviewHolder.initialize(context);
         PureFMTextUtils.init(context);
-    }
 
-    @Override
-    protected void runTest() {
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");
         }

@@ -91,8 +91,8 @@ public final class PartitionInfoDialog extends DialogFragment {
         }
 
         final StatFsCompat stat = new StatFsCompat(path);
-        final long valueTotal = stat.getBlockCountLong() * stat.getBlockSizeLong();
-        final long valueAvail = stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
+        final long valueTotal = stat.getTotalBytes();
+        final long valueAvail = stat.getAvailableBytes();
         final long valueUsed = valueTotal - valueAvail;
         
         final TextView total = (TextView) v.findViewById(R.id.total);
@@ -109,7 +109,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         final TextView free = (TextView) v.findViewById(R.id.free);
         if (valueTotal != 0L) {
             free.setText(FileUtils.byteCountToDisplaySize(
-                    stat.getFreeBlocksLong() * stat.getBlockSizeLong()));
+                    stat.getFreeBytes()));
         }
         
         final TextView avail = (TextView) v.findViewById(R.id.available);
