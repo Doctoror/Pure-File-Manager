@@ -17,6 +17,7 @@ package com.docd.purefm.utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.text.SpannableString;
@@ -32,6 +33,8 @@ public final class PureFMTextUtils {
     private PureFMTextUtils() {}
     
     private static SimpleDateFormat format;
+    private static final Calendar CALENDAR = Calendar.getInstance(
+            TimeZone.getDefault(), Locale.getDefault());
     
     public static void init(Context context) {
         if (DateFormat.is24HourFormat(context)) {
@@ -42,8 +45,14 @@ public final class PureFMTextUtils {
     }
 
     @NotNull
-    public static synchronized String humanReadableDate(long last) {
-        return format.format(last);
+    public static synchronized String humanReadableDate(
+            final long date, final boolean isUtc) {
+        if (isUtc) {
+            final long offset = -(CALENDAR.get(Calendar.ZONE_OFFSET) + CALENDAR.get(Calendar.DST_OFFSET));
+            return format.format(date - offset);
+        } else {
+            return format.format(date);
+        }
     }
     
     public static int stringMonthToInt(String month) {

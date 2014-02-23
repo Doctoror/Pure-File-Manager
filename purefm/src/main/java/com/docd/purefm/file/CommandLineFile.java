@@ -460,7 +460,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
                 new CommandTouch(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(new CommandLineFile(mFile));
+            this.apply(CommandLineFile.fromFile(mFile));
         }
         return result;
     }
@@ -473,7 +473,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
                 new CommandMkdir(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(new CommandLineFile(mFile));
+            this.apply(CommandLineFile.fromFile(mFile));
         }
         return result;
     }
@@ -486,7 +486,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(ShellHolder.getShell(),
                 new CommandMkdirs(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(new CommandLineFile(mFile));
+            this.apply(CommandLineFile.fromFile(mFile));
         }
         return result;
     }

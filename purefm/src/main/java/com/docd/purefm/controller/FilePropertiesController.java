@@ -19,6 +19,7 @@ import java.math.BigInteger;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
+import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.PureFMFileUtils;
@@ -71,6 +72,7 @@ public final class FilePropertiesController {
         }
         
         final TextView mod = (TextView) mView.findViewById(R.id.modified);
-        mod.setText(PureFMTextUtils.humanReadableDate(mFile.lastModified()));
+        mod.setText(PureFMTextUtils.humanReadableDate(
+                mFile.lastModified(), mFile instanceof CommandLineFile));
     }
 }

@@ -94,13 +94,13 @@ public final class CommandLineFileTest extends AndroidTestCase {
 
     private void testAgainstJavaIoFile() {
         CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
-        testAgainstJavaIoFile(file1, test1);
+        testAgainstJavaIoFile(file1, test1, true);
         assertTrue(file1.delete());
-        testAgainstJavaIoFile(file1, test1);
+        testAgainstJavaIoFile(file1, test1, false);
         assertTrue(file1.mkdir());
-        testAgainstJavaIoFile(file1, test1);
+        testAgainstJavaIoFile(file1, test1, true);
         file1.createNewFile();
-        testAgainstJavaIoFile(file1, test1);
+        testAgainstJavaIoFile(file1, test1, true);
 
         try {
             FileUtils.write(new File(test1, "test more"), "test");
@@ -109,7 +109,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
         }
 
         file1 = (CommandLineFile) FileFactory.newFile(test1);
-        testAgainstJavaIoFile(file1, test1);
+        testAgainstJavaIoFile(file1, test1, true);
 
         try {
             FileUtils.forceDelete(file1.toFile());
@@ -124,7 +124,9 @@ public final class CommandLineFileTest extends AndroidTestCase {
         }
     }
 
-    private static void testAgainstJavaIoFile(final CommandLineFile genericFile, final File javaFile) {
+    private static void testAgainstJavaIoFile(final CommandLineFile genericFile,
+                                              final File javaFile,
+                                              final boolean testDate) {
         assertEquals(javaFile, genericFile.toFile());
         assertEquals(javaFile.getName(), genericFile.getName());
         assertEquals(javaFile.getAbsolutePath(), genericFile.getAbsolutePath());
@@ -160,8 +162,10 @@ public final class CommandLineFileTest extends AndroidTestCase {
             assertTrue(listedFilesEqual(javaFile.listFiles(), genericFile.listFiles()));
         }
 
-        assertEquals(lasModifiedFromFormattedDateUTC(javaFile.lastModified()),
-                lasModifiedFromFormattedDate(genericFile.lastModified()));
+        if (testDate) {
+            assertEquals(PureFMTextUtils.humanReadableDate(javaFile.lastModified(), false),
+                    PureFMTextUtils.humanReadableDate(genericFile.lastModified(), true));
+        }
     }
 
     private static boolean listedFilesEqual(final File[] javaIoFiles, final GenericFile[] genericFiles) {
@@ -204,17 +208,6 @@ public final class CommandLineFileTest extends AndroidTestCase {
             }
         }
         return true;
-    }
-
-    private static String lasModifiedFromFormattedDate(final long lastMod) {
-        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        return format.format(lastMod);
-    }
-
-    private static String lasModifiedFromFormattedDateUTC(final long lastMod) {
-        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return format.format(lastMod);
     }
 
     private void testFileReading() {

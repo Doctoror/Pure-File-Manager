@@ -15,6 +15,7 @@
 package com.docd.purefm.adapters;
 
 import com.docd.purefm.R;
+import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PureFMFileUtils;
@@ -88,7 +89,9 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             final long lastModified = f.lastModified();
             String humanReadableLastModified = mHumanReadableLastModified.get(lastModified);
             if (humanReadableLastModified == null) {
-                humanReadableLastModified = PureFMTextUtils.humanReadableDate(lastModified);
+                humanReadableLastModified = PureFMTextUtils.humanReadableDate(
+                        lastModified,
+                        f instanceof CommandLineFile);
                 mHumanReadableLastModified.put(lastModified, humanReadableLastModified);
             }
             h.date.setText(humanReadableLastModified);

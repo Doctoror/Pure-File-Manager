@@ -64,17 +64,11 @@ public final class FilePropertiesDialog extends DialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.action_info));
         builder.setTitle(file.getName());
-        builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNeutralButton(R.string.close, null);
         builder.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mFilePermissionsController.applyPermissions(getActivity());
-                dialog.dismiss();
             }
         });
         final View content = activity.getLayoutInflater()
