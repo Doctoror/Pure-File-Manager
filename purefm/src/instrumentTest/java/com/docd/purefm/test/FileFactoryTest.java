@@ -32,6 +32,11 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Tests {@link com.docd.purefm.file.FileFactory}
+ *
+ * @author Doctoror
+ */
 public final class FileFactoryTest extends AndroidTestCase {
 
     private static final File testDir = new File(Environment.getExternalStorageDirectory(), "test");
@@ -55,13 +60,7 @@ public final class FileFactoryTest extends AndroidTestCase {
     @Override
     protected void runTest() {
 
-        // init what application inits
-        final Context context = this.getContext();
-        ActivityMonitor.init(context);
-        com.docd.purefm.Environment.init(context);
-        Settings.init(context, context.getResources());
-        PreviewHolder.initialize(context);
-        PureFMTextUtils.init(context);
+        com.docd.purefm.Environment.init(getContext());
 
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");

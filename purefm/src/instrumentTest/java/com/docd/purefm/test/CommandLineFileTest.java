@@ -34,6 +34,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * Tests {@link com.docd.purefm.file.CommandLineFile}
+ *
+ * @author Doctoror
+ */
 public final class CommandLineFileTest extends AndroidTestCase {
 
     private static final File testDir = new File(Environment.getExternalStorageDirectory(), "test");
@@ -68,10 +73,8 @@ public final class CommandLineFileTest extends AndroidTestCase {
 
         // init what application inits
         final Context context = this.getContext();
-        ActivityMonitor.init(context);
         com.docd.purefm.Environment.init(context);
         Settings.init(context, context.getResources());
-        PreviewHolder.initialize(context);
         PureFMTextUtils.init(context);
 
         // override settings to force our test busybox
@@ -91,7 +94,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
     }
 
     private void testAgainstJavaIoFile() {
-        CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        CommandLineFile file1 = CommandLineFile.fromFile(test1);
         testAgainstJavaIoFile(file1, test1, true);
         assertTrue(file1.delete());
         testAgainstJavaIoFile(file1, test1, false);
@@ -106,7 +109,8 @@ public final class CommandLineFileTest extends AndroidTestCase {
             throw new RuntimeException("Failed to create test file: " + e);
         }
 
-        file1 = (CommandLineFile) FileFactory.newFile(test1);
+        Settings.useCommandLine = true;
+        file1 = CommandLineFile.fromFile(test1);
         testAgainstJavaIoFile(file1, test1, true);
 
         try {
@@ -209,7 +213,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
     }
 
     private void testFileReading() {
-        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        final CommandLineFile file1 = CommandLineFile.fromFile(test1);
         assertEquals(test1.getAbsolutePath(), file1.getAbsolutePath());
         assertEquals(test1, file1.toFile());
         assertIsNormalFile(file1);
@@ -217,45 +221,45 @@ public final class CommandLineFileTest extends AndroidTestCase {
     }
 
     private void testFileDeletion() {
-        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        final CommandLineFile file1 = CommandLineFile.fromFile(test1);
         file1.delete();
         assertIsEmptyFile(file1);
     }
 
     private void testFileCreation() {
-        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        final CommandLineFile file1 = CommandLineFile.fromFile(test1);
         file1.createNewFile();
         assertIsNormalFile(file1);
     }
 
     private void testFileMoving() {
-        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        final CommandLineFile file1 = CommandLineFile.fromFile(test1);
         final String file1sum = md5sum(file1.toFile());
 
-        CommandLineFile file2 = (CommandLineFile) FileFactory.newFile(test2);
+        CommandLineFile file2 = CommandLineFile.fromFile(test2);
         assertIsEmptyFile(file2);
 
         file1.move(file2);
         assertIsEmptyFile(file1);
 
-        file2 = (CommandLineFile) FileFactory.newFile(test2);
+        file2 = CommandLineFile.fromFile(test2);
         assertIsNormalFile(file2);
         assertEquals(file1sum, md5sum(file2.toFile()));
     }
 
     private void testFileCopying() {
-        CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
-        final CommandLineFile file2 = (CommandLineFile) FileFactory.newFile(test2);
+        CommandLineFile file1 = CommandLineFile.fromFile(test1);
+        final CommandLineFile file2 = CommandLineFile.fromFile(test2);
 
         file2.copy(file1);
-        file1 = (CommandLineFile) FileFactory.newFile(test1);
+        file1 = CommandLineFile.fromFile(test1);
         assertIsNormalFile(file1);
         assertIsNormalFile(file2);
         assertEquals(md5sum(file2.toFile()), md5sum(file1.toFile()));
     }
 
     private void testMkdir() {
-        final CommandLineFile file1 = (CommandLineFile) FileFactory.newFile(test1);
+        final CommandLineFile file1 = CommandLineFile.fromFile(test1);
         file1.delete();
         assertIsEmptyFile(file1);
         assertTrue(file1.mkdir());
@@ -263,7 +267,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
     }
 
     private void testMkdirs() {
-        final CommandLineFile file3 = (CommandLineFile) FileFactory.newFile(test3);
+        final CommandLineFile file3 = CommandLineFile.fromFile(test3);
         assertIsEmptyFile(file3);
         assertTrue(file3.mkdirs());
         assertIsDirectory(file3);
