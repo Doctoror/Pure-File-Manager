@@ -90,9 +90,16 @@
                 android:singleLine="true"
                 android:textIsSelectable="false"
                 android:text="@string/minus"
+                android:visibility="gone"
                 tools:text="vfat"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleSmall"
+                android:id="@android:id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         </TableRow>
-        
+
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

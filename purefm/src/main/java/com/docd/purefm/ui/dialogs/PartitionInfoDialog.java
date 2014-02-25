@@ -15,11 +15,13 @@
 package com.docd.purefm.ui.dialogs;
 
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
+import com.docd.purefm.commandline.CommandMount;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
@@ -37,6 +39,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Set;
 
 public final class PartitionInfoDialog extends DialogFragment {
     
@@ -85,7 +88,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         final TextView fs = (TextView) v.findViewById(R.id.filesystem);
         final View fileSystemRow = v.findViewById(R.id.filesystem_row);
         if (Environment.hasBusybox()) {
-            this.task = new GetFSTypeTask(fs, fileSystemRow);
+            this.task = new GetFSTypeTask(fs, v.findViewById(android.R.id.progress), fileSystemRow);
         } else {
             fileSystemRow.setVisibility(View.GONE);
         }
@@ -149,16 +152,30 @@ public final class PartitionInfoDialog extends DialogFragment {
     }
 
     private static final class GetFSTypeTask extends AsyncTask<GenericFile, Void, String> {
-        private final TextView fsTextView;
-        private final View fileSystemTextRow;
+        private final TextView mFsTextView;
+        private final View mFileSystemRow;
+        private final View mFileSystemProgress;
 
-        GetFSTypeTask(final TextView fsTextView, final View fileSystemTextRow) {
-            this.fsTextView = fsTextView;
-            this.fileSystemTextRow = fileSystemTextRow;
+        GetFSTypeTask(@NotNull final TextView fsTextView,
+                      @NotNull final View fileSystemProgress,
+                      @NotNull final View fileSystemRow) {
+            this.mFsTextView = fsTextView;
+            this.mFileSystemProgress = fileSystemProgress;
+            this.mFileSystemRow = fileSystemRow;
         }
 
         @Override
         protected String doInBackground(final GenericFile... params) {
+            final String path = params[0].getAbsolutePath();
+            final Set<CommandMount.MountOutput> mounts = CommandMount.listMountpoints(path);
+            if (!mounts.isEmpty()) {
+                for (final CommandMount.MountOutput o : mounts) {
+                    if (path.startsWith(o.mountPoint)) {
+                        return o.fileSystem;
+                    }
+                }
+            }
+
             final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
                     new CommandStat(params[0].getAbsolutePath()));
             return fsTypeResult == null || fsTypeResult.isEmpty() ?
@@ -167,10 +184,12 @@ public final class PartitionInfoDialog extends DialogFragment {
 
         @Override
         protected void onPostExecute(final String result) {
-            if (result == null) {
-                this.fileSystemTextRow.setVisibility(View.GONE);
+            if (result != null) {
+                mFileSystemProgress.setVisibility(View.GONE);
+                mFsTextView.setVisibility(View.VISIBLE);
+                mFsTextView.setText(result);
             } else {
-                this.fsTextView.setText(result);
+                mFileSystemRow.setVisibility(View.GONE);
             }
         }
     }
