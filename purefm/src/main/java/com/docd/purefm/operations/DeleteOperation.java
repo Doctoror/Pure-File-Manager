@@ -16,6 +16,7 @@ package com.docd.purefm.operations;
 
 import android.content.Context;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.ShellHolder;
@@ -23,10 +24,12 @@ import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
+import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +53,21 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
 
         if (files[0] instanceof CommandLineFile) {
 
+            final HashSet<String> remountPaths = new HashSet<String>();
+            for (final GenericFile file : files) {
+                final String parent = file.getParent();
+                if (parent != null) {
+                    if (Environment.needsRemount(parent)) {
+                        remountPaths.add(parent);
+                    }
+                } else if (Environment.needsRemount(file.getAbsolutePath())) {
+                    remountPaths.add(file.getAbsolutePath());
+                }
+            }
+            for (final String remountPath : remountPaths) {
+                RootTools.remount(remountPath, "RW");
+            }
+
             final Shell shell = ShellHolder.getShell();
             for (final GenericFile file : files) {
                 final File fileFile = file.toFile();
@@ -59,6 +77,11 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
                     failed.add(file);
                 }
             }
+
+            for (final String remountPath : remountPaths) {
+                RootTools.remount(remountPath, "RO");
+            }
+
         } else {
             for (final GenericFile file : files) {
                 if (file.delete()) {

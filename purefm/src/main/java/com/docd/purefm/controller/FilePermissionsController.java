@@ -15,6 +15,7 @@
 package com.docd.purefm.controller;
 
 import com.cyanogenmod.filemanager.util.AIDHelper;
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandStat;
@@ -22,6 +23,7 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.Permissions;
+import com.stericson.RootTools.RootTools;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -202,7 +204,18 @@ public final class FilePermissionsController implements CompoundButton.OnChecked
         
         @Override
         protected Boolean doInBackground(CommandLineFile... params) {
-            return params[0].applyPermissions(this.target);
+            final String path = params[0].getAbsolutePath();
+            final boolean remount = Environment.needsRemount(path);
+            if (remount) {
+                RootTools.remount(path, "RW");
+            }
+            try {
+                return params[0].applyPermissions(this.target);
+            } finally {
+                if (remount) {
+                    RootTools.remount(path, "RO");
+                }
+            }
         }
         
         @Override

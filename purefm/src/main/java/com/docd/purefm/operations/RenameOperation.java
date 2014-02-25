@@ -16,9 +16,11 @@ package com.docd.purefm.operations;
 
 import android.content.Context;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PureFMFileUtils;
+import com.stericson.RootTools.RootTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,14 +47,25 @@ final class RenameOperation extends Operation<Void, Boolean> {
 
     @Override
     protected Boolean execute(Void... voids) {
-        if (mSource.renameTo(mTarget)) {
-            final List<File> filesCreated = new ArrayList<File>(1);
-            final List<File> filesDeleted = new ArrayList<File>(1);
-            filesDeleted.add(mSource.toFile());
-            filesCreated.add(mTarget.toFile());
-            MediaStoreUtils.deleteFiles(mContext.getContentResolver(), filesDeleted);
-            PureFMFileUtils.requestMediaScanner(mContext, filesCreated);
-            return Boolean.TRUE;
+        final String path = mTarget.getAbsolutePath();
+        final boolean remount = Environment.needsRemount(path);
+        if (remount) {
+            RootTools.remount(path, "RW");
+        }
+        try {
+            if (mSource.renameTo(mTarget)) {
+                final List<File> filesCreated = new ArrayList<File>(1);
+                final List<File> filesDeleted = new ArrayList<File>(1);
+                filesDeleted.add(mSource.toFile());
+                filesCreated.add(mTarget.toFile());
+                MediaStoreUtils.deleteFiles(mContext.getContentResolver(), filesDeleted);
+                PureFMFileUtils.requestMediaScanner(mContext, filesCreated);
+                return Boolean.TRUE;
+            }
+        } finally {
+            if (remount) {
+                RootTools.remount(path, "RO");
+            }
         }
         return Boolean.FALSE;
     }

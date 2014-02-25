@@ -26,6 +26,7 @@ import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
 import com.docd.purefm.commandline.CommandCopyRecursively;
@@ -40,7 +41,9 @@ import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.MimeTypes;
+import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.PureFMTextUtils;
+import com.stericson.RootTools.RootTools;
 
 public final class CommandLineFile implements GenericFile,
         Comparable<GenericFile> {
