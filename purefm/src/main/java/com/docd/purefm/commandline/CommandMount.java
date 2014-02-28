@@ -14,7 +14,7 @@
  */
 package com.docd.purefm.commandline;
 
-import com.stericson.RootTools.RootTools;
+import com.docd.purefm.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ public final class CommandMount extends Command {
     }
 
     private static String buildCommand(final String filter) {
-        if (RootTools.checkUtil("grep")) {
+        if (Environment.isUtilAvailable("grep")) {
             return "mount | grep " + filter;
         }
         return "mount";
@@ -65,7 +65,7 @@ public final class CommandMount extends Command {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            MountOutput that = (MountOutput) o;
+            final MountOutput that = (MountOutput) o;
 
             if (device != null ? !device.equals(that.device) : that.device != null) return false;
             if (fileSystem != null ? !fileSystem.equals(that.fileSystem) : that.fileSystem != null)

@@ -16,8 +16,8 @@ package com.docd.purefm.ui.dialogs;
 
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
@@ -32,12 +32,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Set;
 
@@ -52,121 +52,125 @@ public final class PartitionInfoDialog extends DialogFragment {
         return d;
     }
     
-    private GenericFile file;
-    private GetFSTypeTask task;
+    private GenericFile mFile;
+    private PartitionInfoTask mTask;
+    private View mView;
     
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         final Bundle args = this.getArguments();
-        this.file = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
+        this.mFile = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
     }
     
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final Activity activity = this.getActivity();
+        mView = activity.getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.action_info));
         builder.setTitle(R.string.menu_partition);
-        builder.setView(this.getInfoView(activity));
-        builder.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        
+        builder.setView(mView);
+        builder.setNeutralButton(R.string.close, null);
         return builder.create();
         
-    }
-    
-    public View getInfoView(final Activity activity) {
-        final View v = activity.getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
-        final TextView title = (TextView) v.findViewById(R.id.location);
-        final String path = file.getAbsolutePath();
-        title.setText(path);
-        
-        final TextView fs = (TextView) v.findViewById(R.id.filesystem);
-        final View fileSystemRow = v.findViewById(R.id.filesystem_row);
-        if (Environment.hasBusybox()) {
-            this.task = new GetFSTypeTask(fs, v.findViewById(android.R.id.progress), fileSystemRow);
-        } else {
-            fileSystemRow.setVisibility(View.GONE);
-        }
-
-        final StatFsCompat stat = new StatFsCompat(path);
-        final long valueTotal = stat.getTotalBytes();
-        final long valueAvail = stat.getAvailableBytes();
-        final long valueUsed = valueTotal - valueAvail;
-        
-        final TextView total = (TextView) v.findViewById(R.id.total);
-        if (valueTotal != 0L) {
-            total.setText(FileUtils.byteCountToDisplaySize(valueTotal));
-        }
-        
-        final TextView block = (TextView) v.findViewById(R.id.block_size);
-        final long blockSize = stat.getBlockSizeLong();
-        if (blockSize != 0L) {
-            block.setText(Long.toString(blockSize));
-        }
-        
-        final TextView free = (TextView) v.findViewById(R.id.free);
-        if (valueTotal != 0L) {
-            free.setText(FileUtils.byteCountToDisplaySize(
-                    stat.getFreeBytes()));
-        }
-        
-        final TextView avail = (TextView) v.findViewById(R.id.available);
-        if (valueTotal != 0L) {
-            avail.setText(FileUtils.byteCountToDisplaySize(valueAvail));
-        }
-        
-        final TextView used = (TextView) v.findViewById(R.id.used);
-        if (valueTotal != 0L) {
-            final StringBuilder usage = new StringBuilder();
-            usage.append(FileUtils.byteCountToDisplaySize(valueUsed));
-            usage.append(' ');
-            usage.append('(');
-            usage.append(valueUsed * 100L / valueTotal);
-            usage.append('%');
-            usage.append(')');
-            used.setText(usage.toString());
-        }
-        
-        return v;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (this.task != null && this.task.getStatus() != AsyncTask.Status.RUNNING) {
-            this.task.execute(this.file);
+        if (mTask == null) {
+            mTask = new PartitionInfoTask(mView);
+        }
+        if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
+            mTask.execute(mFile);
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (this.task != null && this.task.getStatus() == AsyncTask.Status.RUNNING) {
-            this.task.cancel(false);
+        if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mTask.cancel(false);
         }
     }
 
-    private static final class GetFSTypeTask extends AsyncTask<GenericFile, Void, String> {
-        private final TextView mFsTextView;
-        private final View mFileSystemRow;
-        private final View mFileSystemProgress;
+    private static final class PartitionInfo {
+        final CharSequence mPath;
 
-        GetFSTypeTask(@NotNull final TextView fsTextView,
-                      @NotNull final View fileSystemProgress,
-                      @NotNull final View fileSystemRow) {
-            this.mFsTextView = fsTextView;
-            this.mFileSystemProgress = fileSystemProgress;
-            this.mFileSystemRow = fileSystemRow;
+        final CharSequence mFsTypeText;
+        final CharSequence mTotalBytesText;
+        final CharSequence mBlockSizeText;
+        final CharSequence mFreeBytesText;
+        final CharSequence mAvailableBytesText;
+        final CharSequence mUsedSpaceText;
+
+        final long mTotalBytes;
+        final long mBlockSize;
+        final long mFreeBytes;
+        final long mAvailableBytes;
+        final long mUsedSpace;
+
+        PartitionInfo(@NotNull final CharSequence path,
+                              @Nullable final CharSequence fsTypeText,
+                              final long totalBytes,
+                              final long blockSize,
+                              final long freeBytes,
+                              final long availableBytes,
+                              final long usedSpace) {
+            this.mPath = path;
+
+            this.mFsTypeText = fsTypeText;
+            this.mTotalBytes = totalBytes;
+            this.mBlockSize = blockSize;
+            this.mFreeBytes = freeBytes;
+            this.mAvailableBytes = availableBytes;
+            this.mUsedSpace = usedSpace;
+
+            this.mTotalBytesText = FileUtils.byteCountToDisplaySize(totalBytes);
+            this.mBlockSizeText = Long.toString(blockSize);
+            this.mFreeBytesText = FileUtils.byteCountToDisplaySize(freeBytes);
+            this.mAvailableBytesText = FileUtils.byteCountToDisplaySize(availableBytes);
+
+            final StringBuilder usage = new StringBuilder();
+            usage.append(FileUtils.byteCountToDisplaySize(usedSpace));
+            usage.append(' ');
+            usage.append('(');
+            usage.append(usedSpace * 100L / totalBytes);
+            usage.append('%');
+            usage.append(')');
+            this.mUsedSpaceText = usage.toString();
+        }
+    }
+
+    private static final class PartitionInfoTask extends
+            AsyncTask<GenericFile, Void, PartitionInfo> {
+
+        private final WeakReference<View> mViewRef;
+
+        PartitionInfoTask(@NotNull final View view) {
+            this.mViewRef = new WeakReference<View>(view);
         }
 
+        @NotNull
         @Override
-        protected String doInBackground(final GenericFile... params) {
+        protected PartitionInfo doInBackground(final GenericFile... params) {
             final String path = params[0].getAbsolutePath();
+            final StatFsCompat statFs = new StatFsCompat(path);
+            final long valueTotal = statFs.getTotalBytes();
+            final long valueAvail = statFs.getAvailableBytes();
+            final long valueUsed = valueTotal - valueAvail;
+            return new PartitionInfo(
+                    path,
+                    resolveFileSystem(path),
+                    valueTotal,
+                    statFs.getBlockSizeLong(),
+                    statFs.getFreeBytes(),
+                    valueAvail,
+                    valueUsed
+            );
+        }
+
+        private String resolveFileSystem(final String path) {
             final Set<CommandMount.MountOutput> mounts = CommandMount.listMountpoints(path);
             if (!mounts.isEmpty()) {
                 for (final CommandMount.MountOutput o : mounts) {
@@ -177,19 +181,50 @@ public final class PartitionInfoDialog extends DialogFragment {
             }
 
             final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
-                    new CommandStat(params[0].getAbsolutePath()));
+                    new CommandStat(path));
             return fsTypeResult == null || fsTypeResult.isEmpty() ?
                     null : fsTypeResult.get(0);
         }
 
         @Override
-        protected void onPostExecute(final String result) {
-            if (result != null) {
-                mFileSystemProgress.setVisibility(View.GONE);
-                mFsTextView.setVisibility(View.VISIBLE);
-                mFsTextView.setText(result);
-            } else {
-                mFileSystemRow.setVisibility(View.GONE);
+        protected void onPostExecute(final @NotNull PartitionInfo partitionInfo) {
+            final View view = mViewRef.get();
+            if (view != null) {
+                final TextView title = (TextView) view.findViewById(R.id.location);
+                title.setText(partitionInfo.mPath);
+
+                if (partitionInfo.mFsTypeText != null) {
+                    final TextView fs = (TextView) view.findViewById(R.id.filesystem);
+                    fs.setText(partitionInfo.mFsTypeText);
+                } else {
+                    final View fileSystemRow = view.findViewById(R.id.filesystem_row);
+                    fileSystemRow.setVisibility(View.GONE);
+                }
+
+                if (partitionInfo.mTotalBytes != 0L) {
+                    final TextView total = (TextView) view.findViewById(R.id.total);
+                    total.setText(partitionInfo.mTotalBytesText);
+                }
+
+                if (partitionInfo.mBlockSize != 0L) {
+                    final TextView block = (TextView) view.findViewById(R.id.block_size);
+                    block.setText(partitionInfo.mBlockSizeText);
+                }
+
+                if (partitionInfo.mFreeBytes != 0L) {
+                    final TextView free = (TextView) view.findViewById(R.id.free);
+                    free.setText(partitionInfo.mFreeBytesText);
+                }
+
+                if (partitionInfo.mAvailableBytes != 0L) {
+                    final TextView avail = (TextView) view.findViewById(R.id.available);
+                    avail.setText(partitionInfo.mAvailableBytesText);
+                }
+
+                if (partitionInfo.mUsedSpace != 0L) {
+                    final TextView used = (TextView) view.findViewById(R.id.used);
+                    used.setText(partitionInfo.mUsedSpaceText);
+                }
             }
         }
     }

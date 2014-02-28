@@ -24,7 +24,6 @@ import com.docd.purefm.tasks.DeleteTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMTextUtils;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -36,7 +35,7 @@ import android.widget.TextView;
 
 public final class DeleteFilesDialog extends DialogFragment {
     
-    public static DialogFragment instantiate(ActionMode mode, List<GenericFile> files) {
+    public static DeleteFilesDialog newInstance(ActionMode mode, List<GenericFile> files) {
         final GenericFile[] extraFiles = new GenericFile[files.size()];
         files.toArray(extraFiles);
         final Bundle extras = new Bundle();

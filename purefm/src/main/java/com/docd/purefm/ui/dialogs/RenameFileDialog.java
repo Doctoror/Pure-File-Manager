@@ -43,7 +43,7 @@ public final class RenameFileDialog extends DialogFragment {
      * @param mode Current ActionMode instance
      * @return Dialog for renaming the file
      */
-    public static DialogFragment instantiate(ActionMode mode, GenericFile f) {
+    public static RenameFileDialog instantiate(ActionMode mode, GenericFile f) {
         final Bundle extras = new Bundle();
         extras.putSerializable(Extras.EXTRA_FILE, f);
 

@@ -13,6 +13,7 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -20,7 +21,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        style="?android:attr/actionBarStyle">
 
         <ToggleButton
             android:id="@+id/tab1"
@@ -29,15 +31,15 @@
             android:layout_weight="1"
             android:background="@drawable/tab_indicator_holo"
             android:checked="true"
-            android:textAllCaps="true"
             android:textOff="@string/info"
-            android:textOn="@string/info" />
+            android:textOn="@string/info"
+            style="?android:attr/actionBarTabTextStyle"/>
 
         <View
             android:layout_width="1dp"
             android:layout_height="25dp"
             android:layout_gravity="center_vertical"
-            android:background="#d6d6d6" />
+            android:background="?android:attr/dividerVertical"/>
 
         <ToggleButton
             android:id="@+id/tab2"
@@ -45,30 +47,20 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/tab_indicator_holo"
-            android:textAllCaps="true"
             android:textOff="@string/permissions"
-            android:textOn="@string/permissions" />
+            android:textOn="@string/permissions"
+            style="?android:attr/actionBarTabTextStyle"/>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="4.66667dp"
-        android:background="@drawable/holo_light_tab_shadow" />
+        android:layout_height="5dp"
+        android:background="@drawable/tab_shadow"
+        tools:ignore="contentDescription"/>
 
-    <ScrollView
+    <android.support.v4.view.ViewPager
+        android:id="@+id/tabsContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
-
-        <ViewAnimator
-            android:id="@+id/tabsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <include layout="@layout/dialog_properties" />
-
-            <include layout="@layout/dialog_permissions" />
-        </ViewAnimator>
-    </ScrollView>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

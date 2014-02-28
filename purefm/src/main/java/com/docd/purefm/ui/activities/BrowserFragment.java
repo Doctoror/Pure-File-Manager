@@ -162,7 +162,9 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
         this.mAttachedBrowserActivity = (AbstractBrowserActivity) activity;
         this.menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
-        this.actionModeController = new ActionModeController(this.mAttachedBrowserActivity);
+
+        // needs FragmentActivity because FilePropertiesDialog uses childFragmentManager
+        this.actionModeController = new ActionModeController(mAttachedBrowserActivity);
     }
 
     @Override

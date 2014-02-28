@@ -19,8 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -139,7 +139,7 @@ public final class ActionModeController {
                     for (int i = 0; i < items.size(); i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
-                            final DialogFragment rename = RenameFileDialog
+                            final RenameFileDialog rename = RenameFileDialog
                                     .instantiate(mode, (GenericFile) mListView
                                             .getAdapter().getItem(key));
                             rename.show(mActivity.getFragmentManager(),
@@ -153,8 +153,8 @@ public final class ActionModeController {
                     for (int i = 0; i < items.size(); i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
-                            final DialogFragment prop = FilePropertiesDialog
-                                    .instantiate((GenericFile) mListView
+                            final FilePropertiesDialog prop = FilePropertiesDialog
+                                    .newInstance((GenericFile) mListView
                                             .getAdapter().getItem(key));
                             mode.finish();
                             prop.show(mActivity.getFragmentManager(),
@@ -173,7 +173,7 @@ public final class ActionModeController {
                             files1.add(adapter.getItem(key));
                         }
                     }
-                    final DialogFragment dialog = DeleteFilesDialog.instantiate(mode, files1);
+                    final DeleteFilesDialog dialog = DeleteFilesDialog.newInstance(mode, files1);
                     dialog.show(mActivity.getFragmentManager(), BrowserPagerActivity.TAG_DIALOG);
                     return true;
 
