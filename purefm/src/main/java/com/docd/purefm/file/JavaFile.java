@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -277,6 +278,17 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      * {@inheritDoc}
      */
     @Override
+    public BigInteger lengthTotal() {
+        if (mFile.exists()) {
+            return FileUtils.sizeOfAsBigInteger(mFile);
+        }
+        return BigInteger.ZERO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long lastModified() {
         return this.mFile.lastModified();
     }
@@ -430,6 +442,18 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     @Override
     public Permissions getPermissions() {
         return this.p;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean applyPermissions(final Permissions newPerm) {
+        boolean result;
+        result = mFile.setReadable(newPerm.ur);
+        result &= mFile.setWritable(newPerm.uw);
+        result &= mFile.setExecutable(newPerm.ux);
+        return result;
     }
 
     /**

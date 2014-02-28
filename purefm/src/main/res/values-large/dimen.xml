@@ -13,13 +13,7 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <resources>
-    
-    <dimen name="preview_width">48dp</dimen>
-    <dimen name="list_item_file_size_width">64dp</dimen>
 
-    <!-- Vertical padding around action bar icons. -->
-    <dimen name="action_bar_icon_vertical_padding">8dip</dimen>
-
-    <dimen name="viewpager_dialog_height">240dp</dimen>
+    <dimen name="viewpager_dialog_height">300dp</dimen>
     
 </resources>

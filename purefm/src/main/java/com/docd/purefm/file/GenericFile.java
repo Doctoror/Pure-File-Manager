@@ -22,6 +22,7 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 
 public interface GenericFile extends Serializable {
 
@@ -119,6 +120,15 @@ public interface GenericFile extends Serializable {
     long length();
 
     /**
+     * Returns the total length of this file in bytes.
+     * Returns 0 if the file does not exist.
+     * If this file is a directory, will return total directory size
+     *
+     * @return the number of bytes in this file or all containing file if is a directory
+     */
+    BigInteger lengthTotal();
+
+    /**
      * Returns the time when this file was last modified, measured in
      * milliseconds since January 1st, 1970, midnight.
      * Returns 0 if the file does not exist.
@@ -150,6 +160,14 @@ public interface GenericFile extends Serializable {
      */
     @NotNull
     Permissions getPermissions();
+
+    /**
+     * Applies permissions to the file
+     *
+     * @param newPerm Permissions to apply
+     * @return true, if the permissions was applied
+     */
+    boolean applyPermissions(Permissions newPerm);
 
     /**
      * Returns path of this file.

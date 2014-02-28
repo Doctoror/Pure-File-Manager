@@ -25,6 +25,7 @@ import com.docd.purefm.commandline.CommandMount;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.StatFsCompat;
 import com.docd.purefm.utils.ThemeUtils;
 
@@ -161,29 +162,13 @@ public final class PartitionInfoDialog extends DialogFragment {
             final long valueUsed = valueTotal - valueAvail;
             return new PartitionInfo(
                     path,
-                    resolveFileSystem(path),
+                    PureFMFileUtils.resolveFileSystem(path),
                     valueTotal,
                     statFs.getBlockSizeLong(),
                     statFs.getFreeBytes(),
                     valueAvail,
                     valueUsed
             );
-        }
-
-        private String resolveFileSystem(final String path) {
-            final Set<CommandMount.MountOutput> mounts = CommandMount.listMountpoints(path);
-            if (!mounts.isEmpty()) {
-                for (final CommandMount.MountOutput o : mounts) {
-                    if (path.startsWith(o.mountPoint)) {
-                        return o.fileSystem;
-                    }
-                }
-            }
-
-            final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
-                    new CommandStat(path));
-            return fsTypeResult == null || fsTypeResult.isEmpty() ?
-                    null : fsTypeResult.get(0);
         }
 
         @Override

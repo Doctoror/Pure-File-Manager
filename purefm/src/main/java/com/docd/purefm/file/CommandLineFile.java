@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -30,6 +31,7 @@ import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
 import com.docd.purefm.commandline.CommandCopyRecursively;
+import com.docd.purefm.commandline.CommandDu;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandListContents;
 import com.docd.purefm.commandline.CommandListFile;
@@ -41,9 +43,7 @@ import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.MimeTypes;
-import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.PureFMTextUtils;
-import com.stericson.RootTools.RootTools;
 
 public final class CommandLineFile implements GenericFile,
         Comparable<GenericFile> {
@@ -447,6 +447,17 @@ public final class CommandLineFile implements GenericFile,
      * {@inheritDoc}
      */
     @Override
+    public BigInteger lengthTotal() {
+        if (mIsDirectory) {
+            return BigInteger.valueOf(CommandDu.du_s(this));
+        }
+        return BigInteger.valueOf(mLength);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long lastModified() {
         return this.mLastmod;
     }
@@ -650,11 +661,9 @@ public final class CommandLineFile implements GenericFile,
     }
 
     /**
-     * Applies permissions to the file
-     *
-     * @param newPerm Permissions to apply
-     * @return true, if the permissions was applied
+     * {@inheritDoc}
      */
+    @Override
     public boolean applyPermissions(final Permissions newPerm) {
         if (this.mPermissions.equals(newPerm)) {
             return true;

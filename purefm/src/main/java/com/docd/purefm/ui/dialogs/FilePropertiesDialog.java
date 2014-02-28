@@ -49,6 +49,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,16 +59,16 @@ import java.math.BigInteger;
 import java.util.List;
 
 public final class FilePropertiesDialog extends DialogFragment {
-    
+
     public static FilePropertiesDialog newInstance(final @NotNull GenericFile f) {
         final Bundle extras = new Bundle();
         extras.putSerializable(Extras.EXTRA_FILE, f);
-        
+
         final FilePropertiesDialog fpd = new FilePropertiesDialog();
         fpd.setArguments(extras);
         return fpd;
     }
-    
+
     private GenericFile file;
     private PropertiesAdapter mAdapter;
 
@@ -77,7 +78,7 @@ public final class FilePropertiesDialog extends DialogFragment {
         final Bundle args = this.getArguments();
         this.file = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
     }
-    
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
@@ -122,7 +123,9 @@ public final class FilePropertiesDialog extends DialogFragment {
                 tab1.setChecked(position == 0);
                 tab2.setChecked(position == 1);
                 ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setVisibility(position == 0 ? View.GONE : View.VISIBLE);
+                        .setVisibility(position == 0 ||
+                                !((FilePermissionsPagerItem) mAdapter.getItem(1)).areBoxesEnabled()
+                                        ? View.GONE : View.VISIBLE);
             }
         });
 
@@ -134,7 +137,7 @@ public final class FilePropertiesDialog extends DialogFragment {
                 pager.setCurrentItem(0);
             }
         });
-        
+
         tab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,6 +163,7 @@ public final class FilePropertiesDialog extends DialogFragment {
     private interface PagerItem {
 
         void onStart();
+
         void onStop();
 
         @NotNull
@@ -293,11 +297,9 @@ public final class FilePropertiesDialog extends DialogFragment {
                     group.setText(aids.get(f.getGroup()));
                 }
 
-                final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
-                        new CommandStat(f.getAbsolutePath()));
-                final String fsType = fsTypeResult == null || fsTypeResult.isEmpty() ?
-                        null : fsTypeResult.get(0);
-                if (fsType == null || fsType.equals("msdos") || fsType.equals("vfat")) {
+                //TODO move to background thread
+                final String fsType = PureFMFileUtils.resolveFileSystem(f.getAbsolutePath());
+                if (fsType == null || fsType.equals("msdos") || fsType.equals("vfat") || fsType.equals("fuse")) {
                     this.disableBoxes();
                 }
             } else {
@@ -328,14 +330,18 @@ public final class FilePropertiesDialog extends DialogFragment {
             this.ox.setEnabled(false);
         }
 
+        boolean areBoxesEnabled() {
+            return this.ur.isEnabled();
+        }
+
         public void applyPermissions(final Context context) {
-            if (!mInputPermissions.equals(mModifiedPermissions) && mFile instanceof CommandLineFile) {
+            if (!mInputPermissions.equals(mModifiedPermissions)) {
                 final ApplyTask task = new ApplyTask(context, mModifiedPermissions);
-                task.execute((CommandLineFile)this.mFile);
+                task.execute(this.mFile);
             }
         }
 
-        private static final class ApplyTask extends AsyncTask<CommandLineFile, Void, Boolean> {
+        private static final class ApplyTask extends AsyncTask<GenericFile, Void, Boolean> {
 
             private final Context context;
             private final Permissions target;
@@ -346,7 +352,7 @@ public final class FilePropertiesDialog extends DialogFragment {
             }
 
             @Override
-            protected Boolean doInBackground(CommandLineFile... params) {
+            protected Boolean doInBackground(final GenericFile... params) {
                 final String path = params[0].getAbsolutePath();
                 final boolean remount = Environment.needsRemount(path);
                 if (remount) {
@@ -466,7 +472,7 @@ public final class FilePropertiesDialog extends DialogFragment {
                         parentPath,
                         typeText,
                         file.getMimeType(),
-                        PureFMFileUtils.byteCountToDisplaySize(BigInteger.valueOf(file.length())),
+                        PureFMFileUtils.byteCountToDisplaySize(file.lengthTotal()),
                         PureFMTextUtils.humanReadableDate(file.lastModified(), file instanceof CommandLineFile));
             }
 
@@ -509,7 +515,7 @@ public final class FilePropertiesDialog extends DialogFragment {
                                   @NotNull final GenericFile file) {
             mLayoutInflater = context.getLayoutInflater();
             mFile = file;
-            mItems= new PagerItem[] {
+            mItems = new PagerItem[]{
                     new FilePropertiesPagerItem(mFile, context
                             .getApplicationContext().getResources()),
                     new FilePermissionsPagerItem(mFile)
