@@ -351,15 +351,15 @@ public final class FilePropertiesDialog extends DialogFragment {
 
             @Override
             protected String doInBackground(final GenericFile... params) {
-                return PureFMFileUtils.resolveFileSystem(params[0].getAbsolutePath());
+                return PureFMFileUtils.resolveFileSystem(params[0]);
             }
 
             @Override
             protected void onPostExecute(final String fsType) {
                 final FilePermissionsPagerItem item = mItemRef.get();
                 if (item != null) {
-                    if (fsType == null || fsType.equals("msdos") ||
-                            fsType.equals("vfat") || fsType.equals("fuse")) {
+                    if (fsType == null || fsType.equals("vfat") || fsType.equals("fuse")
+                            || fsType.equals("ntfs") || fsType.equals("msdos")) {
                         item.disableBoxes();
                     }
                     item.mView.findViewById(android.R.id.progress).setVisibility(View.GONE);

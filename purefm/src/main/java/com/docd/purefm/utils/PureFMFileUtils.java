@@ -76,6 +76,12 @@ public final class PureFMFileUtils {
     }
 
     @Nullable
+    public static String resolveFileSystem(@NotNull final GenericFile file) {
+        return resolveFileSystem(FilenameUtils.getFullPathNoEndSeparator(file.getAbsolutePath()));
+    }
+
+
+    @Nullable
     public static String resolveFileSystem(@NotNull final String path) {
         final Set<CommandMount.MountOutput> mounts = CommandMount.listMountpoints(path);
         if (!mounts.isEmpty()) {
