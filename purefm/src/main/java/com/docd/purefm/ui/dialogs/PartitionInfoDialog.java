@@ -20,10 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.CommandMount;
-import com.docd.purefm.commandline.CommandStat;
-import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.PureFMFileUtils;
 import com.docd.purefm.utils.StatFsCompat;
@@ -39,8 +35,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Set;
 
 public final class PartitionInfoDialog extends DialogFragment {
     
@@ -210,6 +204,8 @@ public final class PartitionInfoDialog extends DialogFragment {
                     final TextView used = (TextView) view.findViewById(R.id.used);
                     used.setText(partitionInfo.mUsedSpaceText);
                 }
+                view.findViewById(android.R.id.progress).setVisibility(View.GONE);
+                view.findViewById(R.id.content).setVisibility(View.VISIBLE);
             }
         }
     }

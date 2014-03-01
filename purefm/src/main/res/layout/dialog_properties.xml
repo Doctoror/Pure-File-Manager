@@ -13,200 +13,214 @@
     tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity"
     tools:ignore="RtlSymmetry">
 
-    <TableLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:stretchColumns="1"
-        android:shrinkColumns="1">
+        android:layout_height="wrap_content">
 
-        <TableRow
+        <ProgressBar
+            android:id="@android:id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleLarge" />
+
+        <TableLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp">
+            android:gravity="center"
+            android:stretchColumns="1"
+            android:shrinkColumns="1"
+            android:visibility="invisible">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:text="@string/name"
-                android:textIsSelectable="false"
-                android:textStyle="bold" />
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:text="@string/name"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:textIsSelectable="false"
+                    tools:text="photo.jpg" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:textIsSelectable="false"
-                tools:text="photo.jpg" />
-        </TableRow>
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:text="@string/location"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:textIsSelectable="false"
+                    tools:text="/sdcard/Pictures" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:text="@string/location"
-                android:textIsSelectable="false"
-                android:textStyle="bold" />
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
-            <TextView
-                android:id="@+id/location"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:text="@string/type"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:textIsSelectable="false"
+                    tools:text="File" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:textIsSelectable="false"
-                tools:text="/sdcard/Pictures" />
-        </TableRow>
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:text="@string/mime"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/mime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/minus"
+                    android:textIsSelectable="false"
+                    tools:text="image/jpeg" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:text="@string/type"
-                android:textIsSelectable="false"
-                android:textStyle="bold" />
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
-            <TextView
-                android:id="@+id/type"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:text="@string/size"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/minus"
+                    android:textIsSelectable="false"
+                    tools:text="1 MiB" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:textIsSelectable="false"
-                tools:text="File" />
-        </TableRow>
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:text="@string/modified"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:text="@string/mime"
-                android:textIsSelectable="false"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/modified"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|top"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="left|center_vertical"
+                    android:textIsSelectable="false"
+                    tools:text="29/01/2014 16:29" />
+            </TableRow>
 
-            <TextView
-                android:id="@+id/mime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:text="@string/minus"
-                android:textIsSelectable="false"
-                tools:text="image/jpeg" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:text="@string/size"
-                android:textIsSelectable="false"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/size"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:text="@string/minus"
-                android:textIsSelectable="false"
-                tools:text="1 MiB" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:text="@string/modified"
-                android:textIsSelectable="false"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/modified"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
-                android:ellipsize="end"
-                android:focusable="false"
-                android:gravity="left|center_vertical"
-                android:textIsSelectable="false"
-                tools:text="29/01/2014 16:29" />
-        </TableRow>
-
-    </TableLayout>
+        </TableLayout>
+    </FrameLayout>
 </ScrollView>

@@ -280,7 +280,12 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     @Override
     public BigInteger lengthTotal() {
         if (mFile.exists()) {
-            return FileUtils.sizeOfAsBigInteger(mFile);
+            try {
+                return FileUtils.sizeOfAsBigInteger(mFile);
+            } catch (StackOverflowError e) {
+                //if we have too much directories, we can get this
+                return BigInteger.valueOf(-1);
+            }
         }
         return BigInteger.ZERO;
     }

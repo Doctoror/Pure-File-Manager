@@ -18,9 +18,6 @@ import com.cyanogenmod.filemanager.util.AIDHelper;
 import com.docd.purefm.Environment;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.CommandStat;
-import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
@@ -49,14 +46,11 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.math.BigInteger;
-import java.util.List;
 
 public final class FilePropertiesDialog extends DialogFragment {
 
@@ -172,6 +166,9 @@ public final class FilePropertiesDialog extends DialogFragment {
 
     static final class FilePermissionsPagerItem implements PagerItem, CompoundButton.OnCheckedChangeListener {
 
+        private LoadFsTask mTask;
+        View mView;
+
         FilePermissionsPagerItem(final GenericFile file) {
             mFile = file;
         }
@@ -179,19 +176,28 @@ public final class FilePropertiesDialog extends DialogFragment {
         @NotNull
         @Override
         public View onCreateView(@NotNull final LayoutInflater inflater) {
-            final View view = inflater.inflate(R.layout.dialog_permissions, null);
-            initView(view);
-            return view;
+            mView = inflater.inflate(R.layout.dialog_permissions, null);
+            initView(mView);
+            return mView;
         }
 
         @Override
         public void onStart() {
-
+            if (mView != null) {
+                if (mTask == null) {
+                    mTask = new LoadFsTask(this);
+                }
+                if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
+                    mTask.execute(mFile);
+                }
+            }
         }
 
         @Override
         public void onStop() {
-
+            if (mTask != null && mTask.getStatus() == AsyncTask.Status.RUNNING) {
+                mTask.cancel(false);
+            }
         }
 
         /**
@@ -296,12 +302,6 @@ public final class FilePropertiesDialog extends DialogFragment {
                     owner.setText(aids.get(f.getOwner()));
                     group.setText(aids.get(f.getGroup()));
                 }
-
-                //TODO move to background thread
-                final String fsType = PureFMFileUtils.resolveFileSystem(f.getAbsolutePath());
-                if (fsType == null || fsType.equals("msdos") || fsType.equals("vfat") || fsType.equals("fuse")) {
-                    this.disableBoxes();
-                }
             } else {
                 this.disableBoxes();
             }
@@ -338,6 +338,33 @@ public final class FilePropertiesDialog extends DialogFragment {
             if (!mInputPermissions.equals(mModifiedPermissions)) {
                 final ApplyTask task = new ApplyTask(context, mModifiedPermissions);
                 task.execute(this.mFile);
+            }
+        }
+
+        private static final class LoadFsTask extends AsyncTask<GenericFile, Void, String> {
+
+            private final WeakReference<FilePermissionsPagerItem> mItemRef;
+
+            LoadFsTask(@NotNull final FilePermissionsPagerItem item) {
+                this.mItemRef = new WeakReference<FilePermissionsPagerItem>(item);
+            }
+
+            @Override
+            protected String doInBackground(final GenericFile... params) {
+                return PureFMFileUtils.resolveFileSystem(params[0].getAbsolutePath());
+            }
+
+            @Override
+            protected void onPostExecute(final String fsType) {
+                final FilePermissionsPagerItem item = mItemRef.get();
+                if (item != null) {
+                    if (fsType == null || fsType.equals("msdos") ||
+                            fsType.equals("vfat") || fsType.equals("fuse")) {
+                        item.disableBoxes();
+                    }
+                    item.mView.findViewById(android.R.id.progress).setVisibility(View.GONE);
+                    item.mView.findViewById(R.id.content).setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -501,6 +528,9 @@ public final class FilePropertiesDialog extends DialogFragment {
 
                 final TextView mod = (TextView) view.findViewById(R.id.modified);
                 mod.setText(fileProperties.mLastModifiedText);
+
+                view.findViewById(android.R.id.progress).setVisibility(View.GONE);
+                view.findViewById(R.id.content).setVisibility(View.VISIBLE);
             }
         }
     }
