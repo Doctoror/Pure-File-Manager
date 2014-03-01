@@ -17,6 +17,8 @@ package com.docd.purefm.ui.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
 
 import com.docd.purefm.settings.Settings;
 
@@ -38,6 +40,16 @@ public abstract class ThemableActivity extends Activity {
             setTheme(currentTheme);
         }
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (NavUtils.getParentActivityName(this) != null) {
+                NavUtils.navigateUpFromSameTask(this);
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

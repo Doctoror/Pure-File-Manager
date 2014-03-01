@@ -42,14 +42,14 @@ public final class SettingsActivity extends ActionBarIconMonitoredActivity {
     protected void setActionBarIcon(final Drawable icon) {
         getActionBar().setIcon(icon);
     }
-    
+
     @Override
-    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.onBeforeFinish();
-                return super.onMenuItemSelected(featureId, item);
-                
+                return super.onOptionsItemSelected(item);
+
             default:
                 return false;
         }
@@ -60,7 +60,6 @@ public final class SettingsActivity extends ActionBarIconMonitoredActivity {
         this.onBeforeFinish();
         super.onBackPressed();
     }
-
 
     void proxyRestart() {
         restart();

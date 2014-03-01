@@ -85,18 +85,6 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     }
     
     @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.onBackPressed();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-    
-    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
             this.onSearchClicked();

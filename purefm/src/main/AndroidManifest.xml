@@ -64,12 +64,24 @@
             android:label="@string/menu_search"
             android:logo="?attr/action_search"
             android:parentActivityName=".ui.activities.BrowserPagerActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.BrowserPagerActivity" />
+
+        </activity>
 
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".ui.activities.BrowserPagerActivity"/>
+            android:parentActivityName=".ui.activities.BrowserPagerActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.BrowserPagerActivity" />
+
+        </activity>
 
         <service android:name=".operations.OperationsService"/>
 
