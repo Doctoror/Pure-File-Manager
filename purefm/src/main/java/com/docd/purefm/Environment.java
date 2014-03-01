@@ -24,6 +24,7 @@ import com.docd.purefm.commandline.CommandListBusyboxApplets;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -168,15 +169,14 @@ public final class Environment {
         File externalStorage = android.os.Environment.getExternalStorageDirectory();
         File externalStorageParent;
         try {
-            externalStorage = android.os.Environment.getExternalStorageDirectory()
-                    .getCanonicalFile();
+            externalStorage = externalStorage.getCanonicalFile();
         } catch (IOException e) {
             //ignored
         }
         externalStorageParent = externalStorage.getParentFile();
         if (externalStorageParent != null) {
             try {
-                externalStorageParent = externalStorage.getCanonicalFile();
+                externalStorageParent = externalStorageParent.getCanonicalFile();
             } catch (IOException e) {
                 //ignored
             }
@@ -187,9 +187,9 @@ public final class Environment {
                 for (final File file : files) {
                     if (!file.equals(externalStorage) && file.canRead() && file.canWrite() && file.canExecute()) {
                         final String fileName = file.getName();
-                        if (fileName.equalsIgnoreCase("extSdCard") || fileName.equalsIgnoreCase("external_sd")) {
+                        if (StringUtils.containsIgnoreCase(fileName, "ext")) {
                             secondaryStorageDirectory = file;
-                        } else if (fileName.contains("usb") || fileName.contains("USB") || fileName.contains("Usb")) {
+                        } else if (StringUtils.containsIgnoreCase(fileName, "usb")) {
                             usbStorageDirectories.add(file);
                         }
                     }
