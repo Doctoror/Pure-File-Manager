@@ -98,18 +98,13 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private int mPrevId;
     private boolean firstRun;
 
-    private void configureGridViewColumns(final @NotNull Configuration config) {
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
         if (this.mListView instanceof GridView) {
             ((GridView) this.mListView).setNumColumns(ThemeUtils.getInteger(
                     getActivity().getTheme(), R.attr.browserGridColumns));
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        this.configureGridViewColumns(newConfig);
     }
 
     @Override
@@ -218,7 +213,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
-        configureGridViewColumns(getResources().getConfiguration());
         actionModeController.setListView(mListView);
         mParentOnNavigateListener = mAttachedBrowserActivity;
 
