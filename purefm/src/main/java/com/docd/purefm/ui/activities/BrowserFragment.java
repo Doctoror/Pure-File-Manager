@@ -101,9 +101,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private void configureGridViewColumns(final @NotNull Configuration config) {
 
         if (this.mListView instanceof GridView) {
-            ((GridView) this.mListView)
-                    .setNumColumns(ThemeUtils.getBrowserGridColumns(
-                            getActivity().getTheme(), config));
+            ((GridView) this.mListView).setNumColumns(ThemeUtils.getInteger(
+                    getActivity().getTheme(), R.attr.browserGridColumns));
         }
     }
 

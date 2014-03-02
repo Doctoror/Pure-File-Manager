@@ -14,9 +14,6 @@
 <!--limitations under the License.-->
 <resources>
 
-    <attr name="browserGridColumns" format="integer" />
-
-    <attr name="themeId" format="integer" />
-    <attr name="browserListTextColor" format="color" />
+    <integer name="browserGridColumns">@integer/browserGridColumnsLand</integer>
 
 </resources>

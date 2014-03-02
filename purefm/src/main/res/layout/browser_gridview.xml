@@ -21,7 +21,7 @@
     android:paddingTop="10dp"
     android:clipToPadding="false"
     android:scrollbarStyle="outsideOverlay"
-    android:numColumns="?attr/browserGridColumnsPort"
+    android:numColumns="?attr/browserGridColumns"
     android:stretchMode="columnWidth"
     android:horizontalSpacing="10dp"
     android:verticalSpacing="4dp"
