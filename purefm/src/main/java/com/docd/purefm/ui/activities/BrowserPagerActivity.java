@@ -80,12 +80,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
 
     private BrowserTabsAdapter mPagerAdapter;
 
-    private final Object currentlyDisplayedFragmentLock;
     private BrowserFragment mCurrentlyDisplayedFragment;
-
-    public BrowserPagerActivity() {
-        this.currentlyDisplayedFragmentLock = new Object();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,6 +204,11 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
     }
 
     @Override
+    public boolean isHistoryEnabled() {
+        return true;
+    }
+
+    @Override
     protected BrowserFragment getCurrentlyDisplayedFragment() {
         return mCurrentlyDisplayedFragment;
     }
@@ -228,9 +228,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
 
     @Override
     protected void setCurrentlyDisplayedFragment(final BrowserFragment fragment) {
-        synchronized (currentlyDisplayedFragmentLock) {
-            mCurrentlyDisplayedFragment = fragment;
-        }
+        mCurrentlyDisplayedFragment = fragment;
     }
 
     /**
@@ -296,12 +294,10 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
         if (this.mDrawerLayout.isDrawerOpen(this.mDrawerList)) {
             this.mDrawerLayout.closeDrawer(this.mDrawerList);
         }
-        synchronized (this.currentlyDisplayedFragmentLock) {
-            if (this.mCurrentlyDisplayedFragment != null) {
-                final Browser browser = this.mCurrentlyDisplayedFragment.getBrowser();
-                if (browser != null) {
-                    browser.navigate(path, true);
-                }
+        if (this.mCurrentlyDisplayedFragment != null) {
+            final Browser browser = this.mCurrentlyDisplayedFragment.getBrowser();
+            if (browser != null) {
+                browser.navigate(path, true);
             }
         }
     }
@@ -309,10 +305,8 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
     @Override
     public void onBackPressed() {
         final boolean onFragmentBackPressed;
-        synchronized (this.currentlyDisplayedFragmentLock) {
-            onFragmentBackPressed = this.mCurrentlyDisplayedFragment != null
-                    && this.mCurrentlyDisplayedFragment.onBackPressed();
-        }
+        onFragmentBackPressed = this.mCurrentlyDisplayedFragment != null
+                && this.mCurrentlyDisplayedFragment.onBackPressed();
         if (!onFragmentBackPressed) {
                 final AlertDialog.Builder b = new AlertDialog.Builder(this);
                 b.setMessage(R.string.dialog_quit_message);

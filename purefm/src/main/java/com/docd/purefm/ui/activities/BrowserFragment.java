@@ -117,9 +117,11 @@ public final class BrowserFragment extends UserVisibleHintFragment
         super.onAttach(activity);
 
         if (activity instanceof AbstractBrowserActivity) {
-            mBrowser = new Browser((AbstractBrowserActivity) activity);
+            mBrowser = new Browser((AbstractBrowserActivity) activity,
+                    ((AbstractBrowserActivity) activity).isHistoryEnabled());
         } else {
-            throw new IllegalStateException("BrowserFragment should be attached only to BrowserPagerActivity");
+            throw new IllegalStateException(
+                    "BrowserFragment should be attached only to BrowserPagerActivity");
         }
         mBrowser.setOnNavigateListener(new OnNavigateListener() {
 

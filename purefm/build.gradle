@@ -38,11 +38,10 @@ android {
 }
 
 dependencies {
-    //compile project(':pull_to_refresh')
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:0.9.3'
     compile 'com.android.support:support-v13:19.0.1'
     compile files('libs/annotations.jar')
-    compile files('libs/RootTools-3.4.jar')
+    compile files('libs/RootTools.jar')
     compile files('libs/commons-io-2.4.jar')
     compile files('libs/commons-codec-1.9.jar')
     compile files('libs/commons-lang3-3.2.1.jar')

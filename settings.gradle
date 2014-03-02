@@ -1,1 +1,1 @@
-include ':purefm', ':pull_to_refresh'
+include ':purefm'

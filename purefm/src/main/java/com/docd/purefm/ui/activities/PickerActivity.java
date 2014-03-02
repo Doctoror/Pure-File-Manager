@@ -2,15 +2,19 @@ package com.docd.purefm.ui.activities;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
+import com.docd.purefm.browser.Browser;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
@@ -25,6 +29,8 @@ public final class PickerActivity extends AbstractBrowserActivity {
      */
     private String mGetContentMimeType;
 
+    private View mUp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Settings.theme == R.style.ThemeDark) {
@@ -33,16 +39,17 @@ public final class PickerActivity extends AbstractBrowserActivity {
             setTheme(R.style.ThemeLight_Overlay);
         }
         super.onCreate(savedInstanceState);
-        final ViewGroup content = (ViewGroup) findViewById(android.R.id.content);
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
-        content.setLayoutParams(new LinearLayout.LayoutParams(
-                (int) (metrics.widthPixels * 0.9f),
-                (int) (metrics.heightPixels * 0.8f)
-        ));
 
         this.setContentView(R.layout.activity_picker);
         this.checkIntentAction(getIntent());
         this.initActionBar();
+
+        final Resources res = getResources();
+        final Window window = getWindow();
+        final WindowManager.LayoutParams params = window.getAttributes();
+        params.width = (int) res.getDimension(R.dimen.picker_dialog_width);
+        params.height = (int) res.getDimension(R.dimen.picker_dialog_height);
+        window.setAttributes(params);
     }
 
     @Override
@@ -65,6 +72,11 @@ public final class PickerActivity extends AbstractBrowserActivity {
     @Override
     public void invalidateList() {
         //do nothing
+    }
+
+    @Override
+    public boolean isHistoryEnabled() {
+        return false;
     }
 
     @Override
@@ -96,11 +108,18 @@ public final class PickerActivity extends AbstractBrowserActivity {
 
     private void initActionBar() {
         mBreadCrumbView = (BreadCrumbTextView) findViewById(R.id.bread_crumb_view);
+        mUp = findViewById(R.id.up);
         final View home = findViewById(android.R.id.home);
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                final BrowserFragment fragment = getCurrentlyDisplayedFragment();
+                if (fragment != null) {
+                    final Browser browser = fragment.getBrowser();
+                    if (browser != null) {
+                        browser.up();
+                    }
+                }
             }
         });
     }
@@ -111,8 +130,9 @@ public final class PickerActivity extends AbstractBrowserActivity {
     }
 
     @Override
-    public void onNavigationCompleted(GenericFile path) {
+    public void onNavigationCompleted(final GenericFile path) {
         mBreadCrumbView.setFile(path.toFile());
+        mUp.setVisibility(path.getAbsolutePath().equals(Environment.rootDirectory.getAbsolutePath()) ? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override

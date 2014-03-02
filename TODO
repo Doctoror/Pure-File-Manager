@@ -1,9 +1,4 @@
 Check for free space before file copy
-Implement changing permissions for JavaFile
-Add a separate picker activity
 Add large folder icons for GridView
-Show total directory sizes in properties
-Detect filesystem by mount
 Replace cancelable progress dialogs with dialogs with cancel button
 Add plurals to "deleted files" text and similar
-Up button should not finish PickerActivity

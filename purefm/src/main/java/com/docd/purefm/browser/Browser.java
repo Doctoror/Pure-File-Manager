@@ -66,33 +66,42 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     private OnNavigateListener mNavigateListener;
 
     private Runnable mLastRunnable;
+    private boolean mHistoryEnabled;
 
-    public Browser(final AbstractBrowserActivity activity) {
+    public Browser(@NotNull final AbstractBrowserActivity activity, final boolean historyEnabled) {
         if (sHandler == null) {
             sHandler = new Handler(activity.getMainLooper());
         }
         mContext = activity;
-        this.mObserverCache = FileObserverCache.getInstance();
-        this.mHistory = new ArrayDeque<String>(15);
+        mHistoryEnabled = historyEnabled;
+        mObserverCache = FileObserverCache.getInstance();
+        mHistory = new ArrayDeque<String>(historyEnabled ? 15 : 0);
         final String home = Settings.getHomeDirectory(activity);
         final String state = Environment.getExternalStorageState();
         if (home != null) {
-            this.mCurrentPath = FileFactory.newFile(home);
-            if (!this.mCurrentPath.exists()) {
-                this.mCurrentPath = null;
+            mCurrentPath = FileFactory.newFile(home);
+            if (!mCurrentPath.exists()) {
+                mCurrentPath = null;
             }
         }
         if (mCurrentPath == null && (state.equals(Environment.MEDIA_MOUNTED) || state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
-            this.mCurrentPath = FileFactory.newFile(Environment.getExternalStorageDirectory());
+            mCurrentPath = FileFactory.newFile(Environment.getExternalStorageDirectory());
         }
-        if (this.mCurrentPath == null) {
-            this.mCurrentPath = FileFactory.newFile(com.docd.purefm.Environment.rootDirectory.getAbsolutePath());
+        if (mCurrentPath == null) {
+            mCurrentPath = FileFactory.newFile(com.docd.purefm.Environment.rootDirectory.getAbsolutePath());
         }
-        if (this.mCurrentPath != null) {
-            this.mCurrentPathObserver = mObserverCache.getOrCreate(
-                    this.mCurrentPath.getAbsolutePath(), OBSERVER_EVENTS);
-            this.mCurrentPathObserver.addOnEventListener(this);
-            this.mCurrentPathObserver.startWatching();
+        if (mCurrentPath != null) {
+            mCurrentPathObserver = mObserverCache.getOrCreate(
+                    mCurrentPath.getAbsolutePath(), OBSERVER_EVENTS);
+            mCurrentPathObserver.addOnEventListener(this);
+            mCurrentPathObserver.startWatching();
+        }
+    }
+
+    public void setHistoryEnabled(final boolean enabled) {
+        if (mHistoryEnabled != enabled) {
+            mHistoryEnabled = enabled;
+            mHistory.clear();
         }
     }
 

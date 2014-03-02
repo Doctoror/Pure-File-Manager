@@ -312,7 +312,7 @@ public final class CommandLineFile implements GenericFile,
         }
         final List<CommandLineFile> res = new ArrayList<CommandLineFile>(
                 result.size());
-        for (String f : result) {
+        for (final String f : result) {
             try {
                 res.add(CommandLineFile.fromLSL(this.mFile, f));
             } catch (IllegalArgumentException e) {

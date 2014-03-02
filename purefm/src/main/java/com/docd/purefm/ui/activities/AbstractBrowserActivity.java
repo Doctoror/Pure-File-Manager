@@ -99,4 +99,9 @@ public abstract class AbstractBrowserActivity extends ActionBarIconMonitoredActi
      * Refresh content list
      */
     public abstract void invalidateList();
+
+    /**
+     * Should return true if history is enabled
+     */
+    public abstract boolean isHistoryEnabled();
 }

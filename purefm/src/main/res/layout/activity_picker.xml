@@ -15,8 +15,8 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="@dimen/picker_dialog_width"
+    android:layout_height="@dimen/picker_dialog_height"
     android:orientation="vertical"
     tools:context="com.docd.purefm.ui.activities.PickerActivity">
 
@@ -33,11 +33,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="?android:attr/actionBarItemBackground"
-            android:paddingLeft="5dp"
             android:paddingRight="5dp"
             tools:ignore="uselessParent">
 
             <ImageView
+                android:id="@+id/up"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:src="?android:attr/homeAsUpIndicator"

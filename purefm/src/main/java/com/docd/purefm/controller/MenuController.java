@@ -56,11 +56,8 @@ public final class MenuController {
     public boolean onMenuItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (!this.browser.isRoot()) {
-                    this.browser.up();
-                    return true;
-                }
-                return false;
+                this.browser.up();
+                return true;
 
             case android.R.id.paste:
                 final PasteTaskExecutor ptc = new PasteTaskExecutor(activity, browser.getCurrentPath());
