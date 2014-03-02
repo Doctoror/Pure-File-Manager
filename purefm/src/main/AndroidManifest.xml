@@ -41,7 +41,8 @@
         </activity>
 
         <activity android:name=".ui.activities.PickerActivity"
-            android:theme="@style/ThemeDark.Overlay">
+            android:theme="@style/ThemeDark.Overlay"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
                 <category android:name="android.intent.category.OPENABLE" />

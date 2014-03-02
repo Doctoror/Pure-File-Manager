@@ -98,18 +98,19 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private int mPrevId;
     private boolean firstRun;
 
-    private void ensureGridViewColumns(Configuration config) {
+    private void configureGridViewColumns(final @NotNull Configuration config) {
+
         if (this.mListView instanceof GridView) {
             ((GridView) this.mListView)
-                    .setNumColumns(config.orientation == Configuration.ORIENTATION_LANDSCAPE ? 6
-                            : 4);
+                    .setNumColumns(ThemeUtils.getBrowserGridColumns(
+                            getActivity().getTheme(), config));
         }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        this.ensureGridViewColumns(newConfig);
+        this.configureGridViewColumns(newConfig);
     }
 
     @Override
@@ -218,7 +219,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
-        ensureGridViewColumns(getResources().getConfiguration());
+        configureGridViewColumns(getResources().getConfiguration());
         actionModeController.setListView(mListView);
         mParentOnNavigateListener = mAttachedBrowserActivity;
 
@@ -267,6 +268,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
         this.mPullToRefreshLayout = (PullToRefreshLayout) parent.findViewById(R.id.pullToRefreshLayout);
         this.initList(parent);
+        this.firstRun = true;
         return parent;
     }
 

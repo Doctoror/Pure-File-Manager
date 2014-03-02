@@ -21,6 +21,7 @@
     <dimen name="action_bar_icon_vertical_padding">8dip</dimen>
 
     <dimen name="viewpager_dialog_height">240dp</dimen>
+
     <dimen name="picker_dialog_width">300dp</dimen>
     <dimen name="picker_dialog_height">400dp</dimen>
 

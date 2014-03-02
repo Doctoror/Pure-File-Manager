@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -19,6 +18,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 import com.docd.purefm.utils.MimeTypes;
+import com.docd.purefm.utils.ThemeUtils;
 
 public final class PickerActivity extends AbstractBrowserActivity {
 
@@ -43,13 +43,24 @@ public final class PickerActivity extends AbstractBrowserActivity {
         this.setContentView(R.layout.activity_picker);
         this.checkIntentAction(getIntent());
         this.initActionBar();
+        this.setWindowParams();
+    }
 
+    private void setWindowParams() {
         final Resources res = getResources();
         final Window window = getWindow();
-        final WindowManager.LayoutParams params = window.getAttributes();
-        params.width = (int) res.getDimension(R.dimen.picker_dialog_width);
-        params.height = (int) res.getDimension(R.dimen.picker_dialog_height);
-        window.setAttributes(params);
+        final WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.width = (int) res.getDimension(R.dimen.picker_dialog_width);
+        windowAttributes.height = (int) res.getDimension(R.dimen.picker_dialog_height);
+        window.setAttributes(windowAttributes);
+
+        final View content = findViewById(R.id.activity_picker_content);
+        final ViewGroup.LayoutParams contentParams = content.getLayoutParams();
+        if (contentParams != null) {
+            contentParams.width = windowAttributes.width;
+            contentParams.height = windowAttributes.height;
+            content.setLayoutParams(contentParams);
+        }
     }
 
     @Override
@@ -103,7 +114,16 @@ public final class PickerActivity extends AbstractBrowserActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mBreadCrumbView.fullScrollRight();
+        setWindowParams();
+
+        final int actionBarSize = (int) ThemeUtils.getDimension(getTheme(), android.R.attr.actionBarSize);
+        final View actionBar = findViewById(R.id.activity_picker_actionbar);
+        final ViewGroup.LayoutParams actionBarParams = actionBar.getLayoutParams();
+        if (actionBarParams != null) {
+            actionBarParams.height = actionBarSize;
+            actionBar.setLayoutParams(actionBarParams);
+            mBreadCrumbView.fullScrollRight();
+        }
     }
 
     private void initActionBar() {

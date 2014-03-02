@@ -17,4 +17,7 @@
     <!-- Vertical padding around action bar icons. -->
     <dimen name="action_bar_icon_vertical_padding">4dip</dimen>
 
+    <dimen name="picker_dialog_width">400dp</dimen>
+    <dimen name="picker_dialog_height">480dp</dimen>
+
 </resources>
