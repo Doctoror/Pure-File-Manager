@@ -126,14 +126,18 @@ public final class PartitionInfoDialog extends DialogFragment {
             this.mFreeBytesText = FileUtils.byteCountToDisplaySize(freeBytes);
             this.mAvailableBytesText = FileUtils.byteCountToDisplaySize(availableBytes);
 
-            final StringBuilder usage = new StringBuilder();
-            usage.append(FileUtils.byteCountToDisplaySize(usedSpace));
-            usage.append(' ');
-            usage.append('(');
-            usage.append(usedSpace * 100L / totalBytes);
-            usage.append('%');
-            usage.append(')');
-            this.mUsedSpaceText = usage.toString();
+            if (totalBytes != 0L) {
+                final StringBuilder usage = new StringBuilder();
+                usage.append(FileUtils.byteCountToDisplaySize(usedSpace));
+                usage.append(' ');
+                usage.append('(');
+                usage.append(usedSpace * 100L / totalBytes);
+                usage.append('%');
+                usage.append(')');
+                this.mUsedSpaceText = usage.toString();
+            } else {
+                this.mUsedSpaceText = null;
+            }
         }
     }
 

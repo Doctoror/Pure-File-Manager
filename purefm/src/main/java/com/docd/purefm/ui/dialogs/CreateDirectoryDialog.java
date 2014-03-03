@@ -31,7 +31,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public final class CreateDirectoryDialog extends DialogFragment {
     
@@ -66,12 +65,7 @@ public final class CreateDirectoryDialog extends DialogFragment {
                 if (newName.isEmpty()) {
                     newName = mFileNameInput.getHint().toString();
                 }
-                final GenericFile target = FileFactory.newFile(current, newName);
-                if (target.exists()) {
-                    Toast.makeText(activity, R.string.file_exists, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                new CreateDirectoryTask(activity).execute(target);
+                new CreateDirectoryTask(activity, current).execute(newName);
             }
         });
         b.setNegativeButton(R.string.cancel, null);

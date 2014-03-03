@@ -302,12 +302,8 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      * {@inheritDoc}
      */
     @Override
-    public boolean createNewFile() {
-        try {
-            return this.mFile.createNewFile();
-        } catch (IOException e) {
-            return false;
-        }
+    public boolean createNewFile() throws IOException {
+        return this.mFile.createNewFile();
     }
 
     /**

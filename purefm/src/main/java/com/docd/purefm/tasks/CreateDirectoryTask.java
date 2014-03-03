@@ -16,22 +16,27 @@ package com.docd.purefm.tasks;
 
 import android.widget.Toast;
 
-import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+
 /**
  * Task for creating directory
  *
  * @author Doctoror
  */
-public final class CreateDirectoryTask extends OperationTask<GenericFile, Boolean> {
+public final class CreateDirectoryTask extends OperationTask<String, CharSequence> {
 
-    public CreateDirectoryTask(@NotNull MonitoredActivity activity) {
+    private final File mParent;
+
+    public CreateDirectoryTask(@NotNull final MonitoredActivity activity,
+                               @NotNull final File parent) {
         super(activity);
+        mParent = parent;
     }
 
     @NotNull
@@ -41,18 +46,17 @@ public final class CreateDirectoryTask extends OperationTask<GenericFile, Boolea
     }
 
     @Override
-    protected void startService(@NotNull GenericFile... files) {
-        for (final GenericFile file : files) {
-            OperationsService.createDirectory(mActivity, file);
+    protected void startService(@NotNull String... fileNames) {
+        for (final String fileName : fileNames) {
+            OperationsService.createDirectory(mActivity, mParent, fileName);
         }
     }
 
     @Override
-    protected void onPostExecute(final Boolean result) {
+    protected void onPostExecute(final CharSequence result) {
         super.onPostExecute(result);
-        if (!result) {
-            Toast.makeText(mActivity, R.string.could_not_create_dir,
-                    Toast.LENGTH_SHORT).show();
+        if (result != null) {
+            Toast.makeText(mActivity, result, Toast.LENGTH_SHORT).show();
         }
     }
 

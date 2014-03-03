@@ -27,7 +27,6 @@ import com.docd.purefm.ui.activities.MonitoredActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
 
 /**
  * OperationTask looks similar to AsyncTask, but the difference is that subclasses must start an {@link com.docd.purefm.operations.OperationsService} in
@@ -36,7 +35,7 @@ import java.lang.ref.WeakReference;
  * @param <Param> type of objects that will be passed to {@link #startService(Object[])}
  * @param <Result> type of object that will be delivered in {@link #onPreExecute()}
  */
-public abstract class OperationTask<Param, Result extends Serializable> implements
+public abstract class OperationTask<Param, Result> implements
         MonitoredActivity.OnStopListener {
 
     protected final MonitoredActivity mActivity;
@@ -91,12 +90,22 @@ public abstract class OperationTask<Param, Result extends Serializable> implemen
             if (extras != null) {
                 final String operation = extras.getString(OperationsService.EXTRA_ACTION);
                 if (getServiceAction().equals(operation)) {
-                    if (extras.getBoolean(OperationsService.EXTRA_WAS_CANCELED, false)) {
-                        onCancelled((Result) extras.getSerializable(
-                                OperationsService.EXTRA_RESULT));
+                    final Class<?> resultClass = (Class<?>) extras.getSerializable(OperationsService.EXTRA_RESULT_CLASS);
+                    if (resultClass == null) {
+                        throw new RuntimeException("EXTRA_RESULT_CLASS must be passed");
+                    }
+                    final Result result;
+                    if (Serializable.class.equals(resultClass)) {
+                        result = (Result) extras.getSerializable(OperationsService.EXTRA_RESULT);
+                    } else if (CharSequence.class.equals(resultClass)) {
+                        result = (Result) extras.getCharSequence(OperationsService.EXTRA_RESULT);
                     } else {
-                        onPostExecute((Result) extras.getSerializable(
-                                OperationsService.EXTRA_RESULT));
+                        throw new RuntimeException("Unexpected Result class: " + resultClass.getName());
+                    }
+                    if (extras.getBoolean(OperationsService.EXTRA_WAS_CANCELED, false)) {
+                        onCancelled(result);
+                    } else {
+                        onPostExecute(result);
                     }
                 }
             }

@@ -19,12 +19,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.docd.purefm.R;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ArrayUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -38,6 +42,7 @@ public final class OperationsService extends IntentService {
     public static final String EXTRA_ACTION = "OperationsService.extras.ACTION";
     public static final String EXTRA_WAS_CANCELED = "OperationsService.extras.WAS_CANCELED";
     public static final String EXTRA_RESULT = "OperationsService.extras.RESULT";
+    public static final String EXTRA_RESULT_CLASS = "OperationsService.extras.RESULT_CLASS";
 
     public static final String ACTION_PASTE = "OperationsService.actions.PASTE";
     public static final String ACTION_DELETE = "OperationsService.actions.DELETE";
@@ -48,6 +53,7 @@ public final class OperationsService extends IntentService {
     private static final String ACTION_CANCEL_PASTE = "OperationsService.actions.cancel.PASTE";
     private static final String ACTION_CANCEL_DELETE = "OperationsService.actions.cancel.DELETE";
 
+    private static final String EXTRA_FILE_NAME = "OperationsService.extras.FILE_NAME";
     private static final String EXTRA_FILES = "OperationsService.extras.FILES";
     private static final String EXTRA_FILE1 = "OperationsService.extras.FILE1";
     private static final String EXTRA_FILE2 = "OperationsService.extras.FILE2";
@@ -99,18 +105,22 @@ public final class OperationsService extends IntentService {
     }
 
     public static void createFile(@NotNull final Context context,
-                                  @NotNull final GenericFile toCreate) {
+                                  @NotNull final File parent,
+                                  @NotNull final String fileName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CREATE_FILE);
-        intent.putExtra(EXTRA_FILE1, toCreate);
+        intent.putExtra(EXTRA_FILE1, parent);
+        intent.putExtra(EXTRA_FILE_NAME, fileName);
         context.startService(intent);
     }
 
     public static void createDirectory(@NotNull final Context context,
-                                  @NotNull final GenericFile toCreate) {
+                                       @NotNull final File parent,
+                                       @NotNull final String dirName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CREATE_DIRECTORY);
-        intent.putExtra(EXTRA_FILE1, toCreate);
+        intent.putExtra(EXTRA_FILE1, parent);
+        intent.putExtra(EXTRA_FILE_NAME, dirName);
         context.startService(intent);
     }
 
@@ -195,31 +205,63 @@ public final class OperationsService extends IntentService {
     }
 
     private void onActionCreateFile(@NotNull final Intent createIntent) {
-        final GenericFile toCreate = (GenericFile) createIntent.getSerializableExtra(EXTRA_FILE1);
-        if (toCreate == null) {
+        final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE1);
+        if (parent == null) {
             throw new RuntimeException(
                     "ACTION_CREATE_FILE intent should contain non-null EXTRA_FILE1");
         }
+        final String fileName = createIntent.getStringExtra(EXTRA_FILE_NAME);
+        final GenericFile target = FileFactory.newFile(parent, fileName);
+        CharSequence message = null;
+        if (target.exists()) {
+            message = getText(R.string.file_exists);
+        } else {
+            try {
+                if (!target.createNewFile()) {
+                    message = getText(R.string.could_not_create_file);
+                }
+            } catch (IOException e) {
+                message = e.getMessage();
+            }
+        }
         onOperationCompleted(ACTION_CREATE_FILE,
-                toCreate.createNewFile(),
+                message,
                 false);
     }
 
     private void onActionCreateDirectory(@NotNull final Intent createIntent) {
-        final GenericFile toCreate = (GenericFile) createIntent.getSerializableExtra(EXTRA_FILE1);
-        if (toCreate == null) {
+        final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE1);
+        if (parent == null) {
             throw new RuntimeException(
                     "ACTION_CREATE_DIRECTORY intent should contain non-null EXTRA_FILE1");
         }
+        final String fileName = createIntent.getStringExtra(EXTRA_FILE_NAME);
+        final GenericFile target = FileFactory.newFile(parent, fileName);
+        CharSequence message = null;
+        if (target.exists()) {
+            message = getText(R.string.file_exists);
+        } else {
+            if (!target.mkdir()) {
+                message = getText(R.string.could_not_create_dir);
+            }
+        }
         onOperationCompleted(ACTION_CREATE_DIRECTORY,
-                toCreate.mkdir(),
+                message,
                 false);
+    }
+
+    private void onOperationCompleted(@NotNull final String action, @Nullable CharSequence result, final boolean wasCanceled) {
+        final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
+        broadcast.putExtra(EXTRA_RESULT, result);
+        broadcast.putExtra(EXTRA_RESULT_CLASS, CharSequence.class);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(broadcast);
     }
 
     private <T extends Serializable> void onOperationCompleted(
             @NotNull final String action, @Nullable T result, final boolean wasCanceled) {
         final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
         broadcast.putExtra(EXTRA_RESULT, result);
+        broadcast.putExtra(EXTRA_RESULT_CLASS, Serializable.class);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(broadcast);
     }
 

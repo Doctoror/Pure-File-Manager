@@ -25,12 +25,9 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.file.FileFactory;
-import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.CreateFileTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMFileUtils;
@@ -64,13 +61,7 @@ public final class CreateFileDialog extends DialogFragment {
                         if (newName.isEmpty()) {
                             newName = mFileNameInput.getHint().toString();
                         }
-                        final GenericFile target = FileFactory.newFile(current, newName);
-                        if (target.exists()) {
-                            Toast.makeText(activity, R.string.file_exists,
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        new CreateFileTask(activity).execute(target);
+                        new CreateFileTask(activity, current).execute(newName);
                     }
                 });
         b.setNegativeButton(R.string.cancel, null);

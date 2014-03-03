@@ -466,7 +466,7 @@ public final class CommandLineFile implements GenericFile,
      * {@inheritDoc}
      */
     @Override
-    public boolean createNewFile() {
+    public boolean createNewFile() throws IOException {
         if (this.mExists) {
             return false;
         }
@@ -475,8 +475,9 @@ public final class CommandLineFile implements GenericFile,
                 new CommandTouch(mFile.getAbsolutePath()));
         if (result) {
             this.apply(CommandLineFile.fromFile(mFile));
+            return true;
         }
-        return result;
+        throw new IOException("Could not create file+");
     }
 
     /**

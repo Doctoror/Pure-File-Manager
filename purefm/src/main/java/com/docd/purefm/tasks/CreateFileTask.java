@@ -16,22 +16,25 @@ package com.docd.purefm.tasks;
 
 import android.widget.Toast;
 
-import com.docd.purefm.R;
-import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 
 /**
  * Task for creating new file
  *
  * @author Doctoror
  */
-public final class CreateFileTask extends OperationTask<GenericFile, Boolean> {
+public final class CreateFileTask extends OperationTask<String, CharSequence> {
 
-    public CreateFileTask(@NotNull MonitoredActivity activity) {
+    private final File mParentDir;
+
+    public CreateFileTask(@NotNull MonitoredActivity activity, @NotNull final File parent) {
         super(activity);
+        mParentDir = parent;
     }
 
     @NotNull
@@ -41,17 +44,17 @@ public final class CreateFileTask extends OperationTask<GenericFile, Boolean> {
     }
 
     @Override
-    protected void startService(@NotNull GenericFile... files) {
-        for (final GenericFile file : files) {
-            OperationsService.createFile(mActivity, file);
+    protected void startService(@NotNull String... fileNames) {
+        for (final String fileName : fileNames) {
+            OperationsService.createFile(mActivity, mParentDir, fileName);
         }
     }
 
     @Override
-    protected void onPostExecute(final Boolean result) {
+    protected void onPostExecute(final CharSequence result) {
         super.onPostExecute(result);
-        if (!result) {
-            Toast.makeText(mActivity, R.string.could_not_create_file,
+        if (result != null) {
+            Toast.makeText(mActivity, result,
                     Toast.LENGTH_SHORT).show();
         }
     }
