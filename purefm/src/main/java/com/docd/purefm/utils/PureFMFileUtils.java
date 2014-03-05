@@ -37,7 +37,10 @@ import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.text.InputFilter;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 public final class PureFMFileUtils {
@@ -54,9 +57,30 @@ public final class PureFMFileUtils {
 
         @Nullable
         @Override
-        public CharSequence filter(CharSequence source, int start, int end,
-                                   Spanned dest, int dstart, int dend) {
-            return source.subSequence(start, end).toString().replaceAll(FILENAME_PATTERN, "");
+        public CharSequence filter(final CharSequence source,
+                                   final int start,
+                                   final int end,
+                                   final Spanned dest,
+                                   final int dstart,
+                                   final int dend) {
+            if (source.length() == 0) {
+                //nothing to filter
+                return null;
+            }
+            final CharSequence sourceSubSequence = source.subSequence(start, end);
+            final String sourceSubSequenceString = sourceSubSequence.toString();
+            final String sourceProcessed = sourceSubSequenceString.replaceAll(FILENAME_PATTERN, "");
+            if (sourceSubSequenceString.equals(sourceProcessed)) {
+                // nothing filtered
+                return null;
+            }
+            if (source instanceof Spanned) {
+                // copy spans from original source
+                final Spannable processed = new SpannableString(sourceProcessed);
+                TextUtils.copySpansFrom((Spanned) source, start, processed.length(), null, processed, 0);
+                return processed;
+            }
+            return sourceProcessed;
         }
     }
 
