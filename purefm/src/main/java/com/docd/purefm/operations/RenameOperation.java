@@ -17,56 +17,60 @@ package com.docd.purefm.operations;
 import android.content.Context;
 
 import com.docd.purefm.Environment;
+import com.docd.purefm.R;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
-import com.docd.purefm.utils.PureFMFileUtils;
 import com.stericson.RootTools.RootTools;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Performs file renaming
+ *
+ * {@link #execute(Void...)} returns null if operation completed successfully,
+ * or error message if an error occurred
  */
-final class RenameOperation extends Operation<Void, Boolean> {
+final class RenameOperation extends Operation<Void, CharSequence> {
 
     private final Context mContext;
     private final GenericFile mSource;
-    private final GenericFile mTarget;
+    private final String mTargetName;
 
     RenameOperation(@NotNull final Context context,
                            @NotNull final GenericFile source,
-                           @NotNull final GenericFile target) {
+                           @NotNull final String targetName) {
         this.mContext = context;
         this.mSource = source;
-        this.mTarget = target;
+        this.mTargetName = targetName;
     }
 
     @Override
-    protected Boolean execute(Void... voids) {
-        final String path = mTarget.getAbsolutePath();
+    protected CharSequence execute(Void... voids) {
+        final GenericFile sourceParent = mSource.getParentFile();
+        if (sourceParent == null) {
+            return "Could not resolve parent directory. Renaming failed.";
+        }
+        final GenericFile target = FileFactory.newFile(sourceParent.toFile(), mTargetName);
+        if (target.exists()) {
+            return mContext.getText(R.string.file_exists);
+        }
+        final String path = target.getAbsolutePath();
         final boolean remount = Environment.needsRemount(path);
         if (remount) {
             RootTools.remount(path, "RW");
         }
         try {
-            if (mSource.renameTo(mTarget)) {
-                final List<File> filesCreated = new ArrayList<File>(1);
-                final List<File> filesDeleted = new ArrayList<File>(1);
-                filesDeleted.add(mSource.toFile());
-                filesCreated.add(mTarget.toFile());
-                MediaStoreUtils.deleteFiles(mContext.getContentResolver(), filesDeleted);
-                PureFMFileUtils.requestMediaScanner(mContext, filesCreated);
-                return Boolean.TRUE;
+            if (mSource.renameTo(target)) {
+                MediaStoreUtils.renameFile(mContext.getContentResolver(), mSource, target);
+                return null;
             }
         } finally {
             if (remount) {
                 RootTools.remount(path, "RO");
             }
         }
-        return Boolean.FALSE;
+        return mContext.getString(R.string.rename_failed,
+                mSource.getName(), target.getName());
     }
 }

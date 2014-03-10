@@ -275,6 +275,17 @@ public interface GenericFile extends Serializable {
     public String getCanonicalPath() throws IOException;
 
     /**
+     * Returns a new file created using the canonical path of this file.
+     * Equivalent to {@code new File(this.getCanonicalPath())}.
+     *
+     * @return the new file constructed from this file's canonical path.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    @NotNull
+    public GenericFile getCanonicalFile() throws IOException;
+
+    /**
      * Returns the pathname of the parent of this file. This is the path up to
      * but not including the last name. {@code null} is returned if there is no
      * parent.

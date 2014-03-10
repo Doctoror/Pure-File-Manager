@@ -15,6 +15,7 @@
 package com.docd.purefm.operations;
 
 import android.content.Context;
+import android.util.Pair;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.Command;
@@ -23,17 +24,16 @@ import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandMove;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
+import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.MediaStoreUtils;
-import com.docd.purefm.utils.PureFMFileUtils;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,22 +57,23 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
 
     @Override
     protected ArrayList<GenericFile> execute(GenericFile... files) {
-        final List<File> filesDeleted = new LinkedList<File>();
-        final List<File> filesCreated = new LinkedList<File>();
+        final LinkedList<Pair<GenericFile, GenericFile>> filesAffected =
+                new LinkedList<>();
 
         final ArrayList<GenericFile> failed;
 
         if (mTarget instanceof JavaFile) {
-            failed = processJavaFiles(files, mTarget, mIsMove, filesCreated, filesDeleted);
+            failed = processJavaFiles(files, mTarget, mIsMove, filesAffected);
         } else {
-            failed = processCommandLineFiles(files, mTarget, mIsMove, filesCreated, filesDeleted);
+            failed = processCommandLineFiles(files, mTarget, mIsMove, filesAffected);
         }
 
-        if (!filesDeleted.isEmpty()) {
-            MediaStoreUtils.deleteFiles(mContext.getContentResolver(), filesDeleted);
-        }
-        if (!filesCreated.isEmpty()) {
-            PureFMFileUtils.requestMediaScanner(mContext, filesCreated);
+        if (!filesAffected.isEmpty()) {
+            if (mIsMove) {
+                MediaStoreUtils.moveFiles(mContext, filesAffected);
+            } else {
+                MediaStoreUtils.copyFiles(mContext, filesAffected);
+            }
         }
 
         return failed;
@@ -84,8 +85,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
      * @param contents files to process
      * @param target target directory to move to
      * @param isMove if true, means the files should be moved, otherwise they will be copied
-     * @param filesCreated the List to fill with successfully created files
-     * @param filesDeleted file List will be filled with successfully deleted files
+     * @param filesAffected Pair of removed and created files
      * @return List of files that were failed to process
      */
     @NotNull
@@ -93,9 +93,8 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             @NotNull final GenericFile[] contents,
             @NotNull final GenericFile target,
             final boolean isMove,
-            @NotNull final List<File> filesCreated,
-            @NotNull final List<File> filesDeleted) {
-        final ArrayList<GenericFile> failed = new ArrayList<GenericFile>();
+            @NotNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
+        final ArrayList<GenericFile> failed = new ArrayList<>();
         for (final GenericFile current : contents) {
             if (isCanceled()) {
                 return failed;
@@ -105,14 +104,15 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
 
                 if (isMove) {
                     if (current.move(target)) {
-                        filesDeleted.add(current.toFile());
-                        filesCreated.add(target.toFile());
+                        filesAffected.add(new Pair<>(current,
+                                FileFactory.newFile(target.toFile(), current.getName())));
                     } else {
                         failed.add(current);
                     }
                 } else {
                     if (current.copy(target)) {
-                        filesCreated.add(target.toFile());
+                        filesAffected.add(new Pair<>(current,
+                                FileFactory.newFile(target.toFile(), current.getName())));
                     } else {
                         failed.add(current);
                     }
@@ -128,8 +128,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
      * @param contents files to process
      * @param target target directory to move to
      * @param isMove if true, means the files should be moved, otherwise they will be copied
-     * @param filesCreated the List to fill with successfully created files
-     * @param filesDeleted file List will be filled with successfully deleted files
+     * @param filesAffected Pair of removed and created files
      * @return List of files that were failed to process
      */
     @NotNull
@@ -137,9 +136,8 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             @NotNull final GenericFile[] contents,
             @NotNull final GenericFile target,
             final boolean isMove,
-            @NotNull final List<File> filesCreated,
-            @NotNull final List<File> filesDeleted) {
-        final ArrayList<GenericFile> failed = new ArrayList<GenericFile>();
+            @NotNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
+        final ArrayList<GenericFile> failed = new ArrayList<>();
         final CommandLineFile[] cont = new CommandLineFile[contents.length];
         ArrayUtils.copyArrayAndCast(contents, cont);
         final CommandLineFile t = (CommandLineFile) target;
@@ -159,10 +157,8 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
 
             final boolean res = CommandLine.execute(shell, command);
             if (res) {
-                if (isMove) {
-                    filesDeleted.add(current.toFile());
-                }
-                filesCreated.add(current.toFile());
+                filesAffected.add(new Pair<GenericFile, GenericFile>(current,
+                        FileFactory.newFile(t.toFile(), current.getName())));
             } else {
                 failed.add(current);
             }

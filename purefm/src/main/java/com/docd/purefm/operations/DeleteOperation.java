@@ -23,11 +23,11 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
-import com.docd.purefm.utils.PureFMFileUtils;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,18 +43,23 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
     private final Context mContext;
 
     protected DeleteOperation(final Context context) {
-        mContext = context;
+      mContext = context;
     }
 
     @Override
     protected ArrayList<GenericFile> execute(GenericFile... files) {
-        final ArrayList<GenericFile> failed = new ArrayList<GenericFile>();
-        final List<File> filesAffected = new LinkedList<File>();
+        final ArrayList<GenericFile> failed = new ArrayList<>();
+        final List<GenericFile> filesAffected = new LinkedList<>();
 
         if (files[0] instanceof CommandLineFile) {
 
-            final HashSet<String> remountPaths = new HashSet<String>();
-            for (final GenericFile file : files) {
+            final HashSet<String> remountPaths = new HashSet<>();
+            for (GenericFile file : files) {
+                try {
+                    file = file.getCanonicalFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 final String parent = file.getParent();
                 if (parent != null) {
                     if (Environment.needsRemount(parent)) {
@@ -72,7 +77,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
             for (final GenericFile file : files) {
                 final File fileFile = file.toFile();
                 if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
-                    filesAffected.add(fileFile);
+                    filesAffected.add(file);
                 } else {
                     failed.add(file);
                 }
@@ -85,8 +90,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
         } else {
             for (final GenericFile file : files) {
                 if (file.delete()) {
-                    final File fileFile = file.toFile();
-                    filesAffected.add(fileFile);
+                    filesAffected.add(file);
                 } else {
                     failed.add(file);
                 }
@@ -94,8 +98,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
         }
 
         if (!filesAffected.isEmpty()) {
-            MediaStoreUtils.deleteFiles(mContext.getContentResolver(), filesAffected);
-            PureFMFileUtils.requestMediaScanner(mContext, filesAffected);
+            MediaStoreUtils.deleteFilesOrDirectories(mContext.getContentResolver(), filesAffected);
         }
 
         return failed;

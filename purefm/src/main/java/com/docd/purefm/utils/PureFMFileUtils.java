@@ -15,6 +15,7 @@
 package com.docd.purefm.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +35,6 @@ import com.docd.purefm.file.GenericFile;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -57,6 +57,20 @@ public final class PureFMFileUtils {
         public CharSequence filter(CharSequence source, int start, int end,
                                    Spanned dest, int dstart, int dend) {
             return source.subSequence(start, end).toString().replaceAll(FILENAME_PATTERN, "");
+        }
+    }
+
+    /**
+     * Returns canonical path or absolute path if failed
+     *
+     * @param file File to get full path
+     * @return caninocal path or absolute path if failed
+     */
+    public static String fullPath(final GenericFile file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException e) {
+            return file.getAbsolutePath();
         }
     }
 
@@ -96,16 +110,6 @@ public final class PureFMFileUtils {
                 new CommandStat(path));
         return fsTypeResult == null || fsTypeResult.isEmpty() ?
                 null : fsTypeResult.get(0);
-    }
-    
-    public static void requestMediaScanner(Context context, List<File> files) {
-        final String[] paths = new String[files.size()];
-        int i = 0;
-        for (File file : files) {
-            paths[i] = file.getAbsolutePath();
-            i++;
-        }
-        MediaScannerConnection.scanFile(context, paths, null, null);
     }
     
     public static void openFile(final Context context, final File target) {

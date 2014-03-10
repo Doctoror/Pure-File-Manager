@@ -27,7 +27,6 @@ import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
 import com.docd.purefm.commandline.CommandCopyRecursively;
@@ -555,6 +554,16 @@ public final class CommandLineFile implements GenericFile,
             return this.mCanonicalPath;
         }
         return this.mFile.getCanonicalPath();
+    }
+
+    @NotNull
+    @Override
+    public CommandLineFile getCanonicalFile() throws IOException {
+        final String canonicalPath = getCanonicalPath();
+        if (mFile.getAbsolutePath().equals(canonicalPath)) {
+            return this;
+        }
+        return new CommandLineFile(canonicalPath);
     }
 
     /**

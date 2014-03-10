@@ -16,14 +16,11 @@ package com.docd.purefm.test;
 
 import android.content.Context;
 import android.os.Environment;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 
-import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.file.CommandLineFile;
-import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.PureFMTextUtils;
 
 import org.apache.commons.codec.binary.Hex;
@@ -39,16 +36,17 @@ import java.io.IOException;
  *
  * @author Doctoror
  */
-public final class CommandLineFileTest extends AndroidTestCase {
+public final class CommandLineFileTest extends InstrumentationTestCase {
 
-    private static final File testDir = new File(Environment.getExternalStorageDirectory(), "test");
+    private static final File testDir = new File(Environment.getExternalStorageDirectory(), "_test_CommandLineFile");
 
     private static File test1 = new File(testDir, "test1.jpg");
     private static File test2 = new File(testDir, "test2.jpg");
     private static File test3 = new File(testDir.getAbsolutePath() + "/test3dir/", "test3.jpg");
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
         final String state = Environment.getExternalStorageState();
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
             throw new RuntimeException("Make sure the external storage is mounted read-write before running this test");
@@ -56,7 +54,7 @@ public final class CommandLineFileTest extends AndroidTestCase {
         try {
             FileUtils.forceDelete(testDir);
         } catch (IOException e) {
-
+            //ignored
         }
         assertTrue(testDir.mkdirs());
 
@@ -69,10 +67,11 @@ public final class CommandLineFileTest extends AndroidTestCase {
     }
 
     @Override
-    protected void runTest() {
+    protected void runTest() throws Throwable {
+        super.runTest();
 
         // init what application inits
-        final Context context = this.getContext();
+        final Context context = getInstrumentation().getContext();
         com.docd.purefm.Environment.init(context);
         Settings.init(context, context.getResources());
         PureFMTextUtils.init(context);
@@ -100,8 +99,12 @@ public final class CommandLineFileTest extends AndroidTestCase {
         testAgainstJavaIoFile(file1, test1, false);
         assertTrue(file1.mkdir());
         testAgainstJavaIoFile(file1, test1, true);
-        file1.createNewFile();
-        testAgainstJavaIoFile(file1, test1, true);
+        try {
+            file1.createNewFile();
+            testAgainstJavaIoFile(file1, test1, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             FileUtils.write(new File(test1, "test more"), "test");
@@ -228,8 +231,12 @@ public final class CommandLineFileTest extends AndroidTestCase {
 
     private void testFileCreation() {
         final CommandLineFile file1 = CommandLineFile.fromFile(test1);
-        file1.createNewFile();
-        assertIsNormalFile(file1);
+        try {
+            file1.createNewFile();
+            assertIsNormalFile(file1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void testFileMoving() {
@@ -308,11 +315,8 @@ public final class CommandLineFileTest extends AndroidTestCase {
     }
 
     @Override
-    protected void tearDown() {
-        try {
-            FileUtils.forceDelete(testDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        FileUtils.forceDelete(testDir);
     }
 }

@@ -35,7 +35,7 @@
     <!-- Rename -->
     <string name="rename">Rename</string>
     <string name="new_name">New Name</string>
-    <string name="toast_rename_failed">Failed to rename &#8216;%1$s&#8217; to &#8216;%2$s&#8217;</string>
+    <string name="rename_failed">Failed to rename &#8216;%1$s&#8217; to &#8216;%2$s&#8217;</string>
 
     <string name="no_apps_to_open">No applications installed to open this file</string>
     <string name="could_not_open_file_">Could open this file:u0020</string>

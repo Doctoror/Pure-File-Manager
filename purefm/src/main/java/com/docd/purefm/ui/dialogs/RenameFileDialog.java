@@ -95,17 +95,7 @@ public final class RenameFileDialog extends DialogFragment {
                         mActionMode.finish();
                     }
 
-                    final GenericFile sourceDir = mSource.getParentFile();
-                    if (sourceDir != null) {
-                        new RenameFileTask(a, mSource, FileFactory.newFile(sourceDir.toFile(),
-                                newName)).execute();
-
-                    } else {
-                        Log.wtf("RenameFileDialog","Parent directory of " +
-                                mSource + " is null");
-                        Toast.makeText(getActivity(), "Could not resolve parent directory for: "
-                                + mSource, Toast.LENGTH_LONG).show();
-                    }
+                    new RenameFileTask(a, mSource, newName).execute();
                 }
             }
         });

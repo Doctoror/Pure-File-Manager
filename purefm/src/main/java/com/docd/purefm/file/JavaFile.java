@@ -368,6 +368,12 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
         return this.mFile.getCanonicalPath();
     }
 
+    @NotNull
+    @Override
+    public JavaFile getCanonicalFile() throws IOException {
+        return new JavaFile(this.mFile.getCanonicalPath());
+    }
+
     /**
      * {@inheritDoc}
      */

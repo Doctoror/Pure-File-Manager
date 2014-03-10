@@ -18,12 +18,9 @@ import android.content.Context;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
-import com.docd.purefm.ActivityMonitor;
-import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.PureFMTextUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -39,12 +36,19 @@ import java.util.Arrays;
  */
 public final class JavaFileTest extends AndroidTestCase {
 
-    private static final File testDir = new File(Environment.getExternalStorageDirectory(), "test");
+    private static final File testDir = new File(Environment.getExternalStorageDirectory(), "_test_JavaFile");
 
     private static File test1 = new File(testDir, "test1.jpg");
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
+        try {
+            FileUtils.forceDelete(testDir);
+        } catch (IOException e) {
+            //ignored
+        }
+
         final String state = Environment.getExternalStorageState();
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
             throw new RuntimeException("Make sure the external storage is mounted read-write before running this test");
@@ -65,7 +69,8 @@ public final class JavaFileTest extends AndroidTestCase {
     }
 
     @Override
-    protected void runTest() {
+    protected void runTest() throws Throwable {
+        super.runTest();
         // init what application inits
         final Context context = this.getContext();
         PureFMTextUtils.init(context);
@@ -124,5 +129,11 @@ public final class JavaFileTest extends AndroidTestCase {
         assertEquals(javaFile.isDirectory(), genericFile.isDirectory());
         assertTrue(Arrays.equals(javaFile.list(), genericFile.list()));
         assertTrue(Arrays.equals(javaFile.listFiles(), genericFile.listFiles()));
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        FileUtils.forceDelete(testDir);
     }
 }

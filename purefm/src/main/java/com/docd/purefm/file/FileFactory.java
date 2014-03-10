@@ -14,6 +14,8 @@
  */
 package com.docd.purefm.file;
 
+import android.os.Looper;
+
 import com.docd.purefm.Environment;
 import com.docd.purefm.settings.Settings;
 
@@ -27,6 +29,9 @@ public final class FileFactory {
 
     @NotNull
     public static GenericFile newFile(String path) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            //throw new RuntimeException("Wrong thread");
+        }
         return Settings.useCommandLine && Environment.hasBusybox() ?
                 CommandLineFile.fromFile(new File(path)) :
                 new JavaFile(path);
@@ -34,6 +39,9 @@ public final class FileFactory {
 
     @NotNull
     public static GenericFile newFile(File path) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw new RuntimeException("Wrong thread");
+        }
         return Settings.useCommandLine && Environment.hasBusybox() ?
                 CommandLineFile.fromFile(path) :
                 new JavaFile(path);
@@ -41,6 +49,9 @@ public final class FileFactory {
 
     @NotNull
     public static GenericFile newFile(File file, String name) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw new RuntimeException("Wrong thread");
+        }
         return Settings.useCommandLine && Environment.hasBusybox() ?
                 CommandLineFile.fromFile(new File(file, name)) :
                 new JavaFile(file, name);

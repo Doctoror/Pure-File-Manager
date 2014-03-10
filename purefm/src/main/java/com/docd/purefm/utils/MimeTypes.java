@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import android.webkit.MimeTypeMap;
@@ -376,7 +377,7 @@ public final class MimeTypes {
     }
 
     @Nullable
-    public static String getMimeType(File file) {
+    public static String getMimeType(@NotNull final File file) {
         if (file.isDirectory()) {
             return null;
         }
@@ -393,11 +394,11 @@ public final class MimeTypes {
         return type;
     }
     
-    public static boolean mimeTypeMatch(String mime, String input) {
+    public static boolean mimeTypeMatch(@NotNull final String mime, @NotNull final String input) {
         return Pattern.matches(mime.replace("*", ".*"), input);
     }
 
-    public static boolean isPicture(File f) {
+    public static boolean isPicture(@NotNull final File f) {
         final String mime = getMimeType(f);
         if (mime != null) {
             return mimeTypeMatch("image/*", mime);
@@ -405,7 +406,7 @@ public final class MimeTypes {
         return false;
     }
     
-    public static boolean isVideo(File f) {
+    public static boolean isVideo(@NotNull final File f) {
         final String mime = getMimeType(f);
         if (mime != null) {
             return mimeTypeMatch("video/*", mime);

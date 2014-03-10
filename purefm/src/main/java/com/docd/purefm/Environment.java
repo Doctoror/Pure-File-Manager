@@ -135,14 +135,35 @@ public final class Environment {
         if (path.startsWith(externalStorageDirectory.getAbsolutePath())) {
             return false;
         }
+        try {
+            if (path.startsWith(externalStorageDirectory.getCanonicalPath())) {
+                return false;
+            }
+        } catch (IOException e) {
+            //ignored
+        }
         if (secondaryStorageDirectory != null) {
             if (path.startsWith(secondaryStorageDirectory.getAbsolutePath())) {
                 return false;
+            }
+            try {
+                if (path.startsWith(secondaryStorageDirectory.getCanonicalPath())) {
+                    return false;
+                }
+            } catch (IOException e) {
+                //ignored
             }
         }
         for (final File file : usbStorageDirectories) {
             if (path.startsWith(file.getAbsolutePath())) {
                 return false;
+            }
+            try {
+                if (path.startsWith(file.getCanonicalPath())) {
+                    return false;
+                }
+            } catch (IOException e) {
+                //ignored
             }
         }
         return true;

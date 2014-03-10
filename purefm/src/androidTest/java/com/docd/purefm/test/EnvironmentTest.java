@@ -30,6 +30,7 @@ public final class EnvironmentTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        super.runTest();
         ActivityMonitor.init(getContext());
         Environment.init(getContext());
         assertEquals(android.os.Environment.getExternalStorageDirectory(),

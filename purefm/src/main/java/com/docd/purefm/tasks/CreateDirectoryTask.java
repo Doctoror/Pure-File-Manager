@@ -16,7 +16,6 @@ package com.docd.purefm.tasks;
 
 import android.widget.Toast;
 
-import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 

@@ -16,7 +16,6 @@ package com.docd.purefm.tasks;
 
 import android.widget.Toast;
 
-import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
@@ -28,17 +27,17 @@ import org.jetbrains.annotations.NotNull;
  *
  * Task for renaming file
  */
-public final class RenameFileTask extends OperationTask<Void, Boolean> {
+public final class RenameFileTask extends OperationTask<Void, CharSequence> {
 
     private final GenericFile mSource;
-    private final GenericFile mTarget;
+    private final String mTargetName;
 
     public RenameFileTask(@NotNull final MonitoredActivity activity,
                           @NotNull final GenericFile source,
-                          @NotNull final GenericFile target) {
+                          @NotNull final String targetName) {
         super(activity);
         this.mSource = source;
-        this.mTarget = target;
+        this.mTargetName = targetName;
     }
 
     @NotNull
@@ -49,7 +48,7 @@ public final class RenameFileTask extends OperationTask<Void, Boolean> {
 
     @Override
     protected void startService(@NotNull Void... voids) {
-        OperationsService.rename(mActivity, mSource, mTarget);
+        OperationsService.rename(mActivity, mSource, mTargetName);
     }
 
     @Override
@@ -58,10 +57,9 @@ public final class RenameFileTask extends OperationTask<Void, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(final Boolean result) {
-        if (!result) {
-            Toast.makeText(mActivity, mActivity.getString(R.string.toast_rename_failed,
-                    mSource.getName(), mTarget.getName()), Toast.LENGTH_LONG).show();
+    protected void onPostExecute(final CharSequence result) {
+        if (result != null) {
+            Toast.makeText(mActivity, result, Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -23,6 +23,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ArrayUtils;
+import com.docd.purefm.utils.MediaStoreUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -96,11 +97,11 @@ public final class OperationsService extends IntentService {
 
     public static void rename(@NotNull final Context context,
                               @NotNull final GenericFile source,
-                              @NotNull final GenericFile target) {
+                              @NotNull final String targetName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_RENAME);
         intent.putExtra(EXTRA_FILE1, source);
-        intent.putExtra(EXTRA_FILE2, target);
+        intent.putExtra(EXTRA_FILE_NAME, targetName);
         context.startService(intent);
     }
 
@@ -191,10 +192,10 @@ public final class OperationsService extends IntentService {
 
     private void onActionRename(@NotNull final Intent renameIntent) {
         final GenericFile source = (GenericFile) renameIntent.getSerializableExtra(EXTRA_FILE1);
-        final GenericFile target = (GenericFile) renameIntent.getSerializableExtra(EXTRA_FILE2);
+        final String target = renameIntent.getStringExtra(EXTRA_FILE_NAME);
         if (source == null || target == null) {
             throw new RuntimeException(
-                    "ACTION_RENAME intent should contain non-null EXTRA_FILE1 and EXTRA_FILE2");
+                    "ACTION_RENAME intent should contain non-null EXTRA_FILE1 and EXTRA_FILE_NAME");
         }
 
         final RenameOperation renameOperation = new RenameOperation(
@@ -219,6 +220,8 @@ public final class OperationsService extends IntentService {
             try {
                 if (!target.createNewFile()) {
                     message = getText(R.string.could_not_create_file);
+                } else {
+                    MediaStoreUtils.addFileOrDirectory(getContentResolver(), target);
                 }
             } catch (IOException e) {
                 message = e.getMessage();
@@ -243,6 +246,8 @@ public final class OperationsService extends IntentService {
         } else {
             if (!target.mkdir()) {
                 message = getText(R.string.could_not_create_dir);
+            } else {
+                MediaStoreUtils.addFileOrDirectory(getContentResolver(), target);
             }
         }
         onOperationCompleted(ACTION_CREATE_DIRECTORY,

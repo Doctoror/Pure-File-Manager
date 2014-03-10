@@ -27,6 +27,7 @@ public final class ArrayUtilsTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        super.runTest();
         testEmpty();
         test();
     }

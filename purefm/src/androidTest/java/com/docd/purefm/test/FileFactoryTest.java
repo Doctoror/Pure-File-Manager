@@ -39,12 +39,19 @@ import java.io.IOException;
  */
 public final class FileFactoryTest extends AndroidTestCase {
 
-    private static final File testDir = new File(Environment.getExternalStorageDirectory(), "test");
+    private static final File testDir = new File(Environment.getExternalStorageDirectory(), "_test_FileFactory");
 
     private static File test1 = new File(testDir, "test1.jpg");
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
+        try {
+            FileUtils.forceDelete(testDir);
+        } catch (IOException e) {
+            //ignored
+        }
+
         final String state = Environment.getExternalStorageState();
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
             throw new RuntimeException("Make sure the external storage is mounted read-write before running this test");
@@ -58,7 +65,7 @@ public final class FileFactoryTest extends AndroidTestCase {
     }
 
     @Override
-    protected void runTest() {
+    protected void runTest() throws Throwable {
 
         com.docd.purefm.Environment.init(getContext());
 
@@ -78,11 +85,8 @@ public final class FileFactoryTest extends AndroidTestCase {
     }
 
     @Override
-    protected void tearDown() {
-        try {
-            FileUtils.forceDelete(testDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        FileUtils.forceDelete(testDir);
     }
 }
