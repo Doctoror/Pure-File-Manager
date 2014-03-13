@@ -178,8 +178,9 @@ public final class Environment {
     // ============== STORAGE LISTENER ===============
     
     static void updateExternalStorageState() {
-        isExternalStorageMounted = isExternalMounted();
-        if (isExternalStorageMounted) {
+        final boolean isExternalStorageMountedNow = isExternalMounted();
+        if (isExternalStorageMounted != isExternalStorageMountedNow) {
+            isExternalStorageMounted = isExternalStorageMountedNow;
             sVolumes = StorageHelper.getAllDevices();
             sStorages = StorageHelper.getStorageVolumes(sVolumes);
             // longest names should be first to detect mount point properly

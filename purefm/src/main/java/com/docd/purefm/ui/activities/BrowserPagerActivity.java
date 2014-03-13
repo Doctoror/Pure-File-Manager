@@ -179,14 +179,22 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerList = (ListView) this.findViewById(R.id.drawerList);
-        mDrawerList.setAdapter(mBookmarksAdapter = new BookmarksAdapter(this,
-                Settings.getBookmarks(getApplicationContext())));
+        mDrawerList.setAdapter(mBookmarksAdapter = new BookmarksAdapter(this));
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mBookmarksAdapter.isModified()) {
+            Settings.saveBookmarks(getApplicationContext(),
+                    mBookmarksAdapter.getData());
+        }
     }
 
     @Override
@@ -381,10 +389,6 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
                     | ActionBar.DISPLAY_HOME_AS_UP
                     | ActionBar.DISPLAY_SHOW_CUSTOM
                     | ActionBar.DISPLAY_USE_LOGO);
-            if (mBookmarksAdapter.isModified()) {
-                Settings.saveBookmarks(getApplicationContext(),
-                        mBookmarksAdapter.getData());
-            }
             mDrawerToggle.setDrawerIndicatorEnabled(!mShowHomeAsUp);
             invalidateOptionsMenu();
         }

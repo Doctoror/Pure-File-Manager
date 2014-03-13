@@ -1,25 +1,19 @@
 package com.docd.purefm.adapters;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 
-import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.BookmarksHelper;
-import com.docd.purefm.utils.ThemeUtils;
 
-import android.content.res.Resources;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,65 +27,59 @@ import android.widget.Toast;
  * @author Doctoror
  */
 public final class BookmarksAdapter implements ListAdapter {
-    private final List<String> bookmarks;
+
+    private final List<BookmarksHelper.BookmarkItem> mBookmarks;
     
     private final DataSetObservable mDataSetObservable;
-    private final LayoutInflater inflater;
-    private final BrowserPagerActivity activity;
+    private final LayoutInflater mLayoutInflater;
+    private final BrowserPagerActivity mActivity;
     
     private boolean modified;
     
-    private int userStart;
+    private int mUserBookmarksStart;
     
-    private Drawable iconStorage;
-    private Drawable iconSdcard;
-    private Drawable iconUsb;
-    private Drawable iconUser;
-    
-    private String rootDisplayName;
-    
-    public BookmarksAdapter(final BrowserPagerActivity activity, final Set<String> user) {
-        this.activity = activity;
+    public BookmarksAdapter(final BrowserPagerActivity activity) {
+        this.mActivity = activity;
         this.mDataSetObservable = new DataSetObservable();
-        this.inflater = activity.getLayoutInflater();
-        
-        final Set<String> storageSet = BookmarksHelper.getStorageBookmarks();
+        this.mLayoutInflater = activity.getLayoutInflater();
 
-        this.bookmarks = new ArrayList<>(user.size() + storageSet.size());
-        this.bookmarks.addAll(storageSet);
-
-        this.userStart = this.bookmarks.size();
-        this.bookmarks.addAll(user);
-
-        final Resources.Theme theme = activity.getTheme();
-        this.iconStorage = ThemeUtils.getDrawable(theme, R.attr.ic_storage);
-        this.iconSdcard = ThemeUtils.getDrawable(theme, R.attr.ic_sdcard);
-        this.iconUsb = ThemeUtils.getDrawable(theme, R.attr.ic_usb);
-        this.iconUser = ThemeUtils.getDrawable(theme, R.attr.ic_bookmark);
-        this.rootDisplayName = activity.getString(R.string.root);
+        this.mUserBookmarksStart = BookmarksHelper.getUserBookmarkOffset();
+        this.mBookmarks = BookmarksHelper.getAllBookmarks(activity);
     }
     
-    public void addItem(String path) {
-        if (bookmarks.contains(path)) {
-            Toast.makeText(activity, R.string.bookmark_exists, Toast.LENGTH_SHORT).show();
+    public void addItem(@NotNull final String path) {
+        if (bookmarksContainPath(path)) {
+            Toast.makeText(mActivity, R.string.bookmark_exists, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!bookmarks.add(path)) {
-            Toast.makeText(activity, R.string.bookmark_not_added, Toast.LENGTH_SHORT).show();
+
+        final BookmarksHelper.BookmarkItem item = BookmarksHelper
+                .createUserBookmarkItem(mActivity, path);
+        if (!mBookmarks.add(item)) {
+            Toast.makeText(mActivity, R.string.bookmark_not_added, Toast.LENGTH_SHORT).show();
             return;
         }        
         this.modified = true;
         this.notifyDataSetChanged();
     }
+
+    private boolean bookmarksContainPath(@NotNull final String path) {
+        for (final BookmarksHelper.BookmarkItem item : mBookmarks) {
+            if (item.getDisplayPath().toString().equals(path)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     @Override
     public int getCount() {
-        return this.bookmarks.size();
+        return this.mBookmarks.size();
     }
 
     @Override
-    public String getItem(final int pos) {
-        return this.bookmarks.get(pos);
+    public BookmarksHelper.BookmarkItem getItem(final int pos) {
+        return this.mBookmarks.get(pos);
     }
 
     @Override
@@ -101,7 +89,7 @@ public final class BookmarksAdapter implements ListAdapter {
 
     @Override
     public int getItemViewType(int arg0) {
-        return arg0 < userStart ? 0 : 1;
+        return arg0 < mUserBookmarksStart ? 0 : 1;
     }
 
     @Override
@@ -112,9 +100,9 @@ public final class BookmarksAdapter implements ListAdapter {
         
         if (v == null) {
             if (viewType == 0) {
-                v = this.inflater.inflate(R.layout.list_item_bookmark, null);
+                v = this.mLayoutInflater.inflate(R.layout.list_item_bookmark, null);
             } else {
-                v = this.inflater.inflate(R.layout.list_item_bookmark_user, null);
+                v = this.mLayoutInflater.inflate(R.layout.list_item_bookmark_user, null);
             }
             h = new Holder();
             h.icon = (ImageView) v.findViewById(android.R.id.icon);
@@ -126,49 +114,32 @@ public final class BookmarksAdapter implements ListAdapter {
             h = (Holder) v.getTag();
         }
         
-        final String cur = this.getItem(pos);
-        final String currentName = FilenameUtils.getName(cur);
-        
+        final BookmarksHelper.BookmarkItem cur = this.getItem(pos);
+        final String currentPath = cur.getDisplayPath().toString();
+
         v.setOnClickListener(new View.OnClickListener() {
-            
+
             @Override
             public void onClick(View v) {
-                final GenericFile path = FileFactory.newFile(cur);
-                activity.setCurrentPath(path);
+                final GenericFile file = FileFactory.newFile(currentPath);
+                mActivity.setCurrentPath(file);
             }
         });
-        
-        h.title.setText(currentName.equals(Environment.rootDirectory.getName()) ?
-                this.rootDisplayName : currentName);
 
-        h.summary.setText(cur);
+        h.title.setText(cur.getDisplayName());
+        h.summary.setText(currentPath);
         if (viewType == 1) {
             h.remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View arg0) {
-                    bookmarks.remove(cur);
+                    mBookmarks.remove(cur);
                     modified = true;
                     notifyDataSetChanged();
                 }
             });
         }
-        
-        switch (BookmarksHelper.getBookmarkType(cur)) {
-            case SDCARD:
-                h.icon.setImageDrawable(iconSdcard);
-                break;
-            case STORAGE:
-                h.icon.setImageDrawable(iconStorage);
-                break;
-            case USB:
-                h.icon.setImageDrawable(iconUsb);
-                break;
-            case USER:
-            default:
-                h.icon.setImageDrawable(iconUser);
-                break;        
-        }
-        
+
+        h.icon.setImageDrawable(cur.getIcon());
         return v;
     }
 
@@ -184,7 +155,7 @@ public final class BookmarksAdapter implements ListAdapter {
 
     @Override
     public boolean isEmpty() {
-        return this.bookmarks.isEmpty();
+        return this.mBookmarks.isEmpty();
     }
 
     @Override
@@ -223,9 +194,9 @@ public final class BookmarksAdapter implements ListAdapter {
     public Set<String> getData() {
         final Set<String> user = new LinkedHashSet<>();
         int i = 0;
-        for (final String bookmark : this.bookmarks) {
-            if (i++ >= this.userStart) {
-                user.add(bookmark);
+        for (final BookmarksHelper.BookmarkItem bookmark : mBookmarks) {
+            if (i++ >= mUserBookmarksStart) {
+                user.add(bookmark.getDisplayPath().toString());
             }
         }
         return user;

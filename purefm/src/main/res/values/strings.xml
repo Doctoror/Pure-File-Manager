@@ -20,6 +20,10 @@
     <string name="empty">Empty</string>
     <string translatable="false" name="minus">-</string>
 
+    <string name="storage_internal">Internal storage</string>
+    <string name="storage_sdcard">SD Card</string>
+    <string name="storage_usb">USB</string>
+
     <!-- Browser -->
     <string name="directory_not_exists">The directory does not exist</string>
     <string name="target_is_not_a_directory">The target is not a directory</string>
