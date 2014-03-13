@@ -19,16 +19,15 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.CommandMount;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
@@ -115,18 +114,16 @@ public final class PureFMFileUtils {
 
     @Nullable
     public static String resolveFileSystem(@NotNull final GenericFile file) {
-        return resolveFileSystem(FilenameUtils.getFullPathNoEndSeparator(file.getAbsolutePath()));
+        final String path = PureFMFileUtils.fullPath(file);
+        return resolveFileSystem(FilenameUtils.getFullPathNoEndSeparator(path));
     }
 
 
     @Nullable
     public static String resolveFileSystem(@NotNull final String path) {
-        final Set<CommandMount.MountOutput> mounts = CommandMount.listMountpoints(path);
-        if (!mounts.isEmpty()) {
-            for (final CommandMount.MountOutput o : mounts) {
-                if (path.startsWith(o.mountPoint)) {
-                    return o.fileSystem;
-                }
+        for (final StorageHelper.Volume v : Environment.getVolumes()) {
+            if (path.startsWith(v.file.getAbsolutePath())) {
+                return v.fileSystem;
             }
         }
 

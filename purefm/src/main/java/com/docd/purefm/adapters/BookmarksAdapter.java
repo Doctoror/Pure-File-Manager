@@ -1,6 +1,5 @@
 package com.docd.purefm.adapters;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -57,13 +56,10 @@ public final class BookmarksAdapter implements ListAdapter {
         this.inflater = activity.getLayoutInflater();
         
         final Set<String> storageSet = BookmarksHelper.getStorageBookmarks();
-        final Set<File> usb = Environment.getUsbStorageDirectories();
-                
-        this.bookmarks = new ArrayList<String>(user.size() + usb.size() + storageSet.size());
+
+        this.bookmarks = new ArrayList<>(user.size() + storageSet.size());
         this.bookmarks.addAll(storageSet);
-        for (final File file : usb) {
-            this.bookmarks.add(file.getAbsolutePath());
-        }
+
         this.userStart = this.bookmarks.size();
         this.bookmarks.addAll(user);
 
@@ -157,7 +153,7 @@ public final class BookmarksAdapter implements ListAdapter {
             });
         }
         
-        switch (BookmarksHelper.getBookmarkType(currentName)) {
+        switch (BookmarksHelper.getBookmarkType(cur)) {
             case SDCARD:
                 h.icon.setImageDrawable(iconSdcard);
                 break;
@@ -225,7 +221,7 @@ public final class BookmarksAdapter implements ListAdapter {
 
     @NotNull
     public Set<String> getData() {
-        final Set<String> user = new LinkedHashSet<String>();
+        final Set<String> user = new LinkedHashSet<>();
         int i = 0;
         for (final String bookmark : this.bookmarks) {
             if (i++ >= this.userStart) {
@@ -236,10 +232,9 @@ public final class BookmarksAdapter implements ListAdapter {
     }
     
     private static final class Holder {
-        private ImageView icon;
-        private TextView title;
-        private TextView summary;
-        private View remove;
+        ImageView icon;
+        TextView title;
+        TextView summary;
+        View remove;
     }
-
 }

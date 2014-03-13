@@ -204,12 +204,10 @@ public final class MediaStoreUtils {
     }
 
     public static boolean isExternal(@NotNull final String path) {
-        if (path.startsWith(Environment.externalStorageDirectory.getAbsolutePath())) {
-            return true;
-        }
-        final File secondary = Environment.getSecondaryStorageDirectory();
-        if (secondary != null && path.startsWith(secondary.getAbsolutePath())) {
-            return true;
+        for (final StorageHelper.StorageVolume volume : Environment.getStorageVolumes()) {
+            if (path.startsWith(volume.file.getAbsolutePath())) {
+                return true;
+            }
         }
         return false;
     }

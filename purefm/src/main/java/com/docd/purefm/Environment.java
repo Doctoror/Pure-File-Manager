@@ -23,16 +23,15 @@ import android.content.IntentFilter;
 import com.docd.purefm.commandline.CommandListBusyboxApplets;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
+import com.docd.purefm.utils.StorageHelper;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public final class Environment {
     
@@ -41,17 +40,17 @@ public final class Environment {
     private static final ActivityMonitorListener activityMonitorListener = new ActivityMonitorListener();
     
     public static final File rootDirectory = File.listRoots()[0];
-    public static final File externalStorageDirectory = android.os.Environment.getExternalStorageDirectory();
     public static final File androidRootDirectory = android.os.Environment.getRootDirectory();
 
-    private static final Set<File> usbStorageDirectories = new TreeSet<File>();
-    private static File secondaryStorageDirectory;
     private static boolean isExternalStorageMounted;
     
     private static Context context;
     public static boolean hasRoot;
     
     public static String busybox;
+
+    private static List<StorageHelper.Volume> sVolumes;
+    private static List<StorageHelper.StorageVolume> sStorages;
     
     public static void init(final Context context1) {
         context = context1;
@@ -62,6 +61,22 @@ public final class Environment {
         hasRoot = isUtilAvailable("su");
         updateExternalStorageState();
         ActivityMonitor.addOnActivitiesOpenedListener(activityMonitorListener);
+    }
+
+    @NotNull
+    public static List<StorageHelper.Volume> getVolumes() {
+        if (sVolumes == null) {
+            throw new IllegalStateException("Environment was not initialized");
+        }
+        return sVolumes;
+    }
+
+    @NotNull
+    public static List<StorageHelper.StorageVolume> getStorageVolumes() {
+        if (sStorages == null) {
+            throw new IllegalStateException("Environment was not initialized");
+        }
+        return sStorages;
     }
 
     public static boolean hasBusybox() {
@@ -75,16 +90,6 @@ public final class Environment {
     
     public static boolean isExternalStorageMounted() {
         return isExternalStorageMounted;
-    }
-
-    @Nullable
-    public static File getSecondaryStorageDirectory() {
-        return secondaryStorageDirectory;
-    }
-
-    @NotNull
-    public static Set<File> getUsbStorageDirectories() {
-        return usbStorageDirectories;
     }
     
     @SuppressLint("SdCardPath")
@@ -132,35 +137,13 @@ public final class Environment {
         if (path.startsWith(androidRootDirectory.getAbsolutePath())) {
             return true;
         }
-        if (path.startsWith(externalStorageDirectory.getAbsolutePath())) {
-            return false;
-        }
-        try {
-            if (path.startsWith(externalStorageDirectory.getCanonicalPath())) {
-                return false;
-            }
-        } catch (IOException e) {
-            //ignored
-        }
-        if (secondaryStorageDirectory != null) {
-            if (path.startsWith(secondaryStorageDirectory.getAbsolutePath())) {
-                return false;
+        for (final StorageHelper.Volume volume : sVolumes) {
+            if (path.startsWith(volume.file.getAbsolutePath())) {
+                return volume.isReadOnly();
             }
             try {
-                if (path.startsWith(secondaryStorageDirectory.getCanonicalPath())) {
-                    return false;
-                }
-            } catch (IOException e) {
-                //ignored
-            }
-        }
-        for (final File file : usbStorageDirectories) {
-            if (path.startsWith(file.getAbsolutePath())) {
-                return false;
-            }
-            try {
-                if (path.startsWith(file.getCanonicalPath())) {
-                    return false;
+                if (path.startsWith(volume.file.getCanonicalPath())) {
+                    return volume.isReadOnly();
                 }
             } catch (IOException e) {
                 //ignored
@@ -186,39 +169,6 @@ public final class Environment {
         return false;
     }
     
-    private static void resolveStorages() {
-        File externalStorage = android.os.Environment.getExternalStorageDirectory();
-        File externalStorageParent;
-        try {
-            externalStorage = externalStorage.getCanonicalFile();
-        } catch (IOException e) {
-            //ignored
-        }
-        externalStorageParent = externalStorage.getParentFile();
-        if (externalStorageParent != null) {
-            try {
-                externalStorageParent = externalStorageParent.getCanonicalFile();
-            } catch (IOException e) {
-                //ignored
-            }
-        }
-        if (externalStorageParent != null) {
-            final File[] files = externalStorageParent.listFiles();
-            if (files != null) {
-                for (final File file : files) {
-                    if (!file.equals(externalStorage) && file.canRead() && file.canWrite() && file.canExecute()) {
-                        final String fileName = file.getName();
-                        if (StringUtils.containsIgnoreCase(fileName, "ext")) {
-                            secondaryStorageDirectory = file;
-                        } else if (StringUtils.containsIgnoreCase(fileName, "usb")) {
-                            usbStorageDirectories.add(file);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     private static boolean isExternalMounted() {
         final String state = android.os.Environment.getExternalStorageState();
         return state.equals(android.os.Environment.MEDIA_MOUNTED) ||
@@ -229,8 +179,11 @@ public final class Environment {
     
     static void updateExternalStorageState() {
         isExternalStorageMounted = isExternalMounted();
-        if (isExternalStorageMounted && secondaryStorageDirectory == null) {
-            resolveStorages();
+        if (isExternalStorageMounted) {
+            sVolumes = StorageHelper.getAllDevices();
+            sStorages = StorageHelper.getStorageVolumes(sVolumes);
+            // longest names should be first to detect mount point properly
+            Collections.sort(sVolumes, StorageHelper.VOLUME_PATH_LENGTH_COMPARATOR);
         }
     }
     

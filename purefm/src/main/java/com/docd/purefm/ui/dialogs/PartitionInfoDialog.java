@@ -153,7 +153,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         @NotNull
         @Override
         protected PartitionInfo doInBackground(final GenericFile... params) {
-            final String path = params[0].getAbsolutePath();
+            final String path = PureFMFileUtils.fullPath(params[0]);
             final StatFsCompat statFs = new StatFsCompat(path);
             final long valueTotal = statFs.getTotalBytes();
             final long valueAvail = statFs.getAvailableBytes();

@@ -16,7 +16,6 @@ package com.docd.purefm.utils;
 
 import android.content.Context;
 
-import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,46 +32,36 @@ public final class BookmarksHelper {
     }
 
     public static Set<String> getAllLocations(final Context context) {
-        final Set<String> result = new TreeSet<String>();
+        final Set<String> result = new TreeSet<>();
         result.addAll(BookmarksHelper.getStorageBookmarks());
-        final Set<File> usb = Environment.getUsbStorageDirectories();
-        for (final File usbFile : usb) {
-            result.add(usbFile.getAbsolutePath());
-        }
         result.addAll(Settings.getBookmarks(context));
         return result;
     }
 
     @NotNull
     public static Set<String> getStorageBookmarks() {
-        final LinkedHashSet<String> storages = new LinkedHashSet<String>();
-        storages.add(Environment.androidRootDirectory.getAbsolutePath());
-        storages.add(Environment.externalStorageDirectory.getAbsolutePath());
-        final File secondary = Environment.getSecondaryStorageDirectory();
-        if (secondary != null) {
-            storages.add(secondary.getAbsolutePath());
+        final LinkedHashSet<String> storages = new LinkedHashSet<>();
+        for (final StorageHelper.StorageVolume v : Environment.getStorageVolumes()) {
+            storages.add(v.file.getAbsolutePath());
         }
         return storages;
     }
 
     @NotNull
     public static Type getBookmarkType(final String location) {
-        if (location.equals(Environment.androidRootDirectory.getName())) {
-            return Type.STORAGE;
-        }
-        
-        final File secondary = Environment.getSecondaryStorageDirectory();
-        if (secondary != null && location.equals(secondary.getName())) {
-            return Type.SDCARD;
-        }
-        
-        if (location.equals(Environment.externalStorageDirectory.getName())) {
-            return secondary == null && (location.contains("sd") || location.contains("card")) ? Type.SDCARD : Type.STORAGE;
-        }
-        
-        for (final File usb : Environment.getUsbStorageDirectories()) {
-            if (usb.getName().equals(location)) {
-                return Type.USB;
+        for (final StorageHelper.StorageVolume v : Environment.getStorageVolumes()) {
+            if (location.equals(v.file.getAbsolutePath())) {
+                switch (v.getType()) {
+                    case EXTERNAL:
+                        return Type.SDCARD;
+
+                    case USB:
+                        return Type.USB;
+
+                    case INTERNAL:
+                    default:
+                        return Type.STORAGE;
+                }
             }
         }
         return Type.USER;
