@@ -35,13 +35,22 @@ public final class StorageHelper {
             "obb", "asec"
     };
 
-    private static final String[] AVOIDED_ROOTS = new String[] {
-            "/cache", "/data", "/efs", "/proc", "/root", "/sys", "/var"
-    };
-
     private static final String[] DISALLOWED_FILESYSTEMS = new String[] {
             "tmpfs", "rootfs", "romfs", "devpts", "sysfs", "proc", "cgroup", "debugfs"
     };
+
+    private static final String STORAGES_ROOT;
+
+    static {
+        final String primaryStoragePath = Environment.getExternalStorageDirectory()
+                .getAbsolutePath();
+        final int index = primaryStoragePath.indexOf(File.separatorChar, 1);
+        if (index != -1) {
+            STORAGES_ROOT = primaryStoragePath.substring(0, index + 1);
+        } else {
+            STORAGES_ROOT = File.separator;
+        }
+    }
 
     /**
      * Returns a list of all mounted {@link StorageVolume}s
@@ -164,24 +173,6 @@ public final class StorageHelper {
     }
 
     /**
-     * Checks whether the given String starts with one of items
-     *
-     * @param path
-     *            String to check
-     * @param what
-     *            Array if items to find
-     * @return true, if the given String starts with one of items
-     */
-    private static boolean pathStartsWithItem(final String path, final String[] what) {
-        for (final String wha : what) {
-            if (path.startsWith(wha)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Checks whether the path contains one of the directories
      *
      * For example, if path is /one/two, it returns true input is "one" or
@@ -212,28 +203,30 @@ public final class StorageHelper {
             @NotNull final String device,
             @NotNull final File file,
             @NotNull final String fileSystem) {
-        // devices that are not sdcard for sure
-        boolean isStorageVolume = true;
-        if (arrayContains(AVOIDED_DEVICES, device)) {
-            isStorageVolume = false;
-        }
+        // this approach considers that all storages are mounted in the same non-root directory
+        boolean isStorageVolume = !STORAGES_ROOT.equals(File.separator);
 
         final String path = file.getAbsolutePath();
-        if (pathStartsWithItem(path, AVOIDED_ROOTS)) {
+        if (isStorageVolume && !path.startsWith(STORAGES_ROOT)) {
             isStorageVolume = false;
         }
 
-        if (pathContainsDir(path, AVOIDED_DIRECTORIES)) {
+        if (isStorageVolume && arrayContains(AVOIDED_DEVICES, device)) {
+            isStorageVolume = false;
+        }
+
+
+        if (isStorageVolume && pathContainsDir(path, AVOIDED_DIRECTORIES)) {
             isStorageVolume = false;
         }
 
         // ones with non-storage filesystems
-        if (arrayContains(DISALLOWED_FILESYSTEMS, fileSystem)) {
+        if (isStorageVolume && arrayContains(DISALLOWED_FILESYSTEMS, fileSystem)) {
             isStorageVolume = false;
         }
 
         // volumes that are not accessible are not storage volumes
-        if (!file.canRead() || !file.canExecute()) {
+        if (isStorageVolume && !(file.canRead() && file.canExecute())) {
             isStorageVolume = false;
         }
         return isStorageVolume ? new StorageVolume(device, file, fileSystem) :
