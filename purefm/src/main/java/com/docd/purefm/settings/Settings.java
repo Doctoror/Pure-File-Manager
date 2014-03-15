@@ -46,12 +46,7 @@ public final class Settings {
     
     public static void init(Context context, Resources res) {
         final SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(context);
-        /*
-         * though application theme is dark, default theme is light.
-         * This is done to avoid white window on app start if using dark theme.
-         * Dark window at start looks better because most devices use dark theme by default
-         */
-        theme = Integer.parseInt(p.getString(res.getString(R.string.key_preference_theme), Integer.toString(R.style.ThemeLight)));
+        theme = Integer.parseInt(p.getString(res.getString(R.string.key_preference_theme), Integer.toString(R.style.ThemeDark)));
         appearance = Integer.parseInt(p.getString(res.getString(R.string.key_preference_appearance), Integer.toString(APPEARANCE_LIST)));
         showHidden = p.getBoolean(res.getString(R.string.key_preference_show_hidden), false);
         showSize = p.getBoolean(res.getString(R.string.key_preference_show_size), true);

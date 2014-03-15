@@ -24,7 +24,7 @@ package com.docd.purefm.operations;
  */
 abstract class Operation<Param, Result> {
 
-    private boolean mCanceled;
+    private volatile boolean mCanceled;
 
     protected Operation() {
     }

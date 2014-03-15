@@ -42,9 +42,9 @@ public final class Environment {
     public static final File rootDirectory = File.listRoots()[0];
     public static final File androidRootDirectory = android.os.Environment.getRootDirectory();
 
-    private static boolean isExternalStorageMounted;
+    private static boolean sExternalStorageMounted;
     
-    private static Context context;
+    private static Context sContext;
     public static boolean hasRoot;
     
     public static String busybox;
@@ -52,8 +52,8 @@ public final class Environment {
     private static List<StorageHelper.Volume> sVolumes;
     private static List<StorageHelper.StorageVolume> sStorages;
     
-    public static void init(final Context context1) {
-        context = context1;
+    public static void init(final Context context) {
+        sContext = context;
         busybox = getUtilPath("busybox");
         if (busybox == null) {
             busybox = getUtilPath("busybox-ba");
@@ -89,7 +89,7 @@ public final class Environment {
     }
     
     public static boolean isExternalStorageMounted() {
-        return isExternalStorageMounted;
+        return sExternalStorageMounted;
     }
     
     @SuppressLint("SdCardPath")
@@ -178,9 +178,9 @@ public final class Environment {
     // ============== STORAGE LISTENER ===============
     
     static void updateExternalStorageState() {
-        final boolean isExternalStorageMountedNow = isExternalMounted();
-        if (isExternalStorageMounted != isExternalStorageMountedNow) {
-            isExternalStorageMounted = isExternalStorageMountedNow;
+        final boolean isExternalStorageMounted = isExternalMounted();
+        if (sVolumes == null && isExternalStorageMounted || sExternalStorageMounted != isExternalStorageMounted) {
+            sExternalStorageMounted = isExternalStorageMounted;
             sVolumes = StorageHelper.getAllDevices();
             sStorages = StorageHelper.getStorageVolumes(sVolumes);
             // longest names should be first to detect mount point properly
@@ -227,7 +227,7 @@ public final class Environment {
         public void onActivitiesStarted() {
             synchronized (LOCK) {
                 if (!this.isRegistered) {
-                    context.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
+                    sContext.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
                     this.isRegistered = true;
                 }
             }
@@ -237,7 +237,7 @@ public final class Environment {
         public void onActivitiesStopped() {
             synchronized (LOCK) {
                 if (this.isRegistered) {
-                    context.unregisterReceiver(externalStorageStateReceiver);
+                    sContext.unregisterReceiver(externalStorageStateReceiver);
                     this.isRegistered = false;
                 }
             }

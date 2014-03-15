@@ -31,8 +31,8 @@ import android.preference.PreferenceFragment;
 public final class SettingsFragment extends PreferenceFragment {
 
     private static final String[] THEMES_VALUES = new String[] {
-            Integer.toString(R.style.ThemeLight),
-            Integer.toString(R.style.ThemeDark)
+            Integer.toString(R.style.ThemeDark),
+            Integer.toString(R.style.ThemeLight)
     };
 
     private boolean wasAllowRoot;
@@ -113,6 +113,7 @@ public final class SettingsFragment extends PreferenceFragment {
 
         final ListPreference theme = (ListPreference) findPreference(getString(R.string.key_preference_theme));
         theme.setEntryValues(THEMES_VALUES);
+        theme.setValue(String.valueOf(Settings.theme));
         theme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

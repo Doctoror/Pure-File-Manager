@@ -16,8 +16,8 @@
 
     <!-- TODO translate to German -->
     <string-array name="themes">
-        <item>Light</item>
         <item>Dark</item>
+        <item>Light</item>
     </string-array>
     
     <string-array name="appearance_types">

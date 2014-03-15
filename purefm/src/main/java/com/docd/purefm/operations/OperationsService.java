@@ -14,15 +14,25 @@
  */
 package com.docd.purefm.operations;
 
-import android.app.IntentService;
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
+import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.services.MultiWorkerService;
+import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.utils.ArrayUtils;
+import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +41,15 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * IntentService that performs file operations
  *
  * @author Doctoror
  */
-public final class OperationsService extends IntentService {
+public final class OperationsService extends MultiWorkerService
+        implements ActivityMonitor.OnActivitiesOpenedListener {
 
     public static final String BROADCAST_OPERATION_COMPLETED = "OperationsService.broadcasts.OPERATION_COMPLETED";
     public static final String EXTRA_ACTION = "OperationsService.extras.ACTION";
@@ -56,12 +68,32 @@ public final class OperationsService extends IntentService {
 
     private static final String EXTRA_FILE_NAME = "OperationsService.extras.FILE_NAME";
     private static final String EXTRA_FILES = "OperationsService.extras.FILES";
-    private static final String EXTRA_FILE1 = "OperationsService.extras.FILE1";
-    private static final String EXTRA_FILE2 = "OperationsService.extras.FILE2";
+    private static final String EXTRA_FILE = "OperationsService.extras.FILE";
     private static final String EXTRA_IS_MOVE = "OperationsService.extras.IS_MOVE";
+
+    private IBinder mLocalBinder;
+    private OperationListener mOperationListener;
 
     private PasteOperation mPasteOperation;
     private DeleteOperation mDeleteOperation;
+
+    private final Object mOperationListenerLock = new Object();
+    private final Object mPasteOperationLock = new Object();
+    private final Object mDeleteOperationLock = new Object();
+
+    private Handler mHandler;
+    private OnOperationStartedRunnable mPendingOperationStartedRunnable;
+    private OnOperationEndedRunnable mPendingOperationEndedRunnable;
+
+    private enum EOperation {
+        PASTE(0), DELETE(1);
+
+        final int mId;
+
+        private EOperation(final int id) {
+            mId = id;
+        }
+    }
 
     public static void paste(@NotNull final Context context,
                              @NotNull final GenericFile target,
@@ -69,16 +101,14 @@ public final class OperationsService extends IntentService {
                              final boolean isMove) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_PASTE);
-        intent.putExtra(EXTRA_FILE1, target);
+        intent.putExtra(EXTRA_FILE, target);
         intent.putExtra(EXTRA_FILES, files);
         intent.putExtra(EXTRA_IS_MOVE, isMove);
         context.startService(intent);
     }
 
     public static void cancelPaste(@NotNull final Context context) {
-        final Intent intent = new Intent(context, OperationsService.class);
-        intent.setAction(ACTION_CANCEL_PASTE);
-        context.startService(intent);
+        context.startService(getCancelPasteIntent(context));
     }
 
     public static void delete(@NotNull final Context context,
@@ -90,9 +120,7 @@ public final class OperationsService extends IntentService {
     }
 
     public static void cancelDelete(@NotNull final Context context) {
-        final Intent intent = new Intent(context, OperationsService.class);
-        intent.setAction(ACTION_CANCEL_DELETE);
-        context.startService(intent);
+        context.startService(getCancelDeleteIntent(context));
     }
 
     public static void rename(@NotNull final Context context,
@@ -100,7 +128,7 @@ public final class OperationsService extends IntentService {
                               @NotNull final String targetName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_RENAME);
-        intent.putExtra(EXTRA_FILE1, source);
+        intent.putExtra(EXTRA_FILE, source);
         intent.putExtra(EXTRA_FILE_NAME, targetName);
         context.startService(intent);
     }
@@ -110,7 +138,7 @@ public final class OperationsService extends IntentService {
                                   @NotNull final String fileName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CREATE_FILE);
-        intent.putExtra(EXTRA_FILE1, parent);
+        intent.putExtra(EXTRA_FILE, parent);
         intent.putExtra(EXTRA_FILE_NAME, fileName);
         context.startService(intent);
     }
@@ -120,45 +148,79 @@ public final class OperationsService extends IntentService {
                                        @NotNull final String dirName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CREATE_DIRECTORY);
-        intent.putExtra(EXTRA_FILE1, parent);
+        intent.putExtra(EXTRA_FILE, parent);
         intent.putExtra(EXTRA_FILE_NAME, dirName);
         context.startService(intent);
     }
 
+    @NotNull
+    private static Intent getCancelPasteIntent(@NotNull final Context context) {
+        final Intent intent = new Intent(context, OperationsService.class);
+        intent.setAction(ACTION_CANCEL_PASTE);
+        return intent;
+    }
+
+    @NotNull
+    private static Intent getCancelDeleteIntent(@NotNull final Context context) {
+        final Intent intent = new Intent(context, OperationsService.class);
+        intent.setAction(ACTION_CANCEL_DELETE);
+        return intent;
+    }
+
     public OperationsService() {
-        super("OperationsService");
-        setIntentRedelivery(false);
+        //super("OperationsService");
+        //setIntentRedelivery(false);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mHandler = new Handler(getMainLooper());
     }
 
     @Override
     protected void onHandleIntent(@NotNull final Intent intent) {
         final String action = intent.getAction();
         if (action != null) {
-            if (action.equals(ACTION_PASTE)) {
-                onActionPaste(intent);
-            } else if (action.equals(ACTION_DELETE)) {
-                onActionDelete(intent);
-            } else if (action.equals(ACTION_RENAME)) {
-                onActionRename(intent);
-            } else if (action.equals(ACTION_CREATE_FILE)) {
-                onActionCreateFile(intent);
-            } else if (action.equals(ACTION_CREATE_DIRECTORY)) {
-                onActionCreateDirectory(intent);
-            } else if (action.equals(ACTION_CANCEL_DELETE)) {
-                if (mPasteOperation != null) {
-                    mPasteOperation.cancel();
-                }
-            } else if (action.equals(ACTION_CANCEL_DELETE)) {
-                if (mDeleteOperation != null) {
-                    mDeleteOperation.cancel();
-                }
+            switch (action) {
+                case ACTION_PASTE:
+                    onActionPaste(intent);
+                    break;
+
+                case ACTION_DELETE:
+                    onActionDelete(intent);
+                    break;
+
+                case ACTION_RENAME:
+                    onActionRename(intent);
+                    break;
+
+                case ACTION_CREATE_FILE:
+                    onActionCreateFile(intent);
+                    break;
+
+                case ACTION_CREATE_DIRECTORY:
+                    onActionCreateDirectory(intent);
+                    break;
+
+                case ACTION_CANCEL_PASTE:
+                    if (mPasteOperation != null) {
+                        mPasteOperation.cancel();
+                    }
+                    break;
+
+                case ACTION_CANCEL_DELETE:
+                    if (mDeleteOperation != null) {
+                        mDeleteOperation.cancel();
+                    }
+                    break;
             }
         }
     }
 
     // only one paste at a time can be done so it's synchronized
     private synchronized void onActionPaste(@NotNull final Intent pasteIntent) {
-        final GenericFile target = (GenericFile) pasteIntent.getSerializableExtra(EXTRA_FILE1);
+        final GenericFile target = (GenericFile) pasteIntent.getSerializableExtra(EXTRA_FILE);
         if (target == null) {
             throw new RuntimeException("ACTION_PASTE intent should contain non-null EXTRA_FILE1");
         }
@@ -171,6 +233,14 @@ public final class OperationsService extends IntentService {
         ArrayUtils.copyArrayAndCast(filesObject, files);
         final boolean isMove = pasteIntent.getBooleanExtra(EXTRA_IS_MOVE, false);
         mPasteOperation = new PasteOperation(getApplicationContext(), target, isMove);
+        synchronized (mOperationListenerLock) {
+            if (mOperationListener != null) {
+                mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
+                        mOperationListener, getOperationMessage(EOperation.PASTE),
+                                getCancelPasteIntent(getApplicationContext()));
+                mHandler.post(mPendingOperationStartedRunnable);
+            }
+        }
         onOperationCompleted(ACTION_PASTE,
                 mPasteOperation.execute(files),
                 mPasteOperation.isCanceled());
@@ -185,13 +255,21 @@ public final class OperationsService extends IntentService {
         final GenericFile[] files = new GenericFile[filesObject.length];
         ArrayUtils.copyArrayAndCast(filesObject, files);
         mDeleteOperation = new DeleteOperation(getApplicationContext());
+        synchronized (mOperationListenerLock) {
+            if (mOperationListener != null) {
+                mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
+                        mOperationListener, getOperationMessage(EOperation.DELETE),
+                                getCancelDeleteIntent(getApplicationContext()));
+                mHandler.post(mPendingOperationStartedRunnable);
+            }
+        }
         onOperationCompleted(ACTION_DELETE,
                 mDeleteOperation.execute(files),
                 mDeleteOperation.isCanceled());
     }
 
     private void onActionRename(@NotNull final Intent renameIntent) {
-        final GenericFile source = (GenericFile) renameIntent.getSerializableExtra(EXTRA_FILE1);
+        final GenericFile source = (GenericFile) renameIntent.getSerializableExtra(EXTRA_FILE);
         final String target = renameIntent.getStringExtra(EXTRA_FILE_NAME);
         if (source == null || target == null) {
             throw new RuntimeException(
@@ -206,7 +284,7 @@ public final class OperationsService extends IntentService {
     }
 
     private void onActionCreateFile(@NotNull final Intent createIntent) {
-        final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE1);
+        final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE);
         if (parent == null) {
             throw new RuntimeException(
                     "ACTION_CREATE_FILE intent should contain non-null EXTRA_FILE1");
@@ -233,7 +311,7 @@ public final class OperationsService extends IntentService {
     }
 
     private void onActionCreateDirectory(@NotNull final Intent createIntent) {
-        final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE1);
+        final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE);
         if (parent == null) {
             throw new RuntimeException(
                     "ACTION_CREATE_DIRECTORY intent should contain non-null EXTRA_FILE1");
@@ -256,6 +334,14 @@ public final class OperationsService extends IntentService {
     }
 
     private void onOperationCompleted(@NotNull final String action, @Nullable CharSequence result, final boolean wasCanceled) {
+        mHandler.removeCallbacks(mPendingOperationStartedRunnable);
+        synchronized (mOperationListenerLock) {
+            if (mOperationListener != null) {
+                mPendingOperationEndedRunnable = new OnOperationEndedRunnable(
+                        mOperationListener, result);
+                mHandler.post(mPendingOperationEndedRunnable);
+            }
+        }
         final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
         broadcast.putExtra(EXTRA_RESULT, result);
         broadcast.putExtra(EXTRA_RESULT_CLASS, CharSequence.class);
@@ -264,6 +350,14 @@ public final class OperationsService extends IntentService {
 
     private <T extends Serializable> void onOperationCompleted(
             @NotNull final String action, @Nullable T result, final boolean wasCanceled) {
+        mHandler.removeCallbacks(mPendingOperationStartedRunnable);
+        synchronized (mOperationListenerLock) {
+            if (mOperationListener != null) {
+                mPendingOperationEndedRunnable = new OnOperationEndedRunnable(
+                        mOperationListener, result);
+                mHandler.post(mPendingOperationEndedRunnable);
+            }
+        }
         final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
         broadcast.putExtra(EXTRA_RESULT, result);
         broadcast.putExtra(EXTRA_RESULT_CLASS, Serializable.class);
@@ -276,5 +370,151 @@ public final class OperationsService extends IntentService {
         broadcast.putExtra(EXTRA_ACTION, action);
         broadcast.putExtra(EXTRA_WAS_CANCELED, wasCanceled);
         return broadcast;
+    }
+
+    @Override
+    public void onActivitiesCreated() {
+    }
+
+    @Override
+    public void onActivitiesStarted() {
+        //once notification is shown, it's okay to leave it until the operation completed
+    }
+
+    @Override
+    public void onActivitiesStopped() {
+        if (mPasteOperation != null) {
+            startForeground(EOperation.PASTE);
+        } else if (mDeleteOperation != null) {
+            startForeground(EOperation.DELETE);
+        }
+    }
+
+    @Override
+    public void onActivitiesDestroyed() {
+    }
+
+    private void startForeground(@NotNull final EOperation opeartion) {
+        final Notification.Builder b = new Notification.Builder(this);
+        b.setContentTitle(getText(R.string.app_name));
+        b.setOngoing(true);
+        b.setContentText(getOperationMessage(opeartion));
+        final Context context = getApplicationContext();
+        b.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(
+                context, BrowserPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
+        startForeground(opeartion.mId, build(b));
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("NewApi")
+    @NotNull
+    private static Notification build(@NotNull final Notification.Builder builder) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return builder.build();
+        }
+        return builder.getNotification();
+    }
+
+    private CharSequence getOperationMessage(final EOperation operation) {
+        switch (operation) {
+            case PASTE:
+                final GenericFile[] files = ClipBoard.getClipBoardContents();
+                if (files != null) {
+                    final int textResId = ClipBoard.isMove() ? R.plurals.progress_moving_n_files :
+                            R.plurals.progress_copying_n_files;
+                    return String.format(Locale.getDefault(), getResources().getQuantityString(
+                            textResId, files.length), files.length);
+                }
+                break;
+
+            case DELETE:
+                return getText(R.string.progress_deleting_files);
+
+            default:
+                break;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        if (mLocalBinder == null) {
+            mLocalBinder = new LocalBinder();
+        }
+        return mLocalBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        synchronized (mOperationListenerLock) {
+            mOperationListener = null;
+        }
+        return super.onUnbind(intent);
+    }
+
+    public interface OperationListener {
+        void onOperationStarted(@Nullable CharSequence operationMessage,
+                                @NotNull Intent cancelIntent);
+
+        void onOperationEnded(@Nullable Object result);
+    }
+
+    private static final class OnOperationStartedRunnable implements Runnable {
+
+        private final CharSequence mOperationMessage;
+        private final Intent mCancelIntent;
+
+        private final OperationListener mOperationListener;
+
+        OnOperationStartedRunnable(@NotNull OperationListener operationListener,
+                                   @Nullable final CharSequence operationMessage,
+                                   @NotNull final Intent cancelIntent) {
+            this.mOperationListener = operationListener;
+            this.mOperationMessage = operationMessage;
+            this.mCancelIntent = cancelIntent;
+        }
+
+        @Override
+        public void run() {
+            mOperationListener.onOperationStarted(mOperationMessage, mCancelIntent);
+        }
+    }
+
+    private static final class OnOperationEndedRunnable implements Runnable {
+
+        private final Object mResult;
+        private final OperationListener mOperationListener;
+
+        OnOperationEndedRunnable(@NotNull OperationListener operationListener,
+                                 @Nullable final Object result) {
+            this.mOperationListener = operationListener;
+            this.mResult = result;
+        }
+
+        @Override
+        public void run() {
+            mOperationListener.onOperationEnded(mResult);
+        }
+    }
+
+    public final class LocalBinder extends Binder {
+
+        public void setOperationListener(@Nullable final OperationListener l) {
+            if (l != null) {
+                if (mDeleteOperation != null) {
+                    l.onOperationStarted(getOperationMessage(EOperation.DELETE),
+                            getCancelDeleteIntent(getApplicationContext()));
+                } else if (mPasteOperation != null) {
+                    l.onOperationStarted(getOperationMessage(EOperation.PASTE),
+                            getCancelPasteIntent(getApplicationContext()));
+                } else {
+                    l.onOperationEnded(null);
+                }
+            }
+            synchronized (mOperationListenerLock) {
+                mOperationListener = l;
+            }
+        }
     }
 }

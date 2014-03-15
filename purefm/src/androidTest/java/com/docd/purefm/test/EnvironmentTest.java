@@ -18,6 +18,7 @@ import android.test.AndroidTestCase;
 
 import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.Environment;
+import com.docd.purefm.utils.StorageHelper;
 
 import java.io.File;
 
@@ -33,10 +34,19 @@ public final class EnvironmentTest extends AndroidTestCase {
         super.runTest();
         ActivityMonitor.init(getContext());
         Environment.init(getContext());
-        assertEquals(android.os.Environment.getExternalStorageDirectory(),
-                Environment.externalStorageDirectory);
         assertEquals(android.os.Environment.getRootDirectory(),
                 Environment.androidRootDirectory);
         assertEquals(File.listRoots()[0], Environment.rootDirectory);
+        final File primaryStorage = android.os.Environment.getExternalStorageDirectory();
+        if (primaryStorage != null) {
+            boolean primaryStorageFound = false;
+            for (final StorageHelper.StorageVolume v : Environment.getStorageVolumes()) {
+                if (v.file.equals(primaryStorage)) {
+                    primaryStorageFound = true;
+                    break;
+                }
+            }
+            assertTrue(primaryStorageFound);
+        }
     }
 }

@@ -17,14 +17,12 @@ package com.docd.purefm.tasks;
 import java.util.ArrayList;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 
 import com.docd.purefm.R;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
-import com.docd.purefm.ui.dialogs.MessageDialog;
+import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.utils.PureFMTextUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,24 +35,8 @@ import org.jetbrains.annotations.NotNull;
 public final class DeleteTask extends
         OperationTask<GenericFile, ArrayList<GenericFile>> {
 
-    private Dialog mDialog;
-
     public DeleteTask(final MonitoredActivity activity) {
         super(activity);
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        mDialog = ProgressAlertDialogBuilder.create(mActivity, R.string.progress_deleting_files, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                cancel();
-            }
-        });
-        if (!mActivity.isFinishing()) {
-            mDialog.show();
-        }
     }
 
     @Override
@@ -74,14 +56,6 @@ public final class DeleteTask extends
     }
 
     @Override
-    public void onActivityStop(MonitoredActivity activity) {
-        super.onActivityStop(activity);
-        if (mDialog != null) {
-            mDialog.dismiss();
-        }
-    }
-
-    @Override
     protected void onPostExecute(@NotNull final ArrayList<GenericFile> failed) {
         super.onPostExecute(failed);
         this.finish(failed);
@@ -94,11 +68,8 @@ public final class DeleteTask extends
     }
 
     private void finish(@NotNull final ArrayList<GenericFile> failed) {
-        if (mDialog != null) {
-            mDialog.dismiss();
-        }
         if (!failed.isEmpty()) {
-            final Dialog dialog = MessageDialog.create(mActivity, R.string.dialog_delete_failed,
+            final Dialog dialog = MessageDialogBuilder.create(mActivity, R.string.dialog_delete_failed,
                     PureFMTextUtils.fileListToDashList(failed));
             if (!mActivity.isFinishing()) {
                 dialog.show();

@@ -55,47 +55,51 @@ public final class PureFMTextUtils {
         }
     }
     
-    public static int stringMonthToInt(String month) {
-        if (month.equals("Jan")) {
-            return Calendar.JANUARY;
+    public static int stringMonthToInt(@NotNull final String month) {
+        switch (month) {
+            case "Jan":
+                return Calendar.JANUARY;
+
+            case "Feb":
+                return Calendar.FEBRUARY;
+
+            case "Mar":
+                return Calendar.MARCH;
+
+            case "Apr":
+                return Calendar.APRIL;
+
+            case "May":
+                return Calendar.MAY;
+
+            case "Jun":
+                return Calendar.JUNE;
+
+            case "Jul":
+                return Calendar.JULY;
+
+            case "Aug":
+                return Calendar.AUGUST;
+
+            case "Sep":
+                return Calendar.SEPTEMBER;
+
+            case "Oct":
+                return Calendar.OCTOBER;
+
+            case "Nov":
+                return Calendar.NOVEMBER;
+
+            case "Dec":
+                return Calendar.DECEMBER;
+
+            default:
+                return 0;
         }
-        if (month.equals("Feb")) {
-            return Calendar.FEBRUARY;
-        }
-        if (month.equals("Mar")) {
-            return Calendar.MARCH;
-        }
-        if (month.equals("Apr")) {
-            return Calendar.APRIL;
-        }
-        if (month.equals("May")) {
-            return Calendar.MAY;
-        }
-        if (month.equals("Jun")) {
-            return Calendar.JUNE;
-        }
-        if (month.equals("Jul")) {
-            return Calendar.JULY;
-        }
-        if (month.equals("Aug")) {
-            return Calendar.AUGUST;
-        }
-        if (month.equals("Sep")) {
-            return Calendar.SEPTEMBER;
-        }
-        if (month.equals("Oct")) {
-            return Calendar.OCTOBER;
-        }
-        if (month.equals("Nov")) {
-            return Calendar.NOVEMBER;
-        }
-        if (month.equals("Dec")) {
-            return Calendar.DECEMBER;
-        }
-        return 0;
     }
 
-    public static SpannableString fileListToDashList(final Iterable<GenericFile> files) {
+    @NotNull
+    public static SpannableString fileListToDashList(@NotNull final Iterable<GenericFile> files) {
         final StringBuilder fileList = new StringBuilder(66);
         for (final GenericFile file : files) {
             fileList.append(file.getName());

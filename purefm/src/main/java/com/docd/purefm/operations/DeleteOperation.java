@@ -75,6 +75,9 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
 
             final Shell shell = ShellHolder.getShell();
             for (final GenericFile file : files) {
+                if (isCanceled()) {
+                    break;
+                }
                 final File fileFile = file.toFile();
                 if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
                     filesAffected.add(file);
@@ -89,6 +92,9 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
 
         } else {
             for (final GenericFile file : files) {
+                if (isCanceled()) {
+                    break;
+                }
                 if (file.delete()) {
                     filesAffected.add(file);
                 } else {

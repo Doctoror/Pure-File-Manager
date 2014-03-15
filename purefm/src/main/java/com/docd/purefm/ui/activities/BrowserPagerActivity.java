@@ -20,12 +20,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -46,11 +49,14 @@ import com.docd.purefm.browser.Browser;
 import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Activity that holds ViewPager with BrowserFragments
@@ -58,7 +64,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Doctoror
  */
-public final class BrowserPagerActivity extends AbstractBrowserActivity {
+public final class BrowserPagerActivity extends AbstractBrowserActivity
+        implements ServiceConnection, OperationsService.OperationListener {
 
     /**
      * Saved fragment state. This saving mechanism is used for restoring
@@ -81,6 +88,8 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
     private BrowserTabsAdapter mPagerAdapter;
 
     private BrowserFragment mCurrentlyDisplayedFragment;
+
+    private Dialog mOperationProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,8 +198,16 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, OperationsService.class), this,
+                BIND_AUTO_CREATE);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
+        unbindService(this);
         if (mBookmarksAdapter.isModified()) {
             Settings.saveBookmarks(getApplicationContext(),
                     mBookmarksAdapter.getData());
@@ -356,6 +373,47 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity {
             if (resultCode == Activity.RESULT_OK) {
                 mPagerAdapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    // =================== SERVICE CONNECTION ==================
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        ((OperationsService.LocalBinder) service).setOperationListener(this);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        if (mOperationProgressDialog != null) {
+            mOperationProgressDialog.dismiss();
+            mOperationProgressDialog = null;
+        }
+    }
+
+    // ================= OPERATION LISTENER ====================
+
+    @Override
+    public void onOperationStarted(@Nullable final CharSequence operationMessage,
+                                   @NotNull final Intent cancelIntent) {
+        mOperationProgressDialog = ProgressAlertDialogBuilder.create(this,
+                operationMessage, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startService(cancelIntent);
+                    }
+                }
+        );
+        if (!isFinishing()) {
+            mOperationProgressDialog.show();
+        }
+    }
+
+    @Override
+    public void onOperationEnded(@Nullable final Object result) {
+        if (mOperationProgressDialog != null) {
+            mOperationProgressDialog.dismiss();
+            mOperationProgressDialog = null;
         }
     }
 
