@@ -1,2 +1,3 @@
 - Sometimes can't focus to AbsListView
 - Cyrillic text from busybox is not displayed properly
+- File observer not working

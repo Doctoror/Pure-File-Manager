@@ -33,6 +33,7 @@ import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.cyanogenmod.filemanager.util.MediaHelper;
 import com.docd.purefm.R;
@@ -61,6 +62,7 @@ import java.io.File;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.ViewDelegate;
 
 /**
  * Fragment manages file List, menu and ActionMode.
@@ -77,18 +79,18 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private MenuController menuController;
 
     private Browser mBrowser;
-    private BrowserBaseAdapter adapter;
+    private BrowserBaseAdapter mAdapter;
     private OnNavigateListener mParentOnNavigateListener;
 
     private OnSequenceClickListener mOnSequenceListener;
 
     private PullToRefreshLayout mPullToRefreshLayout;
     private AbsListView mListView;
-    private View mainProgress;
+    private View mMainProgress;
 
-    private DirectoryScanTask scanner;
+    private DirectoryScanTask mScannerTask;
 
-    private boolean refreshFlag;
+    private boolean mRefreshFlag;
 
     /**
      * If Browser is not yet initialized, initial state will be saved to this field
@@ -98,11 +100,21 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private int mPrevId;
     private boolean firstRun;
 
+    /**
+     * Used fot empty view
+     */
+    private final ViewDelegate mPullableViewDelegate = new ViewDelegate() {
+        @Override
+        public boolean isReadyForPull(View view, float v, float v2) {
+            return true;
+        }
+    };
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (this.mListView instanceof GridView) {
-            ((GridView) this.mListView).setNumColumns(ThemeUtils.getInteger(
+        if (mListView instanceof GridView) {
+            ((GridView) mListView).setNumColumns(ThemeUtils.getInteger(
                     getActivity().getTheme(), R.attr.browserGridColumns));
         }
     }
@@ -128,20 +140,20 @@ public final class BrowserFragment extends UserVisibleHintFragment
                 if (isResumedAndVisible()) {
                     startScan();
                 } else {
-                    refreshFlag = true;
+                    mRefreshFlag = true;
                 }
             }
 
             @Override
             public void onNavigationCompleted(GenericFile path) {
-                if (mainProgress.getVisibility() == View.VISIBLE) {
-                    mainProgress.setVisibility(View.GONE);
+                if (mMainProgress.getVisibility() == View.VISIBLE) {
+                    mMainProgress.setVisibility(View.GONE);
                 }
                 if (firstRun) {
                     firstRun = false;
                 }
-                if (refreshFlag) {
-                    refreshFlag = false;
+                if (mRefreshFlag) {
+                    mRefreshFlag = false;
                 }
                 if (mParentOnNavigateListener != null) {
                     mParentOnNavigateListener.onNavigationCompleted(path);
@@ -149,7 +161,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
             }
         });
 
-        this.mOnSequenceListener = new OnSequenceClickListener() {
+        mOnSequenceListener = new OnSequenceClickListener() {
             @Override
             public void onSequenceClick(String sequence) {
                 final GenericFile target = FileFactory.newFile(sequence);
@@ -157,11 +169,11 @@ public final class BrowserFragment extends UserVisibleHintFragment
             }
         };
 
-        this.mAttachedBrowserActivity = (AbstractBrowserActivity) activity;
-        this.menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
+        mAttachedBrowserActivity = (AbstractBrowserActivity) activity;
+        menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
 
         // needs FragmentActivity because FilePropertiesDialog uses childFragmentManager
-        this.actionModeController = new ActionModeController(mAttachedBrowserActivity);
+        actionModeController = new ActionModeController(mAttachedBrowserActivity);
     }
 
     @Override
@@ -172,9 +184,9 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     @Override
     public void onCreate(Bundle state) {
-        this.setRetainInstance(true);
-        this.setHasOptionsMenu(true);
-        this.firstRun = true;
+        setRetainInstance(true);
+        setHasOptionsMenu(true);
+        firstRun = true;
         restoreManualState(state);
         super.onCreate(state);
     }
@@ -207,7 +219,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     }
 
     public boolean onBackPressed() {
-        return this.mBrowser != null && this.mBrowser.back();
+        return mBrowser != null && mBrowser.back();
     }
 
     @Override
@@ -223,7 +235,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (this.mAttachedBrowserActivity != null && this.mAttachedBrowserActivity
+        if (mAttachedBrowserActivity != null && mAttachedBrowserActivity
                 .shouldShowBrowserFragmentMenu()) {
             inflater.inflate(R.menu.browser, menu);
 
@@ -252,51 +264,51 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return this.menuController.onMenuItemSelected(item);
+        return menuController.onMenuItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
-        this.mPullToRefreshLayout = (PullToRefreshLayout) parent.findViewById(R.id.pullToRefreshLayout);
-        this.initList(parent);
-        this.firstRun = true;
+        mPullToRefreshLayout = (PullToRefreshLayout) parent.findViewById(R.id.pullToRefreshLayout);
+        initList(parent);
+        firstRun = true;
         return parent;
     }
 
     private void initList(View parent) {
-        if (this.mListView != null) {
-            this.mListView.getEmptyView().setVisibility(View.GONE);
-            this.mListView.setVisibility(View.GONE);
+        if (mListView != null) {
+            mListView.getEmptyView().setVisibility(View.GONE);
+            mListView.setVisibility(View.GONE);
         }
-        this.mainProgress = parent.findViewById(android.R.id.progress);
+        mMainProgress = parent.findViewById(android.R.id.progress);
 
         if (Settings.appearance == Settings.APPEARANCE_LIST) {
             View vs = parent.findViewById(android.R.id.list);
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.mListView = (AbsListView) vs;
-            this.adapter = new BrowserListAdapter(this.getActivity());
+            mListView = (AbsListView) vs;
+            mAdapter = new BrowserListAdapter(this.getActivity());
         } else {
             View vs = parent.findViewById(R.id.grid);
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.mListView = (AbsListView) vs;
-            this.adapter = new BrowserGridAdapter(this.getActivity());
+            mListView = (AbsListView) vs;
+            mAdapter = new BrowserGridAdapter(this.getActivity());
         }
 
-        this.menuController.setAdapter(this.adapter);
+        menuController.setAdapter(this.mAdapter);
 
-        this.mListView.setId(this.getNewId(parent));
-        this.mListView.setEmptyView(parent.findViewById(android.R.id.empty));
-        this.mListView.setAdapter(this.adapter);
-        this.mListView.getEmptyView().setVisibility(View.GONE);
-        this.mListView.setVisibility(View.GONE);
+        mListView.setId(this.getNewId(parent));
+        mListView.setEmptyView(parent.findViewById(android.R.id.empty));
+        mListView.setAdapter(this.mAdapter);
+        mListView.getEmptyView().setVisibility(View.GONE);
+        mListView.setVisibility(View.GONE);
 
-        this.mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
                 final GenericFile target = (GenericFile) (av
@@ -307,10 +319,10 @@ public final class BrowserFragment extends UserVisibleHintFragment
                     if (mAttachedBrowserActivity.getGetContentMimeType() == null) {
                         PureFMFileUtils.openFile(mAttachedBrowserActivity, target.toFile());
                     } else {
-                        final Uri result = Uri.fromFile(target.toFile());
                         final Intent intent = new Intent();
-                        intent.setData(getResultUriForFileFromIntent(mAttachedBrowserActivity.getContentResolver(),
-                                target.toFile(), mAttachedBrowserActivity.getIntent()));
+                        intent.setData(getResultUriForFileFromIntent(mAttachedBrowserActivity
+                                .getContentResolver(), target.toFile(), mAttachedBrowserActivity
+                                        .getIntent()));
                         mAttachedBrowserActivity.setResult(Activity.RESULT_OK, intent);
                         mAttachedBrowserActivity.finish();
                     }
@@ -355,8 +367,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
     }
 
     private void onFirstInvalidate() {
-        this.actionModeController.setListView(this.mListView);
-        this.mBrowser.invalidate();
+        actionModeController.setListView(mListView);
+        mBrowser.invalidate();
     }
 
     @Override
@@ -368,7 +380,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     protected void onVisible() {
         invalidatePullToRefresh();
-        if (this.firstRun || this.refreshFlag) {
+        if (firstRun || mRefreshFlag) {
             onFirstInvalidate();
         } else {
             mParentOnNavigateListener.onNavigationCompleted(mBrowser
@@ -380,12 +392,12 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     @Override
     protected void onInvisible() {
-        if (this.actionModeController != null) {
-            this.actionModeController.finishActionMode();
+        if (actionModeController != null) {
+            actionModeController.finishActionMode();
         }
-        if (this.scanner != null
-                && this.scanner.getStatus() == AsyncTask.Status.RUNNING) {
-            this.scanner.cancel(false);
+        if (mScannerTask != null
+                && mScannerTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mScannerTask.cancel(false);
         }
     }
 
@@ -394,6 +406,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
             ActionBarPullToRefresh.from(getActivity())
                     .theseChildrenArePullable(mListView, mListView.getEmptyView())
                     .listener(this)
+                    .useViewDelegate(TextView.class, mPullableViewDelegate)
                     .setup(mPullToRefreshLayout);
         }
     }
@@ -409,27 +422,27 @@ public final class BrowserFragment extends UserVisibleHintFragment
     }
 
     private void startScan() {
-        if (this.scanner != null
-                && this.scanner.getStatus() == AsyncTask.Status.RUNNING) {
-            this.scanner.cancel(false);
+        if (mScannerTask != null
+                && mScannerTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mScannerTask.cancel(false);
         }
 
-        this.scanner = new DirectoryScanTask(mBrowser, mPullToRefreshLayout,
-                mAttachedBrowserActivity.getGetContentMimeType(), adapter);
-        this.scanner.execute(mBrowser.getCurrentPath());
+        mScannerTask = new DirectoryScanTask(mBrowser, mPullToRefreshLayout,
+                mAttachedBrowserActivity.getGetContentMimeType(), mAdapter);
+        mScannerTask.execute(mBrowser.getCurrentPath());
     }
 
     private int getNewId(View parent) {
-        this.mPrevId++;
-        while (parent.findViewById(this.mPrevId) != null) {
-            this.mPrevId++;
+        mPrevId++;
+        while (parent.findViewById(mPrevId) != null) {
+            mPrevId++;
         }
-        return this.mPrevId;
+        return mPrevId;
     }
 
     @Nullable
     public Browser getBrowser() {
-        return this.mBrowser;
+        return mBrowser;
     }
 
     private static final class SavedState implements Parcelable {

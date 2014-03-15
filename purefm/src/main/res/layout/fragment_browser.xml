@@ -40,7 +40,7 @@
             android:layout_height="match_parent"
             android:saveEnabled="false" />
 
-        <include layout="@layout/list_empty" />
+        <include layout="@layout/list_empty"/>
 
         <ProgressBar
             android:id="@android:id/progress"
