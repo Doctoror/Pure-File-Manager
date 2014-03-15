@@ -1,8 +1,4 @@
 Check for free space before file copy
 Add large folder icons for GridView
-Replace cancelable progress dialogs with dialogs with cancel button
-Add plurals to "deleted files" text and similar
-Perform rename with mediastore with no deletion
 MediaStoreUtils should have different move and copy methods and copying without MediaScanner
-
-Apply refreshing in places wher FileObserver can't work
+Apply refreshing in places where FileObserver can't work

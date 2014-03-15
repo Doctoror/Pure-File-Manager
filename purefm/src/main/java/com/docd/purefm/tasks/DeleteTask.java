@@ -17,7 +17,6 @@ package com.docd.purefm.tasks;
 import java.util.ArrayList;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 
 import com.docd.purefm.R;
@@ -25,6 +24,7 @@ import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.MessageDialog;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.utils.PureFMTextUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
 public final class DeleteTask extends
         OperationTask<GenericFile, ArrayList<GenericFile>> {
 
-    private ProgressDialog mDialog;
+    private Dialog mDialog;
 
     public DeleteTask(final MonitoredActivity activity) {
         super(activity);
@@ -46,12 +46,9 @@ public final class DeleteTask extends
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mDialog = new ProgressDialog(mActivity);
-        mDialog.setMessage(mActivity.getText(R.string.progress_deleting_files));
-        mDialog.setCancelable(true); //TODO replace with cancel button
-        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        mDialog = ProgressAlertDialogBuilder.create(mActivity, R.string.progress_deleting_files, new DialogInterface.OnClickListener() {
             @Override
-            public void onCancel(DialogInterface dialog) {
+            public void onClick(DialogInterface dialog, int which) {
                 cancel();
             }
         });

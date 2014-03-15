@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 
@@ -27,24 +26,26 @@ import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.MessageDialog;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PureFMTextUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>> {
 
     private final GenericFile mTarget;
 
-    private ProgressDialog mDialog;
+    private Dialog mDialog;
 
     protected PasteTask(MonitoredActivity activity, GenericFile target) {
         super(activity);
         this.mTarget = target;
     }
 
-    @NotNull
-    private CharSequence getTitle() {
+    @Nullable
+    private CharSequence getProgressDialogMessage() {
         final GenericFile[] files = ClipBoard.getClipBoardContents();
         if (files != null) {
             final Resources res = mActivity.getResources();
@@ -55,23 +56,21 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
             return String.format(Locale.getDefault(), res.getQuantityString(
                     R.plurals.progress_copying_n_files, files.length), files.length);
         }
-        return "";
+        return null;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.mDialog = new ProgressDialog(mActivity);
-        this.mDialog.setMessage(this.getTitle());
-        this.mDialog.setCancelable(true); //TODO replace with cancel button
-        this.mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        mDialog = ProgressAlertDialogBuilder.create(mActivity, getProgressDialogMessage(),
+                new DialogInterface.OnClickListener() {
             @Override
-            public void onCancel(DialogInterface dialog) {
+            public void onClick(DialogInterface dialog, int arg1) {
                 cancel();
             }
         });
         if (!mActivity.isFinishing()) {
-            this.mDialog.show();
+            mDialog.show();
         }
         ClipBoard.lock();
     }
