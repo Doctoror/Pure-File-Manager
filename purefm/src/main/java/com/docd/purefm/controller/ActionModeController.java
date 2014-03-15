@@ -17,9 +17,11 @@ package com.docd.purefm.controller;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -77,9 +79,6 @@ public final class ActionModeController {
 
     private final class MultiChoiceListener implements MultiChoiceModeListener {
 
-        final String mSelected = mActivity
-                .getString(R.string._selected);
-
         @Override
         public boolean onPrepareActionMode(ActionMode mode,
                                            Menu menu) {
@@ -90,7 +89,7 @@ public final class ActionModeController {
             final SparseBooleanArray items = mListView.getCheckedItemPositions();
             final int checkedCount = mListView.getCheckedItemCount();
 
-            final ArrayList<GenericFile> toShare = new ArrayList<GenericFile>(checkedCount);
+            final ArrayList<GenericFile> toShare = new ArrayList<>(checkedCount);
             for (int i = 0; i < items.size(); i++) {
                 final int key = items.keyAt(i);
                 if (items.get(key)) {
@@ -134,6 +133,7 @@ public final class ActionModeController {
                                            MenuItem item) {
             final SparseBooleanArray items = mListView
                     .getCheckedItemPositions();
+            final Resources res = mActivity.getResources();
             switch (item.getItemId()) {
                 case android.R.id.edit:
                     for (int i = 0; i < items.size(); i++) {
@@ -165,7 +165,7 @@ public final class ActionModeController {
                     return true;
 
                 case R.id.menu_delete:
-                    final List<GenericFile> files1 = new LinkedList<GenericFile>();
+                    final List<GenericFile> files1 = new LinkedList<>();
                     final BrowserBaseAdapter adapter = (BrowserBaseAdapter) mListView.getAdapter();
                     for (int i = 0; i < items.size(); i++) {
                         final int key = items.keyAt(i);
@@ -191,11 +191,11 @@ public final class ActionModeController {
                     ClipBoard.cutMove(files);
                     Toast.makeText(
                             mActivity,
-                            mActivity.getString(R.string.cut_)
-                                    + (index + 1)
-                                    + mActivity
-                                    .getString(R.string._files),
-                            Toast.LENGTH_SHORT).show();
+                            String.format(Locale.getDefault(), res.getQuantityString(
+                                            R.plurals.cut_n_files_to_clipboard, index + 1),
+                                                    index + 1),
+                             Toast.LENGTH_SHORT
+                            ).show();
                     mode.finish();
                     return true;
 
@@ -213,11 +213,11 @@ public final class ActionModeController {
                     ClipBoard.cutCopy(files2);
                     Toast.makeText(
                             mActivity,
-                            mActivity.getString(R.string.copied_)
-                                    + (index1 + 1)
-                                    + mActivity
-                                    .getString(R.string._files),
-                            Toast.LENGTH_SHORT).show();
+                            String.format(Locale.getDefault(), res.getQuantityString(
+                                   R.plurals.copied_n_files_to_clipboard, index1 + 1),
+                                            index1 + 1),
+                            Toast.LENGTH_SHORT
+                    ).show();
                     mode.finish();
                     return true;
 
@@ -231,7 +231,7 @@ public final class ActionModeController {
                     if (mShareIntent != null) {
                         mActivity.startActivity(mShareIntent);
                     } else {
-                        Toast.makeText(mActivity, mActivity.getResources().getQuantityText(
+                        Toast.makeText(mActivity, res.getQuantityText(
                                 R.plurals.no_applications_can_share, mShareItemsCount),
                                         Toast.LENGTH_SHORT).show();
                     }
@@ -243,9 +243,9 @@ public final class ActionModeController {
         }
 
         @Override
-        public void onItemCheckedStateChanged(ActionMode mode,
-                                              int position, long id, boolean checked) {
-            mode.setTitle(mListView.getCheckedItemCount() + mSelected);
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                              boolean checked) {
+            mode.setTitle(mActivity.getString(R.string._selected, mListView.getCheckedItemCount()));
             mode.invalidate();
         }
     }

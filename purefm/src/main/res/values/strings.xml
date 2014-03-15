@@ -73,7 +73,7 @@
     
     <string name="menu_select_all">Select all</string>
     
-    <string name="_selected">\u0020selected</string>
+    <string name="_selected">%1$d selected</string>
     
     <!-- Preferences -->
     <string name="preference_category_view">View Settings</string>
@@ -108,14 +108,27 @@
     
     <!-- Progress -->
     <string name="progress_deleting_files">Deleting file(s)</string>
-    <string name="_files">\u0020file(s)</string>
 
-    <string name="progress_moving">Moving\u0020</string>
-    <string name="progress_copying">Copying\u0020</string>
+    <plurals name="progress_moving_n_files">
+        <item quantity="one">Moving %1$d file</item>
+        <item quantity="other">Moving %1$d files</item>
+    </plurals>
+
+    <plurals name="progress_copying_n_files">
+        <item quantity="one">Copying %1$d file</item>
+        <item quantity="other">Copying %1$d files</item>
+    </plurals>
     
     <!-- Copy / Cut -->
-    <string name="cut_">Cut\u0020</string>
-    <string name="copied_">Copied\u0020</string>
+    <plurals name="cut_n_files_to_clipboard">
+        <item quantity="one">Cut %1$d file to clipboard</item>
+        <item quantity="other">Cut %1$d files to clipboard</item>
+    </plurals>
+
+    <plurals name="copied_n_files_to_clipboard">
+        <item quantity="one">Copied %1$d file to clipboard</item>
+        <item quantity="other">Copied %1$d files to clipboard</item>
+    </plurals>
     
     <string name="dialog_overwrite_title">Target file already exists</string>
     <string name="dialog_overwrite_message">This action will overwrite destination.</string>

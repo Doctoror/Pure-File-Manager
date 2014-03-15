@@ -16,7 +16,11 @@
 
     <!-- TODO translate storage_ to German-->
     <string name="storage_internal">Internal storage</string>
+
+    <!-- TODO translate storage_ to German-->
     <string name="storage_sdcard">SD Card</string>
+
+    <!-- TODO translate storage_ to German-->
     <string name="storage_usb">USB</string>
 
     <string name="root">root</string>
@@ -74,7 +78,7 @@
     
     <string name="menu_select_all">Alle auswählen</string>
     
-    <string name="_selected">\u0020ausgewählt</string>
+    <string name="_selected">%1$d ausgewählt</string>
     
     <!-- Preferences -->
     <string name="preference_category_view">Aussehen</string>
@@ -110,14 +114,31 @@
     
     <!-- Progress -->
     <string name="progress_deleting_files">Lösche Datei(en)</string>
-    <string name="_files">\u0020Datei(en)</string>
 
-    <string name="progress_moving">Verschiebe\u0020</string>
-    <string name="progress_copying">Kopiere\u0020</string>
-    
+    <!-- TODO traslate to German -->
+    <plurals name="progress_moving_n_files">
+        <item quantity="one">Moving %1$d file</item>
+        <item quantity="other">Moving %1$d files</item>
+    </plurals>
+
+    <!-- TODO traslate to German -->
+    <plurals name="progress_copying_n_files">
+        <item quantity="one">Copying %1$d file</item>
+        <item quantity="other">Copying %1$d files</item>
+    </plurals>
+
     <!-- Copy / Cut -->
-    <string name="cut_">Entferne\u0020</string>
-    <string name="copied_">Kopiert\u0020</string>
+    <!-- TODO traslate to German -->
+    <plurals name="cut_n_files_to_clipboard">
+        <item quantity="one">Cut %1$d file to clipboard</item>
+        <item quantity="other">Cut %1$d files to clipboard</item>
+    </plurals>
+
+    <!-- TODO traslate to German -->
+    <plurals name="copied_n_files_to_clipboard">
+        <item quantity="one">Copied %1$d file to clipboard</item>
+        <item quantity="other">Copied %1$d files to clipboard</item>
+    </plurals>
     
     <string name="dialog_overwrite_title">Zieldatei existiert bereits</string>
     <string name="dialog_overwrite_message">Diese Aktion überschreibt das Ziel</string>

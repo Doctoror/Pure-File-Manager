@@ -15,10 +15,12 @@
 package com.docd.purefm.tasks;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 
 import com.docd.purefm.R;
 import com.docd.purefm.operations.OperationsService;
@@ -45,15 +47,13 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
     private CharSequence getTitle() {
         final GenericFile[] files = ClipBoard.getClipBoardContents();
         if (files != null) {
-            final StringBuilder title = new StringBuilder();
+            final Resources res = mActivity.getResources();
             if (ClipBoard.isMove()) {
-                title.append(mActivity.getString(R.string.progress_moving));
-            } else {
-                title.append(mActivity.getString(R.string.progress_copying));
+                return String.format(Locale.getDefault(), res.getQuantityString(
+                        R.plurals.progress_moving_n_files, files.length), files.length);
             }
-            title.append(files.length);
-            title.append(mActivity.getString(R.string._files));
-            return title.toString();
+            return String.format(Locale.getDefault(), res.getQuantityString(
+                    R.plurals.progress_copying_n_files, files.length), files.length);
         }
         return "";
     }

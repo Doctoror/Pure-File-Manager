@@ -46,17 +46,17 @@ public final class DeleteTask extends
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.mDialog = new ProgressDialog(mActivity);
-        this.mDialog.setMessage(mActivity.getString(R.string.progress_deleting_files));
-        this.mDialog.setCancelable(true); //TODO replace with cancel button
-        this.mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        mDialog = new ProgressDialog(mActivity);
+        mDialog.setMessage(mActivity.getText(R.string.progress_deleting_files));
+        mDialog.setCancelable(true); //TODO replace with cancel button
+        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 cancel();
             }
         });
         if (!mActivity.isFinishing()) {
-            this.mDialog.show();
+            mDialog.show();
         }
     }
 
@@ -97,8 +97,8 @@ public final class DeleteTask extends
     }
 
     private void finish(@NotNull final ArrayList<GenericFile> failed) {
-        if (this.mDialog != null) {
-            this.mDialog.dismiss();
+        if (mDialog != null) {
+            mDialog.dismiss();
         }
         if (!failed.isEmpty()) {
             final Dialog dialog = MessageDialog.create(mActivity, R.string.dialog_delete_failed,
