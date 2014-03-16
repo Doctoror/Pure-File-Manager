@@ -29,6 +29,7 @@ public final class PureFMFileUtilsTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        super.runTest();
         assertEquals("0 B", PureFMFileUtils.byteCountToDisplaySize(BigInteger.ZERO));
         assertEquals("1 B", PureFMFileUtils.byteCountToDisplaySize(BigInteger.ONE));
         assertEquals("10 B", PureFMFileUtils.byteCountToDisplaySize(BigInteger.TEN));

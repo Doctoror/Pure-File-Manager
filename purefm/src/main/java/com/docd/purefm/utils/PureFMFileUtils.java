@@ -87,9 +87,23 @@ public final class PureFMFileUtils {
      * Returns canonical path or absolute path if failed
      *
      * @param file File to get full path
-     * @return caninocal path or absolute path if failed
+     * @return canonical path or absolute path if failed
      */
     public static String fullPath(final GenericFile file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException e) {
+            return file.getAbsolutePath();
+        }
+    }
+
+    /**
+     * Returns canonical path or absolute path if failed
+     *
+     * @param file File to get full path
+     * @return canonical path or absolute path if failed
+     */
+    public static String fullPath(final File file) {
         try {
             return file.getCanonicalPath();
         } catch (IOException e) {

@@ -29,11 +29,12 @@ public final class PureFMTextUtilsTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        runTest();
         PureFMTextUtils.init(getContext());
         testStringMonthToInt();
     }
 
-    private void testStringMonthToInt() {
+    private void testStringMonthToInt() throws Throwable {
         assertEquals(Calendar.JANUARY, PureFMTextUtils.stringMonthToInt("Jan"));
         assertEquals(Calendar.FEBRUARY, PureFMTextUtils.stringMonthToInt("Feb"));
         assertEquals(Calendar.MARCH, PureFMTextUtils.stringMonthToInt("Mar"));

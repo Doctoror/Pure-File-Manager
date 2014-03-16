@@ -14,18 +14,14 @@
  */
 package com.docd.purefm.test;
 
-import android.content.Context;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
-import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.utils.PureFMTextUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -66,6 +62,7 @@ public final class FileFactoryTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        super.runTest();
 
         com.docd.purefm.Environment.init(getContext());
 

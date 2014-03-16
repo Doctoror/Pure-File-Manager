@@ -62,7 +62,7 @@ final class RenameOperation extends Operation<Void, CharSequence> {
         }
         try {
             if (mSource.renameTo(target)) {
-                MediaStoreUtils.renameFile(mContext.getContentResolver(), mSource, target);
+                MediaStoreUtils.renameFileOrDirectory(mContext.getContentResolver(), mSource, target);
                 return null;
             }
         } finally {

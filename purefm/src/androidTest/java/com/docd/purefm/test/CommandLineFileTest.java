@@ -92,7 +92,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         testMkdirs();
     }
 
-    private void testAgainstJavaIoFile() {
+    private void testAgainstJavaIoFile() throws Throwable {
         CommandLineFile file1 = CommandLineFile.fromFile(test1);
         testAgainstJavaIoFile(file1, test1, true);
         assertTrue(file1.delete());
@@ -131,7 +131,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
 
     private static void testAgainstJavaIoFile(final CommandLineFile genericFile,
                                               final File javaFile,
-                                              final boolean testDate) {
+                                              final boolean testDate) throws Throwable {
         assertEquals(javaFile, genericFile.toFile());
         assertEquals(javaFile.getName(), genericFile.getName());
         assertEquals(javaFile.getAbsolutePath(), genericFile.getAbsolutePath());
@@ -173,7 +173,8 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         }
     }
 
-    private static boolean listedFilesEqual(final File[] javaIoFiles, final GenericFile[] genericFiles) {
+    private static boolean listedFilesEqual(final File[] javaIoFiles,
+                                            final GenericFile[] genericFiles) throws Throwable {
         if (javaIoFiles == null && genericFiles == null) {
             return true;
         }
@@ -194,7 +195,8 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         return true;
     }
 
-    private static boolean listedPathsEqual(final String[] javaIoFiles, final String[] genericFiles) {
+    private static boolean listedPathsEqual(final String[] javaIoFiles,
+                                            final String[] genericFiles) throws Throwable {
         if (javaIoFiles == null && genericFiles == null) {
             return true;
         }

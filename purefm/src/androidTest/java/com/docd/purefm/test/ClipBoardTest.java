@@ -30,8 +30,7 @@ import java.util.Arrays;
  *
  * @author Doctoror
  */
-public class ClipBoardTest extends AndroidTestCase {
-
+public final class ClipBoardTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
@@ -46,7 +45,7 @@ public class ClipBoardTest extends AndroidTestCase {
         testMove(files);
     }
 
-    private void testCopy(@NotNull final GenericFile[] files) {
+    private void testCopy(@NotNull final GenericFile[] files) throws Throwable {
         assertNull(ClipBoard.getClipBoardContents());
         ClipBoard.cutCopy(files);
         assertTrue(Arrays.equals(files, ClipBoard.getClipBoardContents()));
@@ -57,7 +56,7 @@ public class ClipBoardTest extends AndroidTestCase {
         assertNull(ClipBoard.getClipBoardContents());
     }
 
-    private void testMove(@NotNull final GenericFile[] files) {
+    private void testMove(@NotNull final GenericFile[] files) throws Throwable {
         assertNull(ClipBoard.getClipBoardContents());
         ClipBoard.cutMove(files);
         assertTrue(Arrays.equals(files, ClipBoard.getClipBoardContents()));

@@ -376,13 +376,34 @@ public final class MimeTypes {
         return 0;
     }
 
+    /**
+     * Returns mime type from a File based on a file name
+     *
+     * @param file File to get mime type for
+     * @return mime type of the file or null if file is directory or has unknown mime type
+     */
     @Nullable
     public static String getMimeType(@NotNull final File file) {
         if (file.isDirectory()) {
             return null;
         }
+        return getMimeType(file.getAbsolutePath());
+    }
+
+    /**
+     * It is impossible to detect whether path is a directory for sure.
+     * Call this only if you sure the path does not point to a directory
+     *
+     * @param path File path
+     * @return mime type based on file extension
+     */
+    @Nullable
+    public static String getMimeType(@NotNull final String path) {
+        if (path.endsWith(File.separator)) {
+            return null;
+        }
         String type = null;
-        final String extension = FilenameUtils.getExtension(file.getName());
+        final String extension = FilenameUtils.getExtension(FilenameUtils.getName(path));
         if (extension != null && !extension.isEmpty()) {
             final String extensionLowerCase = extension.toLowerCase(Locale.US);
             final MimeTypeMap mime = MimeTypeMap.getSingleton();
@@ -400,17 +421,16 @@ public final class MimeTypes {
 
     public static boolean isPicture(@NotNull final File f) {
         final String mime = getMimeType(f);
-        if (mime != null) {
-            return mimeTypeMatch("image/*", mime);
-        }
-        return false;
+        return mime != null && mimeTypeMatch("image/*", mime);
+    }
+
+    public static boolean isAudio(@NotNull final File f) {
+        final String mime = getMimeType(f);
+        return mime != null && mimeTypeMatch("audio/*", mime);
     }
     
     public static boolean isVideo(@NotNull final File f) {
         final String mime = getMimeType(f);
-        if (mime != null) {
-            return mimeTypeMatch("video/*", mime);
-        }
-        return false;
+        return mime != null && mimeTypeMatch("video/*", mime);
     }
 }

@@ -89,12 +89,13 @@ public final class JavaFileTest extends AndroidTestCase {
         test();
     }
 
-    private void test() {
+    private void test() throws Throwable {
         final JavaFile file1 = new JavaFile(test1);
         testAgainstJavaIoFile(file1, test1);
     }
 
-    private static void testAgainstJavaIoFile(final JavaFile genericFile, final File javaFile) {
+    private static void testAgainstJavaIoFile(final JavaFile genericFile, final File javaFile)
+            throws Throwable{
         assertEquals(javaFile, genericFile.toFile());
         assertEquals(javaFile.getName(), genericFile.getName());
         assertEquals(javaFile.getAbsolutePath(), genericFile.getAbsolutePath());

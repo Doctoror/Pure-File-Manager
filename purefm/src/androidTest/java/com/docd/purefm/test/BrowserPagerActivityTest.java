@@ -24,7 +24,8 @@ import com.docd.purefm.ui.activities.BrowserPagerActivity;
  *
  * @author Doctoror
  */
-public final class BrowserPagerActivityTest extends ActivityInstrumentationTestCase2<BrowserPagerActivity> {
+public final class BrowserPagerActivityTest extends
+        ActivityInstrumentationTestCase2<BrowserPagerActivity> {
 
     public BrowserPagerActivityTest() {
         super(BrowserPagerActivity.class);

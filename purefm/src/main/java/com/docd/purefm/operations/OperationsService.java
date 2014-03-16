@@ -306,7 +306,7 @@ public final class OperationsService extends MultiWorkerService
                 if (!target.createNewFile()) {
                     message = getText(R.string.could_not_create_file);
                 } else {
-                    MediaStoreUtils.addFileOrDirectory(getContentResolver(), target);
+                    MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
                 }
             } catch (IOException e) {
                 message = e.getMessage();
@@ -332,7 +332,7 @@ public final class OperationsService extends MultiWorkerService
             if (!target.mkdir()) {
                 message = getText(R.string.could_not_create_dir);
             } else {
-                MediaStoreUtils.addFileOrDirectory(getContentResolver(), target);
+                MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
             }
         }
         onOperationCompleted(ACTION_CREATE_DIRECTORY,

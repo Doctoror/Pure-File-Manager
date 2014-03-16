@@ -33,6 +33,7 @@ public final class StatFsCompatTest extends AndroidTestCase {
 
     @Override
     protected void setUp() throws Exception {
+        super.setUp();
         final String state = Environment.getExternalStorageState();
         if (!state.equals(Environment.MEDIA_MOUNTED) && !state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
             throw new RuntimeException("Make sure the external storage is mounted before running this test");
@@ -41,6 +42,7 @@ public final class StatFsCompatTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
+        super.runTest();
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
         final StatFs statFs = new StatFs(path);
         final StatFsCompat statFsCompat = new StatFsCompat(path);
@@ -51,7 +53,7 @@ public final class StatFsCompatTest extends AndroidTestCase {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void testStatFs(@NotNull final StatFs fs, @NotNull final StatFsCompat fsc) {
+    private void testStatFs(@NotNull final StatFs fs, @NotNull final StatFsCompat fsc) throws Throwable {
         assertEquals(fs.getAvailableBlocksLong(), fsc.getAvailableBlocksLong());
         assertEquals(fs.getAvailableBytes(), fsc.getAvailableBytes());
         assertEquals(fs.getBlockCountLong(), fsc.getBlockCountLong());

@@ -32,11 +32,11 @@ public final class ArrayUtilsTest extends AndroidTestCase {
         test();
     }
 
-    private void testEmpty() {
+    private void testEmpty() throws Throwable {
         ArrayUtils.copyArrayAndCast(new CharSequence[0], new String[0]);
     }
 
-    private void test() {
+    private void test() throws Throwable {
         final String[] test = new String[] {
                 "abc", "DeF", "123", "~!@#$%^&*()_+"
         };

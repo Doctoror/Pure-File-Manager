@@ -15,8 +15,6 @@
 package com.docd.purefm.test;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -27,9 +25,9 @@ import android.util.Pair;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.MediaStoreUtils;
-import com.docd.purefm.utils.PureFMFileUtils;
 
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,163 +40,126 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
 
     private static final File EXT = Environment.getExternalStorageDirectory();
     private static final File TEST_ROOT = new File(EXT, "MediaStoreUtilsTest");
-    private static final File TEST_DIR_1 = new File(TEST_ROOT, "dir one");
-    private static final File TEST_DIR_2 = new File(TEST_ROOT, "dir two");
-    private static final File TEST_DIR_3 = new File(TEST_ROOT, "dir three");
-    private static final GenericFile TEST1 = new JavaFile(TEST_DIR_1, "image1.jpg");
-    private static final GenericFile TEST2 = new JavaFile(TEST_DIR_1, "image2.jpg");
-    private static final GenericFile TEST3 = new JavaFile(TEST_DIR_1, "image3.jpg");
-
-    private static final GenericFile TEST4 = new JavaFile(TEST_DIR_2, "image1.jpg");
-    private static final GenericFile TEST5 = new JavaFile(TEST_DIR_2, "image2.jpg");
-    private static final GenericFile TEST6 = new JavaFile(TEST_DIR_2, "image3.jpg");
-
-    private static final GenericFile TEST7 = new JavaFile(TEST_DIR_3, "image1.jpg");
-    private static final GenericFile TEST8 = new JavaFile(TEST_DIR_3, "image2.jpg");
-    private static final GenericFile TEST9 = new JavaFile(TEST_DIR_3, "image3.jpg");
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        doTearDown();
+        assertTrue(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED));
 
-        TEST_ROOT.mkdirs();
-        TEST_DIR_1.mkdir();
-        TEST_DIR_2.mkdir();
-        TEST_DIR_3.mkdir();
-        TEST1.createNewFile();
-
+        TEST_ROOT.mkdir();
         assertTrue(TEST_ROOT.exists());
-        assertTrue(TEST_DIR_1.exists());
-        assertTrue(TEST_DIR_2.exists());
-        assertTrue(TEST_DIR_3.exists());
-        assertTrue(TEST1.exists());
+        assertTrue(TEST_ROOT.isDirectory());
+        doTearDown();
     }
 
     @Override
     protected void runTest() throws Throwable {
         super.runTest();
-        // add test file to MediaStore
-        final Context context = getContext();
-        final ContentResolver resolver = context.getContentResolver();
-        addToMediaStoreAsImage(resolver, TEST1);
 
-        // check if test files were added
-        assertTrue(isFileInMediaStore(resolver, TEST1));
-
-        //test rename
-        assertTrue(TEST1.renameTo(TEST2));
-        MediaStoreUtils.renameFile(resolver, TEST1, TEST2);
-        assertFalse(isFileInMediaStore(resolver, TEST1));
-        assertTrue(isFileInMediaStore(resolver, TEST2));
-
-        //test move to same dir
-        FileUtils.moveFile(TEST2.toFile(), TEST1.toFile());
-
-        final List<Pair<GenericFile, GenericFile>> moved = new ArrayList<>(1);
-        moved.add(new Pair<>(TEST2, TEST1));
-        MediaStoreUtils.moveFiles(context, moved);
-        moved.clear();
-        assertFalse(isFileInMediaStore(resolver, TEST2));
-        assertTrue(isFileInMediaStore(resolver, TEST1));
-
-        //test copy to same dir
-        FileUtils.copyFile(TEST1.toFile(), TEST2.toFile());
-        FileUtils.copyFile(TEST1.toFile(), TEST3.toFile());
-
-        moved.add(new Pair<>(TEST1, TEST2));
-        moved.add(new Pair<>(TEST1, TEST3));
-        MediaStoreUtils.copyFiles(context, moved);
-        moved.clear();
-
-        assertTrue(isFileInMediaStore(resolver, TEST1));
-        assertTrue(isFileInMediaStore(resolver, TEST2));
-        assertTrue(isFileInMediaStore(resolver, TEST3));
-
-        //test copy to another dir
-        FileUtils.copyFile(TEST1.toFile(), TEST4.toFile());
-        FileUtils.copyFile(TEST2.toFile(), TEST5.toFile());
-        FileUtils.copyFile(TEST3.toFile(), TEST6.toFile());
-
-        moved.add(new Pair<>(TEST1, TEST4));
-        moved.add(new Pair<>(TEST2, TEST5));
-        moved.add(new Pair<>(TEST3, TEST6));
-        MediaStoreUtils.copyFiles(context, moved);
-        moved.clear();
-
-        assertTrue(isFileInMediaStore(resolver, TEST1));
-        assertTrue(isFileInMediaStore(resolver, TEST2));
-        assertTrue(isFileInMediaStore(resolver, TEST3));
-        assertTrue(isFileInMediaStore(resolver, TEST4));
-        assertTrue(isFileInMediaStore(resolver, TEST5));
-        assertTrue(isFileInMediaStore(resolver, TEST6));
-
-        //test move to another dir
-        FileUtils.moveFile(TEST4.toFile(), TEST7.toFile());
-        FileUtils.moveFile(TEST5.toFile(), TEST8.toFile());
-        FileUtils.moveFile(TEST6.toFile(), TEST9.toFile());
-
-        moved.add(new Pair<>(TEST4, TEST7));
-        moved.add(new Pair<>(TEST5, TEST8));
-        moved.add(new Pair<>(TEST6, TEST9));
-        MediaStoreUtils.moveFiles(context, moved);
-        moved.clear();
-
-        assertFalse(isFileInMediaStore(resolver, TEST4));
-        assertFalse(isFileInMediaStore(resolver, TEST5));
-        assertFalse(isFileInMediaStore(resolver, TEST6));
-        assertTrue(isFileInMediaStore(resolver, TEST7));
-        assertTrue(isFileInMediaStore(resolver, TEST8));
-        assertTrue(isFileInMediaStore(resolver, TEST9));
-
-        //test batch delete
-
-        final List<GenericFile> files = new ArrayList<>();
-        files.add(TEST7);
-        files.add(TEST8);
-        assertTrue(TEST7.delete());
-        assertTrue(TEST8.delete());
-        MediaStoreUtils.deleteFilesOrDirectories(resolver, files);
-
-        assertFalse(isFileInMediaStore(resolver, TEST7));
-        assertFalse(isFileInMediaStore(resolver, TEST8));
-
-        assertTrue(TEST9.delete());
-        MediaStoreUtils.deleteFile(resolver, TEST9);
-
-        assertFalse(isFileInMediaStore(resolver, TEST9));
-
-        //test add file or dir
-        final GenericFile dir2JavaFile = new JavaFile(TEST_DIR_2);
-        MediaStoreUtils.addFileOrDirectory(resolver, dir2JavaFile);
-        MediaStoreUtils.addFileOrDirectory(resolver, TEST4);
-        MediaStoreUtils.addFileOrDirectory(resolver, TEST5);
-        MediaStoreUtils.addFileOrDirectory(resolver, TEST6);
-
-        assertTrue(isFileInMediaStore(resolver, dir2JavaFile));
-        assertTrue(isFileInMediaStore(resolver, TEST4));
-        assertTrue(isFileInMediaStore(resolver, TEST5));
-        assertTrue(isFileInMediaStore(resolver, TEST6));
-
-        // test delete directory with contents
-        MediaStoreUtils.deleteAllFromDirectory(resolver, dir2JavaFile);
-        assertFalse(isFileInMediaStore(resolver, dir2JavaFile));
-        assertFalse(isFileInMediaStore(resolver, TEST4));
-        assertFalse(isFileInMediaStore(resolver, TEST5));
-        assertFalse(isFileInMediaStore(resolver, TEST6));
+        final ContentResolver resolver = getContext().getContentResolver();
+        testAddAndDeleteFile(resolver);
+        testRenameFile(resolver);
+        testRenameEmptyDirectory(resolver);
+        testMoveFile(resolver);
     }
 
-    private static void addToMediaStoreAsImage(final ContentResolver resolver, final GenericFile file) {
-        final ContentValues values = new ContentValues(2);
-        values.put(MediaStore.Files.FileColumns.DATA, PureFMFileUtils.fullPath(file));
-        values.put(MediaStore.Files.FileColumns.DISPLAY_NAME, file.getName());
-        values.put(MediaStore.Files.FileColumns.MIME_TYPE, "image/jpeg");
-        resolver.insert(MediaStore.Files.getContentUri("external"), values);
+    private void testAddAndDeleteFile(@NotNull final ContentResolver resolver) throws Throwable {
+        final GenericFile test = new JavaFile(TEST_ROOT, "test1.txt");
+        assertFalse(isFileInMediaStore(resolver, test));
+        MediaStoreUtils.addEmptyFileOrDirectory(resolver, test);
+        assertTrue(isFileInMediaStore(resolver, test));
+        MediaStoreUtils.deleteFileOrDirectory(resolver, test);
+        assertFalse(isFileInMediaStore(resolver, test));
     }
+
+    private void testRenameFile(@NotNull final ContentResolver resolver) throws Throwable {
+        final GenericFile test1 = new JavaFile(TEST_ROOT, "test2.txt");
+        final GenericFile test2 = new JavaFile(TEST_ROOT, "test3.txt");
+        MediaStoreUtils.addEmptyFileOrDirectory(resolver, test1);
+        assertTrue(isFileInMediaStore(resolver, test1));
+        MediaStoreUtils.renameFileOrDirectory(resolver, test1, test2);
+        assertFalse(isFileInMediaStore(resolver, test1));
+        assertTrue(isFileInMediaStore(resolver, test2));
+
+        MediaStoreUtils.deleteFileOrDirectory(resolver, test2);
+        assertFalse(isFileInMediaStore(resolver, test2));
+    }
+
+    private void testRenameEmptyDirectory(@NotNull final ContentResolver resolver) throws Throwable {
+        final GenericFile test1 = new JavaFile(TEST_ROOT, "test4dir.txt");
+        final GenericFile test2 = new JavaFile(TEST_ROOT, "test5dir.txt");
+
+        test1.mkdir();
+        assertTrue(test1.exists());
+        assertTrue(test1.isDirectory());
+
+        MediaStoreUtils.addEmptyFileOrDirectory(resolver, test1);
+        assertTrue(isFileInMediaStore(resolver, test1));
+
+        MediaStoreUtils.renameFileOrDirectory(resolver, test1, test2);
+        assertFalse(isFileInMediaStore(resolver, test1));
+        assertTrue(isFileInMediaStore(resolver, test2));
+
+        assertTrue(test1.delete());
+        assertTrue(test2.delete());
+
+        MediaStoreUtils.deleteFileOrDirectory(resolver, test2);
+        assertFalse(isFileInMediaStore(resolver, test2));
+    }
+
+    private void testMoveFile(@NotNull final ContentResolver resolver) throws Throwable {
+        final GenericFile test1dir = new JavaFile(TEST_ROOT, "test6.txt");
+        final GenericFile test2dir = new JavaFile(TEST_ROOT, "test7.txt");
+        test1dir.mkdir();
+        assertTrue(test1dir.exists());
+        assertTrue(test1dir.isDirectory());
+
+        test2dir.mkdir();
+        assertTrue(test2dir.exists());
+        assertTrue(test2dir.isDirectory());
+
+        final GenericFile test1file = new JavaFile(test1dir.toFile(), "test8.txt");
+        final GenericFile test2file = new JavaFile(test2dir.toFile(), "test8.txt");
+        test1file.createNewFile();
+        assertTrue(test1file.exists());
+        assertFalse(test1file.isDirectory());
+
+        MediaStoreUtils.addEmptyFileOrDirectory(resolver, test1dir);
+        MediaStoreUtils.addEmptyFileOrDirectory(resolver, test2dir);
+        MediaStoreUtils.addEmptyFileOrDirectory(resolver, test1file);
+
+        assertTrue(isFileInMediaStore(resolver, test1dir));
+        assertTrue(isFileInMediaStore(resolver, test2dir));
+        assertTrue(isFileInMediaStore(resolver, test1file));
+
+
+        FileUtils.moveFile(test1file.toFile(), test2file.toFile());
+        final List<Pair<GenericFile, GenericFile>> files = new ArrayList<>(1);
+        files.add(new Pair<>(test1file, test2file));
+        MediaStoreUtils.moveFiles(getContext(), files);
+
+        assertTrue(isFileInMediaStore(resolver, test1dir));
+        assertTrue(isFileInMediaStore(resolver, test2dir));
+        assertFalse(isFileInMediaStore(resolver, test1file));
+        assertTrue(isFileInMediaStore(resolver, test2file));
+
+        test2file.delete();
+        test1dir.delete();
+        test2dir.delete();
+
+        MediaStoreUtils.deleteFileOrDirectory(resolver, test2file);
+        MediaStoreUtils.deleteFileOrDirectory(resolver, test1dir);
+        MediaStoreUtils.deleteFileOrDirectory(resolver, test2dir);
+
+        assertFalse(isFileInMediaStore(resolver, test1dir));
+        assertFalse(isFileInMediaStore(resolver, test2dir));
+        assertFalse(isFileInMediaStore(resolver, test2file));
+    }
+
 
     private static boolean isFileInMediaStore(final ContentResolver resolver, final GenericFile file) {
         final Uri uri = MediaStoreUtils.getContentUri(file);
-        final Pair<String, String[]> selection = MediaStoreUtils.dataSelection(file);
+        final Pair<String, String[]> selection = MediaStoreUtils.dataSelection(file.toFile());
         final Cursor c = resolver.query(uri, new String[] {MediaStore.Files.FileColumns._ID},
                 selection.first, selection.second, null);
         if (c != null) {

@@ -38,8 +38,8 @@ public final class MediaStoreUtils {
     private MediaStoreUtils() {}
 
     public static void requestMediaScanner(@NotNull final Context context,
-                                           @NotNull final List<GenericFile> files) {
-        final String[] paths = new String[files.size()];
+                                           @NotNull final GenericFile... files) {
+        final String[] paths = new String[files.length];
         int i = 0;
         for (final GenericFile file : files) {
             paths[i] = PureFMFileUtils.fullPath(file);
@@ -48,11 +48,21 @@ public final class MediaStoreUtils {
         MediaScannerConnection.scanFile(context, paths, null, null);
     }
 
-    public static void renameFile(@NotNull final ContentResolver contentResolver,
-                                  @NotNull final GenericFile oldFile,
-                                  @NotNull final GenericFile newFile) {
+    public static void renameFileOrDirectory(@NotNull final ContentResolver contentResolver,
+                                             @NotNull final GenericFile oldFile,
+                                             @NotNull final GenericFile newFile) {
+        if (oldFile.isDirectory()) {
+            moveOrRenameDirectory(contentResolver, oldFile, newFile);
+        } else {
+            renameFile(contentResolver, oldFile, newFile);
+        }
+    }
+
+    private static void renameFile(@NotNull final ContentResolver contentResolver,
+                                   @NotNull final GenericFile oldFile,
+                                   @NotNull final GenericFile newFile) {
         final Uri uri = getContentUri(oldFile);
-        final long id = fileId(contentResolver, uri, oldFile);
+        final long id = fileId(contentResolver, uri, oldFile.toFile());
         if (id != -1) {
             final ContentValues values = new ContentValues(2);
             values.put(MediaStore.Files.FileColumns.DATA, PureFMFileUtils.fullPath(newFile));
@@ -62,13 +72,40 @@ public final class MediaStoreUtils {
         }
     }
 
-    public static void moveFileInSameVolume(@NotNull final ContentResolver contentResolver,
+    private static void moveOrRenameDirectory(@NotNull final ContentResolver contentResolver,
+                                              @NotNull final GenericFile oldFile,
+                                              @NotNull final GenericFile newFile) {
+        final String oldPath = PureFMFileUtils.fullPath(oldFile);
+        final String newPath = PureFMFileUtils.fullPath(newFile);
+        final Uri uri = getContentUri(oldPath);
+
+        final Pair<String, String[]> selection = listDirectoryRecursiveSelelction(oldFile);
+        final Cursor c = contentResolver.query(uri, new String[] {
+                        MediaStore.Files.FileColumns._ID,
+                        MediaStore.Files.FileColumns.DATA},
+                selection.first, selection.second, null);
+        if (c != null){
+            try {
+                for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                    final long id = c.getLong(0);
+                    final String data = c.getString(1);
+                    final ContentValues values = new ContentValues(1);
+                    values.put(MediaStore.Files.FileColumns.DATA, data.replace(oldPath, newPath));
+                    contentResolver.update(ContentUris.withAppendedId(uri, id), values, null, null);
+                }
+            } finally {
+                c.close();
+            }
+        }
+    }
+
+    private static void moveFileInSameVolume(@NotNull final ContentResolver contentResolver,
                                             @NotNull final GenericFile oldFile,
                                             @NotNull final GenericFile newFile) {
         final Uri uri = getContentUri(oldFile);
-        final long id = fileId(contentResolver, uri, oldFile);
+        final long id = fileId(contentResolver, uri, oldFile.toFile());
         final long parentId;
-        final GenericFile newFileParent = newFile.getParentFile();
+        final File newFileParent = newFile.toFile().getParentFile();
         if (newFileParent != null) {
             parentId = fileId(contentResolver, uri, newFileParent);
         } else {
@@ -91,86 +128,37 @@ public final class MediaStoreUtils {
             final String secondPath = PureFMFileUtils.fullPath(pair.second);
             boolean firstExternal = isExternal(PureFMFileUtils.fullPath(pair.first));
             boolean secondExternal = isExternal(secondPath);
-            if ((firstExternal && secondExternal) ||
-                    (!firstExternal && !secondExternal)) {
-                moveFileInSameVolume(context.getContentResolver(), pair.first, pair.second);
+
+            // Move only if CONTENT_URI is the same and the File is not a picture
+            // if you move pictures, the bucket can be updated only from MediaScanner
+            if (((firstExternal && secondExternal) ||
+                    (!firstExternal && !secondExternal)) &&
+                            !MimeTypes.isPicture(pair.second.toFile())) {
+                if (pair.first.isDirectory()) {
+                    moveOrRenameDirectory(context.getContentResolver(), pair.first, pair.second);
+                } else {
+                    moveFileInSameVolume(context.getContentResolver(), pair.first, pair.second);
+                }
             } else {
-                copyFile(context, pair.first, pair.second);
-                deleteFile(context.getContentResolver(), pair.first);
+                deleteFileOrDirectory(context.getContentResolver(), pair.first);
+                requestMediaScanner(context, pair.second);
             }
         }
     }
 
     public static void copyFiles(@NotNull final Context context,
                                  @NotNull final List<Pair<GenericFile, GenericFile>> files) {
-
         final int size = files.size();
-//        final String[] paths = new String[size];
-//        for (int i = 0; i < size; i++) {
-//            final Pair<GenericFile, GenericFile> pair = files.get(i);
-//            final String newPath = PureFMFileUtils.fullPath(pair.second);
-//            paths[i] = newPath;
-//        }
-//        MediaScannerConnection.scanFile(context, paths, null, null);
-        final ContentResolver resolver = context.getContentResolver();
-        final String[] allColumns = getCopyColumns();
         final String[] paths = new String[size];
         for (int i = 0; i < size; i++) {
             final Pair<GenericFile, GenericFile> pair = files.get(i);
             final String newPath = PureFMFileUtils.fullPath(pair.second);
             paths[i] = newPath;
-            final Pair<String, String[]> selection = dataSelection(pair.first);
-            final Cursor c = resolver.query(getContentUri(pair.first), allColumns,
-                    selection.first, selection.second, null);
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    final ContentValues values = new ContentValues(6);
-                    values.put(MediaStore.Files.FileColumns.DATA, newPath);
-                    values.put(MediaStore.Files.FileColumns.DISPLAY_NAME, pair.second.getName());
-                    values.put(MediaStore.Files.FileColumns.DATE_ADDED,
-                            c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED)));
-                    values.put(MediaStore.Files.FileColumns.DATE_MODIFIED,
-                            c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)));
-                    values.put(MediaStore.Files.FileColumns.MEDIA_TYPE,
-                            c.getString(c.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE)));
-                    values.put(MediaStore.Files.FileColumns.MIME_TYPE,
-                            c.getString(c.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)));
-                    resolver.insert(getContentUri(pair.second), values);
-                }
-            }
         }
         MediaScannerConnection.scanFile(context, paths, null, null);
     }
 
-    public static void copyFile(@NotNull final Context context,
-                                @NotNull final GenericFile source,
-                                @NotNull final GenericFile target) {
-        final ContentResolver resolver = context.getContentResolver();
-        final String[] copyColumns = getCopyColumns();
-        final String newPath = PureFMFileUtils.fullPath(target);
-        final Pair<String, String[]> selection = dataSelection(source);
-        final Cursor c = resolver.query(getContentUri(source), copyColumns,
-                selection.first, selection.second, null);
-        if (c != null) {
-            if (c.moveToFirst()) {
-                final ContentValues values = new ContentValues(6);
-                values.put(MediaStore.Files.FileColumns.DATA, newPath);
-                values.put(MediaStore.Files.FileColumns.DISPLAY_NAME, target.getName());
-                values.put(MediaStore.Files.FileColumns.DATE_ADDED,
-                        c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED)));
-                values.put(MediaStore.Files.FileColumns.DATE_MODIFIED,
-                        c.getLong(c.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)));
-                values.put(MediaStore.Files.FileColumns.MEDIA_TYPE,
-                        c.getString(c.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE)));
-                values.put(MediaStore.Files.FileColumns.MIME_TYPE,
-                        c.getString(c.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)));
-                resolver.insert(getContentUri(target), values);
-            }
-        }
-        MediaScannerConnection.scanFile(context, new String[] {newPath}, null, null);
-    }
-
-    public static void addFileOrDirectory(final ContentResolver resolver, final GenericFile file) {
+    public static void addEmptyFileOrDirectory(final ContentResolver resolver, final GenericFile file) {
         final ContentValues values = new ContentValues(2);
         final String fullPath = PureFMFileUtils.fullPath(file);
         values.put(MediaStore.Files.FileColumns.DATA, fullPath);
@@ -179,16 +167,7 @@ public final class MediaStoreUtils {
         if (mimeType != null) {
             values.put(MediaStore.Files.FileColumns.MIME_TYPE, mimeType);
         }
-        resolver.insert(getContentUri(fullPath), values);
-    }
-
-    private static String[] getCopyColumns() {
-            return new String[] {
-                    MediaStore.Files.FileColumns.DATE_ADDED,
-                    MediaStore.Files.FileColumns.DATE_MODIFIED,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
-                    MediaStore.Files.FileColumns.MIME_TYPE
-            };
+        resolver.insert(getContentUri(file), values);
     }
 
     public static Uri getContentUri(@NotNull final GenericFile file) {
@@ -196,11 +175,23 @@ public final class MediaStoreUtils {
     }
 
     public static Uri getContentUri(@NotNull final String path) {
-        if (isExternal(path)) {
-            return MediaStore.Files.getContentUri("external");
-        } else {
-           return MediaStore.Files.getContentUri("internal");
-        }
+        final boolean isExternal = isExternal(path);
+        // general file content uri is just fine, so the code below is commented
+
+//        if (mimeType != null) {
+//            if (mimeType.startsWith("image/")) {
+//                return isExternal ? MediaStore.Images.Media.EXTERNAL_CONTENT_URI :
+//                        MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+//            } else if (mimeType.startsWith("audio/")) {
+//                return isExternal ? MediaStore.Audio.Media.EXTERNAL_CONTENT_URI :
+//                        MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+//            } else if (mimeType.startsWith("video/")) {
+//                return isExternal ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI :
+//                        MediaStore.Video.Media.INTERNAL_CONTENT_URI;
+//            }
+//        }
+        return MediaStore.Files.getContentUri(isExternal ?
+                "external" : "internal");
     }
 
     public static boolean isExternal(@NotNull final String path) {
@@ -214,7 +205,7 @@ public final class MediaStoreUtils {
 
     private static long fileId(@NotNull final ContentResolver contentResolver,
                                @NotNull final Uri uri,
-                               @NotNull final GenericFile file) {
+                               @NotNull final File file) {
         final Pair<String, String[]> selection = dataSelection(file);
         final Cursor c = contentResolver.query(uri,
                 new String[] {MediaStore.Files.FileColumns._ID},
@@ -232,7 +223,7 @@ public final class MediaStoreUtils {
     }
 
     @NotNull
-    public static Pair<String, String[]> dataSelection(final GenericFile file) {
+    public static Pair<String, String[]> dataSelection(final File file) {
         final String canonicalPath = PureFMFileUtils.fullPath(file);
         final String absolutePath = file.getAbsolutePath();
         final String selection;
@@ -251,13 +242,13 @@ public final class MediaStoreUtils {
     public static void deleteFile(@NotNull final ContentResolver contentResolver,
                                   @NotNull final GenericFile file) {
         final String canonicalPath = PureFMFileUtils.fullPath(file);
-        final int result = contentResolver.delete(getContentUri(canonicalPath), MediaStore.Files.FileColumns.DATA + "=?",
-                new String[] {canonicalPath});
+        final int result = contentResolver.delete(getContentUri(canonicalPath),
+                MediaStore.Files.FileColumns.DATA + "=?", new String[] {canonicalPath});
         if (result == 0) {
             final String absolutePath = file.getAbsolutePath();
             if (!absolutePath.equals(canonicalPath)) {
-                contentResolver.delete(getContentUri(absolutePath), MediaStore.Files.FileColumns.DATA + "=?",
-                        new String[] {absolutePath});
+                contentResolver.delete(getContentUri(absolutePath),
+                        MediaStore.Files.FileColumns.DATA + "=?", new String[]{absolutePath});
             }
         }
     }
@@ -287,8 +278,10 @@ public final class MediaStoreUtils {
         }
     }
 
-    public static void deleteAllFromDirectory(@NotNull final ContentResolver contentResolver,
-                                              @NotNull final GenericFile dir) {
+    @NotNull
+    private static Pair<String, String[]> listDirectoryRecursiveSelelction(
+            @NotNull final GenericFile dir) {
+
         if (dir.exists() && !dir.isDirectory()) {
             throw new IllegalArgumentException("\'dir\' is not a directory");
         }
@@ -316,13 +309,27 @@ public final class MediaStoreUtils {
                     MediaStore.Files.FileColumns.DATA + " LIKE \'" + absolutePathWithSeparator + "%\'";
             selectionArgs = new String[] {pathNoSeparator, absolutePathNoSeparator};
         }
+        return new Pair<>(selection, selectionArgs);
+    }
+
+    public static void deleteAllFromDirectory(@NotNull final ContentResolver contentResolver,
+                                              @NotNull final GenericFile dir) {
+
+        final String canonicalPath = PureFMFileUtils.fullPath(dir);
         final Uri uri = MediaStoreUtils.getContentUri(canonicalPath);
-        final Cursor c = contentResolver.query(uri, new String[] {MediaStore.Files.FileColumns._ID},
-                selection, selectionArgs, null);
-        if (c != null) {
-            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-                final long id = c.getLong(0);
-                contentResolver.delete(ContentUris.withAppendedId(uri, id), null, null);
+
+        final Pair<String, String[]> selection = listDirectoryRecursiveSelelction(dir);
+        final Cursor c = contentResolver.query(uri, new String[] {
+                        MediaStore.Files.FileColumns._ID},
+                                selection.first, selection.second, null);
+        if (c != null){
+            try {
+                for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                    final long id = c.getLong(0);
+                    contentResolver.delete(ContentUris.withAppendedId(uri, id), null, null);
+                }
+            } finally {
+                c.close();
             }
         }
     }
