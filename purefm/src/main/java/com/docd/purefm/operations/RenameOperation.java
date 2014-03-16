@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Performs file renaming
  *
- * {@link #execute(Void...)} returns null if operation completed successfully,
+ * {@link #doInBackground(Void...)} returns null if operation completed successfully,
  * or error message if an error occurred
  */
 final class RenameOperation extends Operation<Void, CharSequence> {
@@ -46,7 +46,7 @@ final class RenameOperation extends Operation<Void, CharSequence> {
     }
 
     @Override
-    protected CharSequence execute(Void... voids) {
+    protected CharSequence doInBackground(Void... voids) {
         final GenericFile sourceParent = mSource.getParentFile();
         if (sourceParent == null) {
             return "Could not resolve parent directory. Renaming failed.";

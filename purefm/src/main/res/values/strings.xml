@@ -144,6 +144,8 @@
     <string name="dialog_move_failed">Failed to move the following files</string>
     <string name="dialog_delete_failed">Failed to delete the following files</string>
 
+    <string name="canceling_suffix">\u0020(canceling&#8230;)</string>
+
     <!-- Delete -->
     <string name="dialog_delete_title">The following files will be deleted:</string>
     

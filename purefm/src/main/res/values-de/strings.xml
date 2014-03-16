@@ -139,7 +139,10 @@
     <string name="dialog_copy_failed">Fehler beim Kopieren folgender Dateien</string>
     <string name="dialog_move_failed">Fehler beim Verschieben folgender Dateien</string>
     <string name="dialog_delete_failed">Fehler beim Löschen folgender Dateien</string>
-    
+
+    <!-- TODO translate to German -->
+    <string name="canceling_suffix">\u0020(canceling&#8230;)</string>
+
     <!-- Delete -->
     <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>
     

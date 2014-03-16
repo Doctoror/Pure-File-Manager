@@ -56,7 +56,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
     }
 
     @Override
-    protected ArrayList<GenericFile> execute(GenericFile... files) {
+    protected ArrayList<GenericFile> doInBackground(GenericFile... files) {
         final LinkedList<Pair<GenericFile, GenericFile>> filesAffected =
                 new LinkedList<>();
 

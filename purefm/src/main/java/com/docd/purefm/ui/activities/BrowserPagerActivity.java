@@ -396,16 +396,17 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     @Override
     public void onOperationStarted(@Nullable final CharSequence operationMessage,
                                    @NotNull final Intent cancelIntent) {
-        mOperationProgressDialog = ProgressAlertDialogBuilder.create(this,
-                operationMessage, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startService(cancelIntent);
-                    }
-                }
-        );
-        if (!isFinishing()) {
-            mOperationProgressDialog.show();
+        if (mOperationProgressDialog == null || !mOperationProgressDialog.isShowing()) {
+            mOperationProgressDialog = ProgressAlertDialogBuilder.create(this, false,
+                    operationMessage, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startService(cancelIntent);
+                        }
+                    });
+            if (!isFinishing()) {
+                mOperationProgressDialog.show();
+            }
         }
     }
 

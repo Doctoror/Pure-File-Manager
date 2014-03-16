@@ -176,6 +176,13 @@ public final class OperationsService extends MultiWorkerService
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler(getMainLooper());
+        ActivityMonitor.addOnActivitiesOpenedListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ActivityMonitor.removeOnActivitiesOpenedListener(this);
     }
 
     @Override
@@ -205,13 +212,13 @@ public final class OperationsService extends MultiWorkerService
 
                 case ACTION_CANCEL_PASTE:
                     if (mPasteOperation != null) {
-                        mPasteOperation.cancel();
+                        mPasteOperation.cancel(true);
                     }
                     break;
 
                 case ACTION_CANCEL_DELETE:
                     if (mDeleteOperation != null) {
-                        mDeleteOperation.cancel();
+                        mDeleteOperation.cancel(true);
                     }
                     break;
             }
@@ -342,6 +349,7 @@ public final class OperationsService extends MultiWorkerService
                 mHandler.post(mPendingOperationEndedRunnable);
             }
         }
+        stopForeground(true);
         final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
         broadcast.putExtra(EXTRA_RESULT, result);
         broadcast.putExtra(EXTRA_RESULT_CLASS, CharSequence.class);
@@ -358,6 +366,7 @@ public final class OperationsService extends MultiWorkerService
                 mHandler.post(mPendingOperationEndedRunnable);
             }
         }
+        stopForeground(true);
         final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
         broadcast.putExtra(EXTRA_RESULT, result);
         broadcast.putExtra(EXTRA_RESULT_CLASS, Serializable.class);
@@ -395,11 +404,12 @@ public final class OperationsService extends MultiWorkerService
     }
 
     private void startForeground(@NotNull final EOperation opeartion) {
-        final Notification.Builder b = new Notification.Builder(this);
+        final Context context = getApplicationContext();
+        final Notification.Builder b = new Notification.Builder(context);
         b.setContentTitle(getText(R.string.app_name));
         b.setOngoing(true);
+        b.setSmallIcon(R.drawable.app_icon);
         b.setContentText(getOperationMessage(opeartion));
-        final Context context = getApplicationContext();
         b.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(
                 context, BrowserPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
         startForeground(opeartion.mId, build(b));

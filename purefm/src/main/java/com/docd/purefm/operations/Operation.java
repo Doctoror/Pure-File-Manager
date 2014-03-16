@@ -25,18 +25,27 @@ package com.docd.purefm.operations;
 abstract class Operation<Param, Result> {
 
     private volatile boolean mCanceled;
+    private Thread mOperationThread;
 
     protected Operation() {
     }
 
-    protected final void cancel() {
+    public final void cancel(final boolean interrupt) {
         mCanceled = true;
+        if (interrupt) {
+            mOperationThread.interrupt();
+        }
     }
 
     protected final boolean isCanceled() {
         return mCanceled;
     }
 
-    protected abstract Result execute(Param... params);
+    public final Result execute(Param... params) {
+        mOperationThread = Thread.currentThread();
+        return doInBackground(params);
+    }
+
+    protected abstract Result doInBackground(Param... params);
 
 }

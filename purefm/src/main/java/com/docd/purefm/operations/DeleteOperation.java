@@ -43,11 +43,11 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
     private final Context mContext;
 
     protected DeleteOperation(final Context context) {
-      mContext = context;
+        mContext = context;
     }
 
     @Override
-    protected ArrayList<GenericFile> execute(GenericFile... files) {
+    protected ArrayList<GenericFile> doInBackground(GenericFile... files) {
         final ArrayList<GenericFile> failed = new ArrayList<>();
         final List<GenericFile> filesAffected = new LinkedList<>();
 
