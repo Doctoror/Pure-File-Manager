@@ -14,13 +14,8 @@
 <!--limitations under the License.-->
 <resources>
 
-    <!-- TODO translate storage_ to German-->
-    <string name="storage_internal">Internal storage</string>
-
-    <!-- TODO translate storage_ to German-->
-    <string name="storage_sdcard">SD Card</string>
-
-    <!-- TODO translate storage_ to German-->
+    <string name="storage_internal">Interner Speicher</string>
+    <string name="storage_sdcard">SD Karte</string>
     <string name="storage_usb">USB</string>
 
     <string name="root">root</string>
@@ -31,10 +26,8 @@
     <string name="close">Schließen</string>
 
     <!-- Browser -->
-    <!-- TODO translate to German -->
-    <string name="directory_not_exists">The directory does not exist</string>
-    <!-- TODO translate to German -->
-    <string name="target_is_not_a_directory">The target is not a directory</string>
+    <string name="directory_not_exists">Der Pfad existiert nicht</string>
+    <string name="target_is_not_a_directory">Das Ziel ist kein Verzeichnis</string>
     
     <string name="remove">Entfernen</string>
     <string name="search_files">Dateien Suchen</string>
@@ -43,8 +36,7 @@
     <!-- Rename -->
     <string name="rename">Umbenennen</string>
     <string name="new_name">Neuer Name</string>
-    <!-- TODO traslate to German -->
-    <string name="rename_failed">Failed to rename &#8216;%1$s&#8217; to &#8216;%2$s&#8217;</string>
+    <string name="rename_failed">Fehler beim umbennenen &#8216;%1$s&#8217; zu &#8216;%2$s&#8217;</string>
     
     <string name="no_apps_to_open">Keine App zum öffnen dieser Datei vorhanden</string>
     <string name="could_not_open_file_">Datei konnte nicht geöffnet werden:u0020</string>
@@ -82,7 +74,6 @@
     
     <!-- Preferences -->
     <string name="preference_category_view">Aussehen</string>
-    <!-- TODO translate preference_theme to German -->
     <string name="preference_theme">Theme</string>
     <string name="preference_appearance">Ansicht</string>
     <string name="preference_show_hidden">Versteckte Dateien</string>
@@ -115,29 +106,25 @@
     <!-- Progress -->
     <string name="progress_deleting_files">Lösche Datei(en)</string>
 
-    <!-- TODO traslate to German -->
     <plurals name="progress_moving_n_files">
-        <item quantity="one">Moving %1$d file</item>
-        <item quantity="other">Moving %1$d files</item>
+        <item quantity="one">Verschiebe %1$d Datei</item>
+        <item quantity="other">Verschiebe %1$d Dateien</item>
     </plurals>
 
-    <!-- TODO traslate to German -->
     <plurals name="progress_copying_n_files">
-        <item quantity="one">Copying %1$d file</item>
-        <item quantity="other">Copying %1$d files</item>
+        <item quantity="one">Kopiere %1$d Datei</item>
+        <item quantity="other">Kopiere %1$d Dateien</item>
     </plurals>
 
     <!-- Copy / Cut -->
-    <!-- TODO traslate to German -->
     <plurals name="cut_n_files_to_clipboard">
-        <item quantity="one">Cut %1$d file to clipboard</item>
-        <item quantity="other">Cut %1$d files to clipboard</item>
+        <item quantity="one">Verschiebe %1$d Datei in den Zwischenspeicher</item>
+        <item quantity="other">Verschiebe %1$d Dateien in den Zwischenspeicher</item>
     </plurals>
 
-    <!-- TODO traslate to German -->
     <plurals name="copied_n_files_to_clipboard">
-        <item quantity="one">Copied %1$d file to clipboard</item>
-        <item quantity="other">Copied %1$d files to clipboard</item>
+        <item quantity="one">Kopiere %1$d Datei in den Zwischenspeicher</item>
+        <item quantity="other">Kopiere %1$d Dateien in den Zwischenspeicher</item>
     </plurals>
     
     <string name="dialog_overwrite_title">Zieldatei existiert bereits</string>
@@ -198,10 +185,9 @@
     <string name="dialog_quit_message">Anwendung schließen?</string>
 
     <!-- Sharing -->
-    <!-- TODO translate to German -->
     <plurals name="no_applications_can_share">
-        <item quantity="one">No application can share this file</item>
-        <item quantity="other">No application can share these files</item>
+        <item quantity="one">Keine Applikation kann die Datei teilen</item>
+        <item quantity="other">Keine Applikation kann die Dateien teilen</item>
     </plurals>
 
 </resources>
