@@ -300,11 +300,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     @Override
     public void onEvent(final int event, final String path) {
-        final Bundle data = new Bundle();
-        data.putInt(FileObserverEventHandler.DATA_OBSERVER_EVENT, event);
-        data.putString(FileObserverEventHandler.DATA_OBSERVER_PATH, path);
         final Message message = mHandler.obtainMessage(FileObserverEventHandler.MESSAGE_OBSERVER_EVENT);
-        message.setData(data);
+        message.arg1 = event;
+        message.obj = path;
         mHandler.sendMessage(message);
     }
 
@@ -517,23 +515,19 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     private static final class FileObserverEventHandler extends Handler {
 
         static final int MESSAGE_OBSERVER_EVENT = 666;
-        static final String DATA_OBSERVER_EVENT = "FileObserverEventHandler.data.OBSERVER_EVENT";
-        static final String DATA_OBSERVER_PATH = "FileObserverEventHandler.data.OBSERVER_PATHT";
 
         private final WeakReference<BrowserBaseAdapter> mAdapterReference;
 
-        private FileObserverEventHandler(BrowserBaseAdapter adapter) {
+        FileObserverEventHandler(BrowserBaseAdapter adapter) {
             this.mAdapterReference = new WeakReference<BrowserBaseAdapter>(adapter);
         }
 
         @Override
         public void handleMessage(final Message msg) {
             if (msg.what == MESSAGE_OBSERVER_EVENT) {
-                final Bundle data = msg.getData();
                 final BrowserBaseAdapter adapter = mAdapterReference.get();
                 if (adapter != null) {
-                    adapter.onEventUIThread(data.getInt(DATA_OBSERVER_EVENT),
-                            data.getString(DATA_OBSERVER_PATH));
+                    adapter.onEventUIThread(msg.arg1, (String) msg.obj);
                     if (!hasMessages(MESSAGE_OBSERVER_EVENT)) {
                         adapter.notifyDataSetChanged();
                     }
