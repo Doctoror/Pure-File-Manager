@@ -26,7 +26,7 @@ import com.stericson.RootTools.RootTools;
  */
 public final class PureFMApplicationTest extends ApplicationTestCase<PureFM> {
 
-    public PureFMApplicationTest(Class<PureFM> applicationClass) {
+    public PureFMApplicationTest() {
         super(PureFM.class);
     }
 

@@ -31,13 +31,13 @@ public abstract class ThemableActivity extends Activity {
 
     protected static final String EXTRA_SAVED_STATE = "ThemableActivity.extras.SAVED_STATE";
 
-    private int currentTheme;
+    private int mCurrentTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        currentTheme = Settings.theme;
+        mCurrentTheme = Settings.theme;
         if (setThemeInOnCreate()) {
-            setTheme(currentTheme);
+            setTheme(mCurrentTheme);
         }
         super.onCreate(savedInstanceState);
     }
@@ -55,7 +55,7 @@ public abstract class ThemableActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (currentTheme != Settings.theme) {
+        if (mCurrentTheme != Settings.theme) {
             restart();
         }
     }

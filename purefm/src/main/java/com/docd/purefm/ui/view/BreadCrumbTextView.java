@@ -55,16 +55,19 @@ public class BreadCrumbTextView extends TextView {
     private OnSequenceClickListener mOnSequenceClickListener;
     private HorizontalScrollView parent;
 
+    @SuppressWarnings("unused")
     public BreadCrumbTextView(Context context) {
         super(context);
         init();
     }
 
+    @SuppressWarnings("unused")
     public BreadCrumbTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
+    @SuppressWarnings("unused")
     public BreadCrumbTextView(Context context, AttributeSet attrs,
                               int defStyle) {
         super(context, attrs, defStyle);

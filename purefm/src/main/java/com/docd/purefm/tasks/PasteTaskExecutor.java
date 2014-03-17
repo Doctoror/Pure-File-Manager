@@ -33,21 +33,24 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ClipBoard;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class PasteTaskExecutor implements OnClickListener {
 
-    private final WeakReference<MonitoredActivity> activity;
+    private final WeakReference<MonitoredActivity> mActivityReference;
     
-    private final GenericFile targetPath;
-    private final LinkedList<GenericFile> toProcess;
-    private final HashMap<File, GenericFile> exist;
+    private final GenericFile mTargetFile;
+    private final LinkedList<GenericFile> mToProcess;
+    private final HashMap<File, GenericFile> mExisting;
 
     private GenericFile current;
     
-    public PasteTaskExecutor(final MonitoredActivity activity, final GenericFile targetPath) {
-        this.activity = new WeakReference<MonitoredActivity>(activity);
-        this.targetPath = targetPath;
-        this.toProcess = new LinkedList<GenericFile>();
-        this.exist = new HashMap<File, GenericFile>();
+    public PasteTaskExecutor(@NotNull final MonitoredActivity activity,
+                             @NotNull final GenericFile targetFile) {
+        this.mActivityReference = new WeakReference<>(activity);
+        this.mTargetFile = targetFile;
+        this.mToProcess = new LinkedList<>();
+        this.mExisting = new HashMap<>();
     }
     
     public void start() {
@@ -56,7 +59,7 @@ public final class PasteTaskExecutor implements OnClickListener {
             return;
         }
 
-        final GenericFile target = this.targetPath;
+        final GenericFile target = this.mTargetFile;
 
         if (target instanceof JavaFile) {
             for (final GenericFile file : contents) {
@@ -65,9 +68,9 @@ public final class PasteTaskExecutor implements OnClickListener {
                     
                     final File testTarget = new File(target.toFile(), file.getName());
                     if (testTarget.exists()) {
-                        exist.put(testTarget, file);
+                        mExisting.put(testTarget, file);
                     } else {
-                        toProcess.add(file);
+                        mToProcess.add(file);
                     }
                 }
             }
@@ -75,9 +78,9 @@ public final class PasteTaskExecutor implements OnClickListener {
             for (final GenericFile file : contents) {
                 final File tmp = new File(target.toFile(), file.getName());
                 if (CommandLine.execute(ShellHolder.getShell(), new CommandExists(tmp.getAbsolutePath()))) {
-                    exist.put(tmp, file);
+                    mExisting.put(tmp, file);
                 } else {
-                    toProcess.add(file);
+                    mToProcess.add(file);
                 }
             }
         }
@@ -90,27 +93,27 @@ public final class PasteTaskExecutor implements OnClickListener {
         switch (v.getId()) {
             case android.R.id.button1:
                 // replace
-                toProcess.add(current);
+                mToProcess.add(current);
                 break;
                     
             case android.R.id.button2:
                 // replace all;
-                toProcess.add(current);
-                for (File f : exist.keySet()) {
-                    toProcess.add(exist.get(f));                        
+                mToProcess.add(current);
+                for (File f : mExisting.keySet()) {
+                    mToProcess.add(mExisting.get(f));
                 }
-                exist.clear();
+                mExisting.clear();
                 break;
                 
             case R.id.button4:
                 //skip all
-                exist.clear();
+                mExisting.clear();
                 break;
                 
             case R.id.button5:
                 //abort
-                exist.clear();
-                toProcess.clear();
+                mExisting.clear();
+                mToProcess.clear();
                 return;
                 
         }
@@ -118,24 +121,24 @@ public final class PasteTaskExecutor implements OnClickListener {
         next();
     }   
     private void next() {
-        final MonitoredActivity activity = this.activity.get();
+        final MonitoredActivity activity = this.mActivityReference.get();
         if (activity != null) {
-            if (exist.isEmpty()) {
+            if (mExisting.isEmpty()) {
             
-                if (toProcess.isEmpty()) {
+                if (mToProcess.isEmpty()) {
                     ClipBoard.clear();
                 } else {
-                    final GenericFile[] files = new GenericFile[toProcess.size()];
-                    toProcess.toArray(files);
+                    final GenericFile[] files = new GenericFile[mToProcess.size()];
+                    mToProcess.toArray(files);
 
-                    final PasteTask task = new PasteTask(activity, this.targetPath);
+                    final PasteTask task = new PasteTask(activity, this.mTargetFile);
                     task.execute(files);
                 }
             
             } else {
-                final File key = exist.keySet().iterator().next();
-                this.current = exist.get(key);
-                exist.remove(key);
+                final File key = mExisting.keySet().iterator().next();
+                this.current = mExisting.get(key);
+                mExisting.remove(key);
 
                 final Dialog dialog = new FileExistsDialog(activity, current.getAbsolutePath(),
                         key.getAbsolutePath(), this, this, this, this, this);

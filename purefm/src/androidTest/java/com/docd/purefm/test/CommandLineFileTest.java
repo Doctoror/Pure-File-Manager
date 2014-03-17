@@ -290,7 +290,9 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if (fis != null) try {fis.close();} catch (Exception e) {}
+            if (fis != null) try {fis.close();} catch (Exception e) {
+                //ignored
+            }
         }
     }
 

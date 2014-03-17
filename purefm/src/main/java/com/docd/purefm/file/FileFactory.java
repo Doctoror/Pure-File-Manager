@@ -29,9 +29,9 @@ public final class FileFactory {
 
     @NotNull
     public static GenericFile newFile(String path) {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+        //if (Looper.myLooper() == Looper.getMainLooper()) {
             //throw new RuntimeException("Wrong thread");
-        }
+        //} TODO check this
         return Settings.useCommandLine && Environment.hasBusybox() ?
                 CommandLineFile.fromFile(new File(path)) :
                 new JavaFile(path);

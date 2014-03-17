@@ -35,22 +35,20 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
     
-    private List<String> denied;
-    private String query;
-    
+    private final List<String> mDenied;
+
     public SearchCommandLineTask() {
-        this.denied = new ArrayList<String>();
+        this.mDenied = new ArrayList<>();
     }
     
     public List<String> getDeniedLocations() {
-        return this.denied;
+        return this.mDenied;
     }
     
     @Override
     protected Void doInBackground(String... params) {
         final String what = params[0];
-        this.query = what;
-        
+
         final StringBuilder command = new StringBuilder();
         final String[] commands = new String[params.length - 1];
         for (int i = 0; i < commands.length; i++) {
@@ -67,8 +65,8 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
             os = new DataOutputStream(process.getOutputStream());
             is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            for (int i = 0; i < commands.length; i++) {
-                os.writeBytes(commands[i] + "\n");
+            for (final String commandItem : commands) {
+                os.writeBytes(commandItem + "\n");
                 os.flush();
             }
             os.writeBytes("exit\n"); 
@@ -87,7 +85,7 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
                 while (!isCancelled() && (line = err.readLine()) != null) {
                     final Matcher denied = DENIED.matcher(line);
                     if (denied.matches()) {
-                        this.denied.add(denied.group(1));
+                        this.mDenied.add(denied.group(1));
                     } 
                 }
             } catch (EOFException e) {

@@ -36,12 +36,13 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.TextView;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Activity used for Searching files.
@@ -49,24 +50,24 @@ import android.widget.TextView;
  */
 public final class SearchActivity extends ActionBarIconMonitoredActivity {
 
-    private ActionModeController actionModeController;
+    private ActionModeController mActionModeController;
 
-    private AbsListView list;
-    private BrowserBaseAdapter adapter;
+    private AbsListView mList;
+    private BrowserBaseAdapter mAdapter;
     
     private TextView mInput;
     private View mProgress;
     
-    private AsyncTask<String, GenericFile, Void> searchTask;
-    private String path;
+    private AsyncTask<String, GenericFile, Void> mSearchTask;
+    private String mPath;
     
-    private int prevId;
+    private int mPrevId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_search);
-        this.path = getIntent().getStringExtra(Extras.EXTRA_PATH);
+        this.mPath = getIntent().getStringExtra(Extras.EXTRA_PATH);
         this.initActionBar();
         this.initView();
     }
@@ -79,13 +80,13 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (searchTask != null && searchTask.getStatus() == AsyncTask.Status.RUNNING) {
-            searchTask.cancel(true);
+        if (mSearchTask != null && mSearchTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mSearchTask.cancel(true);
         }
     }
     
     @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
+    public boolean onKeyUp(final int keyCode, @NotNull final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
             this.onSearchClicked();
             return true;
@@ -96,7 +97,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     private void initActionBar() {
         final View actionBarCustom = this.getLayoutInflater().inflate(R.layout.activity_search_actionbar, null);
         final TextView path = (TextView) actionBarCustom.findViewById(android.R.id.text1);
-        path.setText(this.path);
+        path.setText(this.mPath);
 
         final ActionBar bar = this.getActionBar();
         bar.setDisplayOptions(
@@ -106,7 +107,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
                 ActionBar.DISPLAY_USE_LOGO);
         bar.setCustomView(actionBarCustom);
 
-        this.actionModeController = new ActionModeController(this);
+        mActionModeController = new ActionModeController(this);
     }
     
     private void initView() {
@@ -135,12 +136,12 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
         if (text.isEmpty()) {
             return;
         }
-        if (searchTask != null && searchTask.getStatus() == AsyncTask.Status.RUNNING) {
-            searchTask.cancel(true);
+        if (mSearchTask != null && mSearchTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mSearchTask.cancel(true);
         }
         this.buildSearchTask();
-        adapter.updateData(new GenericFile[0]);
-        searchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text, path);
+        mAdapter.updateData(new GenericFile[0]);
+        mSearchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text, mPath);
     }
     
     void onPreExecute() {
@@ -149,8 +150,8 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     
     void onPostExecute() {
         this.mProgress.setVisibility(View.INVISIBLE);
-        if (this.searchTask instanceof SearchCommandLineTask) {
-            final List<String> denied = ((SearchCommandLineTask) this.searchTask).getDeniedLocations();
+        if (this.mSearchTask instanceof SearchCommandLineTask) {
+            final List<String> denied = ((SearchCommandLineTask) this.mSearchTask).getDeniedLocations();
             if (!denied.isEmpty()) {
                 final AlertDialog.Builder b = new AlertDialog.Builder(this);
                 final StringBuilder message = new StringBuilder(getString(R.string.search_denied_message));
@@ -173,13 +174,13 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     }
     
     void onProgressUpdate(GenericFile file) {
-        adapter.addFile(file);
+        mAdapter.addFile(file);
     }
     
     private void initList() {
-        if (this.list != null) {
-            this.list.getEmptyView().setVisibility(View.GONE);
-            this.list.setVisibility(View.GONE);
+        if (this.mList != null) {
+            this.mList.getEmptyView().setVisibility(View.GONE);
+            this.mList.setVisibility(View.GONE);
         }
         
         if (Settings.appearance == Settings.APPEARANCE_LIST) {
@@ -187,26 +188,26 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.list = (AbsListView) vs;
-            this.adapter = new BrowserListAdapter(this);
+            this.mList = (AbsListView) vs;
+            this.mAdapter = new BrowserListAdapter(this);
         } else {
             View vs = findViewById(R.id.grid);
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.list = (AbsListView) vs;
-            this.adapter = new BrowserGridAdapter(this);
+            this.mList = (AbsListView) vs;
+            this.mAdapter = new BrowserGridAdapter(this);
         }
         
-        this.list.setId(this.getNewId());
-        this.list.setEmptyView(findViewById(android.R.id.empty));
-        this.list.setAdapter(this.adapter);
-        this.list.getEmptyView().setVisibility(View.GONE);
-        this.list.setVisibility(View.GONE);
+        this.mList.setId(this.getNewId());
+        this.mList.setEmptyView(findViewById(android.R.id.empty));
+        this.mList.setAdapter(this.mAdapter);
+        this.mList.getEmptyView().setVisibility(View.GONE);
+        this.mList.setVisibility(View.GONE);
 
-        this.actionModeController.setListView(this.list);
+        this.mActionModeController.setListView(this.mList);
 
-        this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        this.mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
                 final GenericFile target = (GenericFile) (av.getItemAtPosition(pos));
@@ -216,17 +217,17 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     }
     
     private int getNewId() {
-        this.prevId++;
-        while (findViewById(this.prevId) != null){  
-              this.prevId++;
+        this.mPrevId++;
+        while (findViewById(this.mPrevId) != null){
+              this.mPrevId++;
         }  
-        return this.prevId;  
+        return this.mPrevId;
     }
     
     
     private void buildSearchTask() {
         if (Settings.useCommandLine) {
-            searchTask = new SearchCommandLineTask() {
+            mSearchTask = new SearchCommandLineTask() {
                 @Override
                 protected void onPreExecute() {
                     SearchActivity.this.onPreExecute();
@@ -248,7 +249,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
                 }
             };
         } else {
-            searchTask = new SearchJavaTask() {
+            mSearchTask = new SearchJavaTask() {
                 @Override
                 protected void onPreExecute() {
                     SearchActivity.this.onPreExecute();

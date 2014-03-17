@@ -24,7 +24,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 public final class Settings {
     
@@ -97,19 +96,5 @@ public final class Settings {
         final Editor e = p.edit();
         e.putStringSet(KEY_BOOKMARKS, bookmarks);
         e.apply();
-    }
-    
-    public static void addBookmark(Context context, String path) {
-        final Set<String> bookmarks = getBookmarks(context);
-        if (bookmarks.contains(path)) {
-            Toast.makeText(context, R.string.bookmark_exists, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!bookmarks.add(path)) {
-            Toast.makeText(context, R.string.bookmark_not_added, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        saveBookmarks(context, bookmarks);
-        Toast.makeText(context, R.string.bookmark_added, Toast.LENGTH_SHORT).show();
     }
 }

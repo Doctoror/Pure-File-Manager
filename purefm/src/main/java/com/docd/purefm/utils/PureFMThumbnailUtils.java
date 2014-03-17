@@ -42,7 +42,7 @@ public final class PureFMThumbnailUtils extends ThumbnailUtils {
             Collections.synchronizedSet(new HashSet<SoftReference<Bitmap>>());
 
     public static void addToReusableCache(final Bitmap value) {
-        sReusableBitmaps.add(new SoftReference<Bitmap>(value));
+        sReusableBitmaps.add(new SoftReference<>(value));
     }
 
     public static Bitmap createPictureThumbnail(final File target, final int w) {

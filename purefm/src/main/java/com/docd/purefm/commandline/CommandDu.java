@@ -17,7 +17,6 @@ package com.docd.purefm.commandline;
 import com.docd.purefm.file.GenericFile;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

@@ -20,15 +20,12 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.RenameFileTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;

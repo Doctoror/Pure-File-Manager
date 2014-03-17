@@ -29,7 +29,7 @@ public final class PureFMTextUtilsTest extends AndroidTestCase {
 
     @Override
     protected void runTest() throws Throwable {
-        runTest();
+        super.runTest();
         PureFMTextUtils.init(getContext());
         testStringMonthToInt();
     }

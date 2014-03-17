@@ -18,6 +18,7 @@ import android.util.Log;
 
 import com.docd.purefm.file.GenericFile;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -30,25 +31,25 @@ public final class ClipBoard {
     /**
      * Files in clip board
      */
-    private static GenericFile[] clipBoard;
+    private static GenericFile[] sClipBoard;
     
     /**
      * True if move, false if cutCopy
      */
-    private static boolean isMove;
+    private static boolean sIsMove;
 
     /**
      * If true, clipBoard can't be modified
      */
-    private static volatile boolean isLocked;
+    private static volatile boolean sIsLocked;
     
     private ClipBoard() {}
     
-    public static synchronized boolean cutCopy(GenericFile[] files) {
+    public static synchronized boolean cutCopy(@NotNull final GenericFile[] files) {
         synchronized (LOCK) {
-            if (!isLocked) {
-                isMove = false;
-                clipBoard = files;
+            if (!sIsLocked) {
+                sIsMove = false;
+                sClipBoard = files;
                 return true;
             } else {
                 Log.w("ClipBoard", "Trying to cutCopy but clipboard is locked");
@@ -57,11 +58,11 @@ public final class ClipBoard {
         }
     }
     
-    public static synchronized boolean cutMove(GenericFile[] files) {
+    public static synchronized boolean cutMove(@NotNull final GenericFile[] files) {
         synchronized (LOCK) {
-            if (!isLocked) {
-                isMove = true;
-                clipBoard = files;
+            if (!sIsLocked) {
+                sIsMove = true;
+                sClipBoard = files;
                 return true;
             } else {
                 Log.w("ClipBoard", "Trying to cutMove clipboard is locked");
@@ -72,40 +73,40 @@ public final class ClipBoard {
 
     public static void lock() {
         synchronized (LOCK) {
-            isLocked = true;
+            sIsLocked = true;
         }
     }
 
     public static void unlock() {
         synchronized (LOCK) {
-            isLocked = false;
+            sIsLocked = false;
         }
     }
 
     @Nullable
     public static GenericFile[] getClipBoardContents() {
         synchronized (LOCK) {
-            return clipBoard;
+            return sClipBoard;
         }
     }
     
     public static boolean isEmpty() {
         synchronized (LOCK) {
-            return clipBoard == null;
+            return sClipBoard == null;
         }
     }
     
     public static boolean isMove() {
         synchronized (LOCK) {
-            return isMove;
+            return sIsMove;
         }
     }
     
     public static boolean clear() {
         synchronized (LOCK) {
-            if (!isLocked) {
-                clipBoard = null;
-                isMove = false;
+            if (!sIsLocked) {
+                sClipBoard = null;
+                sIsMove = false;
                 return true;
             } else {
                 Log.w("ClipBoard", "Trying to clear, but ClipBoard is locked");

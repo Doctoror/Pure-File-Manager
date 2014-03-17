@@ -23,6 +23,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -34,16 +36,19 @@ public class EdgeLimitedMarqueeTextView extends TextView {
 
     private EdgeLimitedMarquee mMarquee;
 
+    @SuppressWarnings("unused")
     public EdgeLimitedMarqueeTextView(Context context) {
         super(context);
         this.init();
     }
 
+    @SuppressWarnings("unused")
     public EdgeLimitedMarqueeTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.init();
     }
 
+    @SuppressWarnings("unused")
     public EdgeLimitedMarqueeTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.init();
@@ -97,7 +102,7 @@ public class EdgeLimitedMarqueeTextView extends TextView {
     }
 
     @Override
-    protected void onDraw(final Canvas canvas) {
+    protected void onDraw(@NotNull final Canvas canvas) {
         super.onDraw(canvas);
         this.mMarquee.sendEmptyMessageDelayed(EdgeLimitedMarquee.MESSAGE_TICK,
                 EdgeLimitedMarquee.MARQUEE_RESOLUTION);

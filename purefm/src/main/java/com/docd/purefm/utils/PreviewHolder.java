@@ -58,7 +58,7 @@ public final class PreviewHolder {
      * @param context Application's Context
      */
     public static void initialize(Context context) {
-        sPreviews = new ReusableBitmapLruCache<File>();
+        sPreviews = new ReusableBitmapLruCache<>();
         sWidth = (int) context.getResources().getDimension(R.dimen.preview_width);
         sPackageManager = context.getPackageManager();
         sIsInitialized = true;

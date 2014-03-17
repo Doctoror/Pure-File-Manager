@@ -22,31 +22,35 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class FileExistsDialog extends Dialog {
     
-    public FileExistsDialog(Context context, String source, String target,
-            final View.OnClickListener abortAction,
-            final View.OnClickListener skipAction,
-            final View.OnClickListener skipAllAction,
-            final View.OnClickListener replaceAction,
-            final View.OnClickListener replaceAllAction) {
+    public FileExistsDialog(
+            @NotNull final Context context,
+            @NotNull final String source,
+            @NotNull final String target,
+            @NotNull final View.OnClickListener abortAction,
+            @NotNull final View.OnClickListener skipAction,
+            @NotNull final View.OnClickListener skipAllAction,
+            @NotNull final View.OnClickListener replaceAction,
+            @NotNull final View.OnClickListener replaceAllAction) {
         super(context);
         
         this.setTitle(R.string.dialog_overwrite_title);
         this.setContentView(R.layout.dialog_exists);
         
-        this.initView(context, source, target, abortAction, skipAction, skipAllAction, replaceAction, replaceAllAction);
+        this.initView(source, target, abortAction, skipAction, skipAllAction, replaceAction, replaceAllAction);
     }
     
     private void initView(
-            final Context context,
-            final String sourcePath,
-            final String targetPath,
-            final View.OnClickListener abortAction,
-            final View.OnClickListener skipAction,
-            final View.OnClickListener skipAllAction,
-            final View.OnClickListener replaceAction,
-            final View.OnClickListener replaceAllAction) {
+            @NotNull final String sourcePath,
+            @NotNull final String targetPath,
+            @NotNull final View.OnClickListener abortAction,
+            @NotNull final View.OnClickListener skipAction,
+            @NotNull final View.OnClickListener skipAllAction,
+            @NotNull final View.OnClickListener replaceAction,
+            @NotNull final View.OnClickListener replaceAllAction) {
         
         final TextView source = (TextView) this.findViewById(android.R.id.text1);
         source.setText(sourcePath);
@@ -86,7 +90,7 @@ public final class FileExistsDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 dismiss();
-                skipAllAction.onClick(v);
+                abortAction.onClick(v);
             }
         });
         this.setOnCancelListener(new DialogInterface.OnCancelListener() {

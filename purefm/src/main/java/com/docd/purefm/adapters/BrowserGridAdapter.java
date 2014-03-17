@@ -24,13 +24,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Browser adapter for GridView
  * @author Doctoror
  */
 public final class BrowserGridAdapter extends BrowserBaseAdapter {
 
-    public BrowserGridAdapter(Activity context) {
+    public BrowserGridAdapter(@NotNull final Activity context) {
         super(context);
     }
 
@@ -47,31 +49,32 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
         if (v == null) {
             v = this.mLayoutInflater.inflate(R.layout.grid_item_file, null);
             h = new Holder();
-            h.icon = (OverlayImageView) v.findViewById(android.R.id.icon);
-            h.title = (TextView) v.findViewById(android.R.id.title);
+            h.mIcon = (OverlayImageView) v.findViewById(android.R.id.icon);
+            h.mTitle = (TextView) v.findViewById(android.R.id.title);
             v.setTag(h);
         } else {
             h = (Holder) v.getTag();
         }
         
         final GenericFile f = this.getItem(pos);
-        h.icon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder : R.drawable.ic_fso_default);
-        this.applyOverlay(f, h.icon);
+        h.mIcon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder :
+                R.drawable.ic_fso_default);
+        this.applyOverlay(f, h.mIcon);
         
         if (Settings.showPreviews) {
-            loadPreview(f, h.icon);
+            loadPreview(f, h.mIcon);
         }
-        h.title.setText(f.getName());
+        h.mTitle.setText(f.getName());
         
         return v;
     }
     
     private static final class Holder {
         
-        private Holder() {}
+        Holder() {}
         
-        private OverlayImageView icon;
-        private TextView title;
+        OverlayImageView mIcon;
+        TextView mTitle;
     }
 
 }

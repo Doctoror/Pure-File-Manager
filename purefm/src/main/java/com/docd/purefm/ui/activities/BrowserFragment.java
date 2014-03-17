@@ -300,7 +300,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
             mAdapter = new BrowserGridAdapter(this.getActivity());
         }
 
-        menuController.setAdapter(this.mAdapter);
+        menuController.setBrowserAdapter(this.mAdapter);
 
         mListView.setId(this.getNewId(parent));
         mListView.setEmptyView(parent.findViewById(android.R.id.empty));

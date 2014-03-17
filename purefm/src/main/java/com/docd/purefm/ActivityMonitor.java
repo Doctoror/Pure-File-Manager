@@ -18,15 +18,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+
+import org.jetbrains.annotations.NotNull;
 
 public final class ActivityMonitor
 {
     private static final long DELAY_CLOSED = 300;
     
-    private static Handler sHandler;
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     private static volatile int sCreated;
     private static volatile int sStarted;
     
@@ -41,29 +43,21 @@ public final class ActivityMonitor
     private static Set<OnActivitiesOpenedListener> sListeners;
     
     static {
-        sListeners = new HashSet<OnActivitiesOpenedListener>();
+        sListeners = new HashSet<>();
     }
     
-    public static void addOnActivitiesOpenedListener(OnActivitiesOpenedListener l) {
-        if (l == null) {
-            throw new IllegalArgumentException("listener can't be null");
-        }
+    public static void addOnActivitiesOpenedListener(
+            @NotNull final OnActivitiesOpenedListener l) {
         synchronized (LISTENERS_LOCK) {
             sListeners.add(l);
         }
     }
     
-    public static void removeOnActivitiesOpenedListener(OnActivitiesOpenedListener l) {
-        if (l == null) {
-            throw new IllegalArgumentException("listener can't be null");
-        }
+    public static void removeOnActivitiesOpenedListener(
+            @NotNull final OnActivitiesOpenedListener l) {
         synchronized (LISTENERS_LOCK) {
             sListeners.remove(l);
         }
-    }
-    
-    public static void init(final Context context) {
-        sHandler = new Handler(context.getMainLooper());
     }
     
     private static final Runnable sOnActivitiesStoppedRunnable = new Runnable() {
@@ -95,10 +89,7 @@ public final class ActivityMonitor
     };
     
     public static synchronized void onStart(Activity a) {
-        if (sHandler == null) {
-            throw new IllegalStateException("ActivityMonitor was not initialized");
-        }
-        sHandler.removeCallbacks(sOnActivitiesStoppedRunnable);
+        HANDLER.removeCallbacks(sOnActivitiesStoppedRunnable);
         sStarted++;
         if (sStarted == 1) {
             synchronized (LISTENERS_LOCK) {
@@ -113,24 +104,18 @@ public final class ActivityMonitor
     }
     
     public static synchronized void onStop(Activity a) {
-        if (sHandler == null) {
-            throw new IllegalStateException("ActivityMonitor was not initialized");
-        }
-        sHandler.removeCallbacks(sOnActivitiesStoppedRunnable);
+        HANDLER.removeCallbacks(sOnActivitiesStoppedRunnable);
         sStarted--;
         if (sStarted < 0) {
             throw new IllegalStateException("Number of opened activities is less than zero. Check whether you call ActivityMonitor.onStart in all activities");
         }
         if (sStarted == 0) {
-            sHandler.postDelayed(sOnActivitiesStoppedRunnable, DELAY_CLOSED);
+            HANDLER.postDelayed(sOnActivitiesStoppedRunnable, DELAY_CLOSED);
         }
     }
 
     public static synchronized void onCreate(Activity a) {
-        if (sHandler == null) {
-            throw new IllegalStateException("ActivityMonitor was not initialized");
-        }
-        sHandler.removeCallbacks(sOnActivitiesDestroyedRunnable);
+        HANDLER.removeCallbacks(sOnActivitiesDestroyedRunnable);
         sCreated++;
         if (sCreated == 1) {
             synchronized (LISTENERS_LOCK) {
@@ -145,16 +130,13 @@ public final class ActivityMonitor
     }
 
     public static synchronized void onDestroy(Activity a) {
-        if (sHandler == null) {
-            throw new IllegalStateException("ActivityMonitor was not initialized");
-        }
-        sHandler.removeCallbacks(sOnActivitiesDestroyedRunnable);
+        HANDLER.removeCallbacks(sOnActivitiesDestroyedRunnable);
         sCreated--;
         if (sCreated < 0) {
             throw new IllegalStateException("Number of created activities is less than zero. Check whether you call ActivityMonitor.onCreate in all activities");
         }
         if (sCreated == 0) {
-            sHandler.postDelayed(sOnActivitiesDestroyedRunnable, DELAY_CLOSED);
+            HANDLER.postDelayed(sOnActivitiesDestroyedRunnable, DELAY_CLOSED);
         }
     }
 }

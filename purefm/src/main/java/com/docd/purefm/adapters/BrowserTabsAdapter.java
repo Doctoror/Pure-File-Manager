@@ -41,7 +41,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
     /**
      * Currently displayed Fragment reference array
      */
-    private final BrowserFragment[] tabs;
+    private final BrowserFragment[] mTabs;
 
     /**
      * Manually saved state to restore
@@ -53,9 +53,9 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
      */
     private ViewPager mPager;
         
-    public BrowserTabsAdapter(final FragmentManager fm) {
+    public BrowserTabsAdapter(@NotNull final FragmentManager fm) {
         super(fm);
-        this.tabs = new BrowserFragment[2];
+        this.mTabs = new BrowserFragment[2];
     }
 
     /**
@@ -68,7 +68,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
     @Override
     public BrowserFragment getItem(final int position) {
         final BrowserFragment f = new BrowserFragment();
-        this.tabs[position] = f;
+        this.mTabs[position] = f;
         if (position == 1 && mToRestore != null) {
             doRestoreManualState(mToRestore);
         }
@@ -89,7 +89,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
      */
     @Override
     public int getCount() {
-        return tabs.length;
+        return mTabs.length;
     }
     
     /**
@@ -108,16 +108,16 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
      */
     public Parcelable saveManualState() {
         final BrowserTabsAdapterState state = new BrowserTabsAdapterState();
-        for (int i = 0; i < tabs.length; i++) {
-            final BrowserFragment tab = tabs[i];
+        for (int i = 0; i < mTabs.length; i++) {
+            final BrowserFragment tab = mTabs[i];
             if (tab != null) {
                 final Bundle tabState = new Bundle();
                 tab.saveManualState(tabState);
-                state.fragmentStates.put(STATE_FRAGMENT_PREFIX + i, tabState);
+                state.mFragmentStates.put(STATE_FRAGMENT_PREFIX + i, tabState);
             }
         }
         if (mPager != null) {
-            state.currentPage = mPager.getCurrentItem();
+            state.mCurrentPage = mPager.getCurrentItem();
         }
         return state;
     }
@@ -130,15 +130,15 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
     private void doRestoreManualState(final Parcelable state) {
         mToRestore = null;
         final BrowserTabsAdapterState savedState = (BrowserTabsAdapterState) state;
-        for (int i = 0; i < tabs.length; i++) {
-            final BrowserFragment tab = tabs[i];
+        for (int i = 0; i < mTabs.length; i++) {
+            final BrowserFragment tab = mTabs[i];
             if (tab != null) {
-                final Bundle tabState = savedState.fragmentStates.get(STATE_FRAGMENT_PREFIX + i);
+                final Bundle tabState = savedState.mFragmentStates.get(STATE_FRAGMENT_PREFIX + i);
                 tab.restoreManualState(tabState);
             }
         }
-        if (mPager != null && savedState.currentPage < getCount()) {
-            mPager.setCurrentItem(savedState.currentPage);
+        if (mPager != null && savedState.mCurrentPage < getCount()) {
+            mPager.setCurrentItem(savedState.mCurrentPage);
         }
     }
 
@@ -149,7 +149,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
      */
     public void restoreManualState(final Parcelable state) {
         int initedFragments = 0;
-        for (final Object tab : tabs) {
+        for (final Object tab : mTabs) {
             if (tab != null) {
                 initedFragments++;
             }
@@ -165,16 +165,16 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
      * Represents manual saved state
      */
     private static final class BrowserTabsAdapterState implements Parcelable {
-        private final HashMap<String, Bundle> fragmentStates;
-        private int currentPage;
+        private final HashMap<String, Bundle> mFragmentStates;
+        private int mCurrentPage;
 
         BrowserTabsAdapterState() {
-            this.fragmentStates = new HashMap<String, Bundle>();
+            this.mFragmentStates = new HashMap<>();
         }
 
-        private BrowserTabsAdapterState(final Parcel source) {
-            this.fragmentStates = source.readHashMap(HashMap.class.getClassLoader());
-            this.currentPage = source.readInt();
+        BrowserTabsAdapterState(final Parcel source) {
+            this.mFragmentStates = source.readHashMap(HashMap.class.getClassLoader());
+            this.mCurrentPage = source.readInt();
         }
 
         /**
@@ -190,8 +190,8 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
          */
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeMap(this.fragmentStates);
-            dest.writeInt(this.currentPage);
+            dest.writeMap(this.mFragmentStates);
+            dest.writeInt(this.mCurrentPage);
         }
 
         public static final Creator<BrowserTabsAdapterState> CREATOR = new Creator<BrowserTabsAdapterState>() {
@@ -202,7 +202,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
             }
 
             @Override
-            public BrowserTabsAdapterState[] newArray(int size) {
+            public BrowserTabsAdapterState[] newArray(final int size) {
                 return new BrowserTabsAdapterState[size];
             }
         };

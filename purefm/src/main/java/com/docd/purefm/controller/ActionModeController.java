@@ -22,7 +22,6 @@ import java.util.Locale;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.v4.app.FragmentActivity;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;

@@ -28,10 +28,8 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -121,12 +119,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     protected final LayoutInflater mLayoutInflater;
 
-    protected BrowserBaseAdapter(final Activity context) {
+    protected BrowserBaseAdapter(@NotNull final Activity context) {
         if (mDrawableLruCache == null) {
-            mDrawableLruCache = new DrawableLruCache<Integer>();
+            mDrawableLruCache = new DrawableLruCache<>();
         }
         if (mMimeTypeIconCache == null) {
-            mMimeTypeIconCache = new DrawableLruCache<String>();
+            mMimeTypeIconCache = new DrawableLruCache<>();
         }
 
         this.mResources = context.getResources();
@@ -135,8 +133,8 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.mDataSetObservable = new DataSetObservable();
         this.mObserverCache = FileObserverCache.getInstance();
         this.mLayoutInflater = context.getLayoutInflater();
-        this.mContent = new ArrayList<GenericFile>();
-        this.mFileObservers = new ArrayList<MultiListenerFileObserver>();
+        this.mContent = new ArrayList<>();
+        this.mFileObservers = new ArrayList<>();
         this.mComparator = FileSortType.NAME_ASC;
     }
 
@@ -470,26 +468,6 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             mDrawableLruCache.put(resId, drawable);
         }
         return drawable;
-    }
-
-    private static final class FileObserverEventRunnable implements Runnable {
-        private final WeakReference<BrowserBaseAdapter> adapter;
-        private final int event;
-        private final String path;
-
-        private FileObserverEventRunnable(final BrowserBaseAdapter adapter, final int event, final String path) {
-            this.adapter = new WeakReference<BrowserBaseAdapter>(adapter);
-            this.event = event;
-            this.path = path;
-        }
-
-        @Override
-        public void run() {
-            final BrowserBaseAdapter localAdapter = this.adapter.get();
-            if (localAdapter != null) {
-                localAdapter.onEventUIThread(this.event, this.path);
-            }
-        }
     }
 
     /**

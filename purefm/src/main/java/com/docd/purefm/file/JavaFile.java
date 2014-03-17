@@ -241,7 +241,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
             return null;
         }
         
-        final List<JavaFile> res = new LinkedList<JavaFile>();
+        final List<JavaFile> res = new LinkedList<>();
         for (final File file : files) {
             final JavaFile f = new JavaFile(file);
             if (filter.accept(f)) {

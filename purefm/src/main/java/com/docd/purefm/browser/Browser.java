@@ -75,7 +75,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         mContext = activity;
         mHistoryEnabled = historyEnabled;
         mObserverCache = FileObserverCache.getInstance();
-        mHistory = new ArrayDeque<String>(historyEnabled ? 15 : 0);
+        mHistory = new ArrayDeque<>(historyEnabled ? 15 : 0);
         final String home = Settings.getHomeDirectory(activity);
         final String state = Environment.getExternalStorageState();
         if (home != null) {
@@ -161,7 +161,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             mCurrentPathObserver.addOnEventListener(this);
             mCurrentPathObserver.startWatching();
         } else {
-            mHistory.remove(requested);
+            mHistory.remove(requested.getAbsolutePath());
             final GenericFile parent = resolveExistingParent(requested);
             navigate(parent, true);
         }
@@ -190,7 +190,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             return file;
         }
         while (!parent.exists() || !parent.isDirectory()) {
-            mHistory.remove(parent);
+            mHistory.remove(parent.getAbsolutePath());
             final GenericFile previousParent = parent;
             parent = parent.getParentFile();
             if (parent == null) {
@@ -278,7 +278,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         final String mCurrentPath;
         final String mPreviousPath;
 
-        SavedState(@NotNull ArrayDeque<String> history,
+        SavedState(@NotNull final ArrayDeque<String> history,
                    @Nullable final String currentPath,
                    @Nullable final String previousPath) {
             this.mHistory = history;
@@ -320,38 +320,38 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
 
     private static final class InvalidateRunnable implements Runnable {
-        private final WeakReference<Browser> browser;
+        private final WeakReference<Browser> mBrowserReference;
         InvalidateRunnable(final Browser browser) {
-            this.browser = new WeakReference<Browser>(browser);
+            this.mBrowserReference = new WeakReference<>(browser);
         }
 
         @Override
         public void run() {
-            final Browser browser1 = this.browser.get();
-            if (browser1 != null) {
-                browser1.invalidate();
+            final Browser browser = this.mBrowserReference.get();
+            if (browser != null) {
+                browser.invalidate();
             }
         }
     }
 
     private static final class NavigateRunnable implements Runnable {
-        private final WeakReference<Browser> browser;
-        private final GenericFile target;
-        private final boolean addToHistory;
+        private final WeakReference<Browser> mBrowserReference;
+        private final GenericFile mTarget;
+        private final boolean mAddToHistory;
 
         NavigateRunnable(final Browser browser,
                          final GenericFile target,
                          final boolean addToHistory) {
-            this.browser = new WeakReference<Browser>(browser);
-            this.target = target;
-            this.addToHistory = addToHistory;
+            this.mBrowserReference = new WeakReference<>(browser);
+            this.mTarget = target;
+            this.mAddToHistory = addToHistory;
         }
 
         @Override
         public void run() {
-            final Browser browser1 = this.browser.get();
-            if (browser1 != null) {
-                browser1.navigate(this.target, this.addToHistory);
+            final Browser browser = this.mBrowserReference.get();
+            if (browser != null) {
+                browser.navigate(this.mTarget, this.mAddToHistory);
             }
         }
     }

@@ -31,7 +31,6 @@ public final class PureFM extends Application implements ActivityMonitor.OnActiv
         super.onCreate();
         RootTools.handlerEnabled = false;
         RootTools.debugMode = BuildConfig.DEBUG;
-        ActivityMonitor.init(this);
         Environment.init(this);
         Settings.init(this, this.getResources());
         PreviewHolder.initialize(this);

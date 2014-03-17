@@ -24,20 +24,24 @@ import android.util.AttributeSet;
  */
 public final class SquareOverlayImageView extends OverlayImageView {
 
+    @SuppressWarnings("unused")
     public SquareOverlayImageView(Context context) {
         super(context);
     }
 
+    @SuppressWarnings("unused")
     public SquareOverlayImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    @SuppressWarnings("unused")
     public SquareOverlayImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
     
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        //noinspection SuspiciousNameCombination
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
     }
 

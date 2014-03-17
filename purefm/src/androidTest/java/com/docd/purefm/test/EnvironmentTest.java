@@ -16,7 +16,6 @@ package com.docd.purefm.test;
 
 import android.test.AndroidTestCase;
 
-import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.Environment;
 import com.docd.purefm.utils.StorageHelper;
 
@@ -32,7 +31,6 @@ public final class EnvironmentTest extends AndroidTestCase {
     @Override
     protected void runTest() throws Throwable {
         super.runTest();
-        ActivityMonitor.init(getContext());
         Environment.init(getContext());
         assertEquals(android.os.Environment.getRootDirectory(),
                 Environment.androidRootDirectory);

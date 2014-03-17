@@ -56,7 +56,7 @@ public final class JavaFileTest extends AndroidTestCase {
         try {
             FileUtils.forceDelete(testDir);
         } catch (IOException e) {
-
+            //ignored
         }
         assertTrue(testDir.mkdirs());
 

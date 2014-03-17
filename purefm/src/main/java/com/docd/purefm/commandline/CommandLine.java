@@ -35,7 +35,7 @@ public final class CommandLine {
 
     @Nullable
     public static synchronized List<String> executeForResult(final Shell shell, final Command command) {
-        final List<String> result = new LinkedList<String>();
+        final List<String> result = new LinkedList<>();
         final ExecutionStatus status = new ExecutionStatus();
         command.setCommandListener(new Command.CommandListener() {
             @Override

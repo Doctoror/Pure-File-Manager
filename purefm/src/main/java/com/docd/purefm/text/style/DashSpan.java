@@ -23,10 +23,10 @@ public final class DashSpan implements LeadingMarginSpan {
     
     private static final String SPAN = "- ";
     
-    private int margin;
+    private int mMargin;
 
     public DashSpan() {
-        this.margin = -1;
+        this.mMargin = -1;
     }
     
     @Override
@@ -35,8 +35,8 @@ public final class DashSpan implements LeadingMarginSpan {
             boolean first, Layout layout)
     {
         if (first) {
-            if (this.margin == -1) {
-                this.margin = (int) p.measureText(SPAN);
+            if (mMargin == -1) {
+                mMargin = (int) p.measureText(SPAN);
             }
             c.drawText(SPAN, x + dir, baseline, p);
         }
@@ -45,6 +45,6 @@ public final class DashSpan implements LeadingMarginSpan {
     @Override
     public int getLeadingMargin(boolean first)
     {
-        return margin;
+        return mMargin;
     }
 }

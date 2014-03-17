@@ -18,8 +18,6 @@ import java.io.File;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.file.FileFactory;
-import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.CreateDirectoryTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PureFMFileUtils;

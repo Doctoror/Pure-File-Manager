@@ -29,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigInteger;
 
 /**
@@ -41,11 +43,11 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
     private final LongSparseArray<String> mHumanReadableLastModified;
     private final LongSparseArray<String> mHumanReadableLength;
     
-    public BrowserListAdapter(Activity context) {
+    public BrowserListAdapter(@NotNull final Activity context) {
         super(context);
         mTypefaceMonospace = Typeface.createFromAsset(context.getAssets(), "DroidSansMono.ttf");
-        mHumanReadableLastModified = new LongSparseArray<String>();
-        mHumanReadableLength = new LongSparseArray<String>();
+        mHumanReadableLastModified = new LongSparseArray<>();
+        mHumanReadableLength = new LongSparseArray<>();
     }
 
     @Override
@@ -62,28 +64,28 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             v = this.mLayoutInflater
                     .inflate(R.layout.list_item_file, null);
             h = new Holder();
-            h.icon = (OverlayImageView) v.findViewById(android.R.id.icon);
-            h.title = (TextView) v.findViewById(android.R.id.title);
-            h.date = (TextView) v.findViewById(android.R.id.text1);
-            h.perm = (TextView) v.findViewById(android.R.id.text2);
-            h.size = (TextView) v.findViewById(R.id.size);
+            h.mIcon = (OverlayImageView) v.findViewById(android.R.id.icon);
+            h.mTitle = (TextView) v.findViewById(android.R.id.title);
+            h.mDate = (TextView) v.findViewById(android.R.id.text1);
+            h.mPerm = (TextView) v.findViewById(android.R.id.text2);
+            h.mSize = (TextView) v.findViewById(R.id.size);
 
-            h.date.setTypeface(this.mTypefaceMonospace);
-            h.perm.setTypeface(this.mTypefaceMonospace);
-            h.size.setTypeface(this.mTypefaceMonospace);
+            h.mDate.setTypeface(this.mTypefaceMonospace);
+            h.mPerm.setTypeface(this.mTypefaceMonospace);
+            h.mSize.setTypeface(this.mTypefaceMonospace);
             v.setTag(h);
         } else {
             h = (Holder) v.getTag();
         }
         
         final GenericFile f = this.getItem(pos);
-        this.setIcon(f, h.icon);
-        this.applyOverlay(f, h.icon);
+        this.setIcon(f, h.mIcon);
+        this.applyOverlay(f, h.mIcon);
 
         if (Settings.showPreviews) {
-            loadPreview(f, h.icon);
+            loadPreview(f, h.mIcon);
         }
-        h.title.setText(f.getName());
+        h.mTitle.setText(f.getName());
 
         if (Settings.showLastModified) {
             final long lastModified = f.lastModified();
@@ -94,9 +96,9 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
                         f instanceof CommandLineFile);
                 mHumanReadableLastModified.put(lastModified, humanReadableLastModified);
             }
-            h.date.setText(humanReadableLastModified);
+            h.mDate.setText(humanReadableLastModified);
         } else {
-            h.date.setText("");
+            h.mDate.setText("");
         }
 
         if (Settings.showSize && !f.isDirectory()) {
@@ -106,29 +108,29 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
                 humanReadableFileSize = PureFMFileUtils.byteCountToDisplaySize(BigInteger.valueOf(fileSize));
                 mHumanReadableLength.put(fileSize, humanReadableFileSize);
             }
-            h.size.setText(humanReadableFileSize);
+            h.mSize.setText(humanReadableFileSize);
         } else {
-            h.size.setText("");
+            h.mSize.setText("");
         }
 
         if (Settings.showPermissions) {
-            h.perm.setText(f.getPermissions().toString());
+            h.mPerm.setText(f.getPermissions().toString());
         } else {
-            h.perm.setText("");
+            h.mPerm.setText("");
         }
 
         return v;
     }
     
-    protected static final class Holder {
+    private static final class Holder {
         
-        private Holder() {}
+        Holder() {}
         
-        protected OverlayImageView icon;
-        protected TextView title;
-        protected TextView size;
-        protected TextView date;
-        protected TextView perm;
+        OverlayImageView mIcon;
+        TextView mTitle;
+        TextView mSize;
+        TextView mDate;
+        TextView mPerm;
         
     }
 

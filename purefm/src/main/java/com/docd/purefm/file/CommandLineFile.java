@@ -132,12 +132,12 @@ public final class CommandLineFile implements GenericFile,
         }
 
         String name = attrs[LS_FILE];
-        String canonicalPath;
+        //String canonicalPath;
         // if is symlink then resolve real path
         //String targetName = null;
         final int index = name.indexOf("->");
         if (index != -1) {
-            canonicalPath = name.substring(index + 3).trim();
+            //canonicalPath = name.substring(index + 3).trim();
             name = name.substring(0, index).trim();
         }
         final CommandLineFile f = parent == null ? new CommandLineFile(name)
@@ -309,7 +309,7 @@ public final class CommandLineFile implements GenericFile,
         if (result == null) {
             return null;
         }
-        final List<CommandLineFile> res = new ArrayList<CommandLineFile>(
+        final List<CommandLineFile> res = new ArrayList<>(
                 result.size());
         for (final String f : result) {
             try {
@@ -338,7 +338,7 @@ public final class CommandLineFile implements GenericFile,
         if (result == null) {
             return null;
         }
-        final List<CommandLineFile> res = new ArrayList<CommandLineFile>(
+        final List<CommandLineFile> res = new ArrayList<>(
                 result.size());
         for (String f : result) {
             try {
@@ -369,7 +369,7 @@ public final class CommandLineFile implements GenericFile,
         if (result == null) {
             return null;
         }
-        final List<CommandLineFile> res = new ArrayList<CommandLineFile>(
+        final List<CommandLineFile> res = new ArrayList<>(
                 result.size());
         for (String f : result) {
             try {
@@ -400,7 +400,7 @@ public final class CommandLineFile implements GenericFile,
         if (result == null) {
             return null;
         }
-        final List<CommandLineFile> res = new ArrayList<CommandLineFile>(
+        final List<CommandLineFile> res = new ArrayList<>(
                 result.size());
         for (String f : result) {
             try {

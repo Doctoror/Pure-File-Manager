@@ -35,7 +35,7 @@ public final class MultiListenerFileObserver extends FileObserver {
     public MultiListenerFileObserver(String path, int mask) {
         super(path, mask);
         this.path = path;
-        this.listeners = new HashSet<OnEventListener>();
+        this.listeners = new HashSet<>();
     }
 
     public void addOnEventListener(final OnEventListener listener) {

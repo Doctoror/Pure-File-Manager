@@ -35,7 +35,7 @@ public final class FileObserverCache {
     private final Map<String, WeakReference<MultiListenerFileObserver>> cache;
 
     private FileObserverCache() {
-        this.cache = new HashMap<String, WeakReference<MultiListenerFileObserver>>();
+        this.cache = new HashMap<>();
     }
 
     public void clear() {
@@ -50,7 +50,7 @@ public final class FileObserverCache {
             return observer;
         } else {
             observer = new MultiListenerFileObserver(path, events);
-            this.cache.put(path, new WeakReference<MultiListenerFileObserver>(observer));
+            this.cache.put(path, new WeakReference<>(observer));
         }
         return observer;
     }

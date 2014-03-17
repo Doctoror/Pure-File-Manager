@@ -32,6 +32,9 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.view.MenuItem;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Controls Browser menu
  *
@@ -39,95 +42,96 @@ import android.view.MenuItem;
  */
 public final class MenuController {
 
-    private final AbstractBrowserActivity activity;
-    private final Browser browser;
+    private final AbstractBrowserActivity mActivity;
+    private final Browser mBrowser;
 
-    private BrowserBaseAdapter adapter;
+    private BrowserBaseAdapter mBrowserAdapter;
 
-    public MenuController(AbstractBrowserActivity activity, Browser browser) {
-        this.activity = activity;
-        this.browser = browser;
+    public MenuController(@NotNull final AbstractBrowserActivity activity,
+                          @NotNull final Browser browser) {
+        this.mActivity = activity;
+        this.mBrowser = browser;
     }
 
-    public void setAdapter(BrowserBaseAdapter adapter) {
-        this.adapter = adapter;
+    public void setBrowserAdapter(@Nullable final BrowserBaseAdapter mBrowserAdapter) {
+        this.mBrowserAdapter = mBrowserAdapter;
     }
 
     public boolean onMenuItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.browser.up();
+                this.mBrowser.up();
                 return true;
 
             case android.R.id.paste:
-                final PasteTaskExecutor ptc = new PasteTaskExecutor(activity, browser.getCurrentPath());
+                final PasteTaskExecutor ptc = new PasteTaskExecutor(mActivity, mBrowser.getCurrentPath());
                 ptc.start();
                 return true;
 
             case android.R.id.content:
                 if (Settings.appearance == Settings.APPEARANCE_LIST) {
-                    Settings.saveAppearance(activity, Settings.APPEARANCE_GRID);
+                    Settings.saveAppearance(mActivity, Settings.APPEARANCE_GRID);
                 } else {
-                    Settings.saveAppearance(activity, Settings.APPEARANCE_LIST);
+                    Settings.saveAppearance(mActivity, Settings.APPEARANCE_LIST);
                 }
-                activity.invalidateList();
+                mActivity.invalidateList();
                 return true;
 
             case R.id.menu_search:
-                final Intent searchIntent = new Intent(activity, SearchActivity.class);
-                searchIntent.putExtra(Extras.EXTRA_PATH, browser.getCurrentPath().getAbsolutePath());
-                activity.startActivity(searchIntent);
+                final Intent searchIntent = new Intent(mActivity, SearchActivity.class);
+                searchIntent.putExtra(Extras.EXTRA_PATH, mBrowser.getCurrentPath().getAbsolutePath());
+                mActivity.startActivity(searchIntent);
                 return true;
 
             case R.id.menu_settings:
-                activity.startActivityForResult(new Intent(activity, SettingsActivity.class), AbstractBrowserActivity.REQUEST_CODE_SETTINGS);
+                mActivity.startActivityForResult(new Intent(mActivity, SettingsActivity.class), AbstractBrowserActivity.REQUEST_CODE_SETTINGS);
                 return true;
 
             case R.id.menu_folder_new:
-                final DialogFragment cd = CreateDirectoryDialog.instantiate(browser.getCurrentPath().toFile());
-                cd.show(activity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+                final DialogFragment cd = CreateDirectoryDialog.instantiate(mBrowser.getCurrentPath().toFile());
+                cd.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
                 return true;
 
             case R.id.menu_file_new:
-                final DialogFragment cf = CreateFileDialog.instantiate(browser.getCurrentPath().toFile());
-                cf.show(activity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+                final DialogFragment cf = CreateFileDialog.instantiate(mBrowser.getCurrentPath().toFile());
+                cf.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
                 return true;
 
             case R.id.menu_partition:
-                final DialogFragment pid = PartitionInfoDialog.instantiate(browser.getCurrentPath());
-                pid.show(activity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+                final DialogFragment pid = PartitionInfoDialog.instantiate(mBrowser.getCurrentPath());
+                pid.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
                 return true;
 
             case R.id.menu_sort_name_asc:
-                adapter.setCompareType(FileSortType.NAME_ASC);
+                mBrowserAdapter.setCompareType(FileSortType.NAME_ASC);
                 return true;
 
             case R.id.menu_sort_name_desc:
-                adapter.setCompareType(FileSortType.NAME_DESC);
+                mBrowserAdapter.setCompareType(FileSortType.NAME_DESC);
                 return true;
 
             case R.id.menu_sort_type_asc:
-                adapter.setCompareType(FileSortType.TYPE_ASC);
+                mBrowserAdapter.setCompareType(FileSortType.TYPE_ASC);
                 return true;
 
             case R.id.menu_sort_type_desc:
-                adapter.setCompareType(FileSortType.TYPE_DESC);
+                mBrowserAdapter.setCompareType(FileSortType.TYPE_DESC);
                 return true;
 
             case R.id.menu_sort_date_asc:
-                adapter.setCompareType(FileSortType.DATE_ASC);
+                mBrowserAdapter.setCompareType(FileSortType.DATE_ASC);
                 return true;
 
             case R.id.menu_sort_date_desc:
-                adapter.setCompareType(FileSortType.DATE_DESC);
+                mBrowserAdapter.setCompareType(FileSortType.DATE_DESC);
                 return true;
 
             case R.id.menu_sort_size_asc:
-                adapter.setCompareType(FileSortType.SIZE_ASC);
+                mBrowserAdapter.setCompareType(FileSortType.SIZE_ASC);
                 return true;
 
             case R.id.menu_sort_size_desc:
-                adapter.setCompareType(FileSortType.SIZE_DESC);
+                mBrowserAdapter.setCompareType(FileSortType.SIZE_DESC);
                 return true;
 
             default:

@@ -71,7 +71,7 @@ public final class Permissions implements Serializable {
         this.ow = ow;
         this.ox = ox;
         
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(ur ? 'r' : '-');
         sb.append(uw ? 'w' : '-');
         sb.append(ux ? 'x' : '-');

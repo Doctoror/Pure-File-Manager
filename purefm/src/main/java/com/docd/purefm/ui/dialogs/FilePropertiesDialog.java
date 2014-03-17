@@ -346,7 +346,7 @@ public final class FilePropertiesDialog extends DialogFragment {
             private final WeakReference<FilePermissionsPagerItem> mItemRef;
 
             LoadFsTask(@NotNull final FilePermissionsPagerItem item) {
-                this.mItemRef = new WeakReference<FilePermissionsPagerItem>(item);
+                this.mItemRef = new WeakReference<>(item);
             }
 
             @Override
@@ -359,7 +359,8 @@ public final class FilePropertiesDialog extends DialogFragment {
                 final FilePermissionsPagerItem item = mItemRef.get();
                 if (item != null) {
                     if (fsType == null || fsType.equals("vfat") || fsType.equals("fuse")
-                            || fsType.equals("ntfs") || fsType.equals("msdos")) {
+                            || fsType.equals("ntfs") || fsType.equals("msdos") ||
+                                    fsType.equals("sdcardfs")) {
                         item.disableBoxes();
                     }
                     item.mView.findViewById(android.R.id.progress).setVisibility(View.GONE);
