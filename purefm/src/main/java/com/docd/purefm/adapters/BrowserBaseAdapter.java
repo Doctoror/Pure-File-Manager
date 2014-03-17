@@ -69,7 +69,6 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             FileObserver.CREATE |
             FileObserver.DELETE_SELF |
             FileObserver.ATTRIB |
-            FileObserver.MODIFY |
             FileObserver.MOVED_TO;
 
     /**
@@ -301,14 +300,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     @Override
     public void onEvent(final int event, final String path) {
-        //mHandler.removeCallbacksAndMessages(null);
         final Bundle data = new Bundle();
         data.putInt(FileObserverEventHandler.DATA_OBSERVER_EVENT, event);
         data.putString(FileObserverEventHandler.DATA_OBSERVER_PATH, path);
         final Message message = mHandler.obtainMessage(FileObserverEventHandler.MESSAGE_OBSERVER_EVENT);
         message.setData(data);
         mHandler.sendMessage(message);
-        //mHandler.post(new FileObserverEventRunnable(this, event, path));
     }
 
     /**
@@ -319,9 +316,6 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      *             of the file or directory which triggered the event
      */
     synchronized void onEventUIThread(final int event, final String path) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            throw new RuntimeException("");
-        }
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.ATTRIB:
             case FileObserver.MODIFY:
