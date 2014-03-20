@@ -39,7 +39,7 @@
     <!-- Rename -->
     <string name="rename">Rename</string>
     <string name="new_name">New Name</string>
-    <string name="rename_failed">Failed to rename &#8216;%1$s&#8217; to &#8216;%2$s&#8217;</string>
+    <string name="rename_failed">Failed to rename “%1$s” to “%2$s”</string>
 
     <string name="no_apps_to_open">No applications installed to open this file</string>
     <string name="could_not_open_file_">Could open this file:u0020</string>
@@ -102,7 +102,6 @@
     <string name="cancel">Cancel</string>
     
     <!-- New Bookmark -->
-    <string name="bookmark_added">The bookmark was added</string>
     <string name="bookmark_exists">The bookmark already exists</string>
     <string name="bookmark_not_added">Could not add bookmark</string>
     
@@ -144,7 +143,7 @@
     <string name="dialog_move_failed">Failed to move the following files</string>
     <string name="dialog_delete_failed">Failed to delete the following files</string>
 
-    <string name="canceling_suffix">\u0020(canceling&#8230;)</string>
+    <string name="canceling_suffix">\u0020(canceling…)</string>
 
     <!-- Delete -->
     <string name="dialog_delete_title">The following files will be deleted:</string>

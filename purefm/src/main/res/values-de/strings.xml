@@ -36,7 +36,7 @@
     <!-- Rename -->
     <string name="rename">Umbenennen</string>
     <string name="new_name">Neuer Name</string>
-    <string name="rename_failed">Fehler beim umbennenen &#8216;%1$s&#8217; zu &#8216;%2$s&#8217;</string>
+    <string name="rename_failed">Fehler beim umbenennen „%1$s“ zu „%2$s“</string>
     
     <string name="no_apps_to_open">Keine App zum öffnen dieser Datei vorhanden</string>
     <string name="could_not_open_file_">Datei konnte nicht geöffnet werden:u0020</string>
@@ -99,7 +99,6 @@
     <string name="cancel">Abbrechen</string>
     
     <!-- New Bookmark -->
-    <string name="bookmark_added">Lesezeichen hinzugfügt</string>
     <string name="bookmark_exists">Lesezeichen existiert bereits</string>
     <string name="bookmark_not_added">Lesezeichen konnte nicht hinzugefügt werden</string>
     
@@ -141,7 +140,7 @@
     <string name="dialog_delete_failed">Fehler beim Löschen folgender Dateien</string>
 
     <!-- TODO translate to German -->
-    <string name="canceling_suffix">\u0020(canceling&#8230;)</string>
+    <string name="canceling_suffix">\u0020(canceling…)</string>
 
     <!-- Delete -->
     <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>
