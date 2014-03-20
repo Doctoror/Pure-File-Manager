@@ -183,6 +183,12 @@ public final class BrowserFragment extends UserVisibleHintFragment
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdapter.dropCaches();
+    }
+
+    @Override
     public void onCreate(Bundle state) {
         setRetainInstance(true);
         setHasOptionsMenu(true);

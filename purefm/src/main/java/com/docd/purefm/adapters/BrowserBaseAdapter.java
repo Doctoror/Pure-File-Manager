@@ -72,12 +72,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     /**
      * Cache that holds file icons
      */
-    private static DrawableLruCache<Integer> mDrawableLruCache;
+    private static DrawableLruCache<Integer> sDrawableLruCache;
 
     /**
      * Cache that holds file icons
      */
-    private static DrawableLruCache<String> mMimeTypeIconCache;
+    private static DrawableLruCache<String> sMimeTypeIconCache;
 
     private final Handler mHandler;
 
@@ -120,11 +120,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     protected final LayoutInflater mLayoutInflater;
 
     protected BrowserBaseAdapter(@NotNull final Activity context) {
-        if (mDrawableLruCache == null) {
-            mDrawableLruCache = new DrawableLruCache<>();
+        if (sDrawableLruCache == null) {
+            sDrawableLruCache = new DrawableLruCache<>();
         }
-        if (mMimeTypeIconCache == null) {
-            mMimeTypeIconCache = new DrawableLruCache<>();
+        if (sMimeTypeIconCache == null) {
+            sMimeTypeIconCache = new DrawableLruCache<>();
         }
 
         this.mResources = context.getResources();
@@ -136,6 +136,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         this.mContent = new ArrayList<>();
         this.mFileObservers = new ArrayList<>();
         this.mComparator = FileSortType.NAME_ASC;
+    }
+
+    public void dropCaches() {
+        sDrawableLruCache.evictAll();
+        sMimeTypeIconCache.evictAll();
     }
 
     /**
@@ -393,12 +398,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             icon.setImageDrawable(getDrawableForRes(mResources, R.drawable.ic_fso_folder));
         } else {
             final String fileExt = FilenameUtils.getExtension(file.getName());
-            Drawable mimeIcon = mMimeTypeIconCache.get(fileExt);
+            Drawable mimeIcon = sMimeTypeIconCache.get(fileExt);
             if (mimeIcon == null) {
                 final int mimeIconId = MimeTypes.getIconForExt(fileExt);
                 if (mimeIconId != 0) {
                     mimeIcon = mResources.getDrawable(mimeIconId);
-                    mMimeTypeIconCache.put(fileExt, mimeIcon);
+                    sMimeTypeIconCache.put(fileExt, mimeIcon);
                 }
             }
             if (mimeIcon != null) {
@@ -407,10 +412,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
                 final Permissions p = file.getPermissions();
                 if (!file.isSymlink() && (p.gx || p.ux || p.ox)) {
                     final int executableIcon = R.drawable.ic_fso_type_executable;
-                    Drawable iconDrawable = mDrawableLruCache.get(executableIcon);
+                    Drawable iconDrawable = sDrawableLruCache.get(executableIcon);
                     if (iconDrawable == null) {
                         iconDrawable = mResources.getDrawable(executableIcon);
-                        mDrawableLruCache.put(executableIcon, iconDrawable);
+                        sDrawableLruCache.put(executableIcon, iconDrawable);
                     }
                     icon.setImageDrawable(iconDrawable);
                 } else {
@@ -444,10 +449,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     @NotNull
     private static Drawable getDrawableForRes(final Resources.Theme theme, final int attrId) {
-        Drawable drawable = mDrawableLruCache.get(attrId);
+        Drawable drawable = sDrawableLruCache.get(attrId);
         if (drawable == null) {
             drawable = ThemeUtils.getDrawable(theme, attrId);
-            mDrawableLruCache.put(attrId, drawable);
+            sDrawableLruCache.put(attrId, drawable);
         }
         return drawable;
     }
@@ -462,10 +467,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     @NotNull
     private static Drawable getDrawableForRes(final Resources res, final int resId) {
-        Drawable drawable = mDrawableLruCache.get(resId);
+        Drawable drawable = sDrawableLruCache.get(resId);
         if (drawable == null) {
             drawable = res.getDrawable(resId);
-            mDrawableLruCache.put(resId, drawable);
+            sDrawableLruCache.put(resId, drawable);
         }
         return drawable;
     }

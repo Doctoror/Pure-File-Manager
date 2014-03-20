@@ -98,7 +98,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             }
             h.mDate.setText(humanReadableLastModified);
         } else {
-            h.mDate.setText("");
+            h.mDate.setText(null);
         }
 
         if (Settings.showSize && !f.isDirectory()) {
@@ -110,13 +110,13 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             }
             h.mSize.setText(humanReadableFileSize);
         } else {
-            h.mSize.setText("");
+            h.mSize.setText(null);
         }
 
         if (Settings.showPermissions) {
             h.mPerm.setText(f.getPermissions().toString());
         } else {
-            h.mPerm.setText("");
+            h.mPerm.setText(null);
         }
 
         return v;
