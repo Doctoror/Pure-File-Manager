@@ -17,11 +17,11 @@ package com.docd.purefm.ui.dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.docd.purefm.R;
@@ -39,16 +39,14 @@ public final class ProgressAlertDialogBuilder {
      * Creates a non-cancelable {@link AlertDialog} with progress bar and Cancel button
      *
      * @param context Current Context
-     * @param autoDismiss if false, the dialog will not be dismissed on Cancel button press
      * @param messageResId Message text res id
      * @param cancelListener Cancel button listener
      * @return non-cancelable {@link AlertDialog} with progress bar and Cancel button
      */
     public static Dialog create(@NotNull final Context context,
-                                final boolean autoDismiss,
                                 final int messageResId,
-                                @Nullable final DialogInterface.OnClickListener cancelListener) {
-        return create(context, autoDismiss, messageResId <= 0 ? null :
+                                @Nullable final View.OnClickListener cancelListener) {
+        return create(context, messageResId <= 0 ? null :
                 context.getText(messageResId),cancelListener);
     }
 
@@ -56,50 +54,82 @@ public final class ProgressAlertDialogBuilder {
      * Creates a non-cancelable {@link AlertDialog} with progress bar and Cancel button
      *
      * @param context Current Context
-     * @param autoDismiss if false, the dialog will not be dismissed on Cancel button press
-                          and R.string.canceling_suffix will be appended to the dialog message
      * @param message Message text
      * @param cancelListener Cancel button listener
      * @return non-cancelable {@link AlertDialog} with progress bar and Cancel button
      */
     public static Dialog create(@NotNull final Context context,
-                                final boolean autoDismiss,
                                 @Nullable final CharSequence message,
-                                @Nullable final DialogInterface.OnClickListener cancelListener) {
-        final AlertDialog.Builder b = new AlertDialog.Builder(context);
-        b.setCancelable(false);
-        final View view = LayoutInflater.from(context).inflate(R.layout.dialog_progress, null);
-        if (message != null) {
-            final TextView messageView = (TextView) view.findViewById(android.R.id.message);
-            messageView.setText(message);
-            messageView.setVisibility(View.VISIBLE);
-        }
-        b.setView(view);
-        b.setNegativeButton(android.R.string.cancel, null);
-        final Dialog d = b.create();
-        d.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(final DialogInterface dialog) {
-                final AlertDialog alertDialog = (AlertDialog) dialog;
-                final Button cancel = alertDialog.getButton(
-                        DialogInterface.BUTTON_NEGATIVE);
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        cancelListener.onClick(dialog, 0);
-                        if (autoDismiss) {
-                            dialog.dismiss();
-                        } else {
-                            final TextView textView = (TextView) alertDialog
-                                    .findViewById(android.R.id.message);
-                            textView.setText(TextUtils.concat(textView.getText(),
-                                    v.getResources().getText(R.string.canceling_suffix)));
-                        }
-                    }
-                });
-            }
-        });
-        return d;
+                                @Nullable final View.OnClickListener cancelListener) {
+        final CancelableProgressDialog dialog = new CancelableProgressDialog(context);
+        dialog.setMessage(message);
+        dialog.setCancelButton(android.R.string.cancel, cancelListener);
+        return dialog;
     }
 
+    private static final class CancelableProgressDialog extends Dialog
+            implements View.OnClickListener {
+
+        private boolean mClickPressed;
+        private CharSequence mMessage;
+
+        private int mCancelTextId = -1;
+        private View.OnClickListener mCancelListener;
+
+
+        CancelableProgressDialog(final Context context) {
+            super(context, false, null);
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+
+        @Override
+        protected void onCreate(final Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(LayoutInflater.from(getContext()).inflate(
+                    R.layout.dialog_progress, null));
+            final TextView messageView = (TextView) findViewById(android.R.id.message);
+            messageView.setText(mMessage);
+            messageView.setVisibility(mMessage == null ? View.GONE : View.VISIBLE);
+
+            final TextView button = (TextView) findViewById(R.id.button);
+            button.setOnClickListener(this);
+            if (mCancelTextId != -1) {
+                button.setText(mCancelTextId);
+            }
+        }
+
+        public void setMessage(@Nullable final CharSequence message) {
+            final TextView messageView = (TextView) findViewById(android.R.id.message);
+            if (messageView != null) {
+                messageView.setText(message);
+                messageView.setVisibility(message == null ? View.GONE : View.VISIBLE);
+            } else {
+                mMessage = message;
+            }
+        }
+
+        public void setCancelButton(final int text, @Nullable final View.OnClickListener l) {
+            mCancelListener = l;
+
+            final TextView button = (TextView) findViewById(R.id.button);
+            if (button != null) {
+                button.setText(text);
+            } else {
+                mCancelTextId = text;
+            }
+        }
+
+        @Override
+        public void onClick(final View v) {
+            if (!mClickPressed) {
+                final TextView textView = (TextView) findViewById(android.R.id.message);
+                textView.setText(TextUtils.concat(textView.getText(),
+                        v.getResources().getText(R.string.canceling_suffix)));
+            }
+            mClickPressed = true;
+            if (mCancelListener != null) {
+                mCancelListener.onClick(v);
+            }
+        }
+    }
 }

@@ -1,4 +1,3 @@
 Check for free space before file copy
 Add large folder icons for GridView
-MediaStoreUtils should have different move and copy methods and copying without MediaScanner
 Apply refreshing in places where FileObserver can't work

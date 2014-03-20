@@ -78,8 +78,6 @@ public final class OperationsService extends MultiWorkerService
     private DeleteOperation mDeleteOperation;
 
     private final Object mOperationListenerLock = new Object();
-    private final Object mPasteOperationLock = new Object();
-    private final Object mDeleteOperationLock = new Object();
 
     private Handler mHandler;
     private OnOperationStartedRunnable mPendingOperationStartedRunnable;
@@ -167,11 +165,6 @@ public final class OperationsService extends MultiWorkerService
         return intent;
     }
 
-    public OperationsService() {
-        //super("OperationsService");
-        //setIntentRedelivery(false);
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -225,7 +218,7 @@ public final class OperationsService extends MultiWorkerService
         }
     }
 
-    // only one paste at a time can be done so it's synchronized
+    // only one paste operation simultaneously
     private synchronized void onActionPaste(@NotNull final Intent pasteIntent) {
         final GenericFile target = (GenericFile) pasteIntent.getSerializableExtra(EXTRA_FILE);
         if (target == null) {
@@ -245,6 +238,7 @@ public final class OperationsService extends MultiWorkerService
                 mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
                         mOperationListener, getOperationMessage(EOperation.PASTE),
                                 getCancelPasteIntent(getApplicationContext()));
+                mHandler.removeCallbacks(mPendingOperationEndedRunnable);
                 mHandler.post(mPendingOperationStartedRunnable);
             }
         }
@@ -253,6 +247,7 @@ public final class OperationsService extends MultiWorkerService
                 mPasteOperation.isCanceled());
     }
 
+    //only one deletion operation can be done simultaneously
     private synchronized void onActionDelete(@NotNull final Intent deleteIntent) {
         final Object[] filesObject = (Object[]) deleteIntent.getSerializableExtra(EXTRA_FILES);
         if (filesObject == null) {
@@ -267,6 +262,7 @@ public final class OperationsService extends MultiWorkerService
                 mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
                         mOperationListener, getOperationMessage(EOperation.DELETE),
                                 getCancelDeleteIntent(getApplicationContext()));
+                mHandler.removeCallbacks(mPendingOperationEndedRunnable);
                 mHandler.post(mPendingOperationStartedRunnable);
             }
         }

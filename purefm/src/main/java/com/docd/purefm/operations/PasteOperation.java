@@ -47,9 +47,9 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
     private final GenericFile mTarget;
     private final boolean mIsMove;
 
-    public PasteOperation(@NotNull final Context context,
-                          @NotNull final GenericFile target,
-                          final boolean isMove) {
+    PasteOperation(@NotNull final Context context,
+                   @NotNull final GenericFile target,
+                   final boolean isMove) {
         mContext = context;
         mTarget = target;
         mIsMove = isMove;
