@@ -17,7 +17,6 @@ package com.docd.purefm.controller;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -190,9 +189,8 @@ public final class ActionModeController {
                     ClipBoard.cutMove(files);
                     Toast.makeText(
                             mActivity,
-                            String.format(Locale.getDefault(), res.getQuantityString(
-                                            R.plurals.cut_n_files_to_clipboard, index + 1),
-                                                    index + 1),
+                            res.getQuantityString(
+                                    R.plurals.cut_n_files_to_clipboard, index + 1, index + 1),
                              Toast.LENGTH_SHORT
                             ).show();
                     mode.finish();
@@ -212,9 +210,8 @@ public final class ActionModeController {
                     ClipBoard.cutCopy(files2);
                     Toast.makeText(
                             mActivity,
-                            String.format(Locale.getDefault(), res.getQuantityString(
-                                   R.plurals.copied_n_files_to_clipboard, index1 + 1),
-                                            index1 + 1),
+                            res.getQuantityString(R.plurals.copied_n_files_to_clipboard, index1 + 1,
+                                    index1 + 1),
                             Toast.LENGTH_SHORT
                     ).show();
                     mode.finish();

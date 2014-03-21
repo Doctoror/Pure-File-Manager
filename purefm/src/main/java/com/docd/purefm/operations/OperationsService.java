@@ -41,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Locale;
 
 /**
  * IntentService that performs file operations
@@ -428,8 +427,8 @@ public final class OperationsService extends MultiWorkerService
                 if (files != null) {
                     final int textResId = ClipBoard.isMove() ? R.plurals.progress_moving_n_files :
                             R.plurals.progress_copying_n_files;
-                    return String.format(Locale.getDefault(), getResources().getQuantityString(
-                            textResId, files.length), files.length);
+                    return getResources().getQuantityString(
+                            textResId, files.length, files.length);
                 }
                 break;
 
