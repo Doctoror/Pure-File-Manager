@@ -14,20 +14,20 @@
 <!--limitations under the License.-->
 <resources>
 
-    <attr name="action_copy" format="reference" />
-    <attr name="action_cut"  format="reference" />
-    <attr name="action_edit" format="reference" />
-    <attr name="action_file_new" format="reference" />
-    <attr name="action_folder_new" format="reference" />
-    <attr name="action_info" format="reference" />
-    <attr name="action_paste" format="reference" />
-    <attr name="action_remove" format="reference" />
-    <attr name="action_search" format="reference" />
-    <attr name="action_settings" format="reference" />
-    <attr name="action_share" format="reference" />
-    <attr name="action_sort" format="reference" />
-    <attr name="action_view_as_grid" format="reference" />
-    <attr name="action_view_as_list" format="reference" />
+    <attr name="ic_menu_copy" format="reference" />
+    <attr name="ic_menu_cut"  format="reference" />
+    <attr name="ic_menu_edit" format="reference" />
+    <attr name="ic_menu_file_new" format="reference" />
+    <attr name="ic_menu_folder_new" format="reference" />
+    <attr name="ic_menu_info" format="reference" />
+    <attr name="ic_menu_paste" format="reference" />
+    <attr name="ic_menu_remove" format="reference" />
+    <attr name="ic_menu_search" format="reference" />
+    <attr name="ic_menu_settings" format="reference" />
+    <attr name="ic_menu_share" format="reference" />
+    <attr name="ic_menu_sort" format="reference" />
+    <attr name="ic_menu_view_as_grid" format="reference" />
+    <attr name="ic_menu_view_as_list" format="reference" />
 
     <attr name="ic_bookmark" format="reference" />
     <attr name="ic_drawer" format="reference" />

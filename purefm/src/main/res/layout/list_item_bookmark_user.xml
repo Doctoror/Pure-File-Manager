@@ -67,7 +67,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/remove"
-        android:src="?attr/action_remove"
+        android:src="?attr/ic_menu_remove"
         android:padding="5dp"
         style="?android:attr/actionButtonStyle" />
 

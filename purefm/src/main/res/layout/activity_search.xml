@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@android:id/progress"
         android:layout_alignParentRight="true"
-        android:src="?attr/action_search"
+        android:src="?attr/ic_menu_search"
         android:contentDescription="@string/menu_search"
         style="?android:attr/actionButtonStyle" />
     

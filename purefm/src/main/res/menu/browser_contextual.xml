@@ -16,37 +16,37 @@
 
     <item
         android:id="@android:id/copy"
-        android:icon="?attr/action_copy"
+        android:icon="?attr/ic_menu_copy"
         android:title="@string/menu_copy"
         android:showAsAction="ifRoom"/>
     
     <item
         android:id="@android:id/cut"
-        android:icon="?attr/action_cut"
+        android:icon="?attr/ic_menu_cut"
         android:title="@string/menu_cut"
         android:showAsAction="ifRoom"/>
 
     <item
         android:id="@android:id/edit"
-        android:icon="?attr/action_edit"
+        android:icon="?attr/ic_menu_edit"
         android:title="@string/menu_rename"
         android:showAsAction="ifRoom"/>
     
     <item
         android:id="@+id/menu_delete"
-        android:icon="?attr/action_remove"
+        android:icon="?attr/ic_menu_remove"
         android:title="@string/menu_delete"
         android:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/menu_share"
-        android:icon="?attr/action_share"
+        android:icon="?attr/ic_menu_share"
         android:title="@string/menu_share"
         android:showAsAction="ifRoom"/>
     
     <item
         android:id="@+id/properties"
-        android:icon="?attr/action_info"
+        android:icon="?attr/ic_menu_info"
         android:title="@string/menu_properties"
         android:showAsAction="ifRoom"/>
     

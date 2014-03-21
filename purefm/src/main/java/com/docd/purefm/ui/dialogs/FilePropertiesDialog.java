@@ -78,7 +78,7 @@ public final class FilePropertiesDialog extends DialogFragment {
         final Activity activity = getActivity();
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         mAdapter = new PropertiesAdapter(activity, file);
-        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.action_info));
+        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.ic_menu_info));
         builder.setTitle(file.getName());
         builder.setNeutralButton(R.string.close, null);
         builder.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {

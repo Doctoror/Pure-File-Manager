@@ -62,7 +62,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         final Activity activity = this.getActivity();
         mView = activity.getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.action_info));
+        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.ic_menu_info));
         builder.setTitle(R.string.menu_partition);
         builder.setView(mView);
         builder.setNeutralButton(R.string.close, null);
