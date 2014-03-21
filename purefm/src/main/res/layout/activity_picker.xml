@@ -53,7 +53,7 @@
                 android:layout_marginBottom="@dimen/action_bar_icon_vertical_padding"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
-                android:src="@drawable/app_icon"
+                android:src="@drawable/ic_launcher"
                 tools:ignore="contentDescription"/>
 
         </LinearLayout>

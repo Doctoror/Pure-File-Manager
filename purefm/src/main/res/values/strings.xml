@@ -106,7 +106,7 @@
     <string name="bookmark_not_added">Could not add bookmark</string>
     
     <!-- Progress -->
-    <string name="progress_deleting_files">Deleting file(s)</string>
+    <string name="progress_deleting_files">Deleting files…</string>
 
     <plurals name="progress_moving_n_files">
         <item quantity="one">Moving %1$d file</item>

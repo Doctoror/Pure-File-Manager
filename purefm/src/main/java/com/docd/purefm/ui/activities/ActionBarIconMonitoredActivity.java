@@ -63,9 +63,9 @@ public abstract class ActionBarIconMonitoredActivity extends MonitoredActivity {
      */
     protected final void invalidateActionBarIcon() {
         if (Settings.su) {
-            setActionBarIcon(getResources().getDrawable(R.drawable.icon_root));
+            setActionBarIcon(getResources().getDrawable(R.drawable.ic_root));
         } else if (Settings.useCommandLine) {
-            setActionBarIcon(getResources().getDrawable(R.drawable.icon_shell));
+            setActionBarIcon(getResources().getDrawable(R.drawable.ic_shell));
         } else {
             setActionBarIcon(mDefaultIcon);
         }

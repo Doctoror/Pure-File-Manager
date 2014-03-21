@@ -403,7 +403,8 @@ public final class OperationsService extends MultiWorkerService
         final Notification.Builder b = new Notification.Builder(context);
         b.setContentTitle(getText(R.string.app_name));
         b.setOngoing(true);
-        b.setSmallIcon(R.drawable.app_icon);
+        b.setProgress(0, 0, true);
+        b.setSmallIcon(R.drawable.ic_stat_notify);
         b.setContentText(getOperationMessage(opeartion));
         b.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(
                 context, BrowserPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));

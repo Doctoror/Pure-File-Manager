@@ -103,7 +103,7 @@
     <string name="bookmark_not_added">Lesezeichen konnte nicht hinzugefügt werden</string>
     
     <!-- Progress -->
-    <string name="progress_deleting_files">Lösche Datei(en)</string>
+    <string name="progress_deleting_files">Lösche Dateien…</string>
 
     <plurals name="progress_moving_n_files">
         <item quantity="one">Verschiebe %1$d Datei</item>
