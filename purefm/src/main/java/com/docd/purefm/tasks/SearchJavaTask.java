@@ -14,16 +14,16 @@
  */
 package com.docd.purefm.tasks;
 
-import android.os.AsyncTask;
-
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
-import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
-public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
+final class SearchJavaTask extends AbstractSearchTask {
 
     @Override
     protected Void doInBackground(String... params) {
@@ -51,5 +51,11 @@ public class SearchJavaTask extends AsyncTask<String, GenericFile, Void> {
             }
         }
     }
-    
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> getDeniedLocations() {
+        return Collections.EMPTY_LIST;
+    }
 }

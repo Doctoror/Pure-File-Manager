@@ -24,8 +24,7 @@ import com.docd.purefm.adapters.BrowserListAdapter;
 import com.docd.purefm.controller.ActionModeController;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.tasks.SearchCommandLineTask;
-import com.docd.purefm.tasks.SearchJavaTask;
+import com.docd.purefm.tasks.AbstractSearchTask;
 import com.docd.purefm.utils.PFMFileUtils;
 
 import android.app.ActionBar;
@@ -48,7 +47,8 @@ import org.jetbrains.annotations.NotNull;
  * Activity used for Searching files.
  * @author Doctoror
  */
-public final class SearchActivity extends ActionBarIconMonitoredActivity {
+public final class SearchActivity extends ActionBarIconMonitoredActivity
+        implements AbstractSearchTask.SearchTaskListener {
 
     private ActionModeController mActionModeController;
 
@@ -58,7 +58,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
     private TextView mInput;
     private View mProgress;
     
-    private AsyncTask<String, GenericFile, Void> mSearchTask;
+    private AbstractSearchTask mSearchTask;
     private String mPath;
     
     private int mPrevId;
@@ -139,19 +139,30 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
         if (mSearchTask != null && mSearchTask.getStatus() == AsyncTask.Status.RUNNING) {
             mSearchTask.cancel(true);
         }
-        this.buildSearchTask();
         mAdapter.updateData(new GenericFile[0]);
+        mSearchTask = AbstractSearchTask.create(this);
         mSearchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text, mPath);
     }
-    
-    void onPreExecute() {
-        this.mProgress.setVisibility(View.VISIBLE);
+
+    @Override
+    public void onPreExecute(@NotNull AbstractSearchTask task) {
+        mProgress.setVisibility(View.VISIBLE);
     }
-    
-    void onPostExecute() {
-        this.mProgress.setVisibility(View.INVISIBLE);
-        if (this.mSearchTask instanceof SearchCommandLineTask) {
-            final List<String> denied = ((SearchCommandLineTask) this.mSearchTask).getDeniedLocations();
+
+    @Override
+    public void onProgressUpdate(@NotNull AbstractSearchTask task, GenericFile... files) {
+        mAdapter.addFiles(files);
+    }
+
+    @Override
+    public void onCancelled(@NotNull AbstractSearchTask task) {
+        onPostExecute(task);
+    }
+
+    @Override
+    public void onPostExecute(@NotNull AbstractSearchTask task) {
+        mProgress.setVisibility(View.INVISIBLE);
+            final List<String> denied = mSearchTask.getDeniedLocations();
             if (!denied.isEmpty()) {
                 final AlertDialog.Builder b = new AlertDialog.Builder(this);
                 final StringBuilder message = new StringBuilder(getString(R.string.search_denied_message));
@@ -170,11 +181,6 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
                     dialog.show();
                 }
             }
-        }
-    }
-    
-    void onProgressUpdate(GenericFile file) {
-        mAdapter.addFile(file);
     }
     
     private void initList() {
@@ -222,54 +228,5 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
               this.mPrevId++;
         }  
         return this.mPrevId;
-    }
-    
-    
-    private void buildSearchTask() {
-        if (Settings.useCommandLine) {
-            mSearchTask = new SearchCommandLineTask() {
-                @Override
-                protected void onPreExecute() {
-                    SearchActivity.this.onPreExecute();
-                }
-                
-                @Override
-                protected void onPostExecute(Void result) {
-                    SearchActivity.this.onPostExecute();
-                }
-                
-                @Override
-                protected void onCancelled(Void result) {
-                    SearchActivity.this.onPostExecute();
-                }
-                
-                @Override
-                protected void onProgressUpdate(GenericFile... files) {
-                    SearchActivity.this.onProgressUpdate(files[0]);
-                }
-            };
-        } else {
-            mSearchTask = new SearchJavaTask() {
-                @Override
-                protected void onPreExecute() {
-                    SearchActivity.this.onPreExecute();
-                }
-                
-                @Override
-                protected void onPostExecute(Void result) {
-                    SearchActivity.this.onPostExecute();
-                }
-                
-                @Override
-                protected void onCancelled(Void result) {
-                    SearchActivity.this.onPostExecute();
-                }
-                
-                @Override
-                protected void onProgressUpdate(GenericFile... files) {
-                    SearchActivity.this.onProgressUpdate(files[0]);
-                }
-            };
-        }
     }
 }

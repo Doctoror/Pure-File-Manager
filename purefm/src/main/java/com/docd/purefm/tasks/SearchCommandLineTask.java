@@ -14,7 +14,6 @@
  */
 package com.docd.purefm.tasks;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -28,19 +27,25 @@ import java.util.regex.Pattern;
 
 import com.docd.purefm.commandline.CommandLineUtils;
 import com.docd.purefm.file.CommandLineFile;
-import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
+import com.stericson.RootTools.execution.Shell;
 
-public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> {
+import org.jetbrains.annotations.NotNull;
+
+final class SearchCommandLineTask extends AbstractSearchTask {
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
-    
+
+    private final Shell mShell;
     private final List<String> mDenied;
 
-    public SearchCommandLineTask() {
+    public SearchCommandLineTask(@NotNull final Shell shell) {
+        this.mShell = shell;
         this.mDenied = new ArrayList<>();
     }
-    
+
+    @Override
+    @NotNull
     public List<String> getDeniedLocations() {
         return this.mDenied;
     }
@@ -61,6 +66,7 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
         BufferedReader err = null;
         Process process = null;
         try {
+            //TODO use mShell instead
             process = Runtime.getRuntime().exec(Settings.su ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             is = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -75,7 +81,7 @@ public class SearchCommandLineTask extends AsyncTask<String, GenericFile, Void> 
             String line;
             try {
                 while (!isCancelled() && (line = is.readLine()) != null) {
-                    this.publishProgress(CommandLineFile.fromLSL(null, line));
+                    this.publishProgress(CommandLineFile.fromLSL(mShell, null, line));
                 }
             } catch (EOFException e) {
                 //ignore

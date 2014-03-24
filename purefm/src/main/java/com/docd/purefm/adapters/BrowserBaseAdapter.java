@@ -181,13 +181,15 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     }
 
     /**
-     * Inserts new item to this Adapter's data to position determined by current FileSortType
+     * Inserts new items to this Adapter's data to position determined by current FileSortType
      *
-     * @param file File to insert
+     * @param files Files to insert
      */
-    public final void addFile(final GenericFile file) {
-        mContent.add(file);
-        mFileObservers.add(mObserverCache.getOrCreate(file, OBSERVER_EVENTS));
+    public final void addFiles(final GenericFile... files) {
+        for (final GenericFile file : files) {
+            mContent.add(file);
+            mFileObservers.add(mObserverCache.getOrCreate(file, OBSERVER_EVENTS));
+        }
         Collections.sort(mContent, mComparator.getComparator());
         notifyDataSetChanged();
     }

@@ -82,20 +82,74 @@ public final class CommandLineFile implements GenericFile,
     private boolean mIsSymlink;
     private boolean mIsDirectory;
 
-    private CommandLineFile(@NotNull File file) {
+    /**
+     * Creates a new CommandLineFile using File and canonical path from {@link CommandReadlink}
+     *
+     * @param shell Current shell
+     * @param file File
+     */
+    private CommandLineFile(@NotNull final Shell shell,
+                            @NotNull final File file) {
         this.mFile = file;
-        this.mCanonicalPath = CommandReadlink.readlink(file.getAbsolutePath());
+        this.mCanonicalPath = CommandReadlink.readlink(shell, file.getAbsolutePath());
     }
 
+    /**
+     * Creates a new CommandLineFile using file path and canonical path from {@link CommandReadlink}
+     *
+     * @param shell Current shell
+     * @param path File path
+     */
+    private CommandLineFile(@NotNull final Shell shell,
+                            @NotNull final String path) {
+        this.mFile = new File(path);
+        this.mCanonicalPath = CommandReadlink.readlink(shell, path);
+    }
+
+    /**
+     * Creates a new CommandLineFile using parent File and file name.
+     * Canonical path is retrieved from {@link CommandReadlink}
+     *
+     * @param shell Current shell
+     * @param parent Parent file
+     * @param name file name
+     */
+    private CommandLineFile(@NotNull final Shell shell,
+                            @NotNull File parent,
+                            @NotNull String name) {
+        this.mFile = new File(parent, name);
+        this.mCanonicalPath = CommandReadlink.readlink(shell, mFile.getAbsolutePath());
+    }
+
+    /**
+     * Creates a new CommandLineFile using file path and canonical path from
+     * {@link java.io.File#getAbsolutePath()}
+     *
+     * @param path File path
+     */
     private CommandLineFile(@NotNull String path) {
         this.mFile = new File(path);
-        this.mCanonicalPath = CommandReadlink.readlink(path);
+        String canonicalPath;
+        try {
+            canonicalPath = mFile.getCanonicalPath();
+        } catch (IOException e) {
+            canonicalPath = null;
+        }
+        this.mCanonicalPath = canonicalPath;
     }
 
-    private CommandLineFile(@NotNull File parent, @NotNull String name) {
-        this.mFile = new File(parent, name);
-        this.mCanonicalPath = CommandReadlink.readlink(mFile.getAbsolutePath());
+    /**
+     * Creates a new CommandLineFile using file path and canonical path
+     *
+     * @param path File path
+     * @param canonicalPath Canonical File path
+     */
+    private CommandLineFile(@NotNull final String path,
+                            @NotNull final String canonicalPath) {
+        this.mFile = new File(path);
+        this.mCanonicalPath = canonicalPath;
     }
+
 
     /**
      * {@inheritDoc}
@@ -112,14 +166,16 @@ public final class CommandLineFile implements GenericFile,
 
         if (res == null || res.isEmpty()) {
             // file not yet exists
-            return new CommandLineFile(file);
+            return new CommandLineFile(shell, file);
         }
 
-        return fromLSL(null, res.get(0));
+        return fromLSL(shell, null, res.get(0));
     }
 
     @NotNull
-    public static CommandLineFile fromLSL(File parent, String line) {
+    public static CommandLineFile fromLSL(@NotNull final Shell shell,
+                                          @Nullable final File parent,
+                                          @NotNull final String line) {
 
         if (line.isEmpty()) {
             throw new IllegalArgumentException("Bad ls -lApe output: is empty");
@@ -133,16 +189,25 @@ public final class CommandLineFile implements GenericFile,
         }
 
         String name = attrs[LS_FILE];
-        //String canonicalPath;
+        String canonicalPath = null;
         // if is symlink then resolve real path
         //String targetName = null;
         final int index = name.indexOf("->");
         if (index != -1) {
-            //canonicalPath = name.substring(index + 3).trim();
+            canonicalPath = name.substring(index + 3).trim();
             name = name.substring(0, index).trim();
         }
-        final CommandLineFile f = parent == null ? new CommandLineFile(name)
-                : new CommandLineFile(parent, name);
+
+        final CommandLineFile f;
+        if (parent == null) {
+            if (canonicalPath != null) {
+                f = new CommandLineFile(name, canonicalPath);
+            } else {
+                f = new CommandLineFile(shell, name);
+            }
+        } else {
+            f = new CommandLineFile(shell, parent, name);
+        }
         init(f, line);
         return f;
     }
@@ -324,7 +389,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (final String f : result) {
             try {
-                res.add(CommandLineFile.fromLSL(this.mFile, f));
+                res.add(CommandLineFile.fromLSL(shell, this.mFile, f));
             } catch (IllegalArgumentException e) {
                 //e.printStackTrace();
                 // not a valid ls -l file line
@@ -358,7 +423,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
                 if (filter.accept(tmp.toFile())) {
                     res.add(tmp);
                 }
@@ -394,7 +459,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
                 if (filter.accept(mFile, tmp.getName())) {
                     res.add(tmp);
                 }
@@ -430,7 +495,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
                 if (filter.accept(tmp)) {
                     res.add(tmp);
                 }

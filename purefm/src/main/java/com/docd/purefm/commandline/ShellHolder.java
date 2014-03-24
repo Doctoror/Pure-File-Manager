@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 public final class ShellHolder {
 
-    private static final int REASK_FOR_ROOT_SHELL_THRESHOLD = 5;
+    private static final int REASK_FOR_ROOT_SHELL_THRESHOLD = 6;
 
     private static int commandId;
 
