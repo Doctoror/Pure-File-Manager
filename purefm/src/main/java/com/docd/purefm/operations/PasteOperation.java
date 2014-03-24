@@ -25,6 +25,7 @@ import com.docd.purefm.commandline.CommandMove;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ArrayUtils;
@@ -71,8 +72,15 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
         if (!filesAffected.isEmpty()) {
             if (mIsMove) {
                 MediaStoreUtils.moveFiles(mContext, filesAffected);
+                for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
+                    FileObserverNotifier.notifyDeleted(filesPair.first);
+                    FileObserverNotifier.notifyCreated(filesPair.second);
+                }
             } else {
                 MediaStoreUtils.copyFiles(mContext, filesAffected);
+                for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
+                    FileObserverNotifier.notifyCreated(filesPair.second);
+                }
             }
         }
 

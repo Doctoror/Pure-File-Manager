@@ -21,6 +21,7 @@ import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
+import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
@@ -105,6 +106,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
 
         if (!filesAffected.isEmpty()) {
             MediaStoreUtils.deleteFilesOrDirectories(mContext.getContentResolver(), filesAffected);
+            FileObserverNotifier.notifyDeleted(filesAffected);
         }
 
         return failed;

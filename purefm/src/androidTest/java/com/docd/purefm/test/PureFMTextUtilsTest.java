@@ -16,12 +16,12 @@ package com.docd.purefm.test;
 
 import android.test.AndroidTestCase;
 
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 
 import java.util.Calendar;
 
 /**
- * Tests {@link com.docd.purefm.utils.PureFMTextUtils}
+ * Tests {@link com.docd.purefm.utils.PFMTextUtils}
  *
  * @author Doctoror
  */
@@ -30,22 +30,22 @@ public final class PureFMTextUtilsTest extends AndroidTestCase {
     @Override
     protected void runTest() throws Throwable {
         super.runTest();
-        PureFMTextUtils.init(getContext());
+        PFMTextUtils.init(getContext());
         testStringMonthToInt();
     }
 
     private void testStringMonthToInt() throws Throwable {
-        assertEquals(Calendar.JANUARY, PureFMTextUtils.stringMonthToInt("Jan"));
-        assertEquals(Calendar.FEBRUARY, PureFMTextUtils.stringMonthToInt("Feb"));
-        assertEquals(Calendar.MARCH, PureFMTextUtils.stringMonthToInt("Mar"));
-        assertEquals(Calendar.APRIL, PureFMTextUtils.stringMonthToInt("Apr"));
-        assertEquals(Calendar.MAY, PureFMTextUtils.stringMonthToInt("May"));
-        assertEquals(Calendar.JUNE, PureFMTextUtils.stringMonthToInt("Jun"));
-        assertEquals(Calendar.JULY, PureFMTextUtils.stringMonthToInt("Jul"));
-        assertEquals(Calendar.AUGUST, PureFMTextUtils.stringMonthToInt("Aug"));
-        assertEquals(Calendar.SEPTEMBER, PureFMTextUtils.stringMonthToInt("Sep"));
-        assertEquals(Calendar.OCTOBER, PureFMTextUtils.stringMonthToInt("Oct"));
-        assertEquals(Calendar.NOVEMBER, PureFMTextUtils.stringMonthToInt("Nov"));
-        assertEquals(Calendar.DECEMBER, PureFMTextUtils.stringMonthToInt("Dec"));
+        assertEquals(Calendar.JANUARY, PFMTextUtils.stringMonthToInt("Jan"));
+        assertEquals(Calendar.FEBRUARY, PFMTextUtils.stringMonthToInt("Feb"));
+        assertEquals(Calendar.MARCH, PFMTextUtils.stringMonthToInt("Mar"));
+        assertEquals(Calendar.APRIL, PFMTextUtils.stringMonthToInt("Apr"));
+        assertEquals(Calendar.MAY, PFMTextUtils.stringMonthToInt("May"));
+        assertEquals(Calendar.JUNE, PFMTextUtils.stringMonthToInt("Jun"));
+        assertEquals(Calendar.JULY, PFMTextUtils.stringMonthToInt("Jul"));
+        assertEquals(Calendar.AUGUST, PFMTextUtils.stringMonthToInt("Aug"));
+        assertEquals(Calendar.SEPTEMBER, PFMTextUtils.stringMonthToInt("Sep"));
+        assertEquals(Calendar.OCTOBER, PFMTextUtils.stringMonthToInt("Oct"));
+        assertEquals(Calendar.NOVEMBER, PFMTextUtils.stringMonthToInt("Nov"));
+        assertEquals(Calendar.DECEMBER, PFMTextUtils.stringMonthToInt("Dec"));
     }
 }

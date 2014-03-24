@@ -42,9 +42,9 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-public final class PureFMFileUtils {
+public final class PFMFileUtils {
 
-    private PureFMFileUtils() {
+    private PFMFileUtils() {
     }
 
     public static final class FileNameFilter implements InputFilter {
@@ -89,7 +89,7 @@ public final class PureFMFileUtils {
      * @param file File to get full path
      * @return canonical path or absolute path if failed
      */
-    public static String fullPath(final GenericFile file) {
+    public static String fullPath(@NotNull final GenericFile file) {
         try {
             return file.getCanonicalPath();
         } catch (IOException e) {
@@ -103,7 +103,7 @@ public final class PureFMFileUtils {
      * @param file File to get full path
      * @return canonical path or absolute path if failed
      */
-    public static String fullPath(final File file) {
+    public static String fullPath(@NotNull final File file) {
         try {
             return file.getCanonicalPath();
         } catch (IOException e) {
@@ -111,7 +111,7 @@ public final class PureFMFileUtils {
         }
     }
 
-    public static String byteCountToDisplaySize(final BigInteger size) {
+    public static String byteCountToDisplaySize(@NotNull final BigInteger size) {
         String displaySize;
 
         if (size.divide(FileUtils.ONE_GB_BI).compareTo(BigInteger.ZERO) > 0) {
@@ -128,7 +128,7 @@ public final class PureFMFileUtils {
 
     @Nullable
     public static String resolveFileSystem(@NotNull final GenericFile file) {
-        final String path = PureFMFileUtils.fullPath(file);
+        final String path = PFMFileUtils.fullPath(file);
         return resolveFileSystem(FilenameUtils.getFullPathNoEndSeparator(path));
     }
 
@@ -147,7 +147,7 @@ public final class PureFMFileUtils {
                 null : fsTypeResult.get(0);
     }
     
-    public static void openFile(final Context context, final File target) {
+    public static void openFile(@NotNull final Context context, @NotNull final File target) {
         final String mime = MimeTypes.getMimeType(target);
         if (mime != null) {
             final Intent i = new Intent(Intent.ACTION_VIEW);

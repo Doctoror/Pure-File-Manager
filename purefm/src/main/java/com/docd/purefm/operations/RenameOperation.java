@@ -19,6 +19,7 @@ import android.content.Context;
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
@@ -63,6 +64,8 @@ final class RenameOperation extends Operation<Void, CharSequence> {
         try {
             if (mSource.renameTo(target)) {
                 MediaStoreUtils.renameFileOrDirectory(mContext.getContentResolver(), mSource, target);
+                FileObserverNotifier.notifyDeleted(mSource);
+                FileObserverNotifier.notifyCreated(target);
                 return null;
             }
         } finally {

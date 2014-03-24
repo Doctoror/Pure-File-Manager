@@ -20,7 +20,7 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.tasks.CreateDirectoryTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;
-import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PFMFileUtils;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -50,8 +50,8 @@ public final class CreateDirectoryDialog extends DialogFragment {
                 R.layout.text_field_filename, null);
         mFileNameInput.setHint(R.string.menu_new_folder);
         mFileNameInput.setFilters(new InputFilter[] {
-                new PureFMFileUtils.FileNameFilter(),
-                new InputFilter.LengthFilter(PureFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
+                new PFMFileUtils.FileNameFilter(),
+                new InputFilter.LengthFilter(PFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
         final File current = (File) this.getArguments().getSerializable(Extras.EXTRA_CURRENT_DIR);
         final AlertDialog.Builder b = new AlertDialog.Builder(activity);
         b.setTitle(R.string.dialog_new_folder_title);

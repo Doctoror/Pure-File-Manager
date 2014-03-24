@@ -29,7 +29,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.RenameFileTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;
-import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PFMFileUtils;
 
 public final class RenameFileDialog extends DialogFragment {
     
@@ -70,8 +70,8 @@ public final class RenameFileDialog extends DialogFragment {
         final EditText text = (EditText) LayoutInflater.from(
                 getActivity()).inflate(R.layout.text_field_filename, null);
         text.setFilters(new InputFilter[] {
-                new PureFMFileUtils.FileNameFilter(),
-                new InputFilter.LengthFilter(PureFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
+                new PFMFileUtils.FileNameFilter(),
+                new InputFilter.LengthFilter(PFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
         text.setText(mSource.getName());
         text.setHint(mSource.getName());
         builder.setView(text);

@@ -30,7 +30,7 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.tasks.CreateFileTask;
 import com.docd.purefm.ui.activities.MonitoredActivity;
-import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PFMFileUtils;
 
 public final class CreateFileDialog extends DialogFragment {
     
@@ -73,7 +73,7 @@ public final class CreateFileDialog extends DialogFragment {
                 context).inflate(R.layout.text_field_filename, null);
         mFileNameInput.setHint(R.string.menu_new_file);
         mFileNameInput.setFilters(new InputFilter[] {
-                new PureFMFileUtils.FileNameFilter(),
-                new InputFilter.LengthFilter(PureFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
+                new PFMFileUtils.FileNameFilter(),
+                new InputFilter.LengthFilter(PFMFileUtils.FileNameFilter.MAX_FILENAME_LENGTH)});
     }
 }

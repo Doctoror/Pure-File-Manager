@@ -23,7 +23,7 @@ import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -70,7 +70,7 @@ public final class DeleteTask extends
     private void finish(@NotNull final ArrayList<GenericFile> failed) {
         if (!failed.isEmpty()) {
             final Dialog dialog = MessageDialogBuilder.create(mActivity, R.string.dialog_delete_failed,
-                    PureFMTextUtils.fileListToDashList(failed));
+                    PFMTextUtils.fileListToDashList(failed));
             if (!mActivity.isFinishing()) {
                 dialog.show();
             }

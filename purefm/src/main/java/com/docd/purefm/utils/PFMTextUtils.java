@@ -28,9 +28,9 @@ import com.docd.purefm.text.style.DashSpan;
 
 import org.jetbrains.annotations.NotNull;
 
-public final class PureFMTextUtils {
+public final class PFMTextUtils {
 
-    private PureFMTextUtils() {}
+    private PFMTextUtils() {}
     
     private static SimpleDateFormat format;
     private static final Calendar CALENDAR = Calendar.getInstance(

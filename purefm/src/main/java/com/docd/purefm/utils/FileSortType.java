@@ -22,14 +22,14 @@ import org.jetbrains.annotations.NotNull;
 
 public enum FileSortType {
 
-    NAME_ASC (new PureFMFileUtils.NameComparator()),
-    NAME_DESC(new PureFMFileUtils.NameComparatorReverse()),
-    TYPE_ASC (new PureFMFileUtils.TypeComparator()),
-    TYPE_DESC(new PureFMFileUtils.TypeComparatorReverse()),
-    SIZE_ASC (new PureFMFileUtils.SizeComparatorAsc()),
-    SIZE_DESC(new PureFMFileUtils.SizeComparatorDesc()),
-    DATE_ASC (new PureFMFileUtils.DateComparatorAsc()),
-    DATE_DESC(new PureFMFileUtils.DateComparatorDesc());
+    NAME_ASC (new PFMFileUtils.NameComparator()),
+    NAME_DESC(new PFMFileUtils.NameComparatorReverse()),
+    TYPE_ASC (new PFMFileUtils.TypeComparator()),
+    TYPE_DESC(new PFMFileUtils.TypeComparatorReverse()),
+    SIZE_ASC (new PFMFileUtils.SizeComparatorAsc()),
+    SIZE_DESC(new PFMFileUtils.SizeComparatorDesc()),
+    DATE_ASC (new PFMFileUtils.DateComparatorAsc()),
+    DATE_DESC(new PFMFileUtils.DateComparatorDesc());
     
     private Comparator<GenericFile> comparator;
     

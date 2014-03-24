@@ -28,6 +28,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.services.MultiWorkerService;
 import com.docd.purefm.ui.activities.BrowserPagerActivity;
@@ -302,6 +303,7 @@ public final class OperationsService extends MultiWorkerService
                     message = getText(R.string.could_not_create_file);
                 } else {
                     MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
+                    FileObserverNotifier.notifyCreated(target);
                 }
             } catch (IOException e) {
                 message = e.getMessage();
@@ -328,6 +330,7 @@ public final class OperationsService extends MultiWorkerService
                 message = getText(R.string.could_not_create_dir);
             } else {
                 MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
+                FileObserverNotifier.notifyCreated(target);
             }
         }
         onOperationCompleted(ACTION_CREATE_DIRECTORY,

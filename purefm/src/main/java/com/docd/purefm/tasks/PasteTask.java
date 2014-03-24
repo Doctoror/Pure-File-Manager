@@ -24,7 +24,8 @@ import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMTextUtils;
+
 import org.jetbrains.annotations.NotNull;
 
 
@@ -73,7 +74,7 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
         if (!failed.isEmpty()) {
             final Dialog dialog = MessageDialogBuilder.create(mActivity, ClipBoard.isMove() ?
                             R.string.dialog_move_failed : R.string.dialog_copy_failed,
-                    PureFMTextUtils.fileListToDashList(failed)
+                    PFMTextUtils.fileListToDashList(failed)
             );
             if (!mActivity.isFinishing()) {
                 dialog.show();

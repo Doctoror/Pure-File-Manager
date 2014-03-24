@@ -18,6 +18,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Environment;
 
 import android.os.FileObserver;
@@ -68,6 +69,8 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     private Runnable mLastRunnable;
     private boolean mHistoryEnabled;
 
+    private ResolveInitialPathTask mInitialPathTask;
+
     public Browser(@NotNull final AbstractBrowserActivity activity, final boolean historyEnabled) {
         if (sHandler == null) {
             sHandler = new Handler(activity.getMainLooper());
@@ -76,25 +79,23 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         mHistoryEnabled = historyEnabled;
         mObserverCache = FileObserverCache.getInstance();
         mHistory = new ArrayDeque<>(historyEnabled ? 15 : 0);
+
         final String home = Settings.getHomeDirectory(activity);
-        final String state = Environment.getExternalStorageState();
-        if (home != null) {
-            mCurrentPath = FileFactory.newFile(home);
-            if (!mCurrentPath.exists()) {
-                mCurrentPath = null;
-            }
-        }
-        if (mCurrentPath == null && (state.equals(Environment.MEDIA_MOUNTED) || state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))) {
-            mCurrentPath = FileFactory.newFile(Environment.getExternalStorageDirectory());
-        }
-        if (mCurrentPath == null) {
-            mCurrentPath = FileFactory.newFile(com.docd.purefm.Environment.rootDirectory.getAbsolutePath());
-        }
-        if (mCurrentPath != null) {
-            mCurrentPathObserver = mObserverCache.getOrCreate(
-                    mCurrentPath.getAbsolutePath(), OBSERVER_EVENTS);
-            mCurrentPathObserver.addOnEventListener(this);
-            mCurrentPathObserver.startWatching();
+        mInitialPathTask = new ResolveInitialPathTask(this, home);
+        mInitialPathTask.execute();
+    }
+
+//    void setInitialPath(final GenericFile currentPath) {
+//        mCurrentPath = currentPath;
+//        mCurrentPathObserver = mObserverCache.getOrCreate(
+//                currentPath, OBSERVER_EVENTS);
+//        mCurrentPathObserver.addOnEventListener(this);
+//        mCurrentPathObserver.startWatching();
+//    }
+
+    private void cancelInitialPathLoading() {
+        if (mInitialPathTask != null && mInitialPathTask.getStatus() == AsyncTask.Status.RUNNING) {
+            mInitialPathTask.cancel(true);
         }
     }
 
@@ -157,7 +158,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             mCurrentPathObserver.removeOnEventListener(this);
         }
         if (requested.exists() && requested.isDirectory()) {
-            mCurrentPathObserver = mObserverCache.getOrCreate(requested.getAbsolutePath(), OBSERVER_EVENTS);
+            mCurrentPathObserver = mObserverCache.getOrCreate(requested, OBSERVER_EVENTS);
             mCurrentPathObserver.addOnEventListener(this);
             mCurrentPathObserver.startWatching();
         } else {
@@ -174,6 +175,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
 
     public boolean goBack(final boolean invalidate) {
+        cancelInitialPathLoading();
         if (mPreviousPath != null) {
             mCurrentPath = this.mPreviousPath;
             if (invalidate) {
@@ -200,14 +202,15 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         return parent;
     }
 
-    public void navigate(final GenericFile target, boolean addToHistory) {
+    public void navigate(@NotNull final GenericFile target, final boolean addToHistory) {
+        cancelInitialPathLoading();
         if (target.exists()) {
             if (target.isDirectory()) {
-                if (!this.mCurrentPath.equals(target)) {
-                    mPreviousPath = this.mCurrentPath;
+                if (!target.equals(mCurrentPath)) {
+                    mPreviousPath = mCurrentPath;
                     mCurrentPath = target;
-                    if (addToHistory) {
-                        this.mHistory.push(mPreviousPath.getAbsolutePath());
+                    if (addToHistory && mHistoryEnabled && mPreviousPath != null) {
+                        mHistory.push(mPreviousPath.getAbsolutePath());
                     }
                     this.invalidate();
                 }
@@ -222,6 +225,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
     
     public boolean back() {
+        cancelInitialPathLoading();
         if (!this.mHistory.isEmpty()) {
             GenericFile f = FileFactory.newFile(mHistory.pop());
             while (!this.mHistory.isEmpty() && !f.exists()) {
@@ -236,6 +240,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
     
     public void up() {
+        cancelInitialPathLoading();
         if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory)) {
             return;
         }
@@ -245,8 +250,8 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
     
     public void invalidate() {
-        if (this.mNavigateListener != null) {
-            this.mNavigateListener.onNavigate(this.mCurrentPath);
+        if (mNavigateListener != null && mCurrentPath != null) {
+            mNavigateListener.onNavigate(mCurrentPath);
         }
     }
 
@@ -317,6 +322,48 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                 return new SavedState[size];
             }
         };
+    }
+
+    private static final class ResolveInitialPathTask extends AsyncTask<Void, Void, GenericFile> {
+
+        private final WeakReference<Browser> mBrowserReference;
+        private final String mHomeDirectory;
+
+        private ResolveInitialPathTask(@NotNull final Browser browser,
+                                       @Nullable final String homeDirectory) {
+            this.mBrowserReference = new WeakReference<>(browser);
+            this.mHomeDirectory = homeDirectory;
+        }
+
+        @Override
+        protected GenericFile doInBackground(Void... params) {
+            GenericFile initialFile = null;
+            if (mHomeDirectory != null) {
+                final GenericFile currentFile = FileFactory.newFile(mHomeDirectory);
+                if (currentFile.exists() && currentFile.isDirectory()) {
+                    initialFile = currentFile;
+                }
+            }
+            if (initialFile == null) {
+                final String state = Environment.getExternalStorageState();
+                if (state.equals(Environment.MEDIA_MOUNTED) ||
+                        state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+                    initialFile = FileFactory.newFile(Environment.getExternalStorageDirectory());
+                }
+            }
+            if (initialFile == null) {
+                initialFile = FileFactory.newFile(com.docd.purefm.Environment.rootDirectory.getAbsolutePath());
+            }
+            return initialFile;
+        }
+
+        @Override
+        protected void onPostExecute(final GenericFile genericFile) {
+            final Browser browser = mBrowserReference.get();
+            if (browser != null) {
+                browser.navigate(genericFile, false);
+            }
+        }
     }
 
     private static final class InvalidateRunnable implements Runnable {

@@ -14,7 +14,10 @@
  */
 package com.docd.purefm.file;
 
+import com.docd.purefm.utils.PFMFileUtils;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -32,25 +35,31 @@ public final class FileObserverCache {
         return instance;
     }
 
-    private final Map<String, WeakReference<MultiListenerFileObserver>> cache;
+    private final Map<String, WeakReference<MultiListenerFileObserver>> mCache;
 
     private FileObserverCache() {
-        this.cache = new HashMap<>();
+        this.mCache = new HashMap<>();
     }
 
     public void clear() {
-        this.cache.clear();
+        this.mCache.clear();
+    }
+
+    @Nullable
+    public MultiListenerFileObserver get(@NotNull final GenericFile path) {
+        return mCache.get(PFMFileUtils.fullPath(path)).get();
     }
 
     @NotNull
-    public MultiListenerFileObserver getOrCreate(final String path, final int events) {
-        final WeakReference<MultiListenerFileObserver> reference = cache.get(path);
+    public MultiListenerFileObserver getOrCreate(@NotNull final GenericFile file, final int events) {
+        final String path = PFMFileUtils.fullPath(file);
+        final WeakReference<MultiListenerFileObserver> reference = mCache.get(path);
         MultiListenerFileObserver observer;
         if (reference != null && (observer = reference.get()) != null) {
             return observer;
         } else {
             observer = new MultiListenerFileObserver(path, events);
-            this.cache.put(path, new WeakReference<>(observer));
+            this.mCache.put(path, new WeakReference<>(observer));
         }
         return observer;
     }

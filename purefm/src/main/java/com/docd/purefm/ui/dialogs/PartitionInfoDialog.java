@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PFMFileUtils;
 import com.docd.purefm.utils.StatFsCompat;
 import com.docd.purefm.utils.ThemeUtils;
 
@@ -153,14 +153,14 @@ public final class PartitionInfoDialog extends DialogFragment {
         @NotNull
         @Override
         protected PartitionInfo doInBackground(final GenericFile... params) {
-            final String path = PureFMFileUtils.fullPath(params[0]);
+            final String path = PFMFileUtils.fullPath(params[0]);
             final StatFsCompat statFs = new StatFsCompat(path);
             final long valueTotal = statFs.getTotalBytes();
             final long valueAvail = statFs.getAvailableBytes();
             final long valueUsed = valueTotal - valueAvail;
             return new PartitionInfo(
                     path,
-                    PureFMFileUtils.resolveFileSystem(path),
+                    PFMFileUtils.resolveFileSystem(path),
                     valueTotal,
                     statFs.getBlockSizeLong(),
                     statFs.getFreeBytes(),

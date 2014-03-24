@@ -15,8 +15,8 @@
 package com.docd.purefm;
 
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.utils.PFMTextUtils;
 import com.docd.purefm.utils.PreviewHolder;
-import com.docd.purefm.utils.PureFMTextUtils;
 import com.stericson.RootTools.RootTools;
 
 import android.app.Application;
@@ -34,7 +34,7 @@ public final class PureFM extends Application implements ActivityMonitor.OnActiv
         Environment.init(this);
         Settings.init(this, this.getResources());
         PreviewHolder.initialize(this);
-        PureFMTextUtils.init(this);
+        PFMTextUtils.init(this);
         ensureNoShellUsedIfNoBusybox();
         ActivityMonitor.addOnActivitiesOpenedListener(this);
     }

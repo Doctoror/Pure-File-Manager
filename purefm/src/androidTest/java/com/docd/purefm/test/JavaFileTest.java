@@ -21,7 +21,7 @@ import android.test.AndroidTestCase;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -73,7 +73,7 @@ public final class JavaFileTest extends AndroidTestCase {
         super.runTest();
         // init what application inits
         final Context context = this.getContext();
-        PureFMTextUtils.init(context);
+        PFMTextUtils.init(context);
         Settings.useCommandLine = false;
         test();
         test1.delete();

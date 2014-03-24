@@ -105,11 +105,11 @@ public final class PreviewHolder {
 
         final Bitmap result;
         if (isImage) {
-            result = PureFMThumbnailUtils.createPictureThumbnail(file, sWidth);
+            result = PFMThumbnailUtils.createPictureThumbnail(file, sWidth);
         } else if (isVideo) {
-            result = PureFMThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MICRO_KIND);
+            result = PFMThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MICRO_KIND);
         } else if (isApk) {
-            result = PureFMThumbnailUtils.extractApkIcon(sPackageManager, file);
+            result = PFMThumbnailUtils.extractApkIcon(sPackageManager, file);
         } else {
             result = null;
         }

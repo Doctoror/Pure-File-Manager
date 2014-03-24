@@ -26,7 +26,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.SearchCommandLineTask;
 import com.docd.purefm.tasks.SearchJavaTask;
-import com.docd.purefm.utils.PureFMFileUtils;
+import com.docd.purefm.utils.PFMFileUtils;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
@@ -211,7 +211,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity {
             @Override
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
                 final GenericFile target = (GenericFile) (av.getItemAtPosition(pos));
-                PureFMFileUtils.openFile(SearchActivity.this, target.toFile());
+                PFMFileUtils.openFile(SearchActivity.this, target.toFile());
             }
         });
     }

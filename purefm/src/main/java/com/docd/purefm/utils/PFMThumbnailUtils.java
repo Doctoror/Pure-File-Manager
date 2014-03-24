@@ -34,9 +34,9 @@ import android.os.Build;
 
 import org.jetbrains.annotations.Nullable;
 
-public final class PureFMThumbnailUtils extends ThumbnailUtils {
+public final class PFMThumbnailUtils extends ThumbnailUtils {
     
-    private PureFMThumbnailUtils() {}
+    private PFMThumbnailUtils() {}
 
     private static final Set<SoftReference<Bitmap>> sReusableBitmaps =
             Collections.synchronizedSet(new HashSet<SoftReference<Bitmap>>());

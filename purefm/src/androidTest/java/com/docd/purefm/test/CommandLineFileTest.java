@@ -21,7 +21,7 @@ import android.test.InstrumentationTestCase;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -74,7 +74,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         final Context context = getInstrumentation().getContext();
         com.docd.purefm.Environment.init(context);
         Settings.init(context, context.getResources());
-        PureFMTextUtils.init(context);
+        PFMTextUtils.init(context);
 
         // override settings to force our test busybox
         if (!com.docd.purefm.Environment.hasBusybox()) {
@@ -168,8 +168,8 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         }
 
         if (testDate) {
-            assertEquals(PureFMTextUtils.humanReadableDate(javaFile.lastModified(), false),
-                    PureFMTextUtils.humanReadableDate(genericFile.lastModified(), true));
+            assertEquals(PFMTextUtils.humanReadableDate(javaFile.lastModified(), false),
+                    PFMTextUtils.humanReadableDate(genericFile.lastModified(), true));
         }
     }
 

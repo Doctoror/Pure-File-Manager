@@ -18,7 +18,7 @@ public class ReusableBitmapLruCache<T> extends LruCache<T, Bitmap> {
     protected final void entryRemoved(boolean evicted, T key,
            Bitmap oldValue, Bitmap newValue) {
         if (oldValue.isMutable()) {
-            PureFMThumbnailUtils.addToReusableCache(oldValue);
+            PFMThumbnailUtils.addToReusableCache(oldValue);
         }
     }
 }

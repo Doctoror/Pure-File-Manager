@@ -37,12 +37,13 @@ import com.docd.purefm.commandline.CommandListFile;
 import com.docd.purefm.commandline.CommandMkdir;
 import com.docd.purefm.commandline.CommandMkdirs;
 import com.docd.purefm.commandline.CommandMove;
+import com.docd.purefm.commandline.CommandReadlink;
 import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.MimeTypes;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 
 public final class CommandLineFile implements GenericFile,
         Comparable<GenericFile> {
@@ -78,23 +79,17 @@ public final class CommandLineFile implements GenericFile,
 
     private CommandLineFile(@NotNull File file) {
         this.mFile = file;
-        this.mCanonicalPath = null;
+        this.mCanonicalPath = CommandReadlink.readlink(file.getAbsolutePath());
     }
 
     private CommandLineFile(@NotNull String path) {
         this.mFile = new File(path);
-        this.mCanonicalPath = null;
+        this.mCanonicalPath = CommandReadlink.readlink(path);
     }
 
     private CommandLineFile(@NotNull File parent, @NotNull String name) {
         this.mFile = new File(parent, name);
-        this.mCanonicalPath = null;
-    }
-
-    private CommandLineFile(@NotNull File parent, @NotNull  String name,
-                            @NotNull String canonicalPath) {
-        this.mFile = new File(parent, name);
-        this.mCanonicalPath = canonicalPath;
+        this.mCanonicalPath =  CommandReadlink.readlink(mFile.getAbsolutePath());
     }
 
     /**
@@ -223,7 +218,7 @@ public final class CommandLineFile implements GenericFile,
 
         final Calendar c = Calendar.getInstance(Locale.US);
         c.set(Calendar.YEAR, Integer.parseInt(attrs[LS_YEAR]));
-        c.set(Calendar.MONTH, PureFMTextUtils.stringMonthToInt(attrs[LS_MONTH]));
+        c.set(Calendar.MONTH, PFMTextUtils.stringMonthToInt(attrs[LS_MONTH]));
         c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(attrs[LS_DAY_OF_MONTH]));
 
         final int index1 = attrs[LS_TIME].indexOf(':');

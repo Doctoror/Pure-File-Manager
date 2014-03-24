@@ -22,8 +22,8 @@ import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.Permissions;
-import com.docd.purefm.utils.PureFMFileUtils;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMFileUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 import com.docd.purefm.utils.ThemeUtils;
 import com.stericson.RootTools.RootTools;
 
@@ -351,7 +351,7 @@ public final class FilePropertiesDialog extends DialogFragment {
 
             @Override
             protected String doInBackground(final GenericFile... params) {
-                return PureFMFileUtils.resolveFileSystem(params[0]);
+                return PFMFileUtils.resolveFileSystem(params[0]);
             }
 
             @Override
@@ -500,8 +500,8 @@ public final class FilePropertiesDialog extends DialogFragment {
                         parentPath,
                         typeText,
                         file.getMimeType(),
-                        PureFMFileUtils.byteCountToDisplaySize(file.lengthTotal()),
-                        PureFMTextUtils.humanReadableDate(file.lastModified(), file instanceof CommandLineFile));
+                        PFMFileUtils.byteCountToDisplaySize(file.lengthTotal()),
+                        PFMTextUtils.humanReadableDate(file.lastModified(), file instanceof CommandLineFile));
             }
 
             @Override

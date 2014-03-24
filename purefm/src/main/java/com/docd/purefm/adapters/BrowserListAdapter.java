@@ -18,8 +18,8 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.PureFMFileUtils;
-import com.docd.purefm.utils.PureFMTextUtils;
+import com.docd.purefm.utils.PFMFileUtils;
+import com.docd.purefm.utils.PFMTextUtils;
 import com.docd.purefm.ui.view.OverlayImageView;
 
 import android.app.Activity;
@@ -91,7 +91,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             final long lastModified = f.lastModified();
             String humanReadableLastModified = mHumanReadableLastModified.get(lastModified);
             if (humanReadableLastModified == null) {
-                humanReadableLastModified = PureFMTextUtils.humanReadableDate(
+                humanReadableLastModified = PFMTextUtils.humanReadableDate(
                         lastModified,
                         f instanceof CommandLineFile);
                 mHumanReadableLastModified.put(lastModified, humanReadableLastModified);
@@ -105,7 +105,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             final long fileSize = f.length();
             String humanReadableFileSize = mHumanReadableLength.get(fileSize);
             if (humanReadableFileSize == null) {
-                humanReadableFileSize = PureFMFileUtils.byteCountToDisplaySize(BigInteger.valueOf(fileSize));
+                humanReadableFileSize = PFMFileUtils.byteCountToDisplaySize(BigInteger.valueOf(fileSize));
                 mHumanReadableLength.put(fileSize, humanReadableFileSize);
             }
             h.mSize.setText(humanReadableFileSize);

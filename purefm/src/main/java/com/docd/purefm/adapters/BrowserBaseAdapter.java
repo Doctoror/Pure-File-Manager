@@ -160,7 +160,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             for (final GenericFile file : data) {
                 mContent.add(file);
                 final MultiListenerFileObserver observer = mObserverCache
-                        .getOrCreate(file.getAbsolutePath(), OBSERVER_EVENTS);
+                        .getOrCreate(file, OBSERVER_EVENTS);
                 observer.addOnEventListener(this);
                 observer.startWatching();
                 mFileObservers.add(observer);
@@ -187,7 +187,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     public final void addFile(final GenericFile file) {
         mContent.add(file);
-        mFileObservers.add(mObserverCache.getOrCreate(file.getAbsolutePath(), OBSERVER_EVENTS));
+        mFileObservers.add(mObserverCache.getOrCreate(file, OBSERVER_EVENTS));
         Collections.sort(mContent, mComparator.getComparator());
         notifyDataSetChanged();
     }
