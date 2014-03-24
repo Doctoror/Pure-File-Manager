@@ -15,6 +15,7 @@
 package com.docd.purefm.operations;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.CommandLine;
@@ -30,6 +31,7 @@ import com.stericson.RootTools.execution.Shell;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +55,12 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
         final List<GenericFile> filesAffected = new LinkedList<>();
 
         if (files[0] instanceof CommandLineFile) {
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                Log.w("DeleteOperation", "shell is null, aborting");
+                failed.addAll(Arrays.asList(files));
+                return failed;
+            }
 
             final HashSet<String> remountPaths = new HashSet<>();
             for (GenericFile file : files) {
@@ -74,7 +82,6 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
                 RootTools.remount(remountPath, "RW");
             }
 
-            final Shell shell = ShellHolder.getShell();
             for (final GenericFile file : files) {
                 if (isCanceled()) {
                     break;

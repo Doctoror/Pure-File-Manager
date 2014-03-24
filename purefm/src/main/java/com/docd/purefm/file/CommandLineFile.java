@@ -37,7 +37,6 @@ import com.docd.purefm.commandline.CommandListFile;
 import com.docd.purefm.commandline.CommandMkdir;
 import com.docd.purefm.commandline.CommandMkdirs;
 import com.docd.purefm.commandline.CommandMove;
-import com.docd.purefm.commandline.CommandReadlink;
 import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
@@ -79,17 +78,23 @@ public final class CommandLineFile implements GenericFile,
 
     private CommandLineFile(@NotNull File file) {
         this.mFile = file;
-        this.mCanonicalPath = CommandReadlink.readlink(file.getAbsolutePath());
+        this.mCanonicalPath = null;
     }
 
     private CommandLineFile(@NotNull String path) {
         this.mFile = new File(path);
-        this.mCanonicalPath = CommandReadlink.readlink(path);
+        this.mCanonicalPath = null;
     }
 
     private CommandLineFile(@NotNull File parent, @NotNull String name) {
         this.mFile = new File(parent, name);
-        this.mCanonicalPath =  CommandReadlink.readlink(mFile.getAbsolutePath());
+        this.mCanonicalPath = null;
+    }
+
+    private CommandLineFile(@NotNull File parent, @NotNull  String name,
+                            @NotNull String canonicalPath) {
+        this.mFile = new File(parent, name);
+        this.mCanonicalPath = canonicalPath;
     }
 
     /**

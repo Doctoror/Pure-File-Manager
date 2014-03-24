@@ -24,6 +24,7 @@ import com.docd.purefm.commandline.CommandListBusyboxApplets;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.StorageHelper;
+import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -157,12 +158,15 @@ public final class Environment {
             return false;
         }
 
-        final List<String> result = CommandLine.executeForResult(ShellHolder.getShell(),
-                new CommandListBusyboxApplets());
-        if (result != null) {
-            for (final String resultLine : result) {
-                if (resultLine.equals(util)) {
-                    return true;
+        final Shell shell = ShellHolder.getShell();
+        if (shell != null) {
+            final List<String> result = CommandLine.executeForResult(shell,
+                    new CommandListBusyboxApplets());
+            if (result != null) {
+                for (final String resultLine : result) {
+                    if (resultLine.equals(util)) {
+                        return true;
+                    }
                 }
             }
         }

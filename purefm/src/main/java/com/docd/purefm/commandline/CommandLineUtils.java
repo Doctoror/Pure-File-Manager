@@ -94,7 +94,7 @@ public final class CommandLineUtils {
         return perm.toString();
     }
 
-    public static boolean copyRecursively(final Shell shell, final CommandCopyRecursively command) {
+    public static boolean copyRecursively(@NotNull final Shell shell, @NotNull final CommandCopyRecursively command) {
         final boolean wasRemounted;
         if (command.target.startsWith(Environment.androidRootDirectory.getAbsolutePath())) {
             RootTools.remount(command.target, "RW");

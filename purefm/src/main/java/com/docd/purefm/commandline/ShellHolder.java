@@ -15,10 +15,12 @@
 package com.docd.purefm.commandline;
 
 import android.util.Log;
+import android.util.Pair;
 
+import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -26,6 +28,8 @@ import java.io.IOException;
  * ShellHolder holds shared Shell instance
  */
 public final class ShellHolder {
+
+    private static final int REASK_FOR_ROOT_SHELL_THRESHOLD = 5;
 
     private static int commandId;
 
@@ -35,33 +39,58 @@ public final class ShellHolder {
 
     private ShellHolder() {}
 
-    private static Shell shell;
+    private static boolean sIsRootShell;
+    private static Shell sShell;
+    private static int sSkipReaskForRootShellCount;
+
+    public static boolean isCurrentShellRoot() {
+        return sIsRootShell;
+    }
 
     public static synchronized void releaseShell() {
-        if (shell != null) {
+        if (sShell != null) {
             try {
-                shell.close();
+                sShell.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            shell = null;
+            sShell = null;
         }
     }
 
     /**
-     * The shell is set by BrowserPagerActivity and is released when BrowserPagerActivity is destroyed
+     * The shell is set by BrowserPagerActivity and is released when BrowserPagerActivity
+     * is destroyed.
+     * Returns current global shell. If current shell is non-root, but root shell is requested,
+     * it will ask for root shell every #REASK_FOR_ROOT_SHELL_THRESHOLD calls.
      *
      * @return shell shared Shell instance
      */
-    @NotNull
+    @Nullable
     public static synchronized Shell getShell() {
-        if (shell == null || !Shell.isAnyShellOpen()) {
+        if (Settings.su && sShell != null && !sIsRootShell &&
+                sSkipReaskForRootShellCount >= REASK_FOR_ROOT_SHELL_THRESHOLD) {
+            sSkipReaskForRootShellCount = 0;
+            final Pair<Boolean, Shell> result = ShellFactory.getRootShell();
+            if (result != null) {
+                sIsRootShell = result.first;
+                sShell = result.second;
+            }
+        } else {
+            sSkipReaskForRootShellCount++;
+        }
+        if (sShell == null || !Shell.isAnyShellOpen()) {
             try {
-                shell = ShellFactory.getShell();
+                final Pair<Boolean, Shell> result = ShellFactory.getShell();
+                if (result != null) {
+                    sIsRootShell = result.first;
+                    sShell = result.second;
+                    sSkipReaskForRootShellCount = 0;
+                }
             } catch (IOException e) {
                 Log.w("getShell() error:", e);
             }
         }
-        return shell;
+        return sShell;
     }
 }

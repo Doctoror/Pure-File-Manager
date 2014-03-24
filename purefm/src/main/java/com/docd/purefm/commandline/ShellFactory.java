@@ -17,12 +17,15 @@
  */
 package com.docd.purefm.commandline;
 
+import android.util.Pair;
+
 import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.exceptions.RootDeniedException;
 import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -30,20 +33,35 @@ import java.util.concurrent.TimeoutException;
 public final class ShellFactory {
     private ShellFactory() {}
 
-    @NotNull
-    public static Shell getShell() throws IOException {
+    @Nullable
+    static Pair<Boolean, Shell> getRootShell() {
         try {
-            return RootTools.getShell(Settings.su);
-        } catch (RootDeniedException e) {
+            return new Pair<>(true, RootTools.getShell(true));
+        } catch (IOException | RootDeniedException | TimeoutException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns new shell
+     *
+     * @return boolean indicating whether the Shell is root shell and the shell,
+     *         or null if timed-out
+     * @throws IOException when an IO error occurs
+     */
+    @Nullable
+    public static Pair<Boolean, Shell> getShell() throws IOException {
+        final boolean root = Settings.su;
+        try {
+            return new Pair<>(root, RootTools.getShell(root));
+        } catch (RootDeniedException | TimeoutException e) {
             try {
-                return RootTools.getShell(false);
+                return new Pair<>(false, RootTools.getShell(false));
             } catch (RootDeniedException e1) {
                 throw new RuntimeException("Access denied for non-superuser shell?", e);
             } catch (TimeoutException e1) {
-                throw new RuntimeException("Shell not initialized", e);
+                return null;
             }
-        } catch (TimeoutException e) {
-            throw new RuntimeException("Shell not initialized", e);
         }
     }
 }

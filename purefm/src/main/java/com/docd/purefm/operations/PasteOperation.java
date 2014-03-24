@@ -15,6 +15,7 @@
 package com.docd.purefm.operations;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.Pair;
 
 import com.docd.purefm.Environment;
@@ -36,6 +37,7 @@ import com.stericson.RootTools.execution.Shell;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -146,6 +148,13 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             final boolean isMove,
             @NotNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
         final ArrayList<GenericFile> failed = new ArrayList<>();
+        final Shell shell = ShellHolder.getShell();
+        if (shell == null) {
+            Log.w("PasteOperation", "shell is null, aborting");
+            failed.addAll(Arrays.asList(contents));
+            return failed;
+        }
+
         final CommandLineFile[] cont = new CommandLineFile[contents.length];
         ArrayUtils.copyArrayAndCast(contents, cont);
         final CommandLineFile t = (CommandLineFile) target;
@@ -158,7 +167,6 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             wasRemounted = false;
         }
 
-        final Shell shell = ShellHolder.getShell();
         for (final CommandLineFile current : cont) {
             final Command command = (isMove ? new CommandMove(current, t) :
                     new CommandCopyRecursively(current, t));
