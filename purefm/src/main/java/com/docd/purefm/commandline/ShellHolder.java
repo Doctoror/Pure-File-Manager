@@ -29,6 +29,8 @@ import java.io.IOException;
  */
 public final class ShellHolder {
 
+    private static final int REASK_FOR_ROOT_SHELL_THRESHOLD = 5;
+
     private static int commandId;
 
     public static int getNextCommandId() {
@@ -39,6 +41,7 @@ public final class ShellHolder {
 
     private static boolean sIsRootShell;
     private static Shell sShell;
+    private static int sSkipReaskForRootShellCount;
 
     public static boolean isCurrentShellRoot() {
         return sIsRootShell;
@@ -56,17 +59,37 @@ public final class ShellHolder {
     }
 
     /**
-     * The shell is set by BrowserPagerActivity and is released when BrowserPagerActivity is destroyed
+     * The shell is set by BrowserPagerActivity and is released when BrowserPagerActivity
+     * is destroyed.
+     * Returns current global shell. If current shell is non-root, but root shell is requested,
+     * it will ask for root shell every #REASK_FOR_ROOT_SHELL_THRESHOLD calls.
      *
      * @return shell shared Shell instance
      */
     @Nullable
     public static synchronized Shell getShell() {
-        if (Settings.su && sShell != null && !sIsRootShell) {
-            //resolveShell();
+        if (Settings.su && sShell != null && !sIsRootShell &&
+                sSkipReaskForRootShellCount >= REASK_FOR_ROOT_SHELL_THRESHOLD) {
+            sSkipReaskForRootShellCount = 0;
+            final Pair<Boolean, Shell> result = ShellFactory.getRootShell();
+            if (result != null) {
+                sIsRootShell = result.first;
+                sShell = result.second;
+            }
+        } else {
+            sSkipReaskForRootShellCount++;
         }
         if (sShell == null || !Shell.isAnyShellOpen()) {
-            resolveShell();
+            try {
+                final Pair<Boolean, Shell> result = ShellFactory.getShell();
+                if (result != null) {
+                    sIsRootShell = result.first;
+                    sShell = result.second;
+                    sSkipReaskForRootShellCount = 0;
+                }
+            } catch (IOException e) {
+                Log.w("getShell() error:", e);
+            }
         }
         return sShell;
     }

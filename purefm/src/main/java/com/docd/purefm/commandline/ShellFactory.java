@@ -33,6 +33,15 @@ import java.util.concurrent.TimeoutException;
 public final class ShellFactory {
     private ShellFactory() {}
 
+    @Nullable
+    static Pair<Boolean, Shell> getRootShell() {
+        try {
+            return new Pair<>(true, RootTools.getShell(true));
+        } catch (IOException | RootDeniedException | TimeoutException e) {
+            return null;
+        }
+    }
+
     /**
      * Returns new shell
      *
@@ -42,8 +51,9 @@ public final class ShellFactory {
      */
     @Nullable
     public static Pair<Boolean, Shell> getShell() throws IOException {
+        final boolean root = Settings.su;
         try {
-            return new Pair<>(Settings.su, RootTools.getShell(Settings.su));
+            return new Pair<>(root, RootTools.getShell(root));
         } catch (RootDeniedException | TimeoutException e) {
             try {
                 return new Pair<>(false, RootTools.getShell(false));
