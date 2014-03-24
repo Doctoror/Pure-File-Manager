@@ -93,16 +93,4 @@ public final class ShellHolder {
         }
         return sShell;
     }
-
-    private static void resolveShell() {
-        try {
-            final Pair<Boolean, Shell> result = ShellFactory.getShell();
-            if (result != null) {
-                sIsRootShell = result.first;
-                sShell = result.second;
-            }
-        } catch (IOException e) {
-            Log.w("getShell() error:", e);
-        }
-    }
 }
