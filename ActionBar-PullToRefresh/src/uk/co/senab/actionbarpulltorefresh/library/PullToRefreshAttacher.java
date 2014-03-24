@@ -73,7 +73,7 @@ public class PullToRefreshAttacher {
     private final int[] mViewLocationResult = new int[2];
     private final Rect mRect = new Rect();
 
-    protected PullToRefreshAttacher(Activity activity, Options options) {
+    protected PullToRefreshAttacher(final Activity activity, Options options) {
         if (activity == null) {
             throw new IllegalArgumentException("activity cannot be null");
         }
@@ -121,15 +121,16 @@ public class PullToRefreshAttacher {
         mHeaderTransformer.onViewCreated(activity, mHeaderView);
 
         // Now HeaderView to Activity
-        decorView.post(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (decorView.getWindowToken() != null) {
+                final View decorView = activity.getWindow().getDecorView();
+                if (decorView != null && decorView.getWindowToken() != null) {
                     // The Decor View has a Window Token, so we can add the HeaderView!
-                    addHeaderViewToActivity(mHeaderView);
+                    addHeaderViewToActivity(decorView, mHeaderView);
                 } else {
                     // The Decor View doesn't have a Window Token yet, post ourselves again...
-                    decorView.post(this);
+                    activity.runOnUiThread(this);
                 }
             }
         });
@@ -590,12 +591,9 @@ public class PullToRefreshAttacher {
         return mIsDestroyed;
     }
 
-    protected void addHeaderViewToActivity(View headerView) {
+    protected void addHeaderViewToActivity(final View decorView, final View headerView) {
         // Get the Display Rect of the Decor View
-        final View decorView = mActivity.getWindow().getDecorView();
-        if (decorView != null) {
-            decorView.getWindowVisibleDisplayFrame(mRect);
-        }
+        decorView.getWindowVisibleDisplayFrame(mRect);
 
         // Honour the requested layout params
         int width = WindowManager.LayoutParams.MATCH_PARENT;
