@@ -16,6 +16,7 @@ package com.docd.purefm.commandline;
 
 import com.stericson.RootTools.execution.Shell;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public final class CommandLine {
     private CommandLine() {}
 
     @Nullable
-    public static synchronized List<String> executeForResult(final Shell shell, final Command command) {
+    public static synchronized List<String> executeForResult(@NotNull final Shell shell,
+                                                             @NotNull final Command command) {
         final List<String> result = new LinkedList<>();
         final ExecutionStatus status = new ExecutionStatus();
         command.setCommandListener(new Command.CommandListener() {
@@ -77,7 +79,8 @@ public final class CommandLine {
         return null;
     }
 
-    public static synchronized boolean execute(final Shell shell, final Command command) {
+    public static synchronized boolean execute(@NotNull final Shell shell,
+                                               @NotNull final Command command) {
         final ExecutionStatus status = new ExecutionStatus();
         command.setCommandListener(new Command.CommandListener() {
             @Override
@@ -117,7 +120,7 @@ public final class CommandLine {
         }
     }
 
-    public static boolean execute(final Shell shell, final String command) {
+    public static boolean execute(@NotNull final Shell shell, @NotNull final String command) {
         return execute(shell, new Command(ShellHolder.getNextCommandId(), command));
     }
 

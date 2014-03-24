@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import android.app.Dialog;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -32,6 +33,7 @@ import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ClipBoard;
+import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -75,12 +77,16 @@ public final class PasteTaskExecutor implements OnClickListener {
                 }
             }
         } else {
-            for (final GenericFile file : contents) {
-                final File tmp = new File(target.toFile(), file.getName());
-                if (CommandLine.execute(ShellHolder.getShell(), new CommandExists(tmp.getAbsolutePath()))) {
-                    mExisting.put(tmp, file);
-                } else {
-                    mToProcess.add(file);
+            final Shell shell = ShellHolder.getShell();
+            if (shell != null) {
+                Log.w("PasteTaskExecutor", "shell is null, skipping");
+                for (final GenericFile file : contents) {
+                    final File tmp = new File(target.toFile(), file.getName());
+                    if (CommandLine.execute(shell, new CommandExists(tmp.getAbsolutePath()))) {
+                        mExisting.put(tmp, file);
+                    } else {
+                        mToProcess.add(file);
+                    }
                 }
             }
         }

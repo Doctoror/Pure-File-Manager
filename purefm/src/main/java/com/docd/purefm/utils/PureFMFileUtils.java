@@ -31,6 +31,7 @@ import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
+import com.stericson.RootTools.execution.Shell;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 public final class PureFMFileUtils {
@@ -141,7 +143,13 @@ public final class PureFMFileUtils {
             }
         }
 
-        final List<String> fsTypeResult = CommandLine.executeForResult(ShellHolder.getShell(),
+        final Shell shell = ShellHolder.getShell();
+        if (shell == null) {
+            Log.w("resolveFileSystem()", "shell is null, aborting");
+            return null;
+        }
+
+        final List<String> fsTypeResult = CommandLine.executeForResult(shell,
                 new CommandStat(path));
         return fsTypeResult == null || fsTypeResult.isEmpty() ?
                 null : fsTypeResult.get(0);

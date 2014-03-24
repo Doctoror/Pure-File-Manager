@@ -17,7 +17,9 @@ package com.docd.purefm.file;
 import android.os.Looper;
 
 import com.docd.purefm.Environment;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.settings.Settings;
+import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,9 +34,12 @@ public final class FileFactory {
         //if (Looper.myLooper() == Looper.getMainLooper()) {
             //throw new RuntimeException("Wrong thread");
         //} TODO check this
-        return Settings.useCommandLine && Environment.hasBusybox() ?
-                CommandLineFile.fromFile(new File(path)) :
-                new JavaFile(path);
+        Shell shell = null;
+        if (Settings.useCommandLine && Environment.hasBusybox()) {
+            shell = ShellHolder.getShell();
+        }
+        return shell == null ? new JavaFile(path) :
+                CommandLineFile.fromFile(shell, new File(path));
     }
 
     @NotNull
@@ -42,8 +47,12 @@ public final class FileFactory {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");
         }
-        return Settings.useCommandLine && Environment.hasBusybox() ?
-                CommandLineFile.fromFile(path) :
+        Shell shell = null;
+        if (Settings.useCommandLine && Environment.hasBusybox()) {
+            shell = ShellHolder.getShell();
+        }
+        return shell != null ?
+                CommandLineFile.fromFile(shell, path) :
                 new JavaFile(path);
     }
 
@@ -52,8 +61,12 @@ public final class FileFactory {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");
         }
-        return Settings.useCommandLine && Environment.hasBusybox() ?
-                CommandLineFile.fromFile(new File(file, name)) :
+        Shell shell = null;
+        if (Settings.useCommandLine && Environment.hasBusybox()) {
+            shell = ShellHolder.getShell();
+        }
+        return  shell != null ?
+                CommandLineFile.fromFile(shell, new File(file, name)) :
                 new JavaFile(file, name);
     }
 }

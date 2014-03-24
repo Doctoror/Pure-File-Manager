@@ -19,6 +19,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import com.docd.purefm.R;
+import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.settings.Settings;
 
 /**
@@ -62,9 +63,9 @@ public abstract class ActionBarIconMonitoredActivity extends MonitoredActivity {
      * Sets ActionBar icon to ic_superuser if superuser enabled.
      */
     protected final void invalidateActionBarIcon() {
-        if (Settings.su) {
+        if (ShellHolder.isCurrentShellRoot()) {
             setActionBarIcon(getResources().getDrawable(R.drawable.ic_root));
-        } else if (Settings.useCommandLine) {
+        } else if (Settings.useCommandLine && ShellHolder.getShell() != null) {
             setActionBarIcon(getResources().getDrawable(R.drawable.ic_shell));
         } else {
             setActionBarIcon(mDefaultIcon);

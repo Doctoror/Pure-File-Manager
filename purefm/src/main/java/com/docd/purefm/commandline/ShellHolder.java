@@ -15,10 +15,12 @@
 package com.docd.purefm.commandline;
 
 import android.util.Log;
+import android.util.Pair;
 
+import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -35,16 +37,21 @@ public final class ShellHolder {
 
     private ShellHolder() {}
 
-    private static Shell shell;
+    private static boolean sIsRootShell;
+    private static Shell sShell;
+
+    public static boolean isCurrentShellRoot() {
+        return sIsRootShell;
+    }
 
     public static synchronized void releaseShell() {
-        if (shell != null) {
+        if (sShell != null) {
             try {
-                shell.close();
+                sShell.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            shell = null;
+            sShell = null;
         }
     }
 
@@ -53,15 +60,26 @@ public final class ShellHolder {
      *
      * @return shell shared Shell instance
      */
-    @NotNull
+    @Nullable
     public static synchronized Shell getShell() {
-        if (shell == null || !Shell.isAnyShellOpen()) {
-            try {
-                shell = ShellFactory.getShell();
-            } catch (IOException e) {
-                Log.w("getShell() error:", e);
-            }
+        if (Settings.su && sShell != null && !sIsRootShell) {
+            //resolveShell();
         }
-        return shell;
+        if (sShell == null || !Shell.isAnyShellOpen()) {
+            resolveShell();
+        }
+        return sShell;
+    }
+
+    private static void resolveShell() {
+        try {
+            final Pair<Boolean, Shell> result = ShellFactory.getShell();
+            if (result != null) {
+                sIsRootShell = result.first;
+                sShell = result.second;
+            }
+        } catch (IOException e) {
+            Log.w("getShell() error:", e);
+        }
     }
 }

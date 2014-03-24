@@ -14,7 +14,10 @@
  */
 package com.docd.purefm.commandline;
 
+import android.util.Log;
+
 import com.docd.purefm.file.GenericFile;
+import com.stericson.RootTools.execution.Shell;
 
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +35,12 @@ public final class CommandDu extends BusyboxCommand {
     }
 
     public static long du_s(@NotNull final GenericFile file) {
-        final List<String> result = CommandLine.executeForResult(ShellHolder.getShell(),
-                new CommandDu(file));
+        final Shell shell = ShellHolder.getShell();
+        if (shell == null) {
+            Log.w("CommandDu", "shell is null, aborting");
+            return 0L;
+        }
+        final List<String> result = CommandLine.executeForResult(shell, new CommandDu(file));
         if (result == null || result.isEmpty()) {
             return 0L;
         }
