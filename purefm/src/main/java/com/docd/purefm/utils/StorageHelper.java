@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 
 import android.os.Environment;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,13 +90,7 @@ public final class StorageHelper {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // ignored
-                }
-            }
+            IOUtils.closeQuietly(reader);
         }
 
         return volumeList;
@@ -416,8 +411,10 @@ public final class StorageHelper {
 
         /**
          * If true, the storage is removable
+         * Defaults to true since there is no way to determine whether the volume is removable
+         * except for {@link android.os.Environment#getExternalStorageDirectory()}
          */
-        private boolean mRemovable;
+        private boolean mRemovable = true;
 
         /**
          * If true, the storage is emulated
