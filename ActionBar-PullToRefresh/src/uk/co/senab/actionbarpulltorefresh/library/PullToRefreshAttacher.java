@@ -126,6 +126,7 @@ public class PullToRefreshAttacher {
     }
 
     private final Runnable mAddHeaderViewRunnable = new Runnable() {
+<<<<<<< HEAD
 
         private final int mRetryLimit = 10;
         private int mRetryCount;
@@ -134,6 +135,12 @@ public class PullToRefreshAttacher {
         public void run() {
             final Activity activity = mActivity.get();
             if (activity != null && mRetryCount++ < mRetryLimit && !activity.isFinishing()) {
+=======
+        @Override
+        public void run() {
+            final Activity activity = mActivity.get();
+            if (activity != null) {
+>>>>>>> origin/master
                 final View decorView = activity.getWindow().getDecorView();
                 if (decorView != null && decorView.getWindowToken() != null) {
                     // The Decor View has a Window Token, so we can add the HeaderView!
@@ -628,8 +635,16 @@ public class PullToRefreshAttacher {
 
         // Workaround for Issue #182
         headerView.setTag(wlp);
+<<<<<<< HEAD
         final Activity activity = mActivity.get();
         activity.getWindowManager().addView(headerView, wlp);
+=======
+
+        final Activity activity = mActivity.get();
+        if (activity != null) {
+            activity.getWindowManager().addView(headerView, wlp);
+        }
+>>>>>>> origin/master
     }
 
     protected void updateHeaderViewPosition(View headerView) {
@@ -641,7 +656,11 @@ public class PullToRefreshAttacher {
             WindowManager.LayoutParams wlp = null;
             if (headerView.getLayoutParams() instanceof WindowManager.LayoutParams) {
                 wlp = (WindowManager.LayoutParams) headerView.getLayoutParams();
+<<<<<<< HEAD
             } else if (headerView.getTag() instanceof WindowManager.LayoutParams) {
+=======
+            } else if (headerView.getTag() instanceof  WindowManager.LayoutParams) {
+>>>>>>> origin/master
                 wlp = (WindowManager.LayoutParams) headerView.getTag();
             }
 

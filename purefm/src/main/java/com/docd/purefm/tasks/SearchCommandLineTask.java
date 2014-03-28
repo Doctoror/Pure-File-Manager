@@ -30,6 +30,7 @@ import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
 final class SearchCommandLineTask extends AbstractSearchTask {
@@ -101,10 +102,16 @@ final class SearchCommandLineTask extends AbstractSearchTask {
         } catch (Exception e) {
             Log.w("Exception while searching", e.toString());
         } finally {
-            if (os != null) { try { os.close(); } catch (Exception e) {} }
-            if (is != null) { try { is.close(); } catch (Exception e) {} }
-            if (err != null) { try { err.close(); } catch (Exception e) {} }
-            if (process != null) { try { process.destroy(); } catch (Exception e) {} }
+            IOUtils.closeQuietly(os);
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(err);
+            if (process != null) {
+                try {
+                    process.destroy();
+                } catch (Exception e) {
+                    //ignored
+                }
+            }
         }
         return null;
     }

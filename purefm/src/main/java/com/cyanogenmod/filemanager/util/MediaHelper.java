@@ -26,6 +26,9 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.text.TextUtils;
 
+import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -73,13 +76,13 @@ public final class MediaHelper {
                 projection, where, new String[]{"1"}, null);
         if (c != null) {
             try {
-                while (c.moveToNext()) {
+                for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
                     long albumId = c.getLong(0);
                     String albumPath = c.getString(1);
                     albums.put(albumPath, albumId);
                 }
             } finally {
-                c.close();
+                IOUtils.closeQuietly(c);
             }
         }
         return albums;
@@ -92,19 +95,18 @@ public final class MediaHelper {
      * @param albumId The album identifier to search
      * @return String The album thumbnail path
      */
-    public static String getAlbumThumbnailPath(ContentResolver cr, long albumId) {
+    public static String getAlbumThumbnailPath(@NotNull final ContentResolver cr,
+                                               final long albumId) {
         final String[] projection = {MediaStore.Audio.Albums.ALBUM_ART};
-        final String where = BaseColumns._ID + " = ?";
+        final String where = BaseColumns._ID + "=?";
         Cursor c = cr.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 projection, where, new String[]{String.valueOf(albumId)}, null);
         try {
-            if (c != null && c.moveToNext()) {
+            if (c != null && c.moveToFirst()) {
                 return c.getString(0);
             }
         } finally {
-            if (c != null) {
-                c.close();
-            }
+            IOUtils.closeQuietly(c);
         }
         return null;
     }
@@ -156,9 +158,7 @@ public final class MediaHelper {
                 }
             }
         } finally {
-            if (c != null) {
-                c.close();
-            }
+            IOUtils.closeQuietly(c);
         }
         return null;
     }
