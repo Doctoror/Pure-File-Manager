@@ -33,6 +33,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import uk.co.senab.actionbarpulltorefresh.library.listeners.HeaderViewListener;
@@ -51,7 +52,7 @@ public class PullToRefreshAttacher {
 
     private OnRefreshListener mOnRefreshListener;
 
-    private Activity mActivity;
+    private WeakReference<Activity> mActivity;
     private View mHeaderView;
     private HeaderViewListener mHeaderViewListener;
 
@@ -82,7 +83,7 @@ public class PullToRefreshAttacher {
             options = new Options();
         }
 
-        mActivity = activity;
+        mActivity = new WeakReference<Activity>(activity);
         mRefreshableViews = new WeakHashMap<View, ViewDelegate>();
 
         // Copy necessary values from options
@@ -121,20 +122,29 @@ public class PullToRefreshAttacher {
         mHeaderTransformer.onViewCreated(activity, mHeaderView);
 
         // Now HeaderView to Activity
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        activity.runOnUiThread(mAddHeaderViewRunnable);
+    }
+
+    private final Runnable mAddHeaderViewRunnable = new Runnable() {
+
+        private final int mRetryLimit = 10;
+        private int mRetryCount;
+
+        @Override
+        public void run() {
+            final Activity activity = mActivity.get();
+            if (activity != null && mRetryCount++ < mRetryLimit && !activity.isFinishing()) {
                 final View decorView = activity.getWindow().getDecorView();
                 if (decorView != null && decorView.getWindowToken() != null) {
                     // The Decor View has a Window Token, so we can add the HeaderView!
                     addHeaderViewToActivity(decorView, mHeaderView);
                 } else {
                     // The Decor View doesn't have a Window Token yet, post ourselves again...
-                    activity.runOnUiThread(this);
+                    mHeaderView.postDelayed(this, 50);
                 }
             }
-        });
-    }
+        }
+    };
 
     /**
      * Add a view which will be used to initiate refresh requests.
@@ -181,7 +191,10 @@ public class PullToRefreshAttacher {
      * @param newConfig The new configuration
      */
     public void onConfigurationChanged(Configuration newConfig) {
-        mHeaderTransformer.onConfigurationChanged(mActivity, newConfig);
+        final Activity activity = mActivity.get();
+        if (activity != null) {
+            mHeaderTransformer.onConfigurationChanged(activity, newConfig);
+        }
     }
 
     /**
@@ -477,7 +490,7 @@ public class PullToRefreshAttacher {
     }
 
     protected final Activity getAttachedActivity() {
-        return mActivity;
+        return mActivity.get();
     }
 
     protected EnvironmentDelegate createDefaultEnvironmentDelegate() {
@@ -615,29 +628,34 @@ public class PullToRefreshAttacher {
 
         // Workaround for Issue #182
         headerView.setTag(wlp);
-        mActivity.getWindowManager().addView(headerView, wlp);
+        final Activity activity = mActivity.get();
+        activity.getWindowManager().addView(headerView, wlp);
     }
 
     protected void updateHeaderViewPosition(View headerView) {
         // Refresh the Display Rect of the Decor View
-        mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
+        final Activity activity = mActivity.get();
+        if (activity != null) {
+            activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
 
-        WindowManager.LayoutParams wlp = null;
-        if (headerView.getLayoutParams() instanceof WindowManager.LayoutParams) {
-            wlp = (WindowManager.LayoutParams) headerView.getLayoutParams();
-        } else if (headerView.getTag() instanceof  WindowManager.LayoutParams) {
-            wlp = (WindowManager.LayoutParams) headerView.getTag();
-        }
+            WindowManager.LayoutParams wlp = null;
+            if (headerView.getLayoutParams() instanceof WindowManager.LayoutParams) {
+                wlp = (WindowManager.LayoutParams) headerView.getLayoutParams();
+            } else if (headerView.getTag() instanceof WindowManager.LayoutParams) {
+                wlp = (WindowManager.LayoutParams) headerView.getTag();
+            }
 
-        if (wlp != null && wlp.y != mRect.top) {
-            wlp.y = mRect.top;
-            mActivity.getWindowManager().updateViewLayout(headerView, wlp);
+            if (wlp != null && wlp.y != mRect.top) {
+                wlp.y = mRect.top;
+                activity.getWindowManager().updateViewLayout(headerView, wlp);
+            }
         }
     }
 
     protected void removeHeaderViewFromActivity(View headerView) {
-        if (headerView.getWindowToken() != null) {
-            mActivity.getWindowManager().removeViewImmediate(headerView);
+        final Activity activity = mActivity.get();
+        if (activity != null && headerView.getWindowToken() != null) {
+            activity.getWindowManager().removeViewImmediate(headerView);
         }
     }
 
