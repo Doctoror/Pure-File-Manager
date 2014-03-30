@@ -191,7 +191,6 @@ public final class CommandLineFile implements GenericFile,
         String name = attrs[LS_FILE];
         String canonicalPath = null;
         // if is symlink then resolve real path
-        //String targetName = null;
         final int index = name.indexOf("->");
         if (index != -1) {
             canonicalPath = name.substring(index + 3).trim();
@@ -200,7 +199,7 @@ public final class CommandLineFile implements GenericFile,
 
         final CommandLineFile f;
         if (parent == null) {
-            if (canonicalPath != null) {
+            if (canonicalPath != null || shell == null) {
                 f = new CommandLineFile(name, canonicalPath);
             } else {
                 f = new CommandLineFile(shell, name);

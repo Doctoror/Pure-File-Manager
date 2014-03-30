@@ -47,24 +47,28 @@ public final class CommandLine {
 
             @Override
             public void commandTerminated(int i, String s) {
-                status.finished = true;
-                command.notify();
+                synchronized (status) {
+                    status.finished = true;
+                    status.notify();
+                }
             }
 
             @Override
             public void commandCompleted(int i, int exitCode) {
                 status.exitCode = exitCode;
-                status.finished = true;
-                command.notify();
+                synchronized (status) {
+                    status.finished = true;
+                    status.notify();
+                }
             }
         });
 
         try {
             shell.add(command);
-            synchronized (command) {
+            synchronized (status) {
                 if (!status.finished) {
                     try {
-                        command.wait();
+                        status.wait();
                     } catch (InterruptedException e) {
                         command.terminate("Interrupted");
                     }
@@ -90,24 +94,28 @@ public final class CommandLine {
 
             @Override
             public void commandTerminated(int id, String reason) {
-                status.finished = true;
-                command.notify();
+                synchronized (status) {
+                    status.finished = true;
+                    status.notify();
+                }
             }
 
             @Override
             public void commandCompleted(int id, int exitCode) {
                 status.exitCode = exitCode;
-                status.finished = true;
-                command.notify();
+                synchronized (status) {
+                    status.finished = true;
+                    status.notify();
+                }
             }
         });
 
         try {
             shell.add(command);
-            synchronized (command) {
+            synchronized (status) {
                 if (!status.finished) {
                     try {
-                        command.wait();
+                        status.wait();
                     } catch (InterruptedException e) {
                         command.terminate("Interrupted");
                     }
@@ -124,9 +132,9 @@ public final class CommandLine {
         return execute(shell, new Command(ShellHolder.getNextCommandId(), command));
     }
 
-    private static final class ExecutionStatus {
-        int exitCode = -1;
-        boolean finished;
+    public static final class ExecutionStatus {
+        public int exitCode = -1;
+        public boolean finished;
     }
 
 //    private static String writeCommand(final String command, final DataOutputStream outputStream) throws IOException {

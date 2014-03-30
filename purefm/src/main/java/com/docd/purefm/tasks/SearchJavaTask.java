@@ -15,40 +15,70 @@
 package com.docd.purefm.tasks;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
 
+import org.apache.commons.io.DirectoryWalker;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 final class SearchJavaTask extends AbstractSearchTask {
 
+    protected SearchJavaTask(@NotNull final GenericFile startDirectory,
+                             @NotNull final SearchTaskListener listener) {
+        super(startDirectory, listener);
+    }
+
     @Override
     protected Void doInBackground(String... params) {
         try {
-            this.search(new File(params[1]), params[0]);
+            new SearchDirectoryWalker(params[0]).walk(new File(params[1]));
         } catch (Throwable e) {
             e.printStackTrace();
         }
         return null;
     }
-    
-    private void search(final File location, final String toFind) {
-        final File[] files = location.listFiles();
-        if (files != null) {
-            for (final File file : files) {
-                if (this.isCancelled()) {
-                    return;
-                }
-                if (file.isDirectory()) {
-                    search(file, toFind);
-                }
-                else if (StringUtils.containsIgnoreCase(file.getName(), toFind)) {
-                    this.publishProgress(new JavaFile(file));
-                }
-            }
+
+    private static final class SearchFileFilter implements FileFilter {
+
+        private final String mToFind;
+
+        SearchFileFilter(@NotNull final String toFind) {
+            mToFind = toFind;
+        }
+
+        @Override
+        public boolean accept(final File file) {
+            return file.isDirectory() || StringUtils.containsIgnoreCase(file.getName(), mToFind);
+        }
+    }
+
+    private final class SearchDirectoryWalker extends DirectoryWalker<File> {
+
+        SearchDirectoryWalker(@NotNull final String toFind) {
+            super(new SearchFileFilter(toFind), -1);
+        }
+
+        @Override
+        protected void handleFile(File file, int depth, Collection<File> results)
+                throws IOException {
+            publishProgress(new JavaFile(file));
+        }
+
+        @Override
+        protected boolean handleIsCancelled(File file, int depth, Collection<File> results)
+                throws IOException {
+            return isCancelled();
+        }
+
+        void walk(@NotNull final File directory) throws IOException {
+            walk(directory, null);
         }
     }
 

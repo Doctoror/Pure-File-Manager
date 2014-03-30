@@ -30,6 +30,7 @@ import com.docd.purefm.utils.PFMFileUtils;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -37,6 +38,8 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -52,31 +55,44 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
 
     private ActionModeController mActionModeController;
 
+    private InputMethodManager mInputMethodManager;
+
     private AbsListView mList;
     private BrowserBaseAdapter mAdapter;
-    
+
     private TextView mInput;
     private View mProgress;
-    
+
     private AbstractSearchTask mSearchTask;
-    private String mPath;
-    
+    private GenericFile mStartDirectory;
+
     private int mPrevId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_search);
-        this.mPath = getIntent().getStringExtra(Extras.EXTRA_PATH);
-        this.initActionBar();
-        this.initView();
+        mStartDirectory = (GenericFile) getIntent().getSerializableExtra(Extras.EXTRA_FILE);
+        mInputMethodManager = (InputMethodManager) getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        initActionBar();
+        initView();
     }
 
     @Override
     protected void setActionBarIcon(final Drawable icon) {
         getActionBar().setIcon(icon);
     }
-    
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mAdapter.isEmpty() && mInput.requestFocus()) {
+            mInputMethodManager.showSoftInput(mInput, InputMethodManager.SHOW_IMPLICIT);
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -84,7 +100,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
             mSearchTask.cancel(true);
         }
     }
-    
+
     @Override
     public boolean onKeyUp(final int keyCode, @NotNull final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
@@ -93,11 +109,11 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
         }
         return super.onKeyUp(keyCode, event);
     }
-    
+
     private void initActionBar() {
         final View actionBarCustom = this.getLayoutInflater().inflate(R.layout.activity_search_actionbar, null);
         final TextView path = (TextView) actionBarCustom.findViewById(android.R.id.text1);
-        path.setText(this.mPath);
+        path.setText(mStartDirectory.getAbsolutePath());
 
         final ActionBar bar = this.getActionBar();
         bar.setDisplayOptions(
@@ -109,7 +125,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
 
         mActionModeController = new ActionModeController(this);
     }
-    
+
     private void initView() {
         this.initList();
         this.mProgress = findViewById(android.R.id.progress);
@@ -122,15 +138,16 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
                 return true;
             }
         });
-        
+
         this.findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onSearchClicked();
             }
         });
+
     }
-    
+
     private void onSearchClicked() {
         final String text = mInput.getText().toString().trim();
         if (text.isEmpty()) {
@@ -140,8 +157,8 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
             mSearchTask.cancel(true);
         }
         mAdapter.updateData(new GenericFile[0]);
-        mSearchTask = AbstractSearchTask.create(this);
-        mSearchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text, mPath);
+        mSearchTask = AbstractSearchTask.create(mStartDirectory, this);
+        mSearchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text);
     }
 
     @Override
@@ -152,6 +169,8 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
     @Override
     public void onProgressUpdate(@NotNull AbstractSearchTask task, GenericFile... files) {
         mAdapter.addFiles(files);
+        mInputMethodManager.hideSoftInputFromWindow(mInput.getWindowToken(),
+                InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     @Override
@@ -182,13 +201,13 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
                 }
             }
     }
-    
+
     private void initList() {
         if (this.mList != null) {
             this.mList.getEmptyView().setVisibility(View.GONE);
             this.mList.setVisibility(View.GONE);
         }
-        
+
         if (Settings.appearance == Settings.APPEARANCE_LIST) {
             View vs = findViewById(android.R.id.list);
             if (vs instanceof ViewStub) {
@@ -204,7 +223,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
             this.mList = (AbsListView) vs;
             this.mAdapter = new BrowserGridAdapter(this);
         }
-        
+
         this.mList.setId(this.getNewId());
         this.mList.setEmptyView(findViewById(android.R.id.empty));
         this.mList.setAdapter(this.mAdapter);
@@ -221,12 +240,12 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
             }
         });
     }
-    
+
     private int getNewId() {
         this.mPrevId++;
         while (findViewById(this.mPrevId) != null){
               this.mPrevId++;
-        }  
+        }
         return this.mPrevId;
     }
 }

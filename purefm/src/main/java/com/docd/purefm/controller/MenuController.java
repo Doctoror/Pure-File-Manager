@@ -79,7 +79,7 @@ public final class MenuController {
 
             case R.id.menu_search:
                 final Intent searchIntent = new Intent(mActivity, SearchActivity.class);
-                searchIntent.putExtra(Extras.EXTRA_PATH, mBrowser.getCurrentPath().getAbsolutePath());
+                searchIntent.putExtra(Extras.EXTRA_FILE, mBrowser.getCurrentPath());
                 mActivity.startActivity(searchIntent);
                 return true;
 

@@ -28,18 +28,18 @@ import java.util.List;
 
 public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, Void> {
 
-    public static AbstractSearchTask create(final SearchTaskListener listener) {
+    public static AbstractSearchTask create(@NotNull final GenericFile startDirectory,
+                                            @NotNull final SearchTaskListener listener) {
         AbstractSearchTask task = null;
         if (Settings.useCommandLine) {
             final Shell shell = ShellHolder.getShell();
             if (shell != null) {
-                task = new SearchCommandLineTask(shell);
+                task = new SearchCommandLineTask(shell, startDirectory, listener);
             }
         }
         if (task == null) {
-            task = new SearchJavaTask();
+            task = new SearchJavaTask(startDirectory, listener);
         }
-        task.setSearchTaskListener(listener);
         return task;
     }
 
@@ -50,42 +50,38 @@ public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, 
         void onPostExecute(@NotNull AbstractSearchTask task);
     }
 
-    private SearchTaskListener mListener;
 
-    public void setSearchTaskListener(@Nullable final SearchTaskListener l) {
-        mListener = l;
+    protected final GenericFile mStartDirectory;
+    private final SearchTaskListener mListener;
+
+    protected AbstractSearchTask(@NotNull final GenericFile startDirectory,
+                                 @NotNull final SearchTaskListener listener) {
+        mStartDirectory = startDirectory;
+        mListener = listener;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        if (mListener != null) {
-            mListener.onPreExecute(this);
-        }
+        mListener.onPreExecute(this);
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (mListener != null) {
-            mListener.onPostExecute(this);
-        }
+        mListener.onPostExecute(this);
     }
 
     @Override
     protected void onCancelled(Void aVoid) {
         super.onCancelled(aVoid);
-        if (mListener != null) {
-            mListener.onCancelled(this);
-        }
+        mListener.onCancelled(this);
     }
 
     @Override
     protected void onProgressUpdate(GenericFile... values) {
         super.onProgressUpdate(values);
-        if (mListener != null) {
-            mListener.onProgressUpdate(this, values);
-        }
+        mListener.onProgressUpdate(this, values);
     }
 
     @NotNull

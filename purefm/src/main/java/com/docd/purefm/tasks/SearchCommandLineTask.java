@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.docd.purefm.commandline.CommandLineUtils;
+import com.docd.purefm.commandline.CommandFind;
 import com.docd.purefm.file.CommandLineFile;
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
@@ -40,45 +41,39 @@ final class SearchCommandLineTask extends AbstractSearchTask {
     private final Shell mShell;
     private final List<String> mDenied;
 
-    public SearchCommandLineTask(@NotNull final Shell shell) {
-        this.mShell = shell;
-        this.mDenied = new ArrayList<>();
+    public SearchCommandLineTask(@NotNull final Shell shell,
+                                 @NotNull final GenericFile startDirectory,
+                                 @NotNull final SearchTaskListener listener) {
+        super(startDirectory, listener);
+        mShell = shell;
+        mDenied = new ArrayList<>();
     }
 
     @Override
     @NotNull
     public List<String> getDeniedLocations() {
-        return this.mDenied;
+        return mDenied;
     }
-    
+
     @Override
     protected Void doInBackground(String... params) {
-        final String what = params[0];
-
-        final StringBuilder command = new StringBuilder();
-        final String[] commands = new String[params.length - 1];
-        for (int i = 0; i < commands.length; i++) {
-            commands[i] = this.buildFindCommand(params[i + 1], what, command);
-        }
-        command.setLength(0);
-        
+        final CommandFind command = new CommandFind(mStartDirectory.getAbsolutePath(), params);
+        // NOTE this doesn't use Shell because we can't create a new CommandLineFile from
+        // CommandOutput because executing readlink (which is done in CommandLineFile constructor)
+        // will freeze the whole Shell
         DataOutputStream os = null;
         BufferedReader is = null;
         BufferedReader err = null;
         Process process = null;
         try {
-            //TODO use mShell instead
             process = Runtime.getRuntime().exec(Settings.su ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            for (final String commandItem : commands) {
-                os.writeBytes(commandItem + "\n");
-                os.flush();
-            }
-            os.writeBytes("exit\n"); 
+            os.writeBytes(command.toString());
+            os.writeBytes("exit\n");
             os.flush();
-            
+
             String line;
             try {
                 while (!isCancelled() && (line = is.readLine()) != null) {
@@ -87,13 +82,13 @@ final class SearchCommandLineTask extends AbstractSearchTask {
             } catch (EOFException e) {
                 //ignore
             }
-            
+
             try {
                 while (!isCancelled() && (line = err.readLine()) != null) {
                     final Matcher denied = DENIED.matcher(line);
                     if (denied.matches()) {
                         this.mDenied.add(denied.group(1));
-                    } 
+                    }
                 }
             } catch (EOFException e) {
                 //ignore
@@ -114,18 +109,6 @@ final class SearchCommandLineTask extends AbstractSearchTask {
             }
         }
         return null;
-    }
-    
-    private String buildFindCommand(String location, String what, StringBuilder command) {
-        command.setLength(0);
-        command.append("find ");
-        command.append(CommandLineUtils.getCommandLineString(location));
-        command.append(" -type f -iname ");
-        command.append('*');
-        command.append(CommandLineUtils.getCommandLineString(what));
-        command.append('*');
-        command.append(" -exec busybox ls -lApedn {} \\;");
-        return command.toString();
     }
 
 }
