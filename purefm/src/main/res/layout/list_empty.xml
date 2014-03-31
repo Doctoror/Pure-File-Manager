@@ -12,16 +12,27 @@
 <!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
-<TextView
+<android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/empty"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:layout_centerInParent="true"
-    android:gravity="center"
-    android:text="@string/empty"
-    android:textAppearance="?android:attr/textAppearanceLarge"
     android:visibility="gone"
-    tools:visibility="visible"/>
+    tools:visibility="visible">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/empty"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    </ScrollView>
+
+</android.support.v4.widget.SwipeRefreshLayout>

@@ -23,6 +23,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +34,7 @@ import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cyanogenmod.filemanager.util.MediaHelper;
@@ -59,17 +61,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.ViewDelegate;
 
 /**
  * Fragment manages file List, menu and ActionMode.
  * @author Doctoror
  */
 public final class BrowserFragment extends UserVisibleHintFragment
-        implements OnRefreshListener {
+        implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String STATE_BROWSER = "BrowserFragment.state.mBrowser";
 
@@ -84,7 +82,9 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     private OnSequenceClickListener mOnSequenceListener;
 
-    private PullToRefreshLayout mPullToRefreshLayout;
+    private SwipeRefreshLayout mSwipeRefreshLayoutList;
+    private SwipeRefreshLayout mSwipeRefreshLayoutEmpty;
+
     private AbsListView mListView;
     private View mMainProgress;
 
@@ -99,16 +99,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     private int mPrevId;
     private boolean firstRun;
-
-    /**
-     * Used fot empty view
-     */
-    private final ViewDelegate mPullableViewDelegate = new ViewDelegate() {
-        @Override
-        public boolean isReadyForPull(View view, float v, float v2) {
-            return true;
-        }
-    };
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -277,33 +267,28 @@ public final class BrowserFragment extends UserVisibleHintFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
-        mPullToRefreshLayout = (PullToRefreshLayout) parent.findViewById(R.id.pullToRefreshLayout);
-        initList(parent);
+        initList(inflater, parent);
         firstRun = true;
         return parent;
     }
 
-    private void initList(View parent) {
+    private void initList(@NotNull final LayoutInflater inflater, @NotNull final View parent) {
         if (mListView != null) {
             mListView.getEmptyView().setVisibility(View.GONE);
             mListView.setVisibility(View.GONE);
         }
         mMainProgress = parent.findViewById(android.R.id.progress);
+        mSwipeRefreshLayoutList = (SwipeRefreshLayout) inflater.inflate(
+                Settings.appearance == Settings.APPEARANCE_LIST ? R.layout.browser_listview :
+                        R.layout.browser_gridview, (ViewGroup) parent.findViewById(
+                        R.id.list_container)).findViewById(R.id.browser_list_swipe_refresh);
+        mSwipeRefreshLayoutEmpty = (SwipeRefreshLayout) parent.findViewById(android.R.id.empty);
 
-        if (Settings.appearance == Settings.APPEARANCE_LIST) {
-            View vs = parent.findViewById(android.R.id.list);
-            if (vs instanceof ViewStub) {
-                vs = ((ViewStub) vs).inflate();
-            }
-            mListView = (AbsListView) vs;
-            mAdapter = new BrowserListAdapter(this.getActivity());
+        mListView = (AbsListView) mSwipeRefreshLayoutList.findViewById(android.R.id.list);
+        if (mListView instanceof ListView) {
+            mAdapter = new BrowserListAdapter(getActivity());
         } else {
-            View vs = parent.findViewById(R.id.grid);
-            if (vs instanceof ViewStub) {
-                vs = ((ViewStub) vs).inflate();
-            }
-            mListView = (AbsListView) vs;
-            mAdapter = new BrowserGridAdapter(this.getActivity());
+            mAdapter = new BrowserGridAdapter(getActivity());
         }
 
         menuController.setBrowserAdapter(this.mAdapter);
@@ -370,6 +355,18 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
         mListView.setChoiceMode(mAttachedBrowserActivity.getGetContentMimeType() == null ?
                 AbsListView.CHOICE_MODE_MULTIPLE_MODAL : AbsListView.CHOICE_MODE_NONE);
+
+        mSwipeRefreshLayoutList.setOnRefreshListener(this);
+        mSwipeRefreshLayoutEmpty.setOnRefreshListener(this);
+
+        mSwipeRefreshLayoutList.setColorScheme(R.color.holo_light_selected,
+                R.color.holo_light_selected,
+                R.color.holo_light_selected,
+                R.color.holo_light_selected);
+        mSwipeRefreshLayoutEmpty.setColorScheme(R.color.holo_light_selected,
+                R.color.holo_light_selected,
+                R.color.holo_light_selected,
+                R.color.holo_light_selected);
     }
 
     private void onFirstInvalidate() {
@@ -385,7 +382,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     @Override
     protected void onVisible() {
-        invalidatePullToRefresh();
         if (firstRun || mRefreshFlag) {
             onFirstInvalidate();
         } else {
@@ -407,21 +403,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
         }
     }
 
-    private void invalidatePullToRefresh() {
-        if (mPullToRefreshLayout != null) {
-            ActionBarPullToRefresh.from(getActivity())
-                    .theseChildrenArePullable(mListView, mListView.getEmptyView())
-                    .listener(this)
-                    .useViewDelegate(TextView.class, mPullableViewDelegate)
-                    .setup(mPullToRefreshLayout);
-        }
-    }
-
-    /**
-     * Called from PullToRefresh
-     */
     @Override
-    public void onRefreshStarted(View view) {
+    public void onRefresh() {
         if (mBrowser != null) {
             mBrowser.invalidate();
         }
@@ -433,8 +416,9 @@ public final class BrowserFragment extends UserVisibleHintFragment
             mScannerTask.cancel(false);
         }
 
-        mScannerTask = new DirectoryScanTask(mBrowser, mPullToRefreshLayout,
-                mAttachedBrowserActivity.getGetContentMimeType(), mAdapter);
+        mScannerTask = new DirectoryScanTask(mBrowser,
+                mAttachedBrowserActivity.getGetContentMimeType(), mAdapter,
+                        mSwipeRefreshLayoutList, mSwipeRefreshLayoutEmpty);
         mScannerTask.execute(mBrowser.getCurrentPath());
     }
 

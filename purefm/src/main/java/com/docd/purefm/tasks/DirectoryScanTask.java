@@ -15,6 +15,7 @@
 package com.docd.purefm.tasks;
 
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.docd.purefm.adapters.BrowserBaseAdapter;
 import com.docd.purefm.browser.Browser;
@@ -23,7 +24,8 @@ import com.docd.purefm.file.GenericFileFilter;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MimeTypes;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class DirectoryScanTask extends
         AsyncTask<GenericFile, Void, GenericFile[]> {
@@ -32,7 +34,7 @@ public final class DirectoryScanTask extends
     private final BrowserBaseAdapter mBrowserAdapter;
     
     private final Browser mBrowser;
-    private final PullToRefreshLayout mPullToRefreshLayout;
+    private final SwipeRefreshLayout[] mSwipeRefreshLayouts;
     
     private GenericFile file;
     
@@ -40,16 +42,21 @@ public final class DirectoryScanTask extends
         sFilter = new ListFileFilter();
     }
 
-    public DirectoryScanTask(Browser browser, PullToRefreshLayout layout, String mimeType, BrowserBaseAdapter adapter) {
+    public DirectoryScanTask(@NotNull final Browser browser,
+                             @Nullable final String mimeType,
+                             @NotNull final BrowserBaseAdapter adapter,
+                             @NotNull final SwipeRefreshLayout... refreshLayouts) {
         this.mBrowser = browser;
-        this.mPullToRefreshLayout = layout;
+        this.mSwipeRefreshLayouts = refreshLayouts;
         this.mBrowserAdapter = adapter;
         sFilter.setMimeType(mimeType);
     }
 
     @Override
     protected void onPreExecute() {
-        mPullToRefreshLayout.setRefreshing(true);
+        for (final SwipeRefreshLayout layout : mSwipeRefreshLayouts) {
+            layout.setRefreshing(true);
+        }
     }
 
     @Override
@@ -63,14 +70,18 @@ public final class DirectoryScanTask extends
         super.onPostExecute(result);
         mBrowserAdapter.updateData(result);
         mBrowser.onScanFinished(this.file);
-        mPullToRefreshLayout.setRefreshComplete();
+        for (final SwipeRefreshLayout layout : mSwipeRefreshLayouts) {
+            layout.setRefreshing(false);
+        }
     }
 
     @Override
     protected void onCancelled(GenericFile[] result) {
         super.onCancelled(result);
         mBrowser.onScanCancelled(false);
-        mPullToRefreshLayout.setRefreshComplete();
+        for (final SwipeRefreshLayout layout : mSwipeRefreshLayouts) {
+            layout.setRefreshing(false);
+        }
     }
 
     private static final class ListFileFilter implements GenericFileFilter {

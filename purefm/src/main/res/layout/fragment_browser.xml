@@ -12,42 +12,25 @@
 <!--WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.-->
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
-<uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pullToRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity">
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/list_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"/>
 
-        <ViewStub
-            android:id="@android:id/list"
-            android:inflatedId="@android:id/list"
-            android:layout="@layout/browser_listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:saveEnabled="false" />
+    <include layout="@layout/list_empty"/>
 
-        <ViewStub
-            android:id="@+id/grid"
-            android:inflatedId="@+id/grid"
-            android:layout="@layout/browser_gridview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:saveEnabled="false" />
+    <ProgressBar
+        android:id="@android:id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
-        <include layout="@layout/list_empty"/>
-
-        <ProgressBar
-            android:id="@android:id/progress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
-
-    </RelativeLayout>
-</uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+</RelativeLayout>
