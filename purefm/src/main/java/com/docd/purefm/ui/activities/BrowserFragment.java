@@ -360,13 +360,13 @@ public final class BrowserFragment extends UserVisibleHintFragment
         mSwipeRefreshLayoutEmpty.setOnRefreshListener(this);
 
         mSwipeRefreshLayoutList.setColorScheme(R.color.holo_light_selected,
+                R.color.holo_dark_window_background,
                 R.color.holo_light_selected,
-                R.color.holo_light_selected,
-                R.color.holo_light_selected);
+                R.color.holo_dark_window_background);
         mSwipeRefreshLayoutEmpty.setColorScheme(R.color.holo_light_selected,
+                R.color.holo_dark_window_background,
                 R.color.holo_light_selected,
-                R.color.holo_light_selected,
-                R.color.holo_light_selected);
+                R.color.holo_dark_window_background);
     }
 
     private void onFirstInvalidate() {
