@@ -359,14 +359,16 @@ public final class BrowserFragment extends UserVisibleHintFragment
         mSwipeRefreshLayoutList.setOnRefreshListener(this);
         mSwipeRefreshLayoutEmpty.setOnRefreshListener(this);
 
+        final int color2resId = Settings.theme == R.style.ThemeLight ?
+                R.color.holo_light_progress_color_res_id : R.color.holo_dark_window_background;
         mSwipeRefreshLayoutList.setColorScheme(R.color.holo_light_selected,
-                R.color.holo_dark_window_background,
+                color2resId,
                 R.color.holo_light_selected,
-                R.color.holo_dark_window_background);
+                color2resId);
         mSwipeRefreshLayoutEmpty.setColorScheme(R.color.holo_light_selected,
-                R.color.holo_dark_window_background,
+                color2resId,
                 R.color.holo_light_selected,
-                R.color.holo_dark_window_background);
+                color2resId);
     }
 
     private void onFirstInvalidate() {
