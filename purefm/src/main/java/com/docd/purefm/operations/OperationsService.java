@@ -26,6 +26,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.docd.purefm.ActivityMonitor;
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverNotifier;
@@ -35,6 +36,8 @@ import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
+import com.docd.purefm.utils.PFMFileUtils;
+import com.stericson.RootTools.RootTools;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -298,6 +301,11 @@ public final class OperationsService extends MultiWorkerService
         if (target.exists()) {
             message = getText(R.string.file_exists);
         } else {
+            final String path = PFMFileUtils.fullPath(target);
+            final boolean remount = Environment.needsRemount(path);
+            if (remount) {
+                RootTools.remount(path, "RW");
+            }
             try {
                 if (!target.createNewFile()) {
                     message = getText(R.string.could_not_create_file);
@@ -307,6 +315,9 @@ public final class OperationsService extends MultiWorkerService
                 }
             } catch (IOException e) {
                 message = e.getMessage();
+            }
+            if (remount) {
+                RootTools.remount(path, "RO");
             }
         }
         onOperationCompleted(ACTION_CREATE_FILE,
@@ -326,11 +337,19 @@ public final class OperationsService extends MultiWorkerService
         if (target.exists()) {
             message = getText(R.string.file_exists);
         } else {
+            final String path = PFMFileUtils.fullPath(target);
+            final boolean remount = Environment.needsRemount(path);
+            if (remount) {
+                RootTools.remount(path, "RW");
+            }
             if (!target.mkdir()) {
                 message = getText(R.string.could_not_create_dir);
             } else {
                 MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
                 FileObserverNotifier.notifyCreated(target);
+            }
+            if (remount) {
+                RootTools.remount(path, "RO");
             }
         }
         onOperationCompleted(ACTION_CREATE_DIRECTORY,

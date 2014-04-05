@@ -21,7 +21,8 @@ import com.stericson.RootTools.RootTools;
 
 import android.app.Application;
 
-public final class PureFM extends Application implements ActivityMonitor.OnActivitiesOpenedListener {
+public final class PureFM extends Application implements
+        ActivityMonitor.OnActivitiesOpenedListener {
 
     public static final int THEME_ID_LIGHT = 1;
     public static final int THEME_ID_DARK = 2;
