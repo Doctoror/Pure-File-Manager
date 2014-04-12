@@ -49,6 +49,8 @@
     <string name="menu_new_folder">Neuer Ordner</string>
     <string name="menu_settings">Einstellungen</string>
     <string name="menu_paste">Einfügen</string>
+    <!-- TODO translate -->
+    <string name="menu_add_to_media_store">Add to Media Store</string>
     <string name="menu_view_as_list">Zeige als Liste</string>
     <string name="menu_view_as_grid">Zeige als Raster</string>
     <string name="menu_sort">Sortieren</string>

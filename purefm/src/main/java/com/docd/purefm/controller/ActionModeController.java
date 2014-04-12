@@ -21,6 +21,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.media.MediaScannerConnection;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -38,6 +39,7 @@ import com.docd.purefm.ui.dialogs.FilePropertiesDialog;
 import com.docd.purefm.ui.dialogs.RenameFileDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
+import com.docd.purefm.utils.PFMFileUtils;
 
 /**
  * Controller that manages ActionMode for BrowserFragment
@@ -127,19 +129,20 @@ public final class ActionModeController {
         }
 
         @Override
-        public boolean onActionItemClicked(ActionMode mode,
-                                           MenuItem item) {
+        public boolean onActionItemClicked(final ActionMode mode,
+                                           final MenuItem item) {
             final SparseBooleanArray items = mListView
                     .getCheckedItemPositions();
+            final int checkedItemSize = items.size();
             final Resources res = mActivity.getResources();
             switch (item.getItemId()) {
                 case android.R.id.edit:
-                    for (int i = 0; i < items.size(); i++) {
+                    for (int i = 0; i < checkedItemSize; i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
                             final RenameFileDialog rename = RenameFileDialog
                                     .instantiate(mode, (GenericFile) mListView
-                                            .getAdapter().getItem(key));
+                                            .getItemAtPosition(key));
                             rename.show(mActivity.getFragmentManager(),
                                     BrowserPagerActivity.TAG_DIALOG);
                             return true;
@@ -148,12 +151,11 @@ public final class ActionModeController {
                     return false;
 
                 case R.id.properties:
-                    for (int i = 0; i < items.size(); i++) {
+                    for (int i = 0; i < checkedItemSize; i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
                             final FilePropertiesDialog prop = FilePropertiesDialog
-                                    .newInstance((GenericFile) mListView
-                                            .getAdapter().getItem(key));
+                                    .newInstance((GenericFile) mListView.getItemAtPosition(key));
                             mode.finish();
                             prop.show(mActivity.getFragmentManager(),
                                     BrowserPagerActivity.TAG_DIALOG);
@@ -165,7 +167,7 @@ public final class ActionModeController {
                 case R.id.menu_delete:
                     final List<GenericFile> files1 = new LinkedList<>();
                     final BrowserBaseAdapter adapter = (BrowserBaseAdapter) mListView.getAdapter();
-                    for (int i = 0; i < items.size(); i++) {
+                    for (int i = 0; i < checkedItemSize; i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
                             files1.add(adapter.getItem(key));
@@ -179,11 +181,10 @@ public final class ActionModeController {
                     final GenericFile[] files = new GenericFile[mListView
                             .getCheckedItemCount()];
                     int index = -1;
-                    for (int i = 0; i < items.size(); i++) {
+                    for (int i = 0; i < checkedItemSize; i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
-                            files[++index] = (GenericFile) mListView.getAdapter()
-                                    .getItem(key);
+                            files[++index] = (GenericFile) mListView.getItemAtPosition(key);
                         }
                     }
                     ClipBoard.cutMove(files);
@@ -200,11 +201,10 @@ public final class ActionModeController {
                     final GenericFile[] files2 = new GenericFile[mListView
                             .getCheckedItemCount()];
                     int index1 = -1;
-                    for (int i = 0; i < items.size(); i++) {
+                    for (int i = 0; i < checkedItemSize; i++) {
                         final int key = items.keyAt(i);
                         if (items.get(key)) {
-                            files2[++index1] = (GenericFile) mListView.getAdapter()
-                                    .getItem(key);
+                            files2[++index1] = (GenericFile) mListView.getItemAtPosition(key);
                         }
                     }
                     ClipBoard.cutCopy(files2);
@@ -221,6 +221,20 @@ public final class ActionModeController {
                     for (int i = 0; i < mListView.getCount(); i++) {
                         mListView.setItemChecked(i, true);
                     }
+                    return true;
+
+                case R.id.menu_add_to_media_store:
+                    final String[] paths = new String[mListView.getCheckedItemCount()];
+                    int pathsCounter = 0;
+                    for (int i = 0; i < checkedItemSize; i++) {
+                        final int key = items.keyAt(i);
+                        if (items.get(key)) {
+                            paths[pathsCounter++] = PFMFileUtils.fullPath((GenericFile)
+                                    mListView.getItemAtPosition(key));
+                        }
+                    }
+                    MediaScannerConnection.scanFile(mActivity, paths, null, null);
+                    mode.finish();
                     return true;
 
                 case R.id.menu_share:

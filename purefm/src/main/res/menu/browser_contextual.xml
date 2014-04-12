@@ -49,6 +49,11 @@
         android:icon="?attr/ic_menu_info"
         android:title="@string/menu_properties"
         android:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_add_to_media_store"
+        android:title="@string/menu_add_to_media_store"
+        android:showAsAction="never"/>
     
     <item
         android:id="@+id/select_all"
