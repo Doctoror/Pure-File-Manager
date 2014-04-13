@@ -22,7 +22,6 @@ import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -51,7 +50,10 @@ public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, 
     }
 
 
+    @NotNull
     protected final GenericFile mStartDirectory;
+
+    @NotNull
     private final SearchTaskListener mListener;
 
     protected AbstractSearchTask(@NotNull final GenericFile startDirectory,

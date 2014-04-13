@@ -152,7 +152,7 @@ public final class PickerActivity extends AbstractBrowserActivity {
     @Override
     public void onNavigationCompleted(final GenericFile path) {
         mBreadCrumbView.setFile(path.toFile());
-        mUp.setVisibility(path.getAbsolutePath().equals(Environment.rootDirectory.getAbsolutePath()) ? View.INVISIBLE : View.VISIBLE);
+        mUp.setVisibility(path.getAbsolutePath().equals(Environment.sRootDirectory.getAbsolutePath()) ? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override

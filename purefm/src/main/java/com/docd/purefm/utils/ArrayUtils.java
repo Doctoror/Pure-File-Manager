@@ -14,14 +14,14 @@
  */
 package com.docd.purefm.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class ArrayUtils {
+
     private ArrayUtils() {}
 
     @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> void copyArrayAndCast(final INPUT[] input, final OUTPUT[] output) {
-        if (input == null || output == null) {
-            throw new IllegalArgumentException("input and output must not be null");
-        }
+    public static <INPUT, OUTPUT> void copyArrayAndCast(@NotNull final INPUT[] input, @NotNull final OUTPUT[] output) {
         if (input.length != output.length) {
             throw new IllegalArgumentException("input and output lengths differ");
         }

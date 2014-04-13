@@ -41,6 +41,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
     /**
      * Currently displayed Fragment reference array
      */
+    @NotNull
     private final BrowserFragment[] mTabs;
 
     /**

@@ -32,6 +32,7 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.Build;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class PFMThumbnailUtils extends ThumbnailUtils {
@@ -50,7 +51,7 @@ public final class PFMThumbnailUtils extends ThumbnailUtils {
     }
 
     @Nullable
-    public static Bitmap extractApkIcon(PackageManager pm, File file) {
+    public static Bitmap extractApkIcon(@NotNull final PackageManager pm, @NotNull final File file) {
         final String filePath = file.getPath();
         final PackageInfo packageInfo = pm.getPackageArchiveInfo(filePath, PackageManager.GET_ACTIVITIES);
         if(packageInfo != null) {
@@ -67,7 +68,8 @@ public final class PFMThumbnailUtils extends ThumbnailUtils {
         return null;
     }
 
-    private static Bitmap decodeSampledBitmap(final File file, final int reqWidth) {
+    @NotNull
+    private static Bitmap decodeSampledBitmap(@NotNull final File file, final int reqWidth) {
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -97,7 +99,8 @@ public final class PFMThumbnailUtils extends ThumbnailUtils {
      * @param options Options to look against
      * @return reusable bitmap, if exists
      */
-    private static Bitmap getBitmapFromReusableSet(final BitmapFactory.Options options) {
+    @Nullable
+    private static Bitmap getBitmapFromReusableSet(@NotNull final BitmapFactory.Options options) {
         Bitmap bitmap = null;
 
         if (sReusableBitmaps != null && sReusableBitmaps.isEmpty()) {
@@ -129,7 +132,8 @@ public final class PFMThumbnailUtils extends ThumbnailUtils {
     }
 
     @SuppressLint("NewApi")
-    private static boolean canUseForInBitmap(Bitmap candidate, BitmapFactory.Options targetOptions) {
+    private static boolean canUseForInBitmap(@NotNull final Bitmap candidate,
+                                             @NotNull final BitmapFactory.Options targetOptions) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // From Android 4.4 (KitKat) onward we can re-use if the byte size of
@@ -152,7 +156,7 @@ public final class PFMThumbnailUtils extends ThumbnailUtils {
      *
      * @return byte usage per pixel
      */
-    private static int getBytesPerPixel(final Bitmap.Config config) {
+    private static int getBytesPerPixel(@NotNull final Bitmap.Config config) {
         switch (config) {
             case ARGB_8888:
                 return 4;

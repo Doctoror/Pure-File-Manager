@@ -28,21 +28,25 @@ import android.widget.Toast;
  */
 public final class BookmarksAdapter implements ListAdapter {
 
+    @NotNull
     private final List<BookmarksHelper.BookmarkItem> mBookmarks;
-    
-    private final DataSetObservable mDataSetObservable;
+
+    @NotNull
+    private final DataSetObservable mDataSetObservable = new DataSetObservable();
+
+    @NotNull
     private final LayoutInflater mLayoutInflater;
+
+    @NotNull
     private final BrowserPagerActivity mActivity;
     
     private boolean modified;
     
     private int mUserBookmarksStart;
     
-    public BookmarksAdapter(final BrowserPagerActivity activity) {
+    public BookmarksAdapter(@NotNull final BrowserPagerActivity activity) {
         this.mActivity = activity;
-        this.mDataSetObservable = new DataSetObservable();
         this.mLayoutInflater = activity.getLayoutInflater();
-
         this.mUserBookmarksStart = BookmarksHelper.getUserBookmarkOffset();
         this.mBookmarks = BookmarksHelper.getAllBookmarks(activity);
     }
@@ -100,9 +104,9 @@ public final class BookmarksAdapter implements ListAdapter {
         
         if (v == null) {
             if (viewType == 0) {
-                v = this.mLayoutInflater.inflate(R.layout.list_item_bookmark, null);
+                v = mLayoutInflater.inflate(R.layout.list_item_bookmark, null);
             } else {
-                v = this.mLayoutInflater.inflate(R.layout.list_item_bookmark_user, null);
+                v = mLayoutInflater.inflate(R.layout.list_item_bookmark_user, null);
             }
             h = new Holder();
             h.icon = (ImageView) v.findViewById(android.R.id.icon);

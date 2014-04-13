@@ -79,30 +79,38 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     private static DrawableLruCache<String> sMimeTypeIconCache;
 
+    @NotNull
     private final Handler mHandler;
 
     /**
      * Application's {@link android.content.res.Resources}
      */
+    @NotNull
     private final Resources mResources;
 
     /**
      * Current {@link android.content.res.Resources.Theme}
      */
+    @NotNull
     private final Resources.Theme mTheme;
 
-    private final DataSetObservable mDataSetObservable;
-    private final FileObserverCache mObserverCache;
+    @NotNull
+    private final DataSetObservable mDataSetObservable = new DataSetObservable();
+
+    @NotNull
+    private final FileObserverCache mObserverCache = FileObserverCache.getInstance();
 
     /**
      * Adapter's content
      */
-    private final List<GenericFile> mContent;
+    @NotNull
+    private final List<GenericFile> mContent = new ArrayList<>();
 
     /**
      * Observers for Files used in this Adapter
      */
-    private final List<MultiListenerFileObserver> mFileObservers;
+    @NotNull
+    private final List<MultiListenerFileObserver> mFileObservers = new ArrayList<>();
 
     /**
      * Executor for loading file previews
@@ -112,12 +120,14 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     /**
      * Current FileSortType
      */
-    private FileSortType mComparator;
+    private FileSortType mComparator = FileSortType.NAME_ASC;
 
     /**
      * Current LayoutInflater
      */
     protected final LayoutInflater mLayoutInflater;
+
+    protected final PreviewHolder mPreviewHolder;
 
     protected BrowserBaseAdapter(@NotNull final Activity context) {
         if (sDrawableLruCache == null) {
@@ -126,16 +136,15 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         if (sMimeTypeIconCache == null) {
             sMimeTypeIconCache = new DrawableLruCache<>();
         }
-
-        this.mResources = context.getResources();
-        this.mHandler = new FileObserverEventHandler(this);
-        this.mTheme = context.getTheme();
-        this.mDataSetObservable = new DataSetObservable();
-        this.mObserverCache = FileObserverCache.getInstance();
-        this.mLayoutInflater = context.getLayoutInflater();
-        this.mContent = new ArrayList<>();
-        this.mFileObservers = new ArrayList<>();
-        this.mComparator = FileSortType.NAME_ASC;
+        final Resources.Theme theme = context.getTheme();
+        if (theme == null) {
+            throw new IllegalArgumentException("Activity doesn't have a theme");
+        }
+        mPreviewHolder = PreviewHolder.getInstance(context);
+        mTheme = theme;
+        mResources = context.getResources();
+        mHandler = new FileObserverEventHandler(this);
+        mLayoutInflater = context.getLayoutInflater();
     }
 
     public void dropCaches() {
@@ -484,13 +493,14 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param file File to load preview for
      * @param logo View to set loaded preview to
      */
-    protected final void loadPreview(final GenericFile file, OverlayImageView logo) {
-        final Bitmap result = PreviewHolder.getCached(file.toFile());
+    protected final void loadPreview(@NotNull final GenericFile file,
+                                     @NotNull final OverlayImageView logo) {
+        final Bitmap result = mPreviewHolder.getCached(file.toFile());
         if (result != null) {
             logo.setImageBitmap(result);
         } else {
             try {
-                mExecutor.submit(new Job(mHandler, file, logo));
+                mExecutor.submit(new Job(mHandler, mPreviewHolder, file, logo));
             } catch (Exception e) {
                 Log.w("BrowserBaseAdapter", "Error submitting Job:" + e);
             }
@@ -501,10 +511,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
         static final int MESSAGE_OBSERVER_EVENT = 666;
 
+        @NotNull
         private final WeakReference<BrowserBaseAdapter> mAdapterReference;
 
         FileObserverEventHandler(BrowserBaseAdapter adapter) {
-            this.mAdapterReference = new WeakReference<BrowserBaseAdapter>(adapter);
+            this.mAdapterReference = new WeakReference<>(adapter);
         }
 
         @Override
@@ -530,16 +541,28 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             implements Runnable
     {
 
-        private final Handler handler;
-        private final OverlayImageView logo;
-        private final GenericFile file;
+        @NotNull
+        private final Handler mHandler;
 
-        Job(Handler handler, GenericFile file, OverlayImageView logo)
+        @NotNull
+        private final PreviewHolder mPreviewHolder;
+
+        @NotNull
+        private final OverlayImageView mImageView;
+
+        @NotNull
+        private final GenericFile mFile;
+
+        Job(@NotNull final Handler handler,
+            @NotNull final PreviewHolder previewHolder,
+            @NotNull final GenericFile file,
+            @NotNull final OverlayImageView imageView)
         {
-            this.handler = handler;
-            this.file = file;
-            this.logo = logo;
-            logo.setTag(file);
+            this.mHandler = handler;
+            this.mPreviewHolder = previewHolder;
+            this.mFile = file;
+            this.mImageView = imageView;
+            imageView.setTag(file);
         }
 
         @Override
@@ -548,13 +571,13 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             final Thread t = Thread.currentThread();
             t.setPriority(Thread.NORM_PRIORITY - 1);
             
-            final Bitmap result = PreviewHolder.loadPreview(this.file.toFile());
-            if (result != null && this.logo.getTag().equals(this.file)) {
-                this.handler.post(new Runnable() {
+            final Bitmap result = mPreviewHolder.loadPreview(this.mFile.toFile());
+            if (result != null && this.mImageView.getTag().equals(this.mFile)) {
+                this.mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        logo.setImageBitmap(result);
-                        logo.setOverlay(null);
+                        mImageView.setImageBitmap(result);
+                        mImageView.setOverlay(null);
                     }
                 });
             }

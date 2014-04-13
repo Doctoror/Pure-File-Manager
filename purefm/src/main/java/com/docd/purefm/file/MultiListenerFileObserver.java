@@ -27,34 +27,35 @@ public final class MultiListenerFileObserver extends FileObserver {
         void onEvent(int event, String path);
     }
 
-    private final Set<OnEventListener> listeners;
-    private final String path;
+    private final Set<OnEventListener> mListeners = new HashSet<>();
+
+    @NotNull
+    private final String mPath;
 
     private int watchCount;
 
-    public MultiListenerFileObserver(String path, int mask) {
+    public MultiListenerFileObserver(@NotNull final String path, final int mask) {
         super(path, mask);
-        this.path = path;
-        this.listeners = new HashSet<>();
+        this.mPath = path;
     }
 
     public void addOnEventListener(final OnEventListener listener) {
-        this.listeners.add(listener);
+        this.mListeners.add(listener);
     }
 
     public void removeOnEventListener(final OnEventListener listener) {
-        this.listeners.remove(listener);
+        this.mListeners.remove(listener);
     }
 
     @NotNull
     public String getPath() {
-        return this.path;
+        return this.mPath;
     }
 
     @Override
     public void onEvent(final int event, final String pathStub) {
-        for (final OnEventListener listener : this.listeners) {
-            listener.onEvent(event, this.path);
+        for (final OnEventListener listener : this.mListeners) {
+            listener.onEvent(event, this.mPath);
         }
     }
 

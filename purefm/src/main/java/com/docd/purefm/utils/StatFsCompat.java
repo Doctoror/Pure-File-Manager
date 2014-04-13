@@ -28,6 +28,7 @@ public final class StatFsCompat {
     /**
      * StatFs instance
      */
+    @NotNull
     private final StatFs mStatFs;
 
     /**
@@ -38,7 +39,7 @@ public final class StatFsCompat {
      *
      * @param path path in the desired file system to stat.
      */
-    public StatFsCompat(final String path) {
+    public StatFsCompat(@NotNull final String path) {
         this.mStatFs = new StatFs(path);
     }
 

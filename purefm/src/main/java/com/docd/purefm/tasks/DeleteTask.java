@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 public final class DeleteTask extends
         OperationTask<GenericFile, ArrayList<GenericFile>> {
 
-    public DeleteTask(final MonitoredActivity activity) {
+    public DeleteTask(@NotNull final MonitoredActivity activity) {
         super(activity);
     }
 

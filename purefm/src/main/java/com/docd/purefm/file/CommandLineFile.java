@@ -67,7 +67,10 @@ public final class CommandLineFile implements GenericFile,
     private static final int LS_YEAR = 9;
     private static final int LS_FILE = 10;
 
+    @NotNull
     private final File mFile;
+
+    @Nullable
     private final String mCanonicalPath;
     private Permissions mPermissions;
     private long mLength;
@@ -199,7 +202,7 @@ public final class CommandLineFile implements GenericFile,
 
         final CommandLineFile f;
         if (parent == null) {
-            if (canonicalPath != null || shell == null) {
+            if (canonicalPath != null) {
                 f = new CommandLineFile(name, canonicalPath);
             } else {
                 f = new CommandLineFile(shell, name);

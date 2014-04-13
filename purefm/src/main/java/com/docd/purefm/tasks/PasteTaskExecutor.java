@@ -39,20 +39,24 @@ import org.jetbrains.annotations.NotNull;
 
 public final class PasteTaskExecutor implements OnClickListener {
 
+    @NotNull
     private final WeakReference<MonitoredActivity> mActivityReference;
-    
-    private final GenericFile mTargetFile;
-    private final LinkedList<GenericFile> mToProcess;
-    private final HashMap<File, GenericFile> mExisting;
 
-    private GenericFile current;
+    @NotNull
+    private final GenericFile mTargetFile;
+
+    @NotNull
+    private final LinkedList<GenericFile> mToProcess = new LinkedList<>();
+
+    @NotNull
+    private final HashMap<File, GenericFile> mExisting = new HashMap<>();
+
+    private GenericFile mCurrentFile;
     
     public PasteTaskExecutor(@NotNull final MonitoredActivity activity,
                              @NotNull final GenericFile targetFile) {
         this.mActivityReference = new WeakReference<>(activity);
         this.mTargetFile = targetFile;
-        this.mToProcess = new LinkedList<>();
-        this.mExisting = new HashMap<>();
     }
     
     public void start() {
@@ -99,12 +103,12 @@ public final class PasteTaskExecutor implements OnClickListener {
         switch (v.getId()) {
             case android.R.id.button1:
                 // replace
-                mToProcess.add(current);
+                mToProcess.add(mCurrentFile);
                 break;
                     
             case android.R.id.button2:
                 // replace all;
-                mToProcess.add(current);
+                mToProcess.add(mCurrentFile);
                 for (File f : mExisting.keySet()) {
                     mToProcess.add(mExisting.get(f));
                 }
@@ -143,10 +147,10 @@ public final class PasteTaskExecutor implements OnClickListener {
             
             } else {
                 final File key = mExisting.keySet().iterator().next();
-                this.current = mExisting.get(key);
+                this.mCurrentFile = mExisting.get(key);
                 mExisting.remove(key);
 
-                final Dialog dialog = new FileExistsDialog(activity, current.getAbsolutePath(),
+                final Dialog dialog = new FileExistsDialog(activity, mCurrentFile.getAbsolutePath(),
                         key.getAbsolutePath(), this, this, this, this, this);
                 if (!activity.isFinishing()) {
                     dialog.show();

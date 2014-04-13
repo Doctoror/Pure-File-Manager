@@ -481,7 +481,7 @@ public final class FilePropertiesDialog extends DialogFragment {
                 final GenericFile file = params[0];
                 GenericFile par = file.getParentFile();
                 if (par == null) {
-                    par = FileFactory.newFile(Environment.rootDirectory);
+                    par = FileFactory.newFile(Environment.sRootDirectory);
                 }
                 String parentPath;
                 try {

@@ -32,41 +32,47 @@ import com.docd.purefm.utils.MimeTypes;
 public final class JavaFile implements GenericFile, Comparable<GenericFile> {
 
     private static final long serialVersionUID = -2117911719748590982L;
-    
+
+    @NotNull
     private final File mFile;
+
+    @NotNull
     private final Permissions p;
-    private final boolean isSymlink; 
+
+    private final boolean isSymlink;
+
+    @Nullable
     private final String mimeType;
 
-    public JavaFile(File file) {
+    public JavaFile(@NotNull final File file) {
         this.mFile = file;
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
     }
     
-    public JavaFile(File dir, String name) {
+    public JavaFile(@NotNull final File dir, @NotNull final String name) {
         this.mFile = new File(dir, name);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
-    public JavaFile(String dirPath, String name) {
+    public JavaFile(@NotNull final String dirPath, @NotNull final String name) {
         this.mFile = new File(dirPath, name);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
-    public JavaFile(String path) {
+    public JavaFile(@NotNull final String path) {
         this.mFile = new File(path);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
-    public JavaFile(URI uri) {
+    public JavaFile(@NotNull final URI uri) {
         this.mFile = new File(uri);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();

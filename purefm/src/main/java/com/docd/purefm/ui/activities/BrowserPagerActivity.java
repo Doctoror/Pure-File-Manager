@@ -144,7 +144,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
 
     @Override
     public void onLowMemory() {
-        PreviewHolder.recycle();
+        PreviewHolder.getInstance(getApplicationContext()).recycle();
     }
 
     private void initActionBar() {
@@ -273,7 +273,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     public void onNavigationCompleted(GenericFile path) {
         currentPath = path;
         mBreadCrumbView.setFile(path.toFile());
-        setDrawerIndicatorEnabled(!path.toFile().equals(Environment.rootDirectory));
+        setDrawerIndicatorEnabled(!path.toFile().equals(Environment.sRootDirectory));
         invalidateOptionsMenu();
     }
 
@@ -341,7 +341,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                PreviewHolder.recycle();
+                                PreviewHolder.getInstance(getApplicationContext()).recycle();
                                 finish();
                             }
                         });

@@ -23,6 +23,7 @@ import android.provider.MediaStore;
 
 import com.docd.purefm.R;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -32,36 +33,44 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class PreviewHolder {
 
+    private static PreviewHolder sInstance;
+
+    public static PreviewHolder getInstance(@NotNull final Context context) {
+        if (sInstance == null) {
+            sInstance = new PreviewHolder(context);
+        }
+        return sInstance;
+    }
+
     /**
      * Recommended width for previews
      */
-    private static int sWidth;
+    private final int mWidth;
 
     /**
      * Application's package manager
      */
-    private static PackageManager sPackageManager;
+    @NotNull
+    private final PackageManager mPackageManager;
 
     /**
      * Preview cache
      */
-    private static ReusableBitmapLruCache<File> sPreviews;
-
-    /**
-     * Initialized state flag
-     */
-    private static boolean sIsInitialized;
+    @NotNull
+    private final ReusableBitmapLruCache<File> mPreviews = new ReusableBitmapLruCache<>();
 
     /**
      * Initializes PreviewHolder
      *
      * @param context Application's Context
      */
-    public static void initialize(Context context) {
-        sPreviews = new ReusableBitmapLruCache<>();
-        sWidth = (int) context.getResources().getDimension(R.dimen.preview_width);
-        sPackageManager = context.getPackageManager();
-        sIsInitialized = true;
+    private PreviewHolder(@NotNull final Context context) {
+        mWidth = (int) context.getResources().getDimension(R.dimen.preview_width);
+        final PackageManager packageManager = context.getPackageManager();
+        if (packageManager == null) {
+            throw new IllegalArgumentException("No PackageManager for context");
+        }
+        mPackageManager = packageManager;
     }
 
     /**
@@ -71,21 +80,15 @@ public final class PreviewHolder {
      * @return preview of the File, if exists in cache. Null otherwise.
      */
     @Nullable
-    public static Bitmap getCached(final File file) {
-        if (!sIsInitialized) {
-            throw new IllegalStateException("PreviewHolder is not initialized");
-        }
-        return sPreviews.get(file);
+    public Bitmap getCached(@NotNull final File file) {
+        return mPreviews.get(file);
     }
 
     /**
      * Marks all previews as removed
      */
-    public static void recycle() {
-        if (!sIsInitialized) {
-            throw new IllegalStateException("PreviewHolder is not initialized");
-        }
-        sPreviews.evictAll();
+    public void recycle() {
+        mPreviews.evictAll();
     }
 
     /**
@@ -95,30 +98,26 @@ public final class PreviewHolder {
      * @return preview of the File, if exists. Null otherwise
      */
     @Nullable
-    public static Bitmap loadPreview(final File file) {
-        if (!sIsInitialized) {
-            throw new IllegalStateException("PreviewHolder is not initialized");
-        }
+    public Bitmap loadPreview(@NotNull final File file) {
         final boolean isImage = MimeTypes.isPicture(file);
         final boolean isVideo = MimeTypes.isVideo(file);
         final boolean isApk = file.getName().endsWith(".apk");
 
         final Bitmap result;
         if (isImage) {
-            result = PFMThumbnailUtils.createPictureThumbnail(file, sWidth);
+            result = PFMThumbnailUtils.createPictureThumbnail(file, mWidth);
         } else if (isVideo) {
             result = PFMThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MICRO_KIND);
         } else if (isApk) {
-            result = PFMThumbnailUtils.extractApkIcon(sPackageManager, file);
+            result = PFMThumbnailUtils.extractApkIcon(mPackageManager, file);
         } else {
             result = null;
         }
 
         if (result != null) {
-            sPreviews.put(file, result);
+            mPreviews.put(file, result);
         }
 
         return result;
     }
-    
 }

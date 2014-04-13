@@ -29,7 +29,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class RenameFileTask extends OperationTask<Void, CharSequence> {
 
+    @NotNull
     private final GenericFile mSource;
+
+    @NotNull
     private final String mTargetName;
 
     public RenameFileTask(@NotNull final MonitoredActivity activity,

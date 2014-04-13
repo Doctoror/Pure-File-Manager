@@ -40,7 +40,11 @@ public abstract class ActionBarIconMonitoredActivity extends MonitoredActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            mDefaultIcon = getPackageManager().getActivityIcon(this.getComponentName());
+            final PackageManager packageManager = getPackageManager();
+            if (packageManager == null) {
+                throw new RuntimeException("PackageManager is null");
+            }
+            mDefaultIcon = packageManager.getActivityIcon(this.getComponentName());
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             mDefaultIcon = getResources().getDrawable(R.drawable.ic_fso_folder);

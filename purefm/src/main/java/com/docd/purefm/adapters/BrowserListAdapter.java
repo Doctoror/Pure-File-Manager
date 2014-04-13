@@ -39,15 +39,18 @@ import java.math.BigInteger;
  */
 public final class BrowserListAdapter extends BrowserBaseAdapter {
 
+    @NotNull
     private final Typeface mTypefaceMonospace;
-    private final LongSparseArray<String> mHumanReadableLastModified;
-    private final LongSparseArray<String> mHumanReadableLength;
+
+    @NotNull
+    private final LongSparseArray<String> mHumanReadableLastModified = new LongSparseArray<>();
+
+    @NotNull
+    private final LongSparseArray<String> mHumanReadableLength = new LongSparseArray<>();
     
     public BrowserListAdapter(@NotNull final Activity context) {
         super(context);
         mTypefaceMonospace = Typeface.createFromAsset(context.getAssets(), "DroidSansMono.ttf");
-        mHumanReadableLastModified = new LongSparseArray<>();
-        mHumanReadableLength = new LongSparseArray<>();
     }
 
     @Override

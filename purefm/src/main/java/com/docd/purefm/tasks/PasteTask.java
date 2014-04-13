@@ -31,9 +31,11 @@ import org.jetbrains.annotations.NotNull;
 
 final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>> {
 
+    @NotNull
     private final GenericFile mTarget;
 
-    protected PasteTask(MonitoredActivity activity, GenericFile target) {
+    protected PasteTask(@NotNull final MonitoredActivity activity,
+                        @NotNull final GenericFile target) {
         super(activity);
         this.mTarget = target;
     }

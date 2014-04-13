@@ -48,8 +48,12 @@ public abstract class MultiWorkerService extends Service {
 
     private static final class HandleIntentRunnable implements Runnable {
 
+        @NotNull
         private final WeakReference<MultiWorkerService> mServiceRef;
+
         private final int mStartId;
+
+        @NotNull
         private final Intent mIntent;
 
         HandleIntentRunnable(@NotNull final MultiWorkerService service,

@@ -124,7 +124,7 @@ public final class ProgressAlertDialogBuilder {
             if (!mClickPressed) {
                 final TextView textView = (TextView) findViewById(android.R.id.message);
                 textView.setText(TextUtils.concat(textView.getText(),
-                        v.getResources().getText(R.string.canceling_suffix)));
+                        textView.getResources().getText(R.string.canceling_suffix)));
             }
             mClickPressed = true;
             if (mCancelListener != null) {

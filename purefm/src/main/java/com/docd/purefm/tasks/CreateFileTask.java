@@ -30,6 +30,7 @@ import java.io.File;
  */
 public final class CreateFileTask extends OperationTask<String, CharSequence> {
 
+    @NotNull
     private final File mParentDir;
 
     public CreateFileTask(@NotNull MonitoredActivity activity, @NotNull final File parent) {

@@ -30,15 +30,16 @@ public enum FileSortType {
     SIZE_DESC(new PFMFileUtils.SizeComparatorDesc()),
     DATE_ASC (new PFMFileUtils.DateComparatorAsc()),
     DATE_DESC(new PFMFileUtils.DateComparatorDesc());
+
+    @NotNull
+    private final Comparator<GenericFile> mComparator;
     
-    private Comparator<GenericFile> comparator;
-    
-    private FileSortType(Comparator<GenericFile> comparator) {
-        this.comparator = comparator;
+    private FileSortType(@NotNull final Comparator<GenericFile> comparator) {
+        this.mComparator = comparator;
     }
 
     @NotNull
     public Comparator<GenericFile> getComparator() {
-        return this.comparator;
+        return this.mComparator;
     }
 }

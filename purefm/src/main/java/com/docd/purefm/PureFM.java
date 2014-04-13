@@ -16,7 +16,6 @@ package com.docd.purefm;
 
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PFMTextUtils;
-import com.docd.purefm.utils.PreviewHolder;
 import com.stericson.RootTools.RootTools;
 
 import android.app.Application;
@@ -33,8 +32,7 @@ public final class PureFM extends Application implements
         RootTools.handlerEnabled = false;
         RootTools.debugMode = BuildConfig.DEBUG;
         Environment.init(this);
-        Settings.init(this, this.getResources());
-        PreviewHolder.initialize(this);
+        Settings.init(this, getResources());
         PFMTextUtils.init(this);
         ensureNoShellUsedIfNoBusybox();
         ActivityMonitor.addOnActivitiesOpenedListener(this);

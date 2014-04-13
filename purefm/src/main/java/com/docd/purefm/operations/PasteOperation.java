@@ -46,8 +46,12 @@ import java.util.List;
  */
 final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>> {
 
+    @NotNull
     private final Context mContext;
+
+    @NotNull
     private final GenericFile mTarget;
+
     private final boolean mIsMove;
 
     PasteOperation(@NotNull final Context context,

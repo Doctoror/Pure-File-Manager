@@ -35,10 +35,10 @@ public final class FileObserverCache {
         return instance;
     }
 
-    private final Map<String, WeakReference<MultiListenerFileObserver>> mCache;
+    private final Map<String, WeakReference<MultiListenerFileObserver>> mCache = new HashMap<>();
 
     private FileObserverCache() {
-        this.mCache = new HashMap<>();
+
     }
 
     public void clear() {

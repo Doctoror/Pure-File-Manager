@@ -15,6 +15,7 @@
 package com.docd.purefm.ui.view;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
@@ -143,10 +144,14 @@ public class EdgeLimitedMarqueeTextView extends TextView {
         private int mScroll;
         private int mScrollUpdate;
 
-        EdgeLimitedMarquee(final TextView v) {
-            final float density = v.getResources().getDisplayMetrics().density;
+        EdgeLimitedMarquee(final TextView view) {
+            final Resources res = view.getResources();
+            if (res == null) {
+                throw new IllegalArgumentException("No Resources for view");
+            }
+            final float density = res.getDisplayMetrics().density;
             mScrollUnit = Math.round(MARQUEE_PIXELS_PER_SECOND * density) / MARQUEE_RESOLUTION;
-            mView = new WeakReference<TextView>(v);
+            mView = new WeakReference<>(view);
         }
 
         void setMaxScrollX(final int maxScrollX) {

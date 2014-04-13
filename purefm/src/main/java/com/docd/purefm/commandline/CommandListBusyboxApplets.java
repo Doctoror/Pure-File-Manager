@@ -27,6 +27,6 @@ public final class CommandListBusyboxApplets extends BusyboxCommand {
      * Builds busybox list applets command
      */
     public CommandListBusyboxApplets() {
-        super(Environment.busybox + " --list");
+        super(Environment.sBusybox + " --list");
     }
 }

@@ -63,7 +63,7 @@ public final class BookmarksHelper {
             @NotNull final String path) {
         final BookmarkItem item = new BookmarkItem();
         item.mDisplayName = FilenameUtils.getName(path);
-        if (item.mDisplayName.equals(Environment.rootDirectory.getAbsolutePath())) {
+        if (item.mDisplayName.equals(Environment.sRootDirectory.getAbsolutePath())) {
             item.mDisplayName = activity.getText(R.string.root);
         }
         item.mDisplayPath = path;
@@ -71,6 +71,7 @@ public final class BookmarksHelper {
         return item;
     }
 
+    @NotNull
     public static List<BookmarkItem> getAllBookmarks(@NotNull final Activity activity) {
         final List<BookmarkItem> items = new ArrayList<>();
         int internalCount = 0;
@@ -121,7 +122,7 @@ public final class BookmarksHelper {
         for (final String bookmark : Settings.getBookmarks(activity)) {
             final BookmarkItem item = new BookmarkItem();
             item.mDisplayName = FilenameUtils.getName(bookmark);
-            if (item.mDisplayName.equals(Environment.rootDirectory.getAbsolutePath())) {
+            if (item.mDisplayName.equals(Environment.sRootDirectory.getAbsolutePath())) {
                 item.mDisplayName = activity.getText(R.string.root);
             }
             item.mDisplayPath = bookmark;
@@ -140,7 +141,8 @@ public final class BookmarksHelper {
         return Environment.getStorageVolumes().size();
     }
 
-    public static Set<String> getAllLocations(final Context context) {
+    @NotNull
+    public static Set<String> getAllLocations(@NotNull final Context context) {
         final Set<String> result = new TreeSet<>();
         result.addAll(BookmarksHelper.getStorageBookmarks());
         result.addAll(Settings.getBookmarks(context));

@@ -31,12 +31,17 @@ public final class DirectoryScanTask extends
         AsyncTask<GenericFile, Void, GenericFile[]> {
 
     private static final ListFileFilter sFilter;
+
+    @NotNull
     private final BrowserBaseAdapter mBrowserAdapter;
-    
+
+    @NotNull
     private final Browser mBrowser;
+
+    @NotNull
     private final SwipeRefreshLayout[] mSwipeRefreshLayouts;
     
-    private GenericFile file;
+    private GenericFile mFile;
     
     static {
         sFilter = new ListFileFilter();
@@ -61,7 +66,7 @@ public final class DirectoryScanTask extends
 
     @Override
     protected GenericFile[] doInBackground(GenericFile... arg0) {
-        this.file = arg0[0];
+        this.mFile = arg0[0];
         return arg0[0].listFiles(sFilter);
     }
 
@@ -69,7 +74,7 @@ public final class DirectoryScanTask extends
     protected void onPostExecute(GenericFile[] result) {
         super.onPostExecute(result);
         mBrowserAdapter.updateData(result);
-        mBrowser.onScanFinished(this.file);
+        mBrowser.onScanFinished(this.mFile);
         for (final SwipeRefreshLayout layout : mSwipeRefreshLayouts) {
             layout.setRefreshing(false);
         }

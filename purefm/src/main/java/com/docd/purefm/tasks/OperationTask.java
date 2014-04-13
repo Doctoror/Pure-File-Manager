@@ -38,8 +38,13 @@ import java.io.Serializable;
 public abstract class OperationTask<Param, Result> implements
         MonitoredActivity.OnStopListener {
 
+    @NotNull
     protected final MonitoredActivity mActivity;
+
+    @NotNull
     private final LocalBroadcastManager mBroadcastManager;
+
+    @NotNull
     private final OperationReceiver mOperationReceiver;
 
     protected OperationTask(@NotNull final MonitoredActivity activity) {

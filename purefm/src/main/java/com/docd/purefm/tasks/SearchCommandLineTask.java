@@ -38,15 +38,17 @@ final class SearchCommandLineTask extends AbstractSearchTask {
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
 
+    @NotNull
     private final Shell mShell;
-    private final List<String> mDenied;
+
+    @NotNull
+    private final List<String> mDenied = new ArrayList<>();
 
     public SearchCommandLineTask(@NotNull final Shell shell,
                                  @NotNull final GenericFile startDirectory,
                                  @NotNull final SearchTaskListener listener) {
         super(startDirectory, listener);
         mShell = shell;
-        mDenied = new ArrayList<>();
     }
 
     @Override

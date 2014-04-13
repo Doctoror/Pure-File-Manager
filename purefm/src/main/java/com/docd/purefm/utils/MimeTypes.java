@@ -31,258 +31,261 @@ public final class MimeTypes {
 
     private MimeTypes() {}
 
+    @NotNull
     public static final String ALL_MIME_TYPES = "*/*";
-    
-    private static final HashMap<String, Integer> EXT_ICONS = new HashMap<String, Integer>();
+
+    @NotNull
+    private static final HashMap<String, Integer> EXT_ICONS = new HashMap<>();
     
     /**
      * This is not a replacement for libcore. This is an addition
      */
-    private static final HashMap<String, String> MIME_TYPES = new HashMap<String, String>();
-    
+    @NotNull
+    private static final HashMap<String, String> MIME_TYPES = new HashMap<>();
+
     static {
         // BINARY
-        EXT_ICONS.put("a",     Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("bin",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("class", Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("com",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("dex",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("dump",  Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("exe",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("dat",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("dll",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("lib",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("o",     Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("obj",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("pyc",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("pyo",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("ser",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("swf",   Integer.valueOf(R.drawable.ic_fso_type_binary));
-        EXT_ICONS.put("so",    Integer.valueOf(R.drawable.ic_fso_type_binary));
+        EXT_ICONS.put("a",     R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("bin",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("class", R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("com",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("dex",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("dump",  R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("exe",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("dat",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("dll",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("lib",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("o",     R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("obj",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("pyc",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("pyo",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("ser",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("swf",   R.drawable.ic_fso_type_binary);
+        EXT_ICONS.put("so",    R.drawable.ic_fso_type_binary);
         
-        EXT_ICONS.put("dmg",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
-        EXT_ICONS.put("cue",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
-        EXT_ICONS.put("img",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
-        EXT_ICONS.put("iso",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
-        EXT_ICONS.put("msd",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
-        EXT_ICONS.put("nrg",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
-        EXT_ICONS.put("uif",   Integer.valueOf(R.drawable.ic_fso_type_cdimage));
+        EXT_ICONS.put("dmg",   R.drawable.ic_fso_type_cdimage);
+        EXT_ICONS.put("cue",   R.drawable.ic_fso_type_cdimage);
+        EXT_ICONS.put("img",   R.drawable.ic_fso_type_cdimage);
+        EXT_ICONS.put("iso",   R.drawable.ic_fso_type_cdimage);
+        EXT_ICONS.put("msd",   R.drawable.ic_fso_type_cdimage);
+        EXT_ICONS.put("nrg",   R.drawable.ic_fso_type_cdimage);
+        EXT_ICONS.put("uif",   R.drawable.ic_fso_type_cdimage);
         
         // TEXT
-        EXT_ICONS.put("conf",       Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("csv",        Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("diff",       Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("in",         Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("list",       Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("log",        Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("prop",       Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("properties", Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("rc",         Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("text",       Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("txt",        Integer.valueOf(R.drawable.ic_fso_type_text));
-        EXT_ICONS.put("tsv",        Integer.valueOf(R.drawable.ic_fso_type_text));
+        EXT_ICONS.put("conf",       R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("csv",        R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("diff",       R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("in",         R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("list",       R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("log",        R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("prop",       R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("properties", R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("rc",         R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("text",       R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("txt",        R.drawable.ic_fso_type_text);
+        EXT_ICONS.put("tsv",        R.drawable.ic_fso_type_text);
         
-        EXT_ICONS.put("dtd",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("htm",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("html", Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("mht",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("mhtml",Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("mxml", Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("sgm",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("sgml", Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("wsdl", Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("xht",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("xhtml",Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("xml",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("xsl",  Integer.valueOf(R.drawable.ic_fso_type_markup_document));
-        EXT_ICONS.put("xslt", Integer.valueOf(R.drawable.ic_fso_type_markup_document));
+        EXT_ICONS.put("dtd",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("htm",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("html", R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("mht",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("mhtml",R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("mxml", R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("sgm",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("sgml", R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("wsdl", R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("xht",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("xhtml",R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("xml",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("xsl",  R.drawable.ic_fso_type_markup_document);
+        EXT_ICONS.put("xslt", R.drawable.ic_fso_type_markup_document);
         
         // DOCUMENT
-        EXT_ICONS.put("doc",  Integer.valueOf(R.drawable.ic_fso_type_document));
-        EXT_ICONS.put("docx", Integer.valueOf(R.drawable.ic_fso_type_document));
-        EXT_ICONS.put("odp",  Integer.valueOf(R.drawable.ic_fso_type_document));
-        EXT_ICONS.put("odt",  Integer.valueOf(R.drawable.ic_fso_type_document));
-        EXT_ICONS.put("rtf",  Integer.valueOf(R.drawable.ic_fso_type_document));
+        EXT_ICONS.put("doc",  R.drawable.ic_fso_type_document);
+        EXT_ICONS.put("docx", R.drawable.ic_fso_type_document);
+        EXT_ICONS.put("odp",  R.drawable.ic_fso_type_document);
+        EXT_ICONS.put("odt",  R.drawable.ic_fso_type_document);
+        EXT_ICONS.put("rtf",  R.drawable.ic_fso_type_document);
         
-        EXT_ICONS.put("fdf",  Integer.valueOf(R.drawable.ic_fso_type_pdf));
-        EXT_ICONS.put("pdf",  Integer.valueOf(R.drawable.ic_fso_type_pdf));
+        EXT_ICONS.put("fdf",  R.drawable.ic_fso_type_pdf);
+        EXT_ICONS.put("pdf",  R.drawable.ic_fso_type_pdf);
         
-        EXT_ICONS.put("ppt",  Integer.valueOf(R.drawable.ic_fso_type_presentation));
-        EXT_ICONS.put("pptx", Integer.valueOf(R.drawable.ic_fso_type_presentation));
+        EXT_ICONS.put("ppt",  R.drawable.ic_fso_type_presentation);
+        EXT_ICONS.put("pptx", R.drawable.ic_fso_type_presentation);
         
-        EXT_ICONS.put("ods",  Integer.valueOf(R.drawable.ic_fso_type_spreadsheet));
-        EXT_ICONS.put("xls",  Integer.valueOf(R.drawable.ic_fso_type_spreadsheet));
-        EXT_ICONS.put("xlsx", Integer.valueOf(R.drawable.ic_fso_type_spreadsheet));
+        EXT_ICONS.put("ods",  R.drawable.ic_fso_type_spreadsheet);
+        EXT_ICONS.put("xls",  R.drawable.ic_fso_type_spreadsheet);
+        EXT_ICONS.put("xlsx", R.drawable.ic_fso_type_spreadsheet);
         
         // e-Book
-        EXT_ICONS.put("azv",   Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("djv",   Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("djvu",  Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("epub",  Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("kf8",   Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("lit",   Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("lrf",   Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("lrx",   Integer.valueOf(R.drawable.ic_fso_type_ebook));
-        EXT_ICONS.put("ibooks",Integer.valueOf(R.drawable.ic_fso_type_ebook));
+        EXT_ICONS.put("azv",   R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("djv",   R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("djvu",  R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("epub",  R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("kf8",   R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("lit",   R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("lrf",   R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("lrx",   R.drawable.ic_fso_type_ebook);
+        EXT_ICONS.put("ibooks",R.drawable.ic_fso_type_ebook);
         
         // Internet document
-        EXT_ICONS.put("ics",  Integer.valueOf(R.drawable.ic_fso_type_calendar));
-        EXT_ICONS.put("ifb",  Integer.valueOf(R.drawable.ic_fso_type_calendar));
-        EXT_ICONS.put("vcs",  Integer.valueOf(R.drawable.ic_fso_type_calendar));
+        EXT_ICONS.put("ics",  R.drawable.ic_fso_type_calendar);
+        EXT_ICONS.put("ifb",  R.drawable.ic_fso_type_calendar);
+        EXT_ICONS.put("vcs",  R.drawable.ic_fso_type_calendar);
         
-        EXT_ICONS.put("eml",  Integer.valueOf(R.drawable.ic_fso_type_email));
-        EXT_ICONS.put("msg",  Integer.valueOf(R.drawable.ic_fso_type_email));
+        EXT_ICONS.put("eml",  R.drawable.ic_fso_type_email);
+        EXT_ICONS.put("msg",  R.drawable.ic_fso_type_email);
         
-        EXT_ICONS.put("vcf",  Integer.valueOf(R.drawable.ic_fso_type_contact));
+        EXT_ICONS.put("vcf",  R.drawable.ic_fso_type_contact);
         
         // Compress
-        EXT_ICONS.put("ace",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("bz",   Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("bz2",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("cab",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("cpio", Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("gz",   Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("lha",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("lrf",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("lzma", Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("jar",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("rar",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("tar",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("tgz",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("xz",   Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("zip",  Integer.valueOf(R.drawable.ic_fso_type_compress));
-        EXT_ICONS.put("Z",    Integer.valueOf(R.drawable.ic_fso_type_compress));
+        EXT_ICONS.put("ace",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("bz",   R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("bz2",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("cab",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("cpio", R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("gz",   R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("lha",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("lrf",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("lzma", R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("jar",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("rar",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("tar",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("tgz",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("xz",   R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("zip",  R.drawable.ic_fso_type_compress);
+        EXT_ICONS.put("Z",    R.drawable.ic_fso_type_compress);
         
         // Executable
-        EXT_ICONS.put("bar", Integer.valueOf(R.drawable.ic_fso_type_shell));
-        EXT_ICONS.put("csh", Integer.valueOf(R.drawable.ic_fso_type_shell));
-        EXT_ICONS.put("ksh", Integer.valueOf(R.drawable.ic_fso_type_shell));
-        EXT_ICONS.put("sh",  Integer.valueOf(R.drawable.ic_fso_type_shell));
+        EXT_ICONS.put("bar", R.drawable.ic_fso_type_shell);
+        EXT_ICONS.put("csh", R.drawable.ic_fso_type_shell);
+        EXT_ICONS.put("ksh", R.drawable.ic_fso_type_shell);
+        EXT_ICONS.put("sh",  R.drawable.ic_fso_type_shell);
         
         // Database
-        EXT_ICONS.put("db",  Integer.valueOf(R.drawable.ic_fso_type_database));
-        EXT_ICONS.put("db3", Integer.valueOf(R.drawable.ic_fso_type_database));
-        EXT_ICONS.put("mdb", Integer.valueOf(R.drawable.ic_fso_type_database));
+        EXT_ICONS.put("db",  R.drawable.ic_fso_type_database);
+        EXT_ICONS.put("db3", R.drawable.ic_fso_type_database);
+        EXT_ICONS.put("mdb", R.drawable.ic_fso_type_database);
         
         //Font
-        EXT_ICONS.put("otf", Integer.valueOf(R.drawable.ic_fso_type_font));
-        EXT_ICONS.put("ttf", Integer.valueOf(R.drawable.ic_fso_type_font));
-        EXT_ICONS.put("gsf", Integer.valueOf(R.drawable.ic_fso_type_font));
-        EXT_ICONS.put("psf", Integer.valueOf(R.drawable.ic_fso_type_font));
+        EXT_ICONS.put("otf", R.drawable.ic_fso_type_font);
+        EXT_ICONS.put("ttf", R.drawable.ic_fso_type_font);
+        EXT_ICONS.put("gsf", R.drawable.ic_fso_type_font);
+        EXT_ICONS.put("psf", R.drawable.ic_fso_type_font);
         
         //Image
-        EXT_ICONS.put("bmp",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("cgm",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("g3",   Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("gif",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("ief",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("jpe",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("jpeg", Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("jpg",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("png",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("btif", Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("svg",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("svgz", Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("tif",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("tiff", Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("psd",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("dwg",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("dxf",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("fbs",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("fpx",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("fst",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("mmr",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("rlc",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("mdi",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("npx",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("wbmp", Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("xif",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("ras",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("ico",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("pcx",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("pct",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("pic",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("xbm",  Integer.valueOf(R.drawable.ic_fso_type_image));
-        EXT_ICONS.put("xwd",  Integer.valueOf(R.drawable.ic_fso_type_image));
+        EXT_ICONS.put("bmp",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("cgm",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("g3",   R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("gif",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("ief",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("jpe",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("jpeg", R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("jpg",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("png",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("btif", R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("svg",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("svgz", R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("tif",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("tiff", R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("psd",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("dwg",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("dxf",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("fbs",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("fpx",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("fst",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("mmr",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("rlc",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("mdi",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("npx",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("wbmp", R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("xif",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("ras",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("ico",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("pcx",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("pct",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("pic",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("xbm",  R.drawable.ic_fso_type_image);
+        EXT_ICONS.put("xwd",  R.drawable.ic_fso_type_image);
         
         // Audio
         
-        EXT_ICONS.put("aac",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("adp",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("aif",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("aifc", Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("aiff", Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("amr",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("ape",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("au",   Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("dts",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("eol",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("flac", Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("kar",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("lvp",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("m2a",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("m3a",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("m3u",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("m4a",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("mid",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("mid",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("mka",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("mp2",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("mp3",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("mpga", Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("oga",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("ogg",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("pya",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("ram",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("rmi",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("snd",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("spx",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("wav",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("wax",  Integer.valueOf(R.drawable.ic_fso_type_audio));
-        EXT_ICONS.put("wma",  Integer.valueOf(R.drawable.ic_fso_type_audio));
+        EXT_ICONS.put("aac",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("adp",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("aif",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("aifc", R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("aiff", R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("amr",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("ape",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("au",   R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("dts",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("eol",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("flac", R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("kar",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("lvp",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("m2a",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("m3a",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("m3u",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("m4a",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("mid",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("mid",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("mka",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("mp2",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("mp3",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("mpga", R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("oga",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("ogg",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("pya",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("ram",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("rmi",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("snd",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("spx",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("wav",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("wax",  R.drawable.ic_fso_type_audio);
+        EXT_ICONS.put("wma",  R.drawable.ic_fso_type_audio);
         
         // Video
-        EXT_ICONS.put("3gp",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("3gpp", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("3g2",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("3gpp2",Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("h261", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("h263", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("h264", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("jpgv", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("jpgm", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("jpm",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mj2",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mp4",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mp4v", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mpg4", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("m1v",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("m2v",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mpa",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mpe",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mpg",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mpeg", Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("ogv",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mov",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("qt",   Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("fvt",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("m4u",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("pyv",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("viv",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("f4v",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("fli",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("flv",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("m4v",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("asf",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("asx",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("avi",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("wmv",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("wmx",  Integer.valueOf(R.drawable.ic_fso_type_video));
-        EXT_ICONS.put("mkv",  Integer.valueOf(R.drawable.ic_fso_type_video));
+        EXT_ICONS.put("3gp",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("3gpp", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("3g2",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("3gpp2",R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("h261", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("h263", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("h264", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("jpgv", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("jpgm", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("jpm",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mj2",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mp4",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mp4v", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mpg4", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("m1v",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("m2v",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mpa",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mpe",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mpg",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mpeg", R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("ogv",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mov",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("qt",   R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("fvt",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("m4u",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("pyv",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("viv",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("f4v",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("fli",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("flv",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("m4v",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("asf",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("asx",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("avi",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("wmv",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("wmx",  R.drawable.ic_fso_type_video);
+        EXT_ICONS.put("mkv",  R.drawable.ic_fso_type_video);
         
         //Application
         
-        EXT_ICONS.put("apk", Integer.valueOf(R.drawable.ic_fso_type_app));
+        EXT_ICONS.put("apk", R.drawable.ic_fso_type_app);
         
         
         /*

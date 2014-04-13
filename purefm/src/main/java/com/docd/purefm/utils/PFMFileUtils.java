@@ -35,6 +35,7 @@ import com.stericson.RootTools.execution.Shell;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.text.InputFilter;
 import android.text.Spannable;
@@ -160,7 +161,11 @@ public final class PFMFileUtils {
         if (mime != null) {
             final Intent i = new Intent(Intent.ACTION_VIEW);
             i.setDataAndType(Uri.fromFile(target), mime);
-            if (context.getPackageManager().queryIntentActivities(i, 0).isEmpty()) {
+            final PackageManager packageManager = context.getPackageManager();
+            if (packageManager == null) {
+                throw new IllegalArgumentException("No PackageManager for context");
+            }
+            if (packageManager.queryIntentActivities(i, 0).isEmpty()) {
                 Toast.makeText(context, R.string.no_apps_to_open, Toast.LENGTH_SHORT).show();
                 return;
             }

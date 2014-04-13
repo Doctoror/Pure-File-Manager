@@ -23,7 +23,6 @@ import android.util.LruCache;
  */
 public final class DrawableLruCache<T> extends LruCache<T, Drawable> {
 
-
     public DrawableLruCache() {
         super(512 * 1024);
     }

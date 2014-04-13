@@ -32,15 +32,15 @@ public final class PFMTextUtils {
 
     private PFMTextUtils() {}
     
-    private static SimpleDateFormat format;
+    private static SimpleDateFormat sFormat;
     private static final Calendar CALENDAR = Calendar.getInstance(
             TimeZone.getDefault(), Locale.getDefault());
     
-    public static void init(Context context) {
+    public static void init(@NotNull final Context context) {
         if (DateFormat.is24HourFormat(context)) {
-            format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            sFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         } else {
-            format = new SimpleDateFormat("dd/MM/yyyy KK:mm aa", Locale.getDefault());
+            sFormat = new SimpleDateFormat("dd/MM/yyyy KK:mm aa", Locale.getDefault());
         }
     }
 
@@ -49,9 +49,9 @@ public final class PFMTextUtils {
             final long date, final boolean isUtc) {
         if (isUtc) {
             final long offset = -(CALENDAR.get(Calendar.ZONE_OFFSET) + CALENDAR.get(Calendar.DST_OFFSET));
-            return format.format(date - offset);
+            return sFormat.format(date - offset);
         } else {
-            return format.format(date);
+            return sFormat.format(date);
         }
     }
     

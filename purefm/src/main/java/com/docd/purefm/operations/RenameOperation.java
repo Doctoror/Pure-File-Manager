@@ -34,13 +34,18 @@ import org.jetbrains.annotations.NotNull;
  */
 final class RenameOperation extends Operation<Void, CharSequence> {
 
+    @NotNull
     private final Context mContext;
+
+    @NotNull
     private final GenericFile mSource;
+
+    @NotNull
     private final String mTargetName;
 
     RenameOperation(@NotNull final Context context,
-                           @NotNull final GenericFile source,
-                           @NotNull final String targetName) {
+                    @NotNull final GenericFile source,
+                    @NotNull final String targetName) {
         this.mContext = context;
         this.mSource = source;
         this.mTargetName = targetName;

@@ -30,10 +30,18 @@ public final class DashSpan implements LeadingMarginSpan {
     }
     
     @Override
-    public void drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top,
-            int baseline, int bottom, CharSequence text, int start, int end,
-            boolean first, Layout layout)
-    {
+    public void drawLeadingMargin(final Canvas c,
+                                  final Paint p,
+                                  final int x,
+                                  final int dir,
+                                  final int top,
+                                  final int baseline,
+                                  final int bottom,
+                                  final CharSequence text,
+                                  final int start,
+                                  final int end,
+                                  final boolean first,
+                                  final Layout layout) {
         if (first) {
             if (mMargin == -1) {
                 mMargin = (int) p.measureText(SPAN);
@@ -43,8 +51,7 @@ public final class DashSpan implements LeadingMarginSpan {
     }
 
     @Override
-    public int getLeadingMargin(boolean first)
-    {
+    public int getLeadingMargin(final boolean first) {
         return mMargin;
     }
 }

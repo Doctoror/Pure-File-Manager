@@ -241,7 +241,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     
     public void up() {
         cancelInitialPathLoading();
-        if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory)) {
+        if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.sRootDirectory)) {
             return;
         }
         final GenericFile parent = resolveExistingParent(mCurrentPath);
@@ -256,7 +256,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
 
     public boolean isRoot() {
-        return this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.rootDirectory);
+        return this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.sRootDirectory);
     }
 
     @Override
@@ -352,7 +352,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                 }
             }
             if (initialFile == null) {
-                initialFile = FileFactory.newFile(com.docd.purefm.Environment.rootDirectory.getAbsolutePath());
+                initialFile = FileFactory.newFile(com.docd.purefm.Environment.sRootDirectory.getAbsolutePath());
             }
             return initialFile;
         }

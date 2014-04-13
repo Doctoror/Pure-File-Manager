@@ -33,8 +33,8 @@ public final class EnvironmentTest extends AndroidTestCase {
         super.runTest();
         Environment.init(getContext());
         assertEquals(android.os.Environment.getRootDirectory(),
-                Environment.androidRootDirectory);
-        assertEquals(File.listRoots()[0], Environment.rootDirectory);
+                Environment.sAndroidRootDirectory);
+        assertEquals(File.listRoots()[0], Environment.sRootDirectory);
         final File primaryStorage = android.os.Environment.getExternalStorageDirectory();
         if (primaryStorage != null) {
             boolean primaryStorageFound = false;

@@ -38,30 +38,34 @@ public final class Environment {
     
     private Environment() {}
 
-    private static final ActivityMonitorListener activityMonitorListener = new ActivityMonitorListener();
-    
-    public static final File rootDirectory = File.listRoots()[0];
-    public static final File androidRootDirectory = android.os.Environment.getRootDirectory();
+    @NotNull
+    private static final ActivityMonitorListener sActivityMonitorListener = new ActivityMonitorListener();
+
+    @NotNull
+    public static final File sRootDirectory = File.listRoots()[0];
+
+    @NotNull
+    public static final File sAndroidRootDirectory = android.os.Environment.getRootDirectory();
 
     private static boolean sExternalStorageMounted;
     
     private static Context sContext;
-    public static boolean hasRoot;
+    public static boolean sHasRoot;
     
-    public static String busybox;
+    public static String sBusybox;
 
     private static List<StorageHelper.Volume> sVolumes;
     private static List<StorageHelper.StorageVolume> sStorages;
     
     public static void init(final Context context) {
         sContext = context;
-        busybox = getUtilPath("busybox");
-        if (busybox == null) {
-            busybox = getUtilPath("busybox-ba");
+        sBusybox = getUtilPath("busybox");
+        if (sBusybox == null) {
+            sBusybox = getUtilPath("busybox-ba");
         }
-        hasRoot = isUtilAvailable("su");
+        sHasRoot = isUtilAvailable("su");
         updateExternalStorageState();
-        ActivityMonitor.addOnActivitiesOpenedListener(activityMonitorListener);
+        ActivityMonitor.addOnActivitiesOpenedListener(sActivityMonitorListener);
     }
 
     @NotNull
@@ -81,12 +85,12 @@ public final class Environment {
     }
 
     public static boolean hasBusybox() {
-        return busybox != null;
+        return sBusybox != null;
     }
 
     @Nullable
     public static String getBusybox() {
-        return busybox;
+        return sBusybox;
     }
     
     public static boolean isExternalStorageMounted() {
@@ -132,10 +136,10 @@ public final class Environment {
     }
 
     public static boolean needsRemount(final @NotNull String path) {
-        if (path.equals(rootDirectory.getAbsolutePath())) {
+        if (path.equals(sRootDirectory.getAbsolutePath())) {
             return true;
         }
-        if (path.startsWith(androidRootDirectory.getAbsolutePath())) {
+        if (path.startsWith(sAndroidRootDirectory.getAbsolutePath())) {
             return true;
         }
         for (final StorageHelper.Volume volume : sVolumes) {
@@ -154,7 +158,7 @@ public final class Environment {
     }
 
     public static boolean isBusyboxUtilAvailable(final String util) {
-        if (busybox == null) {
+        if (sBusybox == null) {
             return false;
         }
 

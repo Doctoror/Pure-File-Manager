@@ -30,12 +30,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.cyanogenmod.filemanager.util.MediaHelper;
 import com.docd.purefm.R;
@@ -243,11 +241,11 @@ public final class BrowserFragment extends UserVisibleHintFragment
             final MenuItem content = menu.findItem(android.R.id.content);
 
             if (Settings.appearance == Settings.APPEARANCE_LIST) {
-                content.setIcon(ThemeUtils.getDrawable(this.mAttachedBrowserActivity, R.attr.ic_menu_view_as_grid))
+                content.setIcon(ThemeUtils.getDrawable(mAttachedBrowserActivity, R.attr.ic_menu_view_as_grid))
                         .setTitle(R.string.menu_view_as_grid)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             } else {
-                content.setIcon(ThemeUtils.getDrawable(this.mAttachedBrowserActivity, R.attr.ic_menu_view_as_list))
+                content.setIcon(ThemeUtils.getDrawable(mAttachedBrowserActivity, R.attr.ic_menu_view_as_list))
                         .setTitle(R.string.menu_view_as_list)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }

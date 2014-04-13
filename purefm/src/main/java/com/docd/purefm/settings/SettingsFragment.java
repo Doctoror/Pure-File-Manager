@@ -22,11 +22,15 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.BookmarksHelper;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+
+import org.jetbrains.annotations.NotNull;
 
 public final class SettingsFragment extends PreferenceFragment {
 
@@ -53,65 +57,91 @@ public final class SettingsFragment extends PreferenceFragment {
         this.init();
     }
 
-    private void init() {
+    @NotNull
+    private SettingsActivity getSettingsActivity() {
         final SettingsActivity parent = (SettingsActivity) getActivity();
-        
-        final Preference perm = findPreference(getString(R.string.key_preference_show_permissions));
+        if (parent == null) {
+            throw new IllegalStateException("getSettingsActivity() is called when the Fragment is not attached");
+        }
+        return parent;
+    }
+
+    private void init() {
+        final Resources res = getSettingsActivity().getResources();
+        final Preference perm = findPreference(res.getString(R.string.key_preference_show_permissions));
+        if (perm == null) {
+            throw new RuntimeException("Show permissions preference not found");
+        }
         perm.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showPermissions = ((Boolean) newValue).booleanValue();
-                parent.notifyNeedInvalidate();
+                Settings.showPermissions = (Boolean) newValue;
+                getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
         });
         
-        final Preference hid = findPreference(getString(R.string.key_preference_show_hidden));
+        final Preference hid = findPreference(res.getString(R.string.key_preference_show_hidden));
+        if (hid == null) {
+            throw new RuntimeException("Show hidden files preference not found");
+        }
         hid.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showHidden = ((Boolean) newValue).booleanValue();
-                parent.notifyNeedInvalidate();
+                Settings.showHidden = (Boolean) newValue;
+                getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
         });
 
-        final Preference prev = findPreference(getString(R.string.key_preference_show_preview));
+        final Preference prev = findPreference(res.getString(R.string.key_preference_show_preview));
+        if (prev == null) {
+            throw new RuntimeException("Show previews preference not found");
+        }
         prev.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showPreviews = ((Boolean) newValue).booleanValue();
-                parent.notifyNeedInvalidate();
+                Settings.showPreviews = (Boolean) newValue;
+                getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
         });
 
-        final Preference size = findPreference(getString(R.string.key_preference_show_size));
+        final Preference size = findPreference(res.getString(R.string.key_preference_show_size));
+        if (size == null) {
+            throw new RuntimeException("Show file sizes preference not found");
+        }
         size.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showSize = ((Boolean) newValue).booleanValue();
-                parent.notifyNeedInvalidate();
+                Settings.showSize = (Boolean) newValue;
+                getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
         });
 
-        final Preference modif = findPreference(getString(R.string.key_preference_show_modified));
+        final Preference modif = findPreference(res.getString(R.string.key_preference_show_modified));
+        if (modif == null) {
+            throw new RuntimeException("Show modified date preference not found");
+        }
         modif.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showLastModified = ((Boolean) newValue).booleanValue();
-                parent.notifyNeedInvalidate();
+                Settings.showLastModified = (Boolean) newValue;
+                getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
         });
 
-        final ListPreference theme = (ListPreference) findPreference(getString(R.string.key_preference_theme));
+        final ListPreference theme = (ListPreference) findPreference(res.getString(R.string.key_preference_theme));
+        if (theme == null) {
+            throw new RuntimeException("Theme preference not found");
+        }
         theme.setEntryValues(THEMES_VALUES);
         theme.setValue(String.valueOf(Settings.theme));
         theme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -120,14 +150,17 @@ public final class SettingsFragment extends PreferenceFragment {
                 final int chosenTheme = Integer.parseInt((String) newValue);
                 if (chosenTheme != Settings.theme) {
                     Settings.theme = chosenTheme;
-                    ((SettingsActivity) getActivity()).proxyRestart();
+                    getSettingsActivity().proxyRestart();
                     return true;
                 }
                 return false;
             }
         });
 
-        final Preference appear = findPreference(getString(R.string.key_preference_appearance));
+        final Preference appear = findPreference(res.getString(R.string.key_preference_appearance));
+        if (appear == null) {
+            throw new RuntimeException("Appearance preference not found");
+        }
         appear.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
@@ -136,20 +169,29 @@ public final class SettingsFragment extends PreferenceFragment {
                 perm.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
                 size.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
                 modif.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
-                parent.notifyNeedInvalidate();
+                getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
         });
         
-        final CheckBoxPreference command = (CheckBoxPreference) findPreference(getString(R.string.key_preference_use_commandline));
+        final CheckBoxPreference command = (CheckBoxPreference) findPreference(
+                res.getString(R.string.key_preference_use_commandline));
+        if (command == null) {
+            throw new RuntimeException("Use command line preference not found");
+        }
         command.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.useCommandLine = ((Boolean) newValue).booleanValue();
+                Settings.useCommandLine = (Boolean) newValue;
+                final SettingsActivity parent = getSettingsActivity();
                 if (!Settings.useCommandLine) {
                     if (Settings.su) {
-                        final CheckBoxPreference root = (CheckBoxPreference) findPreference(getString(R.string.key_preference_allow_root));
+                        final CheckBoxPreference root = (CheckBoxPreference) findPreference(
+                                res.getString(R.string.key_preference_allow_root));
+                        if (root == null) {
+                            throw new RuntimeException("Allow root preference not found");
+                        }
                         root.setChecked(false);
                         Settings.su = false;
                         Settings.setAllowRoot(parent, false);
@@ -161,12 +203,16 @@ public final class SettingsFragment extends PreferenceFragment {
             }
         });
         
-        final Preference root = findPreference(getString(R.string.key_preference_allow_root));
+        final Preference root = findPreference(res.getString(R.string.key_preference_allow_root));
+        if (root == null) {
+            throw new RuntimeException("Allow root preference not found");
+        }
         root.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.su = ((Boolean) newValue).booleanValue();
+                Settings.su = (Boolean) newValue;
+                final SettingsActivity parent = getSettingsActivity();
                 if (Settings.su) {
                     if (!Settings.useCommandLine) {
                         command.setChecked(true);
@@ -187,14 +233,23 @@ public final class SettingsFragment extends PreferenceFragment {
         modif.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
         
         command.setEnabled(Environment.hasBusybox());
-        root.setEnabled(Environment.hasRoot && Environment.hasBusybox());
-        
-        final Set<String> options = BookmarksHelper.getAllLocations(parent.getApplicationContext());
+        root.setEnabled(Environment.sHasRoot && Environment.hasBusybox());
+
+        final Context appContext = getSettingsActivity().getApplicationContext();
+        if (appContext == null) {
+            throw new RuntimeException("Application context of attached SettingsActivity is null");
+        }
+
+        final Set<String> options = BookmarksHelper.getAllLocations(appContext);
         final String defaultHome = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         options.add(defaultHome);
         
-        final ListPreference home = (ListPreference) this.findPreference(getString(R.string.key_preference_home_directory));
-        home.setSummary(Settings.getHomeDirectory(parent));
+        final ListPreference home = (ListPreference) this.findPreference(
+                res.getString(R.string.key_preference_home_directory));
+        if (home == null) {
+            throw new RuntimeException("Home directory preference not found");
+        }
+        home.setSummary(Settings.getHomeDirectory(appContext));
         final CharSequence[] opts = new CharSequence[options.size()];
         options.toArray(opts);
         home.setEntries(opts);
@@ -207,40 +262,6 @@ public final class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
-        
-        
-//        if (!options.isEmpty()) {
-//            final PreferenceCategory startup = new PreferenceCategory(parent);
-//            startup.setTitle(R.string.preference_category_startup);
-//            
-//            final PreferenceScreen ps = this.getPreferenceScreen();
-//            ps.addPreference(startup);
-//            
-//            final String defaultHome = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-//            options.add(defaultHome);
-//
-//            final ListPreference home = new ListPreference(parent);
-//            home.setTitle(R.string.preference_home_directory);
-//            home.setKey(getString(R.string.key_preference_home_directory));
-//            home.setDialogTitle(R.string.menu_bookmarks);
-//            home.setSummary(Settings.getHomeDirectory(parent));
-//            
-//            final CharSequence[] opts = new CharSequence[options.size()];
-//            options.toArray(opts);
-//            home.setEntries(opts);
-//            home.setEntryValues(opts);
-//            home.setDefaultValue(defaultHome);
-//            home.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-//                @Override
-//                public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                    preference.setSummary((CharSequence) newValue);
-//                    return true;
-//                }
-//            });
-//            
-//            startup.addPreference(home);
-//
-//        }
 
     }
 
