@@ -46,10 +46,10 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
         super.setUp();
         assertTrue(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED));
 
-        TEST_ROOT.mkdir();
+        doTearDown();
+        TEST_ROOT.mkdirs();
         assertTrue(TEST_ROOT.exists());
         assertTrue(TEST_ROOT.isDirectory());
-        doTearDown();
     }
 
     @Override
@@ -101,7 +101,6 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
         assertTrue(isFileInMediaStore(resolver, test2));
 
         assertTrue(test1.delete());
-        assertTrue(test2.delete());
 
         MediaStoreUtils.deleteFileOrDirectory(resolver, test2);
         assertFalse(isFileInMediaStore(resolver, test2));
