@@ -27,7 +27,7 @@ import android.provider.MediaStore.MediaColumns;
 import android.text.TextUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -95,7 +95,7 @@ public final class MediaHelper {
      * @param albumId The album identifier to search
      * @return String The album thumbnail path
      */
-    public static String getAlbumThumbnailPath(@NotNull final ContentResolver cr,
+    public static String getAlbumThumbnailPath(@NonNull final ContentResolver cr,
                                                final long albumId) {
         final String[] projection = {MediaStore.Audio.Albums.ALBUM_ART};
         final String where = BaseColumns._ID + "=?";

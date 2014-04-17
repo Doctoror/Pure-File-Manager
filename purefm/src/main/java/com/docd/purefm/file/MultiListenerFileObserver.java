@@ -16,7 +16,7 @@ package com.docd.purefm.file;
 
 import android.os.FileObserver;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,12 +29,12 @@ public final class MultiListenerFileObserver extends FileObserver {
 
     private final Set<OnEventListener> mListeners = new HashSet<>();
 
-    @NotNull
+    @NonNull
     private final String mPath;
 
     private int watchCount;
 
-    public MultiListenerFileObserver(@NotNull final String path, final int mask) {
+    public MultiListenerFileObserver(@NonNull final String path, final int mask) {
         super(path, mask);
         this.mPath = path;
     }
@@ -47,7 +47,7 @@ public final class MultiListenerFileObserver extends FileObserver {
         this.mListeners.remove(listener);
     }
 
-    @NotNull
+    @NonNull
     public String getPath() {
         return this.mPath;
     }

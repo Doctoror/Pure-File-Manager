@@ -21,14 +21,14 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
 public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, Void> {
 
-    public static AbstractSearchTask create(@NotNull final GenericFile startDirectory,
-                                            @NotNull final SearchTaskListener listener) {
+    public static AbstractSearchTask create(@NonNull final GenericFile startDirectory,
+                                            @NonNull final SearchTaskListener listener) {
         AbstractSearchTask task = null;
         if (Settings.useCommandLine) {
             final Shell shell = ShellHolder.getShell();
@@ -43,21 +43,21 @@ public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, 
     }
 
     public interface SearchTaskListener {
-        void onPreExecute(@NotNull AbstractSearchTask task);
-        void onCancelled(@NotNull AbstractSearchTask task);
-        void onProgressUpdate(@NotNull AbstractSearchTask task, GenericFile... files);
-        void onPostExecute(@NotNull AbstractSearchTask task);
+        void onPreExecute(@NonNull AbstractSearchTask task);
+        void onCancelled(@NonNull AbstractSearchTask task);
+        void onProgressUpdate(@NonNull AbstractSearchTask task, GenericFile... files);
+        void onPostExecute(@NonNull AbstractSearchTask task);
     }
 
 
-    @NotNull
+    @NonNull
     protected final GenericFile mStartDirectory;
 
-    @NotNull
+    @NonNull
     private final SearchTaskListener mListener;
 
-    protected AbstractSearchTask(@NotNull final GenericFile startDirectory,
-                                 @NotNull final SearchTaskListener listener) {
+    protected AbstractSearchTask(@NonNull final GenericFile startDirectory,
+                                 @NonNull final SearchTaskListener listener) {
         mStartDirectory = startDirectory;
         mListener = listener;
     }
@@ -86,6 +86,6 @@ public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, 
         mListener.onProgressUpdate(this, values);
     }
 
-    @NotNull
+    @NonNull
     public abstract List<String> getDeniedLocations();
 }

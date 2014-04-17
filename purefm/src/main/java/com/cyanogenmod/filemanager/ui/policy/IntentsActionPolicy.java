@@ -29,8 +29,8 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MimeTypes;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public final class IntentsActionPolicy {
      */
     @Nullable
     public static Intent createShareIntent(
-            @NotNull final Context ctx, @NotNull final GenericFile genericFile) {
+            @NonNull final Context ctx, @NonNull final GenericFile genericFile) {
         try {
             // Create the intent to
             final Intent intent = new Intent();
@@ -79,8 +79,8 @@ public final class IntentsActionPolicy {
      */
     @Nullable
     public static Intent createShareIntent(
-            @NotNull final Context ctx,
-            @NotNull final List<GenericFile> genericFiles) {
+            @NonNull final Context ctx,
+            @NonNull final List<GenericFile> genericFiles) {
         try {
             // Create the intent to
             final Intent intent = new Intent();
@@ -137,7 +137,7 @@ public final class IntentsActionPolicy {
      */
     @Nullable
     private static Intent resolveIntent(
-            @NotNull Context ctx, @NotNull Intent intent) {
+            @NonNull Context ctx, @NonNull Intent intent) {
         //Retrieve the activities that can handle the file
         final PackageManager packageManager = ctx.getPackageManager();
         List<ResolveInfo> info = packageManager.queryIntentActivities(intent, 0);

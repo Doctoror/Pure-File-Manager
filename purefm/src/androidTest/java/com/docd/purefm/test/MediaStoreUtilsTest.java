@@ -27,7 +27,7 @@ import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
         testMoveFile(resolver);
     }
 
-    private void testAddAndDeleteFile(@NotNull final ContentResolver resolver) throws Throwable {
+    private void testAddAndDeleteFile(@NonNull final ContentResolver resolver) throws Throwable {
         final GenericFile test = new JavaFile(TEST_ROOT, "test1.txt");
         assertFalse(isFileInMediaStore(resolver, test));
         MediaStoreUtils.addEmptyFileOrDirectory(resolver, test);
@@ -72,7 +72,7 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
         assertFalse(isFileInMediaStore(resolver, test));
     }
 
-    private void testRenameFile(@NotNull final ContentResolver resolver) throws Throwable {
+    private void testRenameFile(@NonNull final ContentResolver resolver) throws Throwable {
         final GenericFile test1 = new JavaFile(TEST_ROOT, "test2.txt");
         final GenericFile test2 = new JavaFile(TEST_ROOT, "test3.txt");
         MediaStoreUtils.addEmptyFileOrDirectory(resolver, test1);
@@ -85,7 +85,7 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
         assertFalse(isFileInMediaStore(resolver, test2));
     }
 
-    private void testRenameEmptyDirectory(@NotNull final ContentResolver resolver) throws Throwable {
+    private void testRenameEmptyDirectory(@NonNull final ContentResolver resolver) throws Throwable {
         final GenericFile test1 = new JavaFile(TEST_ROOT, "test4dir.txt");
         final GenericFile test2 = new JavaFile(TEST_ROOT, "test5dir.txt");
 
@@ -106,7 +106,7 @@ public final class MediaStoreUtilsTest extends AndroidTestCase {
         assertFalse(isFileInMediaStore(resolver, test2));
     }
 
-    private void testMoveFile(@NotNull final ContentResolver resolver) throws Throwable {
+    private void testMoveFile(@NonNull final ContentResolver resolver) throws Throwable {
         final GenericFile test1dir = new JavaFile(TEST_ROOT, "test6.txt");
         final GenericFile test2dir = new JavaFile(TEST_ROOT, "test7.txt");
         test1dir.mkdir();

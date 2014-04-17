@@ -26,16 +26,16 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PFMTextUtils;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 
 final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>> {
 
-    @NotNull
+    @NonNull
     private final GenericFile mTarget;
 
-    protected PasteTask(@NotNull final MonitoredActivity activity,
-                        @NotNull final GenericFile target) {
+    protected PasteTask(@NonNull final MonitoredActivity activity,
+                        @NonNull final GenericFile target) {
         super(activity);
         this.mTarget = target;
     }
@@ -46,14 +46,14 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
         ClipBoard.lock();
     }
 
-    @NotNull
+    @NonNull
     @Override
     protected String getServiceAction() {
         return OperationsService.ACTION_PASTE;
     }
 
     @Override
-    protected void startService(@NotNull final GenericFile... files) {
+    protected void startService(@NonNull final GenericFile... files) {
         OperationsService.paste(mActivity, mTarget, files, ClipBoard.isMove());
     }
 
@@ -72,7 +72,7 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
         this.finish(failed);
     }
 
-    private void finish(@NotNull final ArrayList<GenericFile> failed) {
+    private void finish(@NonNull final ArrayList<GenericFile> failed) {
         if (!failed.isEmpty()) {
             final Dialog dialog = MessageDialogBuilder.create(mActivity, ClipBoard.isMove() ?
                             R.string.dialog_move_failed : R.string.dialog_copy_failed,

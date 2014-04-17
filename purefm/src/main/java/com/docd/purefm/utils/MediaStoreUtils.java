@@ -31,14 +31,14 @@ import android.util.Pair;
 import com.docd.purefm.Environment;
 import com.docd.purefm.file.GenericFile;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class MediaStoreUtils {
 
     private MediaStoreUtils() {}
 
-    public static void requestMediaScanner(@NotNull final Context context,
-                                           @NotNull final GenericFile... files) {
+    public static void requestMediaScanner(@NonNull final Context context,
+                                           @NonNull final GenericFile... files) {
         final String[] paths = new String[files.length];
         int i = 0;
         for (final GenericFile file : files) {
@@ -48,9 +48,9 @@ public final class MediaStoreUtils {
         MediaScannerConnection.scanFile(context, paths, null, null);
     }
 
-    public static void renameFileOrDirectory(@NotNull final ContentResolver contentResolver,
-                                             @NotNull final GenericFile oldFile,
-                                             @NotNull final GenericFile newFile) {
+    public static void renameFileOrDirectory(@NonNull final ContentResolver contentResolver,
+                                             @NonNull final GenericFile oldFile,
+                                             @NonNull final GenericFile newFile) {
         if (oldFile.isDirectory()) {
             moveOrRenameDirectory(contentResolver, oldFile, newFile);
         } else {
@@ -58,9 +58,9 @@ public final class MediaStoreUtils {
         }
     }
 
-    private static void renameFile(@NotNull final ContentResolver contentResolver,
-                                   @NotNull final GenericFile oldFile,
-                                   @NotNull final GenericFile newFile) {
+    private static void renameFile(@NonNull final ContentResolver contentResolver,
+                                   @NonNull final GenericFile oldFile,
+                                   @NonNull final GenericFile newFile) {
         final Uri uri = getContentUri(oldFile);
         final long id = fileId(contentResolver, uri, oldFile.toFile());
         if (id != -1) {
@@ -72,9 +72,9 @@ public final class MediaStoreUtils {
         }
     }
 
-    private static void moveOrRenameDirectory(@NotNull final ContentResolver contentResolver,
-                                              @NotNull final GenericFile oldFile,
-                                              @NotNull final GenericFile newFile) {
+    private static void moveOrRenameDirectory(@NonNull final ContentResolver contentResolver,
+                                              @NonNull final GenericFile oldFile,
+                                              @NonNull final GenericFile newFile) {
         final String oldPath = PFMFileUtils.fullPath(oldFile);
         final String newPath = PFMFileUtils.fullPath(newFile);
         final Uri uri = getContentUri(oldPath);
@@ -99,9 +99,9 @@ public final class MediaStoreUtils {
         }
     }
 
-    private static void moveFileInSameVolume(@NotNull final ContentResolver contentResolver,
-                                            @NotNull final GenericFile oldFile,
-                                            @NotNull final GenericFile newFile) {
+    private static void moveFileInSameVolume(@NonNull final ContentResolver contentResolver,
+                                            @NonNull final GenericFile oldFile,
+                                            @NonNull final GenericFile newFile) {
         final Uri uri = getContentUri(oldFile);
         final long id = fileId(contentResolver, uri, oldFile.toFile());
         final long parentId;
@@ -122,8 +122,8 @@ public final class MediaStoreUtils {
         }
     }
 
-    public static void moveFiles(@NotNull final Context context,
-                                 @NotNull final List<Pair<GenericFile, GenericFile>> files) {
+    public static void moveFiles(@NonNull final Context context,
+                                 @NonNull final List<Pair<GenericFile, GenericFile>> files) {
         for (final Pair<GenericFile, GenericFile> pair : files) {
             final String secondPath = PFMFileUtils.fullPath(pair.second);
             boolean firstExternal = isExternal(PFMFileUtils.fullPath(pair.first));
@@ -146,8 +146,8 @@ public final class MediaStoreUtils {
         }
     }
 
-    public static void copyFiles(@NotNull final Context context,
-                                 @NotNull final List<Pair<GenericFile, GenericFile>> files) {
+    public static void copyFiles(@NonNull final Context context,
+                                 @NonNull final List<Pair<GenericFile, GenericFile>> files) {
         final int size = files.size();
         final String[] paths = new String[size];
         for (int i = 0; i < size; i++) {
@@ -170,11 +170,11 @@ public final class MediaStoreUtils {
         resolver.insert(getContentUri(file), values);
     }
 
-    public static Uri getContentUri(@NotNull final GenericFile file) {
+    public static Uri getContentUri(@NonNull final GenericFile file) {
         return getContentUri(PFMFileUtils.fullPath(file));
     }
 
-    public static Uri getContentUri(@NotNull final String path) {
+    public static Uri getContentUri(@NonNull final String path) {
         final boolean isExternal = isExternal(path);
         // general file content uri is just fine, so the code below is commented
 
@@ -194,7 +194,7 @@ public final class MediaStoreUtils {
                 "external" : "internal");
     }
 
-    public static boolean isExternal(@NotNull final String path) {
+    public static boolean isExternal(@NonNull final String path) {
         for (final StorageHelper.StorageVolume volume : Environment.getStorageVolumes()) {
             if (path.startsWith(volume.file.getAbsolutePath())) {
                 return true;
@@ -203,9 +203,9 @@ public final class MediaStoreUtils {
         return false;
     }
 
-    private static long fileId(@NotNull final ContentResolver contentResolver,
-                               @NotNull final Uri uri,
-                               @NotNull final File file) {
+    private static long fileId(@NonNull final ContentResolver contentResolver,
+                               @NonNull final Uri uri,
+                               @NonNull final File file) {
         final Pair<String, String[]> selection = dataSelection(file);
         final Cursor c = contentResolver.query(uri,
                 new String[] {MediaStore.Files.FileColumns._ID},
@@ -222,7 +222,7 @@ public final class MediaStoreUtils {
         return -1;
     }
 
-    @NotNull
+    @NonNull
     public static Pair<String, String[]> dataSelection(final File file) {
         final String canonicalPath = PFMFileUtils.fullPath(file);
         final String absolutePath = file.getAbsolutePath();
@@ -239,8 +239,8 @@ public final class MediaStoreUtils {
         return new Pair<>(selection, selectionArgs);
     }
 
-    public static void deleteFile(@NotNull final ContentResolver contentResolver,
-                                  @NotNull final GenericFile file) {
+    public static void deleteFile(@NonNull final ContentResolver contentResolver,
+                                  @NonNull final GenericFile file) {
         final String canonicalPath = PFMFileUtils.fullPath(file);
         final int result = contentResolver.delete(getContentUri(canonicalPath),
                 MediaStore.Files.FileColumns.DATA + "=?", new String[] {canonicalPath});
@@ -253,8 +253,8 @@ public final class MediaStoreUtils {
         }
     }
 
-    public static void deleteFileOrDirectory(@NotNull final ContentResolver contentResolver,
-                                             @NotNull final GenericFile file) {
+    public static void deleteFileOrDirectory(@NonNull final ContentResolver contentResolver,
+                                             @NonNull final GenericFile file) {
         if (file.isDirectory()) {
             deleteAllFromDirectory(contentResolver, file);
         } else {
@@ -262,8 +262,8 @@ public final class MediaStoreUtils {
         }
     }
 
-    public static void deleteFilesOrDirectories(@NotNull final ContentResolver contentResolver,
-                                                @NotNull final List<GenericFile> files) {
+    public static void deleteFilesOrDirectories(@NonNull final ContentResolver contentResolver,
+                                                @NonNull final List<GenericFile> files) {
         final List<GenericFile> regular = new ArrayList<>();
         for (final GenericFile file : files) {
             if (file.isDirectory()) {
@@ -278,9 +278,9 @@ public final class MediaStoreUtils {
         }
     }
 
-    @NotNull
+    @NonNull
     private static Pair<String, String[]> listDirectoryRecursiveSelelction(
-            @NotNull final GenericFile dir) {
+            @NonNull final GenericFile dir) {
 
         if (dir.exists() && !dir.isDirectory()) {
             throw new IllegalArgumentException("\'dir\' is not a directory");
@@ -312,8 +312,8 @@ public final class MediaStoreUtils {
         return new Pair<>(selection, selectionArgs);
     }
 
-    public static void deleteAllFromDirectory(@NotNull final ContentResolver contentResolver,
-                                              @NotNull final GenericFile dir) {
+    public static void deleteAllFromDirectory(@NonNull final ContentResolver contentResolver,
+                                              @NonNull final GenericFile dir) {
 
         final String canonicalPath = PFMFileUtils.fullPath(dir);
         final Uri uri = MediaStoreUtils.getContentUri(canonicalPath);
@@ -334,7 +334,7 @@ public final class MediaStoreUtils {
         }
     }
 
-    @NotNull
+    @NonNull
     private static String filesToSelection(final List<GenericFile> files) {
         final StringBuilder selection = new StringBuilder(MediaStore.Files.FileColumns.DATA);
         selection.append(" IN ");

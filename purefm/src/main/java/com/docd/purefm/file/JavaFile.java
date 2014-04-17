@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.docd.purefm.utils.MimeTypes;
 
@@ -33,10 +33,10 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
 
     private static final long serialVersionUID = -2117911719748590982L;
 
-    @NotNull
+    @NonNull
     private final File mFile;
 
-    @NotNull
+    @NonNull
     private final Permissions p;
 
     private final boolean isSymlink;
@@ -44,35 +44,35 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     @Nullable
     private final String mimeType;
 
-    public JavaFile(@NotNull final File file) {
+    public JavaFile(@NonNull final File file) {
         this.mFile = file;
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(file);
     }
     
-    public JavaFile(@NotNull final File dir, @NotNull final String name) {
+    public JavaFile(@NonNull final File dir, @NonNull final String name) {
         this.mFile = new File(dir, name);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
-    public JavaFile(@NotNull final String dirPath, @NotNull final String name) {
+    public JavaFile(@NonNull final String dirPath, @NonNull final String name) {
         this.mFile = new File(dirPath, name);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
-    public JavaFile(@NotNull final String path) {
+    public JavaFile(@NonNull final String path) {
         this.mFile = new File(path);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
         this.mimeType = MimeTypes.getMimeType(mFile);
     }
 
-    public JavaFile(@NotNull final URI uri) {
+    public JavaFile(@NonNull final URI uri) {
         this.mFile = new File(uri);
         this.p = this.readPermissions();
         this.isSymlink = this.detectSymlink();
@@ -82,7 +82,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     private Permissions readPermissions() {
         return new Permissions(this.mFile.canRead(), this.mFile.canWrite(), this.mFile.canExecute());
     }
@@ -138,7 +138,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public File toFile() {
         return this.mFile;
@@ -341,7 +341,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return this.mFile.getName();
@@ -350,7 +350,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getPath() {
         return this.mFile.getPath();
@@ -359,7 +359,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getAbsolutePath() {
         return this.mFile.getAbsolutePath();
@@ -368,13 +368,13 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getCanonicalPath() throws IOException {
         return this.mFile.getCanonicalPath();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public JavaFile getCanonicalFile() throws IOException {
         return new JavaFile(this.mFile.getCanonicalPath());
@@ -451,7 +451,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public Permissions getPermissions() {
         return this.p;

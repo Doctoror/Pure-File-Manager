@@ -26,8 +26,8 @@ import android.util.SparseArray;
 
 import com.docd.purefm.R;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 import java.util.Properties;
@@ -102,7 +102,7 @@ public final class AIDHelper {
      * @param id The id
      * @return AID The AID, or null if not found
      */
-    @NotNull
+    @NonNull
     public static String getUserName(int id) {
         return sAids.get(id);
     }
@@ -113,7 +113,7 @@ public final class AIDHelper {
      * @param name The user identifier
      * @return AID The AID
      */
-    @NotNull
+    @NonNull
     public static String getUserName(String name) {
         final int len = sAids.size();
         for (int i = 0; i < len; i++) {

@@ -22,7 +22,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class ActivityMonitor
 {
@@ -47,14 +47,14 @@ public final class ActivityMonitor
     }
     
     public static void addOnActivitiesOpenedListener(
-            @NotNull final OnActivitiesOpenedListener l) {
+            @NonNull final OnActivitiesOpenedListener l) {
         synchronized (LISTENERS_LOCK) {
             sListeners.add(l);
         }
     }
     
     public static void removeOnActivitiesOpenedListener(
-            @NotNull final OnActivitiesOpenedListener l) {
+            @NonNull final OnActivitiesOpenedListener l) {
         synchronized (LISTENERS_LOCK) {
             sListeners.remove(l);
         }

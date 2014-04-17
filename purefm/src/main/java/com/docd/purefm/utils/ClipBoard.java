@@ -18,8 +18,8 @@ import android.util.Log;
 
 import com.docd.purefm.file.GenericFile;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Holds references to copied or moved to clipboard files
@@ -45,7 +45,7 @@ public final class ClipBoard {
     
     private ClipBoard() {}
     
-    public static synchronized boolean cutCopy(@NotNull final GenericFile[] files) {
+    public static synchronized boolean cutCopy(@NonNull final GenericFile[] files) {
         synchronized (LOCK) {
             if (!sIsLocked) {
                 sIsMove = false;
@@ -58,7 +58,7 @@ public final class ClipBoard {
         }
     }
     
-    public static synchronized boolean cutMove(@NotNull final GenericFile[] files) {
+    public static synchronized boolean cutMove(@NonNull final GenericFile[] files) {
         synchronized (LOCK) {
             if (!sIsLocked) {
                 sIsMove = true;

@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 
@@ -30,23 +30,23 @@ import java.io.File;
  */
 public final class CreateDirectoryTask extends OperationTask<String, CharSequence> {
 
-    @NotNull
+    @NonNull
     private final File mParent;
 
-    public CreateDirectoryTask(@NotNull final MonitoredActivity activity,
-                               @NotNull final File parent) {
+    public CreateDirectoryTask(@NonNull final MonitoredActivity activity,
+                               @NonNull final File parent) {
         super(activity);
         mParent = parent;
     }
 
-    @NotNull
+    @NonNull
     @Override
     protected String getServiceAction() {
         return OperationsService.ACTION_CREATE_DIRECTORY;
     }
 
     @Override
-    protected void startService(@NotNull String... fileNames) {
+    protected void startService(@NonNull String... fileNames) {
         for (final String fileName : fileNames) {
             OperationsService.createDirectory(mActivity, mParent, fileName);
         }

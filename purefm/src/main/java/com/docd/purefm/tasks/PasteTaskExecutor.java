@@ -35,26 +35,26 @@ import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ClipBoard;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class PasteTaskExecutor implements OnClickListener {
 
-    @NotNull
+    @NonNull
     private final WeakReference<MonitoredActivity> mActivityReference;
 
-    @NotNull
+    @NonNull
     private final GenericFile mTargetFile;
 
-    @NotNull
+    @NonNull
     private final LinkedList<GenericFile> mToProcess = new LinkedList<>();
 
-    @NotNull
+    @NonNull
     private final HashMap<File, GenericFile> mExisting = new HashMap<>();
 
     private GenericFile mCurrentFile;
     
-    public PasteTaskExecutor(@NotNull final MonitoredActivity activity,
-                             @NotNull final GenericFile targetFile) {
+    public PasteTaskExecutor(@NonNull final MonitoredActivity activity,
+                             @NonNull final GenericFile targetFile) {
         this.mActivityReference = new WeakReference<>(activity);
         this.mTargetFile = targetFile;
     }

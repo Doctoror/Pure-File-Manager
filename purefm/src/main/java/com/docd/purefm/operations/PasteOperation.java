@@ -34,7 +34,7 @@ import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,16 +46,16 @@ import java.util.List;
  */
 final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>> {
 
-    @NotNull
+    @NonNull
     private final Context mContext;
 
-    @NotNull
+    @NonNull
     private final GenericFile mTarget;
 
     private final boolean mIsMove;
 
-    PasteOperation(@NotNull final Context context,
-                   @NotNull final GenericFile target,
+    PasteOperation(@NonNull final Context context,
+                   @NonNull final GenericFile target,
                    final boolean isMove) {
         mContext = context;
         mTarget = target;
@@ -102,12 +102,12 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
      * @param filesAffected Pair of removed and created files
      * @return List of files that were failed to process
      */
-    @NotNull
+    @NonNull
     private ArrayList<GenericFile> processJavaFiles(
-            @NotNull final GenericFile[] contents,
-            @NotNull final GenericFile target,
+            @NonNull final GenericFile[] contents,
+            @NonNull final GenericFile target,
             final boolean isMove,
-            @NotNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
+            @NonNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
         final ArrayList<GenericFile> failed = new ArrayList<>();
         for (final GenericFile current : contents) {
             if (isCanceled()) {
@@ -145,12 +145,12 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
      * @param filesAffected Pair of removed and created files
      * @return List of files that were failed to process
      */
-    @NotNull
+    @NonNull
     private static ArrayList<GenericFile> processCommandLineFiles(
-            @NotNull final GenericFile[] contents,
-            @NotNull final GenericFile target,
+            @NonNull final GenericFile[] contents,
+            @NonNull final GenericFile target,
             final boolean isMove,
-            @NotNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
+            @NonNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
         final ArrayList<GenericFile> failed = new ArrayList<>();
         final Shell shell = ShellHolder.getShell();
         if (shell == null) {

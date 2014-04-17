@@ -5,12 +5,12 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.view.ContextThemeWrapper;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class ThemeUtils {
     private ThemeUtils() {}
 
-    public static int getInteger(@NotNull final Resources.Theme theme, final int attr) {
+    public static int getInteger(@NonNull final Resources.Theme theme, final int attr) {
         final TypedArray array = theme.obtainStyledAttributes(new int[] {attr});
         try {
             return array.getInteger(0, 0);
@@ -37,7 +37,7 @@ public final class ThemeUtils {
         }
     }
 
-    @NotNull
+    @NonNull
     public static Drawable getDrawable(final ContextThemeWrapper themeWrapper, final int attr) {
         final TypedArray array = themeWrapper.obtainStyledAttributes(new int[] {attr});
         try {

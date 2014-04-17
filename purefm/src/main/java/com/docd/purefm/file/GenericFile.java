@@ -14,8 +14,8 @@
  */
 package com.docd.purefm.file;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -201,7 +201,7 @@ public interface GenericFile extends Serializable {
      *
      * @return permissions for the file
      */
-    @NotNull
+    @NonNull
     Permissions getPermissions();
 
     /**
@@ -217,7 +217,7 @@ public interface GenericFile extends Serializable {
      *
      * @return path of this file
      */
-    @NotNull
+    @NonNull
     String getPath();
 
     /**
@@ -234,7 +234,7 @@ public interface GenericFile extends Serializable {
      * @return this file's name or an empty string if there is no name part in
      *         the file's path.
      */
-    @NotNull
+    @NonNull
     String getName();
 
     /**
@@ -245,7 +245,7 @@ public interface GenericFile extends Serializable {
      * command-line arguments, to remove the requirement implied by relative paths, that the
      * child must have the same working directory as its parent.
      */
-    @NotNull
+    @NonNull
     String getAbsolutePath();
 
     /**
@@ -271,7 +271,7 @@ public interface GenericFile extends Serializable {
      * @throws IOException
      *             if an I/O error occurs.
      */
-    @NotNull
+    @NonNull
     public String getCanonicalPath() throws IOException;
 
     /**
@@ -282,7 +282,7 @@ public interface GenericFile extends Serializable {
      * @throws IOException
      *             if an I/O error occurs.
      */
-    @NotNull
+    @NonNull
     public GenericFile getCanonicalFile() throws IOException;
 
     /**
@@ -311,7 +311,7 @@ public interface GenericFile extends Serializable {
      *
      * @return java.io.File that represents this file
      */
-    @NotNull
+    @NonNull
     File toFile();
 
     /**

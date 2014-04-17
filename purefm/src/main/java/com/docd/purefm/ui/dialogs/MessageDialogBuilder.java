@@ -20,7 +20,7 @@ import android.content.Context;
 
 import com.docd.purefm.R;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class MessageDialogBuilder {
 
@@ -28,10 +28,10 @@ public final class MessageDialogBuilder {
         // empty
     }
 
-    @NotNull
-    public static Dialog create(@NotNull final Context context,
+    @NonNull
+    public static Dialog create(@NonNull final Context context,
                                 final int titleRes,
-                                @NotNull final CharSequence message) {
+                                @NonNull final CharSequence message) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(titleRes);
         builder.setMessage(message);

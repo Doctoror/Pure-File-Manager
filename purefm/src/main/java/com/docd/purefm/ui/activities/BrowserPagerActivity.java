@@ -55,8 +55,8 @@ import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Activity that holds ViewPager with BrowserFragments
@@ -126,7 +126,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    protected void onSaveInstanceState(@NotNull final Bundle outState) {
+    protected void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(EXTRA_SAVED_FRAGMENT_ADAPTER_STATE, mPagerAdapter.saveManualState());
     }
@@ -278,7 +278,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public boolean onKeyUp(int keyCode, @NotNull KeyEvent event) {
+    public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_SEARCH) {
             final Intent searchIntent = new Intent(this, SearchActivity.class);
             searchIntent.putExtra(Extras.EXTRA_PATH, currentPath.getAbsolutePath());
@@ -298,7 +298,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public boolean onMenuItemSelected(final int featureId, @NotNull final MenuItem item) {
+    public boolean onMenuItemSelected(final int featureId, @NonNull final MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_bookmarks_new:
             if (currentPath != null) {
@@ -395,7 +395,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
 
     @Override
     public void onOperationStarted(@Nullable final CharSequence operationMessage,
-                                   @NotNull final Intent cancelIntent) {
+                                   @NonNull final Intent cancelIntent) {
         if (mOperationProgressDialog == null || !mOperationProgressDialog.isShowing()) {
             mOperationProgressDialog = ProgressAlertDialogBuilder.create(this,
                     operationMessage, new View.OnClickListener() {

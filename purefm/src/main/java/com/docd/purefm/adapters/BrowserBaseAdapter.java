@@ -50,7 +50,7 @@ import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.ui.view.OverlayImageView;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Base adapter for file list.
@@ -79,37 +79,37 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     private static DrawableLruCache<String> sMimeTypeIconCache;
 
-    @NotNull
+    @NonNull
     private final Handler mHandler;
 
     /**
      * Application's {@link android.content.res.Resources}
      */
-    @NotNull
+    @NonNull
     private final Resources mResources;
 
     /**
      * Current {@link android.content.res.Resources.Theme}
      */
-    @NotNull
+    @NonNull
     private final Resources.Theme mTheme;
 
-    @NotNull
+    @NonNull
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
-    @NotNull
+    @NonNull
     private final FileObserverCache mObserverCache = FileObserverCache.getInstance();
 
     /**
      * Adapter's content
      */
-    @NotNull
+    @NonNull
     private final List<GenericFile> mContent = new ArrayList<>();
 
     /**
      * Observers for Files used in this Adapter
      */
-    @NotNull
+    @NonNull
     private final List<MultiListenerFileObserver> mFileObservers = new ArrayList<>();
 
     /**
@@ -129,7 +129,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     protected final PreviewHolder mPreviewHolder;
 
-    protected BrowserBaseAdapter(@NotNull final Activity context) {
+    protected BrowserBaseAdapter(@NonNull final Activity context) {
         if (sDrawableLruCache == null) {
             sDrawableLruCache = new DrawableLruCache<>();
         }
@@ -458,7 +458,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param attrId attribute id of resource to load
      * @return Drawable for Theme
      */
-    @NotNull
+    @NonNull
     private static Drawable getDrawableForRes(final Resources.Theme theme, final int attrId) {
         Drawable drawable = sDrawableLruCache.get(attrId);
         if (drawable == null) {
@@ -476,7 +476,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param resId Id of resource to load
      * @return Drawable from resources
      */
-    @NotNull
+    @NonNull
     private static Drawable getDrawableForRes(final Resources res, final int resId) {
         Drawable drawable = sDrawableLruCache.get(resId);
         if (drawable == null) {
@@ -493,8 +493,8 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param file File to load preview for
      * @param logo View to set loaded preview to
      */
-    protected final void loadPreview(@NotNull final GenericFile file,
-                                     @NotNull final OverlayImageView logo) {
+    protected final void loadPreview(@NonNull final GenericFile file,
+                                     @NonNull final OverlayImageView logo) {
         final Bitmap result = mPreviewHolder.getCached(file.toFile());
         if (result != null) {
             logo.setImageBitmap(result);
@@ -511,7 +511,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
         static final int MESSAGE_OBSERVER_EVENT = 666;
 
-        @NotNull
+        @NonNull
         private final WeakReference<BrowserBaseAdapter> mAdapterReference;
 
         FileObserverEventHandler(BrowserBaseAdapter adapter) {
@@ -541,22 +541,22 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             implements Runnable
     {
 
-        @NotNull
+        @NonNull
         private final Handler mHandler;
 
-        @NotNull
+        @NonNull
         private final PreviewHolder mPreviewHolder;
 
-        @NotNull
+        @NonNull
         private final OverlayImageView mImageView;
 
-        @NotNull
+        @NonNull
         private final GenericFile mFile;
 
-        Job(@NotNull final Handler handler,
-            @NotNull final PreviewHolder previewHolder,
-            @NotNull final GenericFile file,
-            @NotNull final OverlayImageView imageView)
+        Job(@NonNull final Handler handler,
+            @NonNull final PreviewHolder previewHolder,
+            @NonNull final GenericFile file,
+            @NonNull final OverlayImageView imageView)
         {
             this.mHandler = handler;
             this.mPreviewHolder = previewHolder;

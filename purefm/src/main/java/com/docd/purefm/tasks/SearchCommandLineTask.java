@@ -32,27 +32,27 @@ import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
 import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 final class SearchCommandLineTask extends AbstractSearchTask {
 
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
 
-    @NotNull
+    @NonNull
     private final Shell mShell;
 
-    @NotNull
+    @NonNull
     private final List<String> mDenied = new ArrayList<>();
 
-    public SearchCommandLineTask(@NotNull final Shell shell,
-                                 @NotNull final GenericFile startDirectory,
-                                 @NotNull final SearchTaskListener listener) {
+    public SearchCommandLineTask(@NonNull final Shell shell,
+                                 @NonNull final GenericFile startDirectory,
+                                 @NonNull final SearchTaskListener listener) {
         super(startDirectory, listener);
         mShell = shell;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public List<String> getDeniedLocations() {
         return mDenied;
     }

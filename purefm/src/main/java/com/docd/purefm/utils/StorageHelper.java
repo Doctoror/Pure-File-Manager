@@ -16,7 +16,7 @@ import android.os.Environment;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Provides methods for working with storages
@@ -58,7 +58,7 @@ public final class StorageHelper {
      *
      * @return list of mounted {@link StorageVolume}s
      */
-    @NotNull
+    @NonNull
     public static List<Volume> getAllDevices() {
         final List<Volume> volumeList = new ArrayList<>(20);
         BufferedReader reader = null;
@@ -193,11 +193,11 @@ public final class StorageHelper {
         return false;
     }
 
-    @NotNull
+    @NonNull
     private static StorageHelper.Volume createVolume(
-            @NotNull final String device,
-            @NotNull final File file,
-            @NotNull final String fileSystem) {
+            @NonNull final String device,
+            @NonNull final File file,
+            @NonNull final String fileSystem) {
         // this approach considers that all storages are mounted in the same non-root directory
         boolean isStorageVolume = !STORAGES_ROOT.equals(File.separator);
 
@@ -234,8 +234,8 @@ public final class StorageHelper {
      * @param allVolumes List to get {@link StorageVolume} from
      * @return {@link StorageVolume} list from items of volume list
      */
-    @NotNull
-    public static List<StorageVolume> getStorageVolumes(@NotNull final List<Volume> allVolumes) {
+    @NonNull
+    public static List<StorageVolume> getStorageVolumes(@NonNull final List<Volume> allVolumes) {
         final Map<String, List<StorageVolume>> deviceVolumeMap = new HashMap<>();
         for (final Volume v : allVolumes) {
             if (v instanceof StorageVolume) {
@@ -328,9 +328,9 @@ public final class StorageHelper {
          */
         protected boolean mReadOnly;
 
-        Volume(@NotNull final String device,
-               @NotNull final File file,
-               @NotNull final String fileSystem) {
+        Volume(@NonNull final String device,
+               @NonNull final File file,
+               @NonNull final String fileSystem) {
             this.device = device;
             this.file = file;
             this.fileSystem = fileSystem;
@@ -426,9 +426,9 @@ public final class StorageHelper {
          */
         private Type mType;
 
-        StorageVolume(@NotNull final String device,
-                      @NotNull final File file,
-                      @NotNull final String fileSystem) {
+        StorageVolume(@NonNull final String device,
+                      @NonNull final File file,
+                      @NonNull final String fileSystem) {
             super(device, file, fileSystem);
         }
 

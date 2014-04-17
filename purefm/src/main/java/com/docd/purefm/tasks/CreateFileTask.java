@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 
@@ -30,22 +30,22 @@ import java.io.File;
  */
 public final class CreateFileTask extends OperationTask<String, CharSequence> {
 
-    @NotNull
+    @NonNull
     private final File mParentDir;
 
-    public CreateFileTask(@NotNull MonitoredActivity activity, @NotNull final File parent) {
+    public CreateFileTask(@NonNull MonitoredActivity activity, @NonNull final File parent) {
         super(activity);
         mParentDir = parent;
     }
 
-    @NotNull
+    @NonNull
     @Override
     protected String getServiceAction() {
         return OperationsService.ACTION_CREATE_FILE;
     }
 
     @Override
-    protected void startService(@NotNull String... fileNames) {
+    protected void startService(@NonNull String... fileNames) {
         for (final String fileName : fileNames) {
             OperationsService.createFile(mActivity, mParentDir, fileName);
         }

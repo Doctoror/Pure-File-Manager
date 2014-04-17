@@ -26,8 +26,8 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.StorageHelper;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,13 +38,13 @@ public final class Environment {
     
     private Environment() {}
 
-    @NotNull
+    @NonNull
     private static final ActivityMonitorListener sActivityMonitorListener = new ActivityMonitorListener();
 
-    @NotNull
+    @NonNull
     public static final File sRootDirectory = File.listRoots()[0];
 
-    @NotNull
+    @NonNull
     public static final File sAndroidRootDirectory = android.os.Environment.getRootDirectory();
 
     private static boolean sExternalStorageMounted;
@@ -68,7 +68,7 @@ public final class Environment {
         ActivityMonitor.addOnActivitiesOpenedListener(sActivityMonitorListener);
     }
 
-    @NotNull
+    @NonNull
     public static List<StorageHelper.Volume> getVolumes() {
         if (sVolumes == null) {
             throw new IllegalStateException("Environment was not initialized");
@@ -76,7 +76,7 @@ public final class Environment {
         return sVolumes;
     }
 
-    @NotNull
+    @NonNull
     public static List<StorageHelper.StorageVolume> getStorageVolumes() {
         if (sStorages == null) {
             throw new IllegalStateException("Environment was not initialized");
@@ -135,7 +135,7 @@ public final class Environment {
         return false;
     }
 
-    public static boolean needsRemount(final @NotNull String path) {
+    public static boolean needsRemount(final @NonNull String path) {
         if (path.equals(sRootDirectory.getAbsolutePath())) {
             return true;
         }

@@ -14,7 +14,7 @@
  */
 package com.docd.purefm.commandline;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * find - search for files in a directory hierarchy
@@ -54,13 +54,13 @@ public final class CommandFind extends BusyboxCommand {
      * @param startDirectory Directory to search in
      * @param what Names of files to find
      */
-    public CommandFind(@NotNull final String startDirectory,
-                       @NotNull final String... what) {
+    public CommandFind(@NonNull final String startDirectory,
+                       @NonNull final String... what) {
         super(buildCommand(startDirectory, what));
 
     }
 
-    private static String buildCommand(@NotNull final String startDirectory, @NotNull final String[] what) {
+    private static String buildCommand(@NonNull final String startDirectory, @NonNull final String[] what) {
         final StringBuilder command = new StringBuilder();
         command.append("find ");
         command.append(CommandLineUtils.getCommandLineString(startDirectory));

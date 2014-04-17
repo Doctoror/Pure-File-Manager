@@ -30,7 +30,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class SettingsFragment extends PreferenceFragment {
 
@@ -57,7 +57,7 @@ public final class SettingsFragment extends PreferenceFragment {
         this.init();
     }
 
-    @NotNull
+    @NonNull
     private SettingsActivity getSettingsActivity() {
         final SettingsActivity parent = (SettingsActivity) getActivity();
         if (parent == null) {

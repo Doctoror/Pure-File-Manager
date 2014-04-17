@@ -17,7 +17,7 @@ package com.docd.purefm.services;
 import android.app.Service;
 import android.content.Intent;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
@@ -44,20 +44,20 @@ public abstract class MultiWorkerService extends Service {
         return START_NOT_STICKY;
     }
 
-    protected abstract void onHandleIntent(@NotNull final Intent intent);
+    protected abstract void onHandleIntent(@NonNull final Intent intent);
 
     private static final class HandleIntentRunnable implements Runnable {
 
-        @NotNull
+        @NonNull
         private final WeakReference<MultiWorkerService> mServiceRef;
 
         private final int mStartId;
 
-        @NotNull
+        @NonNull
         private final Intent mIntent;
 
-        HandleIntentRunnable(@NotNull final MultiWorkerService service,
-                             @NotNull final Intent intent,
+        HandleIntentRunnable(@NonNull final MultiWorkerService service,
+                             @NonNull final Intent intent,
                              final int startId) {
             this.mServiceRef = new WeakReference<>(service);
             this.mIntent = intent;

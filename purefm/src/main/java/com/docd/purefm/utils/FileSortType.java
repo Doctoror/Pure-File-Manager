@@ -18,7 +18,7 @@ import java.util.Comparator;
 
 import com.docd.purefm.file.GenericFile;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public enum FileSortType {
 
@@ -31,14 +31,14 @@ public enum FileSortType {
     DATE_ASC (new PFMFileUtils.DateComparatorAsc()),
     DATE_DESC(new PFMFileUtils.DateComparatorDesc());
 
-    @NotNull
+    @NonNull
     private final Comparator<GenericFile> mComparator;
     
-    private FileSortType(@NotNull final Comparator<GenericFile> comparator) {
+    private FileSortType(@NonNull final Comparator<GenericFile> comparator) {
         this.mComparator = comparator;
     }
 
-    @NotNull
+    @NonNull
     public Comparator<GenericFile> getComparator() {
         return this.mComparator;
     }

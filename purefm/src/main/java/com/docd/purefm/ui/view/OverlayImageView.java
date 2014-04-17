@@ -23,7 +23,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Can draw two drawables
@@ -67,7 +67,7 @@ public class OverlayImageView extends ImageView {
     }
 
     @Override
-    protected void onDraw(@NotNull final Canvas c) {
+    protected void onDraw(@NonNull final Canvas c) {
         super.onDraw(c);
         final Drawable drawable = this.getDrawable();
         if (drawOverlay && drawable != null && overlay != null) {

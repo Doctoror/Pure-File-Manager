@@ -14,14 +14,14 @@
  */
 package com.docd.purefm.utils;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class ArrayUtils {
 
     private ArrayUtils() {}
 
     @SuppressWarnings("unchecked")
-    public static <INPUT, OUTPUT> void copyArrayAndCast(@NotNull final INPUT[] input, @NotNull final OUTPUT[] output) {
+    public static <INPUT, OUTPUT> void copyArrayAndCast(@NonNull final INPUT[] input, @NonNull final OUTPUT[] output) {
         if (input.length != output.length) {
             throw new IllegalArgumentException("input and output lengths differ");
         }

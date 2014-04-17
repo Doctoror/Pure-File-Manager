@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import android.webkit.MimeTypeMap;
 
@@ -31,16 +31,16 @@ public final class MimeTypes {
 
     private MimeTypes() {}
 
-    @NotNull
+    @NonNull
     public static final String ALL_MIME_TYPES = "*/*";
 
-    @NotNull
+    @NonNull
     private static final HashMap<String, Integer> EXT_ICONS = new HashMap<>();
     
     /**
      * This is not a replacement for libcore. This is an addition
      */
-    @NotNull
+    @NonNull
     private static final HashMap<String, String> MIME_TYPES = new HashMap<>();
 
     static {
@@ -386,7 +386,7 @@ public final class MimeTypes {
      * @return mime type of the file or null if file is directory or has unknown mime type
      */
     @Nullable
-    public static String getMimeType(@NotNull final File file) {
+    public static String getMimeType(@NonNull final File file) {
         if (file.isDirectory()) {
             return null;
         }
@@ -401,7 +401,7 @@ public final class MimeTypes {
      * @return mime type based on file extension
      */
     @Nullable
-    public static String getMimeType(@NotNull final String path) {
+    public static String getMimeType(@NonNull final String path) {
         if (path.endsWith(File.separator)) {
             return null;
         }
@@ -418,21 +418,21 @@ public final class MimeTypes {
         return type;
     }
     
-    public static boolean mimeTypeMatch(@NotNull final String mime, @NotNull final String input) {
+    public static boolean mimeTypeMatch(@NonNull final String mime, @NonNull final String input) {
         return Pattern.matches(mime.replace("*", ".*"), input);
     }
 
-    public static boolean isPicture(@NotNull final File f) {
+    public static boolean isPicture(@NonNull final File f) {
         final String mime = getMimeType(f);
         return mime != null && mimeTypeMatch("image/*", mime);
     }
 
-    public static boolean isAudio(@NotNull final File f) {
+    public static boolean isAudio(@NonNull final File f) {
         final String mime = getMimeType(f);
         return mime != null && mimeTypeMatch("audio/*", mime);
     }
     
-    public static boolean isVideo(@NotNull final File f) {
+    public static boolean isVideo(@NonNull final File f) {
         final String mime = getMimeType(f);
         return mime != null && mimeTypeMatch("video/*", mime);
     }

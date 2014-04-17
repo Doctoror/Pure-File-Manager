@@ -26,8 +26,8 @@ import android.widget.TextView;
 
 import com.docd.purefm.R;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public final class ProgressAlertDialogBuilder {
 
@@ -43,7 +43,7 @@ public final class ProgressAlertDialogBuilder {
      * @param cancelListener Cancel button listener
      * @return non-cancelable {@link AlertDialog} with progress bar and Cancel button
      */
-    public static Dialog create(@NotNull final Context context,
+    public static Dialog create(@NonNull final Context context,
                                 final int messageResId,
                                 @Nullable final View.OnClickListener cancelListener) {
         return create(context, messageResId <= 0 ? null :
@@ -58,7 +58,7 @@ public final class ProgressAlertDialogBuilder {
      * @param cancelListener Cancel button listener
      * @return non-cancelable {@link AlertDialog} with progress bar and Cancel button
      */
-    public static Dialog create(@NotNull final Context context,
+    public static Dialog create(@NonNull final Context context,
                                 @Nullable final CharSequence message,
                                 @Nullable final View.OnClickListener cancelListener) {
         final CancelableProgressDialog dialog = new CancelableProgressDialog(context);

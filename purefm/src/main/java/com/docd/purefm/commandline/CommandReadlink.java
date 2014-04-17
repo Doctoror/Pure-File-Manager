@@ -16,8 +16,8 @@ package com.docd.purefm.commandline;
 
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public final class CommandReadlink extends Command {
 
-    public CommandReadlink(@NotNull final String path) {
+    public CommandReadlink(@NonNull final String path) {
         super("readlink -f " + path);
     }
 
@@ -43,7 +43,7 @@ public final class CommandReadlink extends Command {
      * @return canonical path of input file returned by readlink
      */
     @Nullable
-    public static String readlink(@NotNull final Shell shell, @NotNull final String path) {
+    public static String readlink(@NonNull final Shell shell, @NonNull final String path) {
         final List<String> result = CommandLine.executeForResult(shell,
                 new CommandReadlink(CommandLineUtils.getCommandLineString(path)));
         return result == null || result.isEmpty() ? null : result.get(0);

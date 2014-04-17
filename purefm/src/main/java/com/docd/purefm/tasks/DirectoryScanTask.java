@@ -24,21 +24,21 @@ import com.docd.purefm.file.GenericFileFilter;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MimeTypes;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public final class DirectoryScanTask extends
         AsyncTask<GenericFile, Void, GenericFile[]> {
 
     private static final ListFileFilter sFilter;
 
-    @NotNull
+    @NonNull
     private final BrowserBaseAdapter mBrowserAdapter;
 
-    @NotNull
+    @NonNull
     private final Browser mBrowser;
 
-    @NotNull
+    @NonNull
     private final SwipeRefreshLayout[] mSwipeRefreshLayouts;
     
     private GenericFile mFile;
@@ -47,10 +47,10 @@ public final class DirectoryScanTask extends
         sFilter = new ListFileFilter();
     }
 
-    public DirectoryScanTask(@NotNull final Browser browser,
+    public DirectoryScanTask(@NonNull final Browser browser,
                              @Nullable final String mimeType,
-                             @NotNull final BrowserBaseAdapter adapter,
-                             @NotNull final SwipeRefreshLayout... refreshLayouts) {
+                             @NonNull final BrowserBaseAdapter adapter,
+                             @NonNull final SwipeRefreshLayout... refreshLayouts) {
         this.mBrowser = browser;
         this.mSwipeRefreshLayouts = refreshLayouts;
         this.mBrowserAdapter = adapter;

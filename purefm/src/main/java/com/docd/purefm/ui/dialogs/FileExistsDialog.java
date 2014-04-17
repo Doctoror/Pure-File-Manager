@@ -22,19 +22,19 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class FileExistsDialog extends Dialog {
     
     public FileExistsDialog(
-            @NotNull final Context context,
-            @NotNull final String source,
-            @NotNull final String target,
-            @NotNull final View.OnClickListener abortAction,
-            @NotNull final View.OnClickListener skipAction,
-            @NotNull final View.OnClickListener skipAllAction,
-            @NotNull final View.OnClickListener replaceAction,
-            @NotNull final View.OnClickListener replaceAllAction) {
+            @NonNull final Context context,
+            @NonNull final String source,
+            @NonNull final String target,
+            @NonNull final View.OnClickListener abortAction,
+            @NonNull final View.OnClickListener skipAction,
+            @NonNull final View.OnClickListener skipAllAction,
+            @NonNull final View.OnClickListener replaceAction,
+            @NonNull final View.OnClickListener replaceAllAction) {
         super(context);
         
         this.setTitle(R.string.dialog_overwrite_title);
@@ -44,13 +44,13 @@ public final class FileExistsDialog extends Dialog {
     }
     
     private void initView(
-            @NotNull final String sourcePath,
-            @NotNull final String targetPath,
-            @NotNull final View.OnClickListener abortAction,
-            @NotNull final View.OnClickListener skipAction,
-            @NotNull final View.OnClickListener skipAllAction,
-            @NotNull final View.OnClickListener replaceAction,
-            @NotNull final View.OnClickListener replaceAllAction) {
+            @NonNull final String sourcePath,
+            @NonNull final String targetPath,
+            @NonNull final View.OnClickListener abortAction,
+            @NonNull final View.OnClickListener skipAction,
+            @NonNull final View.OnClickListener skipAllAction,
+            @NonNull final View.OnClickListener replaceAction,
+            @NonNull final View.OnClickListener replaceAllAction) {
         
         final TextView source = (TextView) this.findViewById(android.R.id.text1);
         source.setText(sourcePath);

@@ -18,7 +18,7 @@ import com.docd.purefm.browser.Browser;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.Nullable;
 
 /**
  * Base BrowserActivity that can hold one or more BrowserFragment

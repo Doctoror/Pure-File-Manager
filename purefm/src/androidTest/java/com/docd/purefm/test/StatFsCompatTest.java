@@ -22,7 +22,7 @@ import android.test.AndroidTestCase;
 
 import com.docd.purefm.utils.StatFsCompat;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Tests {@link com.docd.purefm.utils.StatFsCompat}
@@ -53,7 +53,7 @@ public final class StatFsCompatTest extends AndroidTestCase {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void testStatFs(@NotNull final StatFs fs, @NotNull final StatFsCompat fsc) throws Throwable {
+    private void testStatFs(@NonNull final StatFs fs, @NonNull final StatFsCompat fsc) throws Throwable {
         assertEquals(fs.getAvailableBlocksLong(), fsc.getAvailableBlocksLong());
         assertEquals(fs.getAvailableBytes(), fsc.getAvailableBytes());
         assertEquals(fs.getBlockCountLong(), fsc.getBlockCountLong());

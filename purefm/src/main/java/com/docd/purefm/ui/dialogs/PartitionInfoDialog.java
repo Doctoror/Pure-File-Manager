@@ -15,8 +15,8 @@
 package com.docd.purefm.ui.dialogs;
 
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
@@ -105,7 +105,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         final long mAvailableBytes;
         final long mUsedSpace;
 
-        PartitionInfo(@NotNull final CharSequence path,
+        PartitionInfo(@NonNull final CharSequence path,
                               @Nullable final CharSequence fsTypeText,
                               final long totalBytes,
                               final long blockSize,
@@ -146,11 +146,11 @@ public final class PartitionInfoDialog extends DialogFragment {
 
         private final WeakReference<View> mViewRef;
 
-        PartitionInfoTask(@NotNull final View view) {
+        PartitionInfoTask(@NonNull final View view) {
             this.mViewRef = new WeakReference<View>(view);
         }
 
-        @NotNull
+        @NonNull
         @Override
         protected PartitionInfo doInBackground(final GenericFile... params) {
             final String path = PFMFileUtils.fullPath(params[0]);
@@ -170,7 +170,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         }
 
         @Override
-        protected void onPostExecute(final @NotNull PartitionInfo partitionInfo) {
+        protected void onPostExecute(final @NonNull PartitionInfo partitionInfo) {
             final View view = mViewRef.get();
             if (view != null) {
                 final TextView title = (TextView) view.findViewById(R.id.location);

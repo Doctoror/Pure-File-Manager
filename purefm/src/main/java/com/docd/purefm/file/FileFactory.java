@@ -21,7 +21,7 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 
@@ -29,7 +29,7 @@ public final class FileFactory {
     private FileFactory() {}
 
 
-    @NotNull
+    @NonNull
     public static GenericFile newFile(String path) {
         //if (Looper.myLooper() == Looper.getMainLooper()) {
             //throw new RuntimeException("Wrong thread");
@@ -42,7 +42,7 @@ public final class FileFactory {
                 CommandLineFile.fromFile(shell, new File(path));
     }
 
-    @NotNull
+    @NonNull
     public static GenericFile newFile(File path) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");
@@ -56,7 +56,7 @@ public final class FileFactory {
                 new JavaFile(path);
     }
 
-    @NotNull
+    @NonNull
     public static GenericFile newFile(File file, String name) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");

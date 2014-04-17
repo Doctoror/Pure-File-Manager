@@ -31,7 +31,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.settings.Settings;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class BookmarksHelper {
 
@@ -57,10 +57,10 @@ public final class BookmarksHelper {
         }
     }
 
-    @NotNull
+    @NonNull
     public static BookmarkItem createUserBookmarkItem(
-            @NotNull final Activity activity,
-            @NotNull final String path) {
+            @NonNull final Activity activity,
+            @NonNull final String path) {
         final BookmarkItem item = new BookmarkItem();
         item.mDisplayName = FilenameUtils.getName(path);
         if (item.mDisplayName.equals(Environment.sRootDirectory.getAbsolutePath())) {
@@ -71,8 +71,8 @@ public final class BookmarksHelper {
         return item;
     }
 
-    @NotNull
-    public static List<BookmarkItem> getAllBookmarks(@NotNull final Activity activity) {
+    @NonNull
+    public static List<BookmarkItem> getAllBookmarks(@NonNull final Activity activity) {
         final List<BookmarkItem> items = new ArrayList<>();
         int internalCount = 0;
         int externalCount = 0;
@@ -141,15 +141,15 @@ public final class BookmarksHelper {
         return Environment.getStorageVolumes().size();
     }
 
-    @NotNull
-    public static Set<String> getAllLocations(@NotNull final Context context) {
+    @NonNull
+    public static Set<String> getAllLocations(@NonNull final Context context) {
         final Set<String> result = new TreeSet<>();
         result.addAll(BookmarksHelper.getStorageBookmarks());
         result.addAll(Settings.getBookmarks(context));
         return result;
     }
 
-    @NotNull
+    @NonNull
     public static Set<String> getStorageBookmarks() {
         final LinkedHashSet<String> storages = new LinkedHashSet<>();
         for (final StorageHelper.StorageVolume v : Environment.getStorageVolumes()) {

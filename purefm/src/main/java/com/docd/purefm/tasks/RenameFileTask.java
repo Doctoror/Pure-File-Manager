@@ -20,7 +20,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * @author Doctoror
@@ -29,28 +29,28 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class RenameFileTask extends OperationTask<Void, CharSequence> {
 
-    @NotNull
+    @NonNull
     private final GenericFile mSource;
 
-    @NotNull
+    @NonNull
     private final String mTargetName;
 
-    public RenameFileTask(@NotNull final MonitoredActivity activity,
-                          @NotNull final GenericFile source,
-                          @NotNull final String targetName) {
+    public RenameFileTask(@NonNull final MonitoredActivity activity,
+                          @NonNull final GenericFile source,
+                          @NonNull final String targetName) {
         super(activity);
         this.mSource = source;
         this.mTargetName = targetName;
     }
 
-    @NotNull
+    @NonNull
     @Override
     protected String getServiceAction() {
         return OperationsService.ACTION_RENAME;
     }
 
     @Override
-    protected void startService(@NotNull Void... voids) {
+    protected void startService(@NonNull Void... voids) {
         OperationsService.rename(mActivity, mSource, mTargetName);
     }
 

@@ -26,7 +26,7 @@ import android.text.format.DateFormat;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.text.style.DashSpan;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 public final class PFMTextUtils {
 
@@ -36,7 +36,7 @@ public final class PFMTextUtils {
     private static final Calendar CALENDAR = Calendar.getInstance(
             TimeZone.getDefault(), Locale.getDefault());
     
-    public static void init(@NotNull final Context context) {
+    public static void init(@NonNull final Context context) {
         if (DateFormat.is24HourFormat(context)) {
             sFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         } else {
@@ -44,7 +44,7 @@ public final class PFMTextUtils {
         }
     }
 
-    @NotNull
+    @NonNull
     public static synchronized String humanReadableDate(
             final long date, final boolean isUtc) {
         if (isUtc) {
@@ -55,7 +55,7 @@ public final class PFMTextUtils {
         }
     }
     
-    public static int stringMonthToInt(@NotNull final String month) {
+    public static int stringMonthToInt(@NonNull final String month) {
         switch (month) {
             case "Jan":
                 return Calendar.JANUARY;
@@ -98,8 +98,8 @@ public final class PFMTextUtils {
         }
     }
 
-    @NotNull
-    public static SpannableString fileListToDashList(@NotNull final Iterable<GenericFile> files) {
+    @NonNull
+    public static SpannableString fileListToDashList(@NonNull final Iterable<GenericFile> files) {
         final StringBuilder fileList = new StringBuilder(66);
         for (final GenericFile file : files) {
             fileList.append(file.getName());

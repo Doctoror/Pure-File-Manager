@@ -28,7 +28,7 @@ import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,10 +45,10 @@ import java.util.List;
  */
 final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile>> {
 
-    @NotNull
+    @NonNull
     private final Context mContext;
 
-    protected DeleteOperation(@NotNull final Context context) {
+    protected DeleteOperation(@NonNull final Context context) {
         mContext = context;
     }
 

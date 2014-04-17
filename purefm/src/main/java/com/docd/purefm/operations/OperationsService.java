@@ -39,8 +39,8 @@ import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PFMFileUtils;
 import com.stericson.RootTools.RootTools;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,9 +96,9 @@ public final class OperationsService extends MultiWorkerService
         }
     }
 
-    public static void paste(@NotNull final Context context,
-                             @NotNull final GenericFile target,
-                             @NotNull final GenericFile[] files,
+    public static void paste(@NonNull final Context context,
+                             @NonNull final GenericFile target,
+                             @NonNull final GenericFile[] files,
                              final boolean isMove) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_PASTE);
@@ -108,25 +108,25 @@ public final class OperationsService extends MultiWorkerService
         context.startService(intent);
     }
 
-    public static void cancelPaste(@NotNull final Context context) {
+    public static void cancelPaste(@NonNull final Context context) {
         context.startService(getCancelPasteIntent(context));
     }
 
-    public static void delete(@NotNull final Context context,
-                              @NotNull final GenericFile[] files) {
+    public static void delete(@NonNull final Context context,
+                              @NonNull final GenericFile[] files) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_DELETE);
         intent.putExtra(EXTRA_FILES, files);
         context.startService(intent);
     }
 
-    public static void cancelDelete(@NotNull final Context context) {
+    public static void cancelDelete(@NonNull final Context context) {
         context.startService(getCancelDeleteIntent(context));
     }
 
-    public static void rename(@NotNull final Context context,
-                              @NotNull final GenericFile source,
-                              @NotNull final String targetName) {
+    public static void rename(@NonNull final Context context,
+                              @NonNull final GenericFile source,
+                              @NonNull final String targetName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_RENAME);
         intent.putExtra(EXTRA_FILE, source);
@@ -134,9 +134,9 @@ public final class OperationsService extends MultiWorkerService
         context.startService(intent);
     }
 
-    public static void createFile(@NotNull final Context context,
-                                  @NotNull final File parent,
-                                  @NotNull final String fileName) {
+    public static void createFile(@NonNull final Context context,
+                                  @NonNull final File parent,
+                                  @NonNull final String fileName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CREATE_FILE);
         intent.putExtra(EXTRA_FILE, parent);
@@ -144,9 +144,9 @@ public final class OperationsService extends MultiWorkerService
         context.startService(intent);
     }
 
-    public static void createDirectory(@NotNull final Context context,
-                                       @NotNull final File parent,
-                                       @NotNull final String dirName) {
+    public static void createDirectory(@NonNull final Context context,
+                                       @NonNull final File parent,
+                                       @NonNull final String dirName) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CREATE_DIRECTORY);
         intent.putExtra(EXTRA_FILE, parent);
@@ -154,15 +154,15 @@ public final class OperationsService extends MultiWorkerService
         context.startService(intent);
     }
 
-    @NotNull
-    private static Intent getCancelPasteIntent(@NotNull final Context context) {
+    @NonNull
+    private static Intent getCancelPasteIntent(@NonNull final Context context) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CANCEL_PASTE);
         return intent;
     }
 
-    @NotNull
-    private static Intent getCancelDeleteIntent(@NotNull final Context context) {
+    @NonNull
+    private static Intent getCancelDeleteIntent(@NonNull final Context context) {
         final Intent intent = new Intent(context, OperationsService.class);
         intent.setAction(ACTION_CANCEL_DELETE);
         return intent;
@@ -182,7 +182,7 @@ public final class OperationsService extends MultiWorkerService
     }
 
     @Override
-    protected void onHandleIntent(@NotNull final Intent intent) {
+    protected void onHandleIntent(@NonNull final Intent intent) {
         final String action = intent.getAction();
         if (action != null) {
             switch (action) {
@@ -222,7 +222,7 @@ public final class OperationsService extends MultiWorkerService
     }
 
     // only one paste operation simultaneously
-    private synchronized void onActionPaste(@NotNull final Intent pasteIntent) {
+    private synchronized void onActionPaste(@NonNull final Intent pasteIntent) {
         final GenericFile target = (GenericFile) pasteIntent.getSerializableExtra(EXTRA_FILE);
         if (target == null) {
             throw new RuntimeException("ACTION_PASTE intent should contain non-null EXTRA_FILE1");
@@ -251,7 +251,7 @@ public final class OperationsService extends MultiWorkerService
     }
 
     //only one deletion operation can be done simultaneously
-    private synchronized void onActionDelete(@NotNull final Intent deleteIntent) {
+    private synchronized void onActionDelete(@NonNull final Intent deleteIntent) {
         final Object[] filesObject = (Object[]) deleteIntent.getSerializableExtra(EXTRA_FILES);
         if (filesObject == null) {
             throw new RuntimeException("ACTION_DELETE intent should contain non-null EXTRA_FILES");
@@ -274,7 +274,7 @@ public final class OperationsService extends MultiWorkerService
                 mDeleteOperation.isCanceled());
     }
 
-    private void onActionRename(@NotNull final Intent renameIntent) {
+    private void onActionRename(@NonNull final Intent renameIntent) {
         final GenericFile source = (GenericFile) renameIntent.getSerializableExtra(EXTRA_FILE);
         final String target = renameIntent.getStringExtra(EXTRA_FILE_NAME);
         if (source == null || target == null) {
@@ -289,7 +289,7 @@ public final class OperationsService extends MultiWorkerService
                 renameOperation.isCanceled());
     }
 
-    private void onActionCreateFile(@NotNull final Intent createIntent) {
+    private void onActionCreateFile(@NonNull final Intent createIntent) {
         final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE);
         if (parent == null) {
             throw new RuntimeException(
@@ -325,7 +325,7 @@ public final class OperationsService extends MultiWorkerService
                 false);
     }
 
-    private void onActionCreateDirectory(@NotNull final Intent createIntent) {
+    private void onActionCreateDirectory(@NonNull final Intent createIntent) {
         final File parent = (File) createIntent.getSerializableExtra(EXTRA_FILE);
         if (parent == null) {
             throw new RuntimeException(
@@ -357,7 +357,7 @@ public final class OperationsService extends MultiWorkerService
                 false);
     }
 
-    private void onOperationCompleted(@NotNull final String action, @Nullable CharSequence result, final boolean wasCanceled) {
+    private void onOperationCompleted(@NonNull final String action, @Nullable CharSequence result, final boolean wasCanceled) {
         mHandler.removeCallbacks(mPendingOperationStartedRunnable);
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
@@ -374,7 +374,7 @@ public final class OperationsService extends MultiWorkerService
     }
 
     private <T extends Serializable> void onOperationCompleted(
-            @NotNull final String action, @Nullable T result, final boolean wasCanceled) {
+            @NonNull final String action, @Nullable T result, final boolean wasCanceled) {
         mHandler.removeCallbacks(mPendingOperationStartedRunnable);
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
@@ -391,7 +391,7 @@ public final class OperationsService extends MultiWorkerService
     }
 
     private Intent createOperationCompletedIntent(
-            @NotNull final String action, final boolean wasCanceled) {
+            @NonNull final String action, final boolean wasCanceled) {
         final Intent broadcast = new Intent(BROADCAST_OPERATION_COMPLETED);
         broadcast.putExtra(EXTRA_ACTION, action);
         broadcast.putExtra(EXTRA_WAS_CANCELED, wasCanceled);
@@ -420,7 +420,7 @@ public final class OperationsService extends MultiWorkerService
     public void onActivitiesDestroyed() {
     }
 
-    private void startForeground(@NotNull final EOperation opeartion) {
+    private void startForeground(@NonNull final EOperation opeartion) {
         final Context context = getApplicationContext();
         final Notification.Builder b = new Notification.Builder(context);
         b.setContentTitle(getText(R.string.app_name));
@@ -435,8 +435,8 @@ public final class OperationsService extends MultiWorkerService
 
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
-    @NotNull
-    private static Notification build(@NotNull final Notification.Builder builder) {
+    @NonNull
+    private static Notification build(@NonNull final Notification.Builder builder) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             return builder.build();
         }
@@ -483,7 +483,7 @@ public final class OperationsService extends MultiWorkerService
 
     public interface OperationListener {
         void onOperationStarted(@Nullable CharSequence operationMessage,
-                                @NotNull Intent cancelIntent);
+                                @NonNull Intent cancelIntent);
 
         void onOperationEnded(@Nullable Object result);
     }
@@ -495,9 +495,9 @@ public final class OperationsService extends MultiWorkerService
 
         private final OperationListener mOperationListener;
 
-        OnOperationStartedRunnable(@NotNull OperationListener operationListener,
+        OnOperationStartedRunnable(@NonNull OperationListener operationListener,
                                    @Nullable final CharSequence operationMessage,
-                                   @NotNull final Intent cancelIntent) {
+                                   @NonNull final Intent cancelIntent) {
             this.mOperationListener = operationListener;
             this.mOperationMessage = operationMessage;
             this.mCancelIntent = cancelIntent;
@@ -514,7 +514,7 @@ public final class OperationsService extends MultiWorkerService
         private final Object mResult;
         private final OperationListener mOperationListener;
 
-        OnOperationEndedRunnable(@NotNull OperationListener operationListener,
+        OnOperationEndedRunnable(@NonNull OperationListener operationListener,
                                  @Nullable final Object result) {
             this.mOperationListener = operationListener;
             this.mResult = result;

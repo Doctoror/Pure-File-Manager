@@ -24,7 +24,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 
@@ -103,7 +103,7 @@ public class EdgeLimitedMarqueeTextView extends TextView {
     }
 
     @Override
-    protected void onDraw(@NotNull final Canvas canvas) {
+    protected void onDraw(@NonNull final Canvas canvas) {
         super.onDraw(canvas);
         this.mMarquee.sendEmptyMessageDelayed(EdgeLimitedMarquee.MESSAGE_TICK,
                 EdgeLimitedMarquee.MARQUEE_RESOLUTION);

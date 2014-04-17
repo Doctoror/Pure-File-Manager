@@ -23,8 +23,8 @@ import android.provider.MediaStore;
 
 import com.docd.purefm.R;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Holds preview cache and provides a method for loading previews
@@ -35,7 +35,7 @@ public final class PreviewHolder {
 
     private static PreviewHolder sInstance;
 
-    public static PreviewHolder getInstance(@NotNull final Context context) {
+    public static PreviewHolder getInstance(@NonNull final Context context) {
         if (sInstance == null) {
             sInstance = new PreviewHolder(context);
         }
@@ -50,13 +50,13 @@ public final class PreviewHolder {
     /**
      * Application's package manager
      */
-    @NotNull
+    @NonNull
     private final PackageManager mPackageManager;
 
     /**
      * Preview cache
      */
-    @NotNull
+    @NonNull
     private final ReusableBitmapLruCache<File> mPreviews = new ReusableBitmapLruCache<>();
 
     /**
@@ -64,7 +64,7 @@ public final class PreviewHolder {
      *
      * @param context Application's Context
      */
-    private PreviewHolder(@NotNull final Context context) {
+    private PreviewHolder(@NonNull final Context context) {
         mWidth = (int) context.getResources().getDimension(R.dimen.preview_width);
         final PackageManager packageManager = context.getPackageManager();
         if (packageManager == null) {
@@ -80,7 +80,7 @@ public final class PreviewHolder {
      * @return preview of the File, if exists in cache. Null otherwise.
      */
     @Nullable
-    public Bitmap getCached(@NotNull final File file) {
+    public Bitmap getCached(@NonNull final File file) {
         return mPreviews.get(file);
     }
 
@@ -98,7 +98,7 @@ public final class PreviewHolder {
      * @return preview of the File, if exists. Null otherwise
      */
     @Nullable
-    public Bitmap loadPreview(@NotNull final File file) {
+    public Bitmap loadPreview(@NonNull final File file) {
         final boolean isImage = MimeTypes.isPicture(file);
         final boolean isVideo = MimeTypes.isVideo(file);
         final boolean isApk = file.getName().endsWith(".apk");

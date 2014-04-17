@@ -23,7 +23,7 @@ import android.os.Parcelable;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 /**
@@ -41,7 +41,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
     /**
      * Currently displayed Fragment reference array
      */
-    @NotNull
+    @NonNull
     private final BrowserFragment[] mTabs;
 
     /**
@@ -54,7 +54,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
      */
     private ViewPager mPager;
         
-    public BrowserTabsAdapter(@NotNull final FragmentManager fm) {
+    public BrowserTabsAdapter(@NonNull final FragmentManager fm) {
         super(fm);
         this.mTabs = new BrowserFragment[2];
     }
@@ -196,7 +196,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
         }
 
         public static final Creator<BrowserTabsAdapterState> CREATOR = new Creator<BrowserTabsAdapterState>() {
-            @NotNull
+            @NonNull
             @Override
             public BrowserTabsAdapterState createFromParcel(final Parcel source) {
                 return new BrowserTabsAdapterState(source);

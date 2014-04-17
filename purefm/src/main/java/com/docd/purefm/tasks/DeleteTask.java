@@ -25,7 +25,7 @@ import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.PFMTextUtils;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * @author Doctoror
@@ -35,16 +35,16 @@ import org.jetbrains.annotations.NotNull;
 public final class DeleteTask extends
         OperationTask<GenericFile, ArrayList<GenericFile>> {
 
-    public DeleteTask(@NotNull final MonitoredActivity activity) {
+    public DeleteTask(@NonNull final MonitoredActivity activity) {
         super(activity);
     }
 
     @Override
-    protected void startService(@NotNull GenericFile... genericFiles) {
+    protected void startService(@NonNull GenericFile... genericFiles) {
         OperationsService.delete(mActivity, genericFiles);
     }
 
-    @NotNull
+    @NonNull
     @Override
     protected String getServiceAction() {
         return OperationsService.ACTION_DELETE;
@@ -56,18 +56,18 @@ public final class DeleteTask extends
     }
 
     @Override
-    protected void onPostExecute(@NotNull final ArrayList<GenericFile> failed) {
+    protected void onPostExecute(@NonNull final ArrayList<GenericFile> failed) {
         super.onPostExecute(failed);
         this.finish(failed);
     }
 
     @Override
-    protected void onCancelled(@NotNull final ArrayList<GenericFile> failed) {
+    protected void onCancelled(@NonNull final ArrayList<GenericFile> failed) {
         super.onCancelled(failed);
         this.finish(failed);
     }
 
-    private void finish(@NotNull final ArrayList<GenericFile> failed) {
+    private void finish(@NonNull final ArrayList<GenericFile> failed) {
         if (!failed.isEmpty()) {
             final Dialog dialog = MessageDialogBuilder.create(mActivity, R.string.dialog_delete_failed,
                     PFMTextUtils.fileListToDashList(failed));

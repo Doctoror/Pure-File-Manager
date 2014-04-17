@@ -24,7 +24,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Performs file renaming
@@ -34,18 +34,18 @@ import org.jetbrains.annotations.NotNull;
  */
 final class RenameOperation extends Operation<Void, CharSequence> {
 
-    @NotNull
+    @NonNull
     private final Context mContext;
 
-    @NotNull
+    @NonNull
     private final GenericFile mSource;
 
-    @NotNull
+    @NonNull
     private final String mTargetName;
 
-    RenameOperation(@NotNull final Context context,
-                    @NotNull final GenericFile source,
-                    @NotNull final String targetName) {
+    RenameOperation(@NonNull final Context context,
+                    @NonNull final GenericFile source,
+                    @NonNull final String targetName) {
         this.mContext = context;
         this.mSource = source;
         this.mTargetName = targetName;

@@ -46,15 +46,15 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public final class FilePropertiesDialog extends DialogFragment {
 
-    public static FilePropertiesDialog newInstance(final @NotNull GenericFile f) {
+    public static FilePropertiesDialog newInstance(final @NonNull GenericFile f) {
         final Bundle extras = new Bundle();
         extras.putSerializable(Extras.EXTRA_FILE, f);
 
@@ -104,7 +104,7 @@ public final class FilePropertiesDialog extends DialogFragment {
         return dialog;
     }
 
-    private void initView(@NotNull final View view) {
+    private void initView(@NonNull final View view) {
         final ViewPager pager = (ViewPager) view.findViewById(R.id.tabsContainer);
         pager.setAdapter(mAdapter);
 
@@ -160,8 +160,8 @@ public final class FilePropertiesDialog extends DialogFragment {
 
         void onStop();
 
-        @NotNull
-        View onCreateView(@NotNull LayoutInflater inflater);
+        @NonNull
+        View onCreateView(@NonNull LayoutInflater inflater);
     }
 
     static final class FilePermissionsPagerItem implements PagerItem, CompoundButton.OnCheckedChangeListener {
@@ -173,9 +173,9 @@ public final class FilePropertiesDialog extends DialogFragment {
             mFile = file;
         }
 
-        @NotNull
+        @NonNull
         @Override
-        public View onCreateView(@NotNull final LayoutInflater inflater) {
+        public View onCreateView(@NonNull final LayoutInflater inflater) {
             mView = inflater.inflate(R.layout.dialog_permissions, null);
             initView(mView);
             return mView;
@@ -345,7 +345,7 @@ public final class FilePropertiesDialog extends DialogFragment {
 
             private final WeakReference<FilePermissionsPagerItem> mItemRef;
 
-            LoadFsTask(@NotNull final FilePermissionsPagerItem item) {
+            LoadFsTask(@NonNull final FilePermissionsPagerItem item) {
                 this.mItemRef = new WeakReference<>(item);
             }
 
@@ -411,15 +411,15 @@ public final class FilePropertiesDialog extends DialogFragment {
         private PropertiesTask mTask;
         private View mView;
 
-        FilePropertiesPagerItem(@NotNull final GenericFile file,
-                                @NotNull final Resources resources) {
+        FilePropertiesPagerItem(@NonNull final GenericFile file,
+                                @NonNull final Resources resources) {
             mFile = file;
             mResources = resources;
         }
 
-        @NotNull
+        @NonNull
         @Override
-        public View onCreateView(@NotNull final LayoutInflater inflater) {
+        public View onCreateView(@NonNull final LayoutInflater inflater) {
             mView = inflater.inflate(R.layout.dialog_properties, null);
             return mView;
         }
@@ -451,12 +451,12 @@ public final class FilePropertiesDialog extends DialogFragment {
             final CharSequence mFileSizeText;
             final CharSequence mLastModifiedText;
 
-            private FileProperties(@NotNull final CharSequence fileName,
-                                   @NotNull CharSequence parentPath,
-                                   @NotNull CharSequence typeText,
+            private FileProperties(@NonNull final CharSequence fileName,
+                                   @NonNull CharSequence parentPath,
+                                   @NonNull CharSequence typeText,
                                    @Nullable CharSequence mimeTypeText,
-                                   @NotNull CharSequence fileSizeText,
-                                   @NotNull CharSequence lastModifiedText) {
+                                   @NonNull CharSequence fileSizeText,
+                                   @NonNull CharSequence lastModifiedText) {
                 this.mFileName = fileName;
                 this.mParentPath = parentPath;
                 this.mTypeText = typeText;
@@ -470,12 +470,12 @@ public final class FilePropertiesDialog extends DialogFragment {
             private final WeakReference<View> mViewRef;
             private final Resources mResources;
 
-            PropertiesTask(@NotNull final View view, @NotNull final Resources res) {
+            PropertiesTask(@NonNull final View view, @NonNull final Resources res) {
                 this.mViewRef = new WeakReference<View>(view);
                 this.mResources = res;
             }
 
-            @NotNull
+            @NonNull
             @Override
             protected FileProperties doInBackground(final GenericFile... params) {
                 final GenericFile file = params[0];
@@ -505,7 +505,7 @@ public final class FilePropertiesDialog extends DialogFragment {
             }
 
             @Override
-            protected void onPostExecute(final @NotNull FileProperties fileProperties) {
+            protected void onPostExecute(final @NonNull FileProperties fileProperties) {
                 final View view = mViewRef.get();
                 if (view == null) {
                     return;
@@ -542,8 +542,8 @@ public final class FilePropertiesDialog extends DialogFragment {
         private final GenericFile mFile;
         private final PagerItem[] mItems;
 
-        private PropertiesAdapter(@NotNull final Activity context,
-                                  @NotNull final GenericFile file) {
+        private PropertiesAdapter(@NonNull final Activity context,
+                                  @NonNull final GenericFile file) {
             mLayoutInflater = context.getLayoutInflater();
             mFile = file;
             mItems = new PagerItem[]{
@@ -565,7 +565,7 @@ public final class FilePropertiesDialog extends DialogFragment {
             }
         }
 
-        @NotNull
+        @NonNull
         PagerItem getItem(final int position) {
             return mItems[position];
         }

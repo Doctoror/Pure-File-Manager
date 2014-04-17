@@ -20,7 +20,7 @@ import com.docd.purefm.file.GenericFile;
 import com.stericson.RootTools.execution.Shell;
 
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -30,11 +30,11 @@ import java.util.List;
  */
 public final class CommandDu extends BusyboxCommand {
 
-    public CommandDu(@NotNull final GenericFile file) {
+    public CommandDu(@NonNull final GenericFile file) {
         super("du -s " + file.getAbsolutePath());
     }
 
-    public static long du_s(@NotNull final GenericFile file) {
+    public static long du_s(@NonNull final GenericFile file) {
         final Shell shell = ShellHolder.getShell();
         if (shell == null) {
             Log.w("CommandDu", "shell is null, aborting");

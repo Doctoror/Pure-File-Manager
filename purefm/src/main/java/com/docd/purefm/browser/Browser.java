@@ -36,8 +36,8 @@ import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.activities.AbstractBrowserActivity;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Browser manages current path and navigation
@@ -71,7 +71,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
     private ResolveInitialPathTask mInitialPathTask;
 
-    public Browser(@NotNull final AbstractBrowserActivity activity, final boolean historyEnabled) {
+    public Browser(@NonNull final AbstractBrowserActivity activity, final boolean historyEnabled) {
         if (sHandler == null) {
             sHandler = new Handler(activity.getMainLooper());
         }
@@ -202,7 +202,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         return parent;
     }
 
-    public void navigate(@NotNull final GenericFile target, final boolean addToHistory) {
+    public void navigate(@NonNull final GenericFile target, final boolean addToHistory) {
         cancelInitialPathLoading();
         if (target.exists()) {
             if (target.isDirectory()) {
@@ -283,7 +283,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         final String mCurrentPath;
         final String mPreviousPath;
 
-        SavedState(@NotNull final ArrayDeque<String> history,
+        SavedState(@NonNull final ArrayDeque<String> history,
                    @Nullable final String currentPath,
                    @Nullable final String previousPath) {
             this.mHistory = history;
@@ -311,7 +311,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
 
         public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            @NotNull
+            @NonNull
             @Override
             public SavedState createFromParcel(Parcel source) {
                 return new SavedState(source);
@@ -329,7 +329,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         private final WeakReference<Browser> mBrowserReference;
         private final String mHomeDirectory;
 
-        private ResolveInitialPathTask(@NotNull final Browser browser,
+        private ResolveInitialPathTask(@NonNull final Browser browser,
                                        @Nullable final String homeDirectory) {
             this.mBrowserReference = new WeakReference<>(browser);
             this.mHomeDirectory = homeDirectory;

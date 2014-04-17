@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jetbrains.annotations.NotNull;
 
 import com.docd.purefm.R;
 import com.docd.purefm.ui.activities.BrowserPagerActivity;
@@ -14,6 +13,7 @@ import com.docd.purefm.utils.BookmarksHelper;
 
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,30 +28,30 @@ import android.widget.Toast;
  */
 public final class BookmarksAdapter implements ListAdapter {
 
-    @NotNull
+    @NonNull
     private final List<BookmarksHelper.BookmarkItem> mBookmarks;
 
-    @NotNull
+    @NonNull
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
-    @NotNull
+    @NonNull
     private final LayoutInflater mLayoutInflater;
 
-    @NotNull
+    @NonNull
     private final BrowserPagerActivity mActivity;
     
     private boolean modified;
     
     private int mUserBookmarksStart;
     
-    public BookmarksAdapter(@NotNull final BrowserPagerActivity activity) {
+    public BookmarksAdapter(@NonNull final BrowserPagerActivity activity) {
         this.mActivity = activity;
         this.mLayoutInflater = activity.getLayoutInflater();
         this.mUserBookmarksStart = BookmarksHelper.getUserBookmarkOffset();
         this.mBookmarks = BookmarksHelper.getAllBookmarks(activity);
     }
     
-    public void addItem(@NotNull final String path) {
+    public void addItem(@NonNull final String path) {
         if (bookmarksContainPath(path)) {
             Toast.makeText(mActivity, R.string.bookmark_exists, Toast.LENGTH_SHORT).show();
             return;
@@ -67,7 +67,7 @@ public final class BookmarksAdapter implements ListAdapter {
         this.notifyDataSetChanged();
     }
 
-    private boolean bookmarksContainPath(@NotNull final String path) {
+    private boolean bookmarksContainPath(@NonNull final String path) {
         for (final BookmarksHelper.BookmarkItem item : mBookmarks) {
             if (item.getDisplayPath().toString().equals(path)) {
                 return true;
@@ -194,7 +194,7 @@ public final class BookmarksAdapter implements ListAdapter {
         return this.modified;
     }
 
-    @NotNull
+    @NonNull
     public Set<String> getData() {
         final Set<String> user = new LinkedHashSet<>();
         int i = 0;

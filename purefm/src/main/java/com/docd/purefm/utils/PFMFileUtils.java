@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
@@ -92,7 +92,7 @@ public final class PFMFileUtils {
      * @param file File to get full path
      * @return canonical path or absolute path if failed
      */
-    public static String fullPath(@NotNull final GenericFile file) {
+    public static String fullPath(@NonNull final GenericFile file) {
         try {
             return file.getCanonicalPath();
         } catch (IOException e) {
@@ -106,7 +106,7 @@ public final class PFMFileUtils {
      * @param file File to get full path
      * @return canonical path or absolute path if failed
      */
-    public static String fullPath(@NotNull final File file) {
+    public static String fullPath(@NonNull final File file) {
         try {
             return file.getCanonicalPath();
         } catch (IOException e) {
@@ -114,7 +114,7 @@ public final class PFMFileUtils {
         }
     }
 
-    public static String byteCountToDisplaySize(@NotNull final BigInteger size) {
+    public static String byteCountToDisplaySize(@NonNull final BigInteger size) {
         String displaySize;
 
         if (size.divide(FileUtils.ONE_GB_BI).compareTo(BigInteger.ZERO) > 0) {
@@ -130,14 +130,14 @@ public final class PFMFileUtils {
     }
 
     @Nullable
-    public static String resolveFileSystem(@NotNull final GenericFile file) {
+    public static String resolveFileSystem(@NonNull final GenericFile file) {
         final String path = PFMFileUtils.fullPath(file);
         return resolveFileSystem(FilenameUtils.getFullPathNoEndSeparator(path));
     }
 
 
     @Nullable
-    public static String resolveFileSystem(@NotNull final String path) {
+    public static String resolveFileSystem(@NonNull final String path) {
         for (final StorageHelper.Volume v : Environment.getVolumes()) {
             if (path.startsWith(v.file.getAbsolutePath())) {
                 return v.fileSystem;
@@ -156,7 +156,7 @@ public final class PFMFileUtils {
                 null : fsTypeResult.get(0);
     }
     
-    public static void openFile(@NotNull final Context context, @NotNull final File target) {
+    public static void openFile(@NonNull final Context context, @NonNull final File target) {
         final String mime = MimeTypes.getMimeType(target);
         if (mime != null) {
             final Intent i = new Intent(Intent.ACTION_VIEW);

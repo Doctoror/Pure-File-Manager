@@ -21,7 +21,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.ClipBoard;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.util.Arrays;
 
@@ -45,7 +45,7 @@ public final class ClipBoardTest extends AndroidTestCase {
         testMove(files);
     }
 
-    private void testCopy(@NotNull final GenericFile[] files) throws Throwable {
+    private void testCopy(@NonNull final GenericFile[] files) throws Throwable {
         assertNull(ClipBoard.getClipBoardContents());
         ClipBoard.cutCopy(files);
         assertTrue(Arrays.equals(files, ClipBoard.getClipBoardContents()));
@@ -56,7 +56,7 @@ public final class ClipBoardTest extends AndroidTestCase {
         assertNull(ClipBoard.getClipBoardContents());
     }
 
-    private void testMove(@NotNull final GenericFile[] files) throws Throwable {
+    private void testMove(@NonNull final GenericFile[] files) throws Throwable {
         assertNull(ClipBoard.getClipBoardContents());
         ClipBoard.cutMove(files);
         assertTrue(Arrays.equals(files, ClipBoard.getClipBoardContents()));

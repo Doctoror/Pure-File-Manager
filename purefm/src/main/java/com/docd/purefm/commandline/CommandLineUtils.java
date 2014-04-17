@@ -20,7 +20,7 @@ import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
 import org.intellij.lang.annotations.Language;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Contains various utils and methods of this class execute commands and deliver results.
@@ -50,7 +50,7 @@ public final class CommandLineUtils {
      * @param p Permissions to generate octal format for
      * @return octal-formatted permission representation
      */
-    @NotNull
+    @NonNull
     protected static String toOctalPermission(final Permissions p) {
         byte user = 00;
         byte group = 00;
@@ -94,7 +94,7 @@ public final class CommandLineUtils {
         return perm.toString();
     }
 
-    public static boolean copyRecursively(@NotNull final Shell shell, @NotNull final CommandCopyRecursively command) {
+    public static boolean copyRecursively(@NonNull final Shell shell, @NonNull final CommandCopyRecursively command) {
         final boolean wasRemounted;
         if (command.target.startsWith(Environment.sAndroidRootDirectory.getAbsolutePath())) {
             RootTools.remount(command.target, "RW");

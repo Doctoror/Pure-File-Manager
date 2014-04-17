@@ -16,8 +16,8 @@ package com.docd.purefm.file;
 
 import com.docd.purefm.utils.PFMFileUtils;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public final class FileObserverCache {
 
     private static FileObserverCache instance;
 
-    @NotNull
+    @NonNull
     public static FileObserverCache getInstance() {
         if (instance == null) {
             instance = new FileObserverCache();
@@ -46,12 +46,12 @@ public final class FileObserverCache {
     }
 
     @Nullable
-    public MultiListenerFileObserver get(@NotNull final GenericFile path) {
+    public MultiListenerFileObserver get(@NonNull final GenericFile path) {
         return mCache.get(PFMFileUtils.fullPath(path)).get();
     }
 
-    @NotNull
-    public MultiListenerFileObserver getOrCreate(@NotNull final GenericFile file, final int events) {
+    @NonNull
+    public MultiListenerFileObserver getOrCreate(@NonNull final GenericFile file, final int events) {
         final String path = PFMFileUtils.fullPath(file);
         final WeakReference<MultiListenerFileObserver> reference = mCache.get(path);
         MultiListenerFileObserver observer;

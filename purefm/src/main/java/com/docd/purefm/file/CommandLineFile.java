@@ -26,8 +26,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
@@ -67,7 +67,7 @@ public final class CommandLineFile implements GenericFile,
     private static final int LS_YEAR = 9;
     private static final int LS_FILE = 10;
 
-    @NotNull
+    @NonNull
     private final File mFile;
 
     @Nullable
@@ -91,8 +91,8 @@ public final class CommandLineFile implements GenericFile,
      * @param shell Current shell
      * @param file File
      */
-    private CommandLineFile(@NotNull final Shell shell,
-                            @NotNull final File file) {
+    private CommandLineFile(@NonNull final Shell shell,
+                            @NonNull final File file) {
         this.mFile = file;
         this.mCanonicalPath = CommandReadlink.readlink(shell, file.getAbsolutePath());
     }
@@ -103,8 +103,8 @@ public final class CommandLineFile implements GenericFile,
      * @param shell Current shell
      * @param path File path
      */
-    private CommandLineFile(@NotNull final Shell shell,
-                            @NotNull final String path) {
+    private CommandLineFile(@NonNull final Shell shell,
+                            @NonNull final String path) {
         this.mFile = new File(path);
         this.mCanonicalPath = CommandReadlink.readlink(shell, path);
     }
@@ -117,9 +117,9 @@ public final class CommandLineFile implements GenericFile,
      * @param parent Parent file
      * @param name file name
      */
-    private CommandLineFile(@NotNull final Shell shell,
-                            @NotNull File parent,
-                            @NotNull String name) {
+    private CommandLineFile(@NonNull final Shell shell,
+                            @NonNull File parent,
+                            @NonNull String name) {
         this.mFile = new File(parent, name);
         this.mCanonicalPath = CommandReadlink.readlink(shell, mFile.getAbsolutePath());
     }
@@ -130,7 +130,7 @@ public final class CommandLineFile implements GenericFile,
      *
      * @param path File path
      */
-    private CommandLineFile(@NotNull String path) {
+    private CommandLineFile(@NonNull String path) {
         this.mFile = new File(path);
         String canonicalPath;
         try {
@@ -147,8 +147,8 @@ public final class CommandLineFile implements GenericFile,
      * @param path File path
      * @param canonicalPath Canonical File path
      */
-    private CommandLineFile(@NotNull final String path,
-                            @NotNull final String canonicalPath) {
+    private CommandLineFile(@NonNull final String path,
+                            @NonNull final String canonicalPath) {
         this.mFile = new File(path);
         this.mCanonicalPath = canonicalPath;
     }
@@ -162,9 +162,9 @@ public final class CommandLineFile implements GenericFile,
         return this.mIsSymlink;
     }
 
-    @NotNull
-    public static CommandLineFile fromFile(@NotNull final Shell shell,
-                                           @NotNull final File file) {
+    @NonNull
+    public static CommandLineFile fromFile(@NonNull final Shell shell,
+                                           @NonNull final File file) {
         final List<String> res = CommandLine.executeForResult(shell, new CommandListFile(file));
 
         if (res == null || res.isEmpty()) {
@@ -175,10 +175,10 @@ public final class CommandLineFile implements GenericFile,
         return fromLSL(shell, null, res.get(0));
     }
 
-    @NotNull
-    public static CommandLineFile fromLSL(@NotNull final Shell shell,
+    @NonNull
+    public static CommandLineFile fromLSL(@NonNull final Shell shell,
                                           @Nullable final File parent,
-                                          @NotNull final String line) {
+                                          @NonNull final String line) {
 
         if (line.isEmpty()) {
             throw new IllegalArgumentException("Bad ls -lApe output: is empty");
@@ -214,7 +214,7 @@ public final class CommandLineFile implements GenericFile,
         return f;
     }
 
-    @NotNull
+    @NonNull
     private static String[] getAttrs(String string) {
         if (string.length() < 44) {
             throw new IllegalArgumentException("Bad ls -lApe output: " + string);
@@ -344,7 +344,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public File toFile() {
         return this.mFile;
@@ -628,7 +628,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return this.mFile.getName();
@@ -637,7 +637,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getPath() {
         return this.mFile.getPath();
@@ -646,7 +646,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getAbsolutePath() {
         return this.mFile.getAbsolutePath();
@@ -655,7 +655,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public String getCanonicalPath() throws IOException {
         if (this.mCanonicalPath != null) {
@@ -664,7 +664,7 @@ public final class CommandLineFile implements GenericFile,
         return this.mFile.getCanonicalPath();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public CommandLineFile getCanonicalFile() throws IOException {
         final String canonicalPath = getCanonicalPath();
@@ -782,7 +782,7 @@ public final class CommandLineFile implements GenericFile,
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @NonNull
     @Override
     public Permissions getPermissions() {
         return this.mPermissions;

@@ -26,12 +26,12 @@ import com.docd.purefm.file.JavaFile;
 
 import org.apache.commons.io.DirectoryWalker;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 final class SearchJavaTask extends AbstractSearchTask {
 
-    protected SearchJavaTask(@NotNull final GenericFile startDirectory,
-                             @NotNull final SearchTaskListener listener) {
+    protected SearchJavaTask(@NonNull final GenericFile startDirectory,
+                             @NonNull final SearchTaskListener listener) {
         super(startDirectory, listener);
     }
 
@@ -49,7 +49,7 @@ final class SearchJavaTask extends AbstractSearchTask {
 
         private final String mToFind;
 
-        SearchFileFilter(@NotNull final String toFind) {
+        SearchFileFilter(@NonNull final String toFind) {
             mToFind = toFind;
         }
 
@@ -61,7 +61,7 @@ final class SearchJavaTask extends AbstractSearchTask {
 
     private final class SearchDirectoryWalker extends DirectoryWalker<File> {
 
-        SearchDirectoryWalker(@NotNull final String toFind) {
+        SearchDirectoryWalker(@NonNull final String toFind) {
             super(new SearchFileFilter(toFind), -1);
         }
 
@@ -77,12 +77,12 @@ final class SearchJavaTask extends AbstractSearchTask {
             return isCancelled();
         }
 
-        void walk(@NotNull final File directory) throws IOException {
+        void walk(@NonNull final File directory) throws IOException {
             walk(directory, null);
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     @SuppressWarnings("unchecked")
     public List<String> getDeniedLocations() {

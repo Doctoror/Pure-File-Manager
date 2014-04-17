@@ -29,7 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.math.BigInteger;
 
@@ -39,16 +39,16 @@ import java.math.BigInteger;
  */
 public final class BrowserListAdapter extends BrowserBaseAdapter {
 
-    @NotNull
+    @NonNull
     private final Typeface mTypefaceMonospace;
 
-    @NotNull
+    @NonNull
     private final LongSparseArray<String> mHumanReadableLastModified = new LongSparseArray<>();
 
-    @NotNull
+    @NonNull
     private final LongSparseArray<String> mHumanReadableLength = new LongSparseArray<>();
     
-    public BrowserListAdapter(@NotNull final Activity context) {
+    public BrowserListAdapter(@NonNull final Activity context) {
         super(context);
         mTypefaceMonospace = Typeface.createFromAsset(context.getAssets(), "DroidSansMono.ttf");
     }

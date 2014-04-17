@@ -54,8 +54,8 @@ import com.docd.purefm.utils.PFMFileUtils;
 import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.ui.view.BreadCrumbTextView.OnSequenceClickListener;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 
@@ -270,7 +270,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
         return parent;
     }
 
-    private void initList(@NotNull final LayoutInflater inflater, @NotNull final View parent) {
+    private void initList(@NonNull final LayoutInflater inflater, @NonNull final View parent) {
         if (mListView != null) {
             mListView.getEmptyView().setVisibility(View.GONE);
             mListView.setVisibility(View.GONE);
@@ -461,7 +461,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
         }
 
         public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            @NotNull
+            @NonNull
             @Override
             public SavedState createFromParcel(final Parcel source) {
                 return new SavedState(source);

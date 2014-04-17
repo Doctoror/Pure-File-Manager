@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Browser adapter for GridView
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class BrowserGridAdapter extends BrowserBaseAdapter {
 
-    public BrowserGridAdapter(@NotNull final Activity context) {
+    public BrowserGridAdapter(@NonNull final Activity context) {
         super(context);
     }
 

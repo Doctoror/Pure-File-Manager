@@ -20,7 +20,7 @@ import android.util.Pair;
 import com.docd.purefm.settings.Settings;
 import com.stericson.RootTools.execution.Shell;
 
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 

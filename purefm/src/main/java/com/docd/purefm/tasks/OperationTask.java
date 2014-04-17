@@ -24,7 +24,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.ui.activities.MonitoredActivity;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
@@ -38,22 +38,22 @@ import java.io.Serializable;
 public abstract class OperationTask<Param, Result> implements
         MonitoredActivity.OnStopListener {
 
-    @NotNull
+    @NonNull
     protected final MonitoredActivity mActivity;
 
-    @NotNull
+    @NonNull
     private final LocalBroadcastManager mBroadcastManager;
 
-    @NotNull
+    @NonNull
     private final OperationReceiver mOperationReceiver;
 
-    protected OperationTask(@NotNull final MonitoredActivity activity) {
+    protected OperationTask(@NonNull final MonitoredActivity activity) {
         mActivity = activity;
         mBroadcastManager = LocalBroadcastManager.getInstance(activity);
         mOperationReceiver = new OperationReceiver();
     }
 
-    public final void execute(@NotNull final Param... params) {
+    public final void execute(@NonNull final Param... params) {
         mActivity.setOnStopListener(this);
         mBroadcastManager.registerReceiver(mOperationReceiver, new IntentFilter(
                 OperationsService.BROADCAST_OPERATION_COMPLETED));
@@ -61,10 +61,10 @@ public abstract class OperationTask<Param, Result> implements
         startService(params);
     }
 
-    protected abstract void startService(@NotNull Param... params);
+    protected abstract void startService(@NonNull Param... params);
     protected abstract void cancel();
 
-    @NotNull
+    @NonNull
     protected abstract String getServiceAction();
 
     protected void onPreExecute() {

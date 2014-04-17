@@ -44,7 +44,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Activity used for Searching files.
@@ -102,7 +102,7 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
     }
 
     @Override
-    public boolean onKeyUp(final int keyCode, @NotNull final KeyEvent event) {
+    public boolean onKeyUp(final int keyCode, @NonNull final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
             this.onSearchClicked();
             return true;
@@ -162,24 +162,24 @@ public final class SearchActivity extends ActionBarIconMonitoredActivity
     }
 
     @Override
-    public void onPreExecute(@NotNull AbstractSearchTask task) {
+    public void onPreExecute(@NonNull AbstractSearchTask task) {
         mProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onProgressUpdate(@NotNull AbstractSearchTask task, GenericFile... files) {
+    public void onProgressUpdate(@NonNull AbstractSearchTask task, GenericFile... files) {
         mAdapter.addFiles(files);
         mInputMethodManager.hideSoftInputFromWindow(mInput.getWindowToken(),
                 InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     @Override
-    public void onCancelled(@NotNull AbstractSearchTask task) {
+    public void onCancelled(@NonNull AbstractSearchTask task) {
         onPostExecute(task);
     }
 
     @Override
-    public void onPostExecute(@NotNull AbstractSearchTask task) {
+    public void onPostExecute(@NonNull AbstractSearchTask task) {
         mProgress.setVisibility(View.INVISIBLE);
             final List<String> denied = mSearchTask.getDeniedLocations();
             if (!denied.isEmpty()) {
