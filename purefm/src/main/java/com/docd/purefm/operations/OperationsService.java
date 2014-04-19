@@ -32,6 +32,7 @@ import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.services.MultiWorkerService;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
@@ -297,7 +298,13 @@ public final class OperationsService extends MultiWorkerService
                     "ACTION_CREATE_FILE intent should contain non-null EXTRA_FILE1");
         }
         final String fileName = createIntent.getStringExtra(EXTRA_FILE_NAME);
-        final GenericFile target = FileFactory.newFile(parent, fileName);
+        if (fileName == null) {
+            throw new RuntimeException(
+                    "ACTION_CREATE_FILE intent should contain non-null EXTRA_FILE_NAME");
+        }
+
+        final GenericFile target = FileFactory.newFile(
+                Settings.getInstance(this), parent, fileName);
         CharSequence message = null;
         if (target.exists()) {
             message = getText(R.string.file_exists);
@@ -333,7 +340,12 @@ public final class OperationsService extends MultiWorkerService
                     "ACTION_CREATE_DIRECTORY intent should contain non-null EXTRA_FILE1");
         }
         final String fileName = createIntent.getStringExtra(EXTRA_FILE_NAME);
-        final GenericFile target = FileFactory.newFile(parent, fileName);
+        if (fileName == null) {
+            throw new RuntimeException(
+                    "ACTION_CREATE_DIRECTORY intent should contain non-null EXTRA_FILE_NAME");
+        }
+        final GenericFile target = FileFactory.newFile(
+                Settings.getInstance(this), parent, fileName);
         CharSequence message = null;
         if (target.exists()) {
             message = getText(R.string.file_exists);

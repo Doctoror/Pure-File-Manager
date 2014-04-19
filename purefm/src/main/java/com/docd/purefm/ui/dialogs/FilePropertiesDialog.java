@@ -22,6 +22,7 @@ import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.Permissions;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PFMFileUtils;
 import com.docd.purefm.utils.PFMTextUtils;
 import com.docd.purefm.utils.ThemeUtils;
@@ -42,6 +43,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,15 +72,22 @@ public final class FilePropertiesDialog extends DialogFragment {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         final Bundle args = this.getArguments();
+        if (args == null) {
+            throw new RuntimeException(
+                    "Arguments were not supplied. Make sure you created this DialogFragment using newInstance method");
+        }
         this.file = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return null;
+        }
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         mAdapter = new PropertiesAdapter(activity, file);
-        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.ic_menu_info));
+        builder.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_info));
         builder.setTitle(file.getName());
         builder.setNeutralButton(R.string.close, null);
         builder.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
@@ -91,14 +100,21 @@ public final class FilePropertiesDialog extends DialogFragment {
         });
         final View content = activity.getLayoutInflater()
                 .inflate(R.layout.dialog_properties_container, null);
+        if (content == null) {
+            throw new RuntimeException("Inflated view is null");
+        }
         this.initView(content);
         builder.setView(content);
         final AlertDialog dialog = builder.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialog) {
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setVisibility(View.GONE);
+                final Button button = ((AlertDialog) dialog).getButton(
+                        DialogInterface.BUTTON_POSITIVE);
+                if (button == null) {
+                    throw new RuntimeException("Can't get positive button");
+                }
+                button.setVisibility(View.GONE);
             }
         });
         return dialog;
@@ -116,8 +132,15 @@ public final class FilePropertiesDialog extends DialogFragment {
             public void onPageSelected(int position) {
                 tab1.setChecked(position == 0);
                 tab2.setChecked(position == 1);
-                ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setVisibility(position == 0 ||
+                final AlertDialog dialog = (AlertDialog) getDialog();
+                if (dialog == null) {
+                    throw new RuntimeException("The dialog is null");
+                }
+                final Button positive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                if (positive == null) {
+                    throw new RuntimeException("Can't get positive button");
+                }
+                positive.setVisibility(position == 0 ||
                                 !((FilePermissionsPagerItem) mAdapter.getItem(1)).areBoxesEnabled()
                                         ? View.GONE : View.VISIBLE);
             }
@@ -407,13 +430,16 @@ public final class FilePropertiesDialog extends DialogFragment {
     static final class FilePropertiesPagerItem implements PagerItem {
 
         private final GenericFile mFile;
+        private final Settings mSettings;
         private final Resources mResources;
         private PropertiesTask mTask;
         private View mView;
 
         FilePropertiesPagerItem(@NonNull final GenericFile file,
+                                @NonNull final Settings settings,
                                 @NonNull final Resources resources) {
             mFile = file;
+            mSettings = settings;
             mResources = resources;
         }
 
@@ -428,7 +454,7 @@ public final class FilePropertiesDialog extends DialogFragment {
         public void onStart() {
             if (mView != null) {
                 if (mTask == null) {
-                    mTask = new PropertiesTask(mView, mResources);
+                    mTask = new PropertiesTask(mView, mSettings, mResources);
                 }
                 if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
                     mTask.execute(mFile);
@@ -466,12 +492,18 @@ public final class FilePropertiesDialog extends DialogFragment {
             }
         }
 
-        private static final class PropertiesTask extends AsyncTask<GenericFile, Void, FileProperties> {
+        private static final class PropertiesTask extends AsyncTask
+                <GenericFile, Void, FileProperties> {
+
             private final WeakReference<View> mViewRef;
+            private final Settings mSettings;
             private final Resources mResources;
 
-            PropertiesTask(@NonNull final View view, @NonNull final Resources res) {
-                this.mViewRef = new WeakReference<View>(view);
+            PropertiesTask(@NonNull final View view,
+                           @NonNull final Settings settings,
+                           @NonNull final Resources res) {
+                this.mViewRef = new WeakReference<>(view);
+                this.mSettings = settings;
                 this.mResources = res;
             }
 
@@ -481,7 +513,7 @@ public final class FilePropertiesDialog extends DialogFragment {
                 final GenericFile file = params[0];
                 GenericFile par = file.getParentFile();
                 if (par == null) {
-                    par = FileFactory.newFile(Environment.sRootDirectory);
+                    par = FileFactory.newFile(mSettings, Environment.sRootDirectory);
                 }
                 String parentPath;
                 try {
@@ -546,8 +578,9 @@ public final class FilePropertiesDialog extends DialogFragment {
                                   @NonNull final GenericFile file) {
             mLayoutInflater = context.getLayoutInflater();
             mFile = file;
+            //noinspection ConstantConditions
             mItems = new PagerItem[]{
-                    new FilePropertiesPagerItem(mFile, context
+                    new FilePropertiesPagerItem(mFile, Settings.getInstance(context), context
                             .getApplicationContext().getResources()),
                     new FilePermissionsPagerItem(mFile)
             };

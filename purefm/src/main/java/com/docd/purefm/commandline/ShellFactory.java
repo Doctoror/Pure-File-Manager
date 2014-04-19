@@ -50,9 +50,9 @@ public final class ShellFactory {
      */
     @Nullable
     public static Pair<Boolean, Shell> getShell() throws IOException {
-        final boolean root = Settings.su;
+        final boolean suEnabled = Settings.getInstance().isSuEnabled();
         try {
-            return new Pair<>(root, RootTools.getShell(root));
+            return new Pair<>(suEnabled, RootTools.getShell(suEnabled));
         } catch (RootDeniedException | TimeoutException e) {
             try {
                 return new Pair<>(false, RootTools.getShell(false));

@@ -21,6 +21,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
 
@@ -57,7 +58,8 @@ final class RenameOperation extends Operation<Void, CharSequence> {
         if (sourceParent == null) {
             return "Could not resolve parent directory. Renaming failed.";
         }
-        final GenericFile target = FileFactory.newFile(sourceParent.toFile(), mTargetName);
+        final GenericFile target = FileFactory.newFile(Settings.getInstance(mContext),
+                sourceParent.toFile(), mTargetName);
         if (target.exists()) {
             return mContext.getText(R.string.file_exists);
         }
@@ -68,7 +70,8 @@ final class RenameOperation extends Operation<Void, CharSequence> {
         }
         try {
             if (mSource.renameTo(target)) {
-                MediaStoreUtils.renameFileOrDirectory(mContext.getContentResolver(), mSource, target);
+                MediaStoreUtils.renameFileOrDirectory(mContext.getContentResolver(),
+                        mSource, target);
                 FileObserverNotifier.notifyDeleted(mSource);
                 FileObserverNotifier.notifyCreated(target);
                 return null;

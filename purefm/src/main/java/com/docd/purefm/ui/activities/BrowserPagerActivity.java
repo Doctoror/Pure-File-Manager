@@ -25,7 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -54,6 +53,7 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
+import com.docd.purefm.utils.ThemeUtils;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -121,8 +121,12 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    protected void setActionBarIcon(Drawable icon) {
-        getActionBar().setIcon(icon);
+    protected void setActionBarIcon(final Drawable icon) {
+        final ActionBar actionBar = getActionBar();
+        if (actionBar == null) {
+            throw new RuntimeException("Should have ActionBar");
+        }
+        actionBar.setIcon(icon);
     }
 
     @Override
@@ -143,32 +147,35 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onLowMemory() {
-        PreviewHolder.getInstance(getApplicationContext()).recycle();
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        PreviewHolder.getInstance(this).recycle();
     }
 
     private void initActionBar() {
-        this.mActionBar = this.getActionBar();
-        if (this.mActionBar == null) {
+        mActionBar = this.getActionBar();
+        if (mActionBar == null) {
             throw new RuntimeException("BrowserPagerActivity should have an ActionBar");
         }
-        this.mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+        mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_SHOW_CUSTOM
                 | ActionBar.DISPLAY_USE_LOGO
                 | ActionBar.DISPLAY_HOME_AS_UP);
 
         final View custom = LayoutInflater.from(this).inflate(
                 R.layout.activity_browser_actionbar, null);
-        this.mActionBar.setCustomView(custom);
+        if (custom == null) {
+            throw new RuntimeException("Inflated View is null");
+        }
+        mActionBar.setCustomView(custom);
 
-        this.mBreadCrumbView = (BreadCrumbTextView) custom
+        mBreadCrumbView = (BreadCrumbTextView) custom
                 .findViewById(R.id.bread_crumb_view);
     }
 
     private void initView() {
         final ViewPager pager = (ViewPager) this.findViewById(R.id.pager);
-        mPagerAdapter = new BrowserTabsAdapter(
-                this.getFragmentManager());
+        mPagerAdapter = new BrowserTabsAdapter(getFragmentManager());
         pager.setAdapter(mPagerAdapter);
         mPagerAdapter.setViewPager(pager);
         pager.setOffscreenPageLimit(2);
@@ -176,9 +183,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
         mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        final TypedArray array = obtainStyledAttributes(new int[]{R.attr.themeId});
-        final int themeId = array.getInteger(0, PureFM.THEME_ID_LIGHT);
-        array.recycle();
+        final int themeId = ThemeUtils.getInteger(getTheme(), R.attr.themeId, PureFM.THEME_ID_DARK);
 
         mDrawerToggle = new BrowserActivityDrawerToggle(this, this.mDrawerLayout,
                 themeId == PureFM.THEME_ID_LIGHT ?
@@ -209,8 +214,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
         super.onStop();
         unbindService(this);
         if (mBookmarksAdapter.isModified()) {
-            Settings.saveBookmarks(getApplicationContext(),
-                    mBookmarksAdapter.getData());
+            Settings.getInstance(this).setBookmarks(mBookmarksAdapter.getData());
         }
     }
 
@@ -218,7 +222,8 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
-        if (mDrawerToggle.isDrawerIndicatorEnabled() && mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle.isDrawerIndicatorEnabled() &&
+                mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -341,7 +346,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                PreviewHolder.getInstance(getApplicationContext()).recycle();
+                                PreviewHolder.getInstance(BrowserPagerActivity.this).recycle();
                                 finish();
                             }
                         });

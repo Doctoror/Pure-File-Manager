@@ -42,6 +42,7 @@ import com.docd.purefm.file.FileObserverCache;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.file.Permissions;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.DrawableLruCache;
 import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.MimeTypes;
@@ -129,6 +130,12 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
 
     protected final PreviewHolder mPreviewHolder;
 
+    /**
+     * Settings instance
+     */
+    @NonNull
+    protected final Settings mSettings;
+
     protected BrowserBaseAdapter(@NonNull final Activity context) {
         if (sDrawableLruCache == null) {
             sDrawableLruCache = new DrawableLruCache<>();
@@ -136,12 +143,9 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         if (sMimeTypeIconCache == null) {
             sMimeTypeIconCache = new DrawableLruCache<>();
         }
-        final Resources.Theme theme = context.getTheme();
-        if (theme == null) {
-            throw new IllegalArgumentException("Activity doesn't have a theme");
-        }
+        mSettings = Settings.getInstance(context);
         mPreviewHolder = PreviewHolder.getInstance(context);
-        mTheme = theme;
+        mTheme = context.getTheme();
         mResources = context.getResources();
         mHandler = new FileObserverEventHandler(this);
         mLayoutInflater = context.getLayoutInflater();
@@ -366,7 +370,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param path of the modified file
      */
     private void onFileModified(final String path) {
-        final GenericFile affectedFile = FileFactory.newFile(path);
+        final GenericFile affectedFile = FileFactory.newFile(mSettings, path);
         mContent.remove(affectedFile);
         if (affectedFile.exists()) {
             final int index = mContent.indexOf(affectedFile);
@@ -462,7 +466,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     private static Drawable getDrawableForRes(final Resources.Theme theme, final int attrId) {
         Drawable drawable = sDrawableLruCache.get(attrId);
         if (drawable == null) {
-            drawable = ThemeUtils.getDrawable(theme, attrId);
+            drawable = ThemeUtils.getDrawableNonNull(theme, attrId);
             sDrawableLruCache.put(attrId, drawable);
         }
         return drawable;

@@ -65,7 +65,10 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         
         if (v == null) {
             v = this.mLayoutInflater
-                    .inflate(R.layout.list_item_file, null);
+                    .inflate(R.layout.list_item_file, arg2, false);
+            if (v == null) {
+                throw new RuntimeException("Inflated View is null");
+            }
             h = new Holder();
             h.mIcon = (OverlayImageView) v.findViewById(android.R.id.icon);
             h.mTitle = (TextView) v.findViewById(android.R.id.title);
@@ -85,12 +88,12 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         this.setIcon(f, h.mIcon);
         this.applyOverlay(f, h.mIcon);
 
-        if (Settings.showPreviews) {
+        if (mSettings.showPreviews()) {
             loadPreview(f, h.mIcon);
         }
         h.mTitle.setText(f.getName());
 
-        if (Settings.showLastModified) {
+        if (mSettings.showLastModified()) {
             final long lastModified = f.lastModified();
             String humanReadableLastModified = mHumanReadableLastModified.get(lastModified);
             if (humanReadableLastModified == null) {
@@ -104,7 +107,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h.mDate.setText(null);
         }
 
-        if (Settings.showSize && !f.isDirectory()) {
+        if (mSettings.showSize() && !f.isDirectory()) {
             final long fileSize = f.length();
             String humanReadableFileSize = mHumanReadableLength.get(fileSize);
             if (humanReadableFileSize == null) {
@@ -116,7 +119,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h.mSize.setText(null);
         }
 
-        if (Settings.showPermissions) {
+        if (mSettings.showPermissions()) {
             h.mPerm.setText(f.getPermissions().toString());
         } else {
             h.mPerm.setText(null);

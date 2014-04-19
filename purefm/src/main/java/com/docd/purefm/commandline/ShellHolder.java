@@ -68,7 +68,7 @@ public final class ShellHolder {
      */
     @Nullable
     public static synchronized Shell getShell() {
-        if (Settings.su && sShell != null && !sIsRootShell &&
+        if (Settings.getInstance().isSuEnabled() && sShell != null && !sIsRootShell &&
                 sSkipReaskForRootShellCount >= REASK_FOR_ROOT_SHELL_THRESHOLD) {
             sSkipReaskForRootShellCount = 0;
             final Pair<Boolean, Shell> result = ShellFactory.getRootShell();

@@ -6,6 +6,7 @@ import java.util.Set;
 
 
 import com.docd.purefm.R;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
@@ -39,16 +40,20 @@ public final class BookmarksAdapter implements ListAdapter {
 
     @NonNull
     private final BrowserPagerActivity mActivity;
+
+    @NonNull
+    private final Settings mSettings;
     
     private boolean modified;
     
     private int mUserBookmarksStart;
     
     public BookmarksAdapter(@NonNull final BrowserPagerActivity activity) {
-        this.mActivity = activity;
-        this.mLayoutInflater = activity.getLayoutInflater();
-        this.mUserBookmarksStart = BookmarksHelper.getUserBookmarkOffset();
-        this.mBookmarks = BookmarksHelper.getAllBookmarks(activity);
+        mActivity = activity;
+        mSettings = Settings.getInstance(activity);
+        mLayoutInflater = activity.getLayoutInflater();
+        mUserBookmarksStart = BookmarksHelper.getUserBookmarkOffset();
+        mBookmarks = BookmarksHelper.getAllBookmarks(activity);
     }
     
     public void addItem(@NonNull final String path) {
@@ -103,10 +108,10 @@ public final class BookmarksAdapter implements ListAdapter {
         Holder h;
         
         if (v == null) {
-            if (viewType == 0) {
-                v = mLayoutInflater.inflate(R.layout.list_item_bookmark, null);
-            } else {
-                v = mLayoutInflater.inflate(R.layout.list_item_bookmark_user, null);
+            v = mLayoutInflater.inflate(viewType == 0 ? R.layout.list_item_bookmark :
+                    R.layout.list_item_bookmark_user, arg2, false);
+            if (v == null) {
+                throw new RuntimeException("Inflated View is null");
             }
             h = new Holder();
             h.icon = (ImageView) v.findViewById(android.R.id.icon);
@@ -125,7 +130,7 @@ public final class BookmarksAdapter implements ListAdapter {
 
             @Override
             public void onClick(View v) {
-                final GenericFile file = FileFactory.newFile(currentPath);
+                final GenericFile file = FileFactory.newFile(mSettings, currentPath);
                 mActivity.setCurrentPath(file);
             }
         });

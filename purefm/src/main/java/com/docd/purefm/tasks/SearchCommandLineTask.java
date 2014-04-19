@@ -42,13 +42,18 @@ final class SearchCommandLineTask extends AbstractSearchTask {
     private final Shell mShell;
 
     @NonNull
+    private final Settings mSettings;
+
+    @NonNull
     private final List<String> mDenied = new ArrayList<>();
 
     public SearchCommandLineTask(@NonNull final Shell shell,
+                                 @NonNull final Settings settings,
                                  @NonNull final GenericFile startDirectory,
                                  @NonNull final SearchTaskListener listener) {
         super(startDirectory, listener);
         mShell = shell;
+        mSettings = settings;
     }
 
     @Override
@@ -68,7 +73,7 @@ final class SearchCommandLineTask extends AbstractSearchTask {
         BufferedReader err = null;
         Process process = null;
         try {
-            process = Runtime.getRuntime().exec(Settings.su ? "su" : "sh");
+            process = Runtime.getRuntime().exec(mSettings.isSuEnabled() ? "su" : "sh");
             os = new DataOutputStream(process.getOutputStream());
             is = new BufferedReader(new InputStreamReader(process.getInputStream()));
             err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -79,7 +84,7 @@ final class SearchCommandLineTask extends AbstractSearchTask {
             String line;
             try {
                 while (!isCancelled() && (line = is.readLine()) != null) {
-                    this.publishProgress(CommandLineFile.fromLSL(mShell, null, line));
+                    this.publishProgress(CommandLineFile.fromLSL(mShell, mSettings, null, line));
                 }
             } catch (EOFException e) {
                 //ignore

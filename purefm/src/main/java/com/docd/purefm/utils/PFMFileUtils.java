@@ -92,6 +92,7 @@ public final class PFMFileUtils {
      * @param file File to get full path
      * @return canonical path or absolute path if failed
      */
+    @NonNull
     public static String fullPath(@NonNull final GenericFile file) {
         try {
             return file.getCanonicalPath();
@@ -106,6 +107,7 @@ public final class PFMFileUtils {
      * @param file File to get full path
      * @return canonical path or absolute path if failed
      */
+    @NonNull
     public static String fullPath(@NonNull final File file) {
         try {
             return file.getCanonicalPath();
@@ -114,6 +116,7 @@ public final class PFMFileUtils {
         }
     }
 
+    @NonNull
     public static String byteCountToDisplaySize(@NonNull final BigInteger size) {
         String displaySize;
 

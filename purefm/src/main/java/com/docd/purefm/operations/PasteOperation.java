@@ -29,6 +29,7 @@ import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
@@ -50,6 +51,9 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
     private final Context mContext;
 
     @NonNull
+    private final Settings mSettings;
+
+    @NonNull
     private final GenericFile mTarget;
 
     private final boolean mIsMove;
@@ -58,6 +62,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
                    @NonNull final GenericFile target,
                    final boolean isMove) {
         mContext = context;
+        mSettings = Settings.getInstance(context);
         mTarget = target;
         mIsMove = isMove;
     }
@@ -72,7 +77,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
         if (mTarget instanceof JavaFile) {
             failed = processJavaFiles(files, mTarget, mIsMove, filesAffected);
         } else {
-            failed = processCommandLineFiles(files, mTarget, mIsMove, filesAffected);
+            failed = processCommandLineFiles(mSettings, files, mTarget, mIsMove, filesAffected);
         }
 
         if (!filesAffected.isEmpty()) {
@@ -118,15 +123,15 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
 
                 if (isMove) {
                     if (current.move(target)) {
-                        filesAffected.add(new Pair<>(current,
-                                FileFactory.newFile(target.toFile(), current.getName())));
+                        filesAffected.add(new Pair<>(current, FileFactory.newFile(
+                                mSettings, target.toFile(), current.getName())));
                     } else {
                         failed.add(current);
                     }
                 } else {
                     if (current.copy(target)) {
-                        filesAffected.add(new Pair<>(current,
-                                FileFactory.newFile(target.toFile(), current.getName())));
+                        filesAffected.add(new Pair<>(current, FileFactory.newFile(
+                                mSettings, target.toFile(), current.getName())));
                     } else {
                         failed.add(current);
                     }
@@ -147,6 +152,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
      */
     @NonNull
     private static ArrayList<GenericFile> processCommandLineFiles(
+            @NonNull final Settings settings,
             @NonNull final GenericFile[] contents,
             @NonNull final GenericFile target,
             final boolean isMove,
@@ -178,7 +184,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             final boolean res = CommandLine.execute(shell, command);
             if (res) {
                 filesAffected.add(new Pair<GenericFile, GenericFile>(current,
-                        FileFactory.newFile(t.toFile(), current.getName())));
+                        FileFactory.newFile(settings, t.toFile(), current.getName())));
             } else {
                 failed.add(current);
             }

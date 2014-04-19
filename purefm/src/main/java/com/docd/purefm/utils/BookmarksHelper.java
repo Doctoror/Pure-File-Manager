@@ -67,7 +67,7 @@ public final class BookmarksHelper {
             item.mDisplayName = activity.getText(R.string.root);
         }
         item.mDisplayPath = path;
-        item.mIcon = ThemeUtils.getDrawable(activity.getTheme(), R.attr.ic_bookmark);
+        item.mIcon = ThemeUtils.getDrawableNonNull(activity.getTheme(), R.attr.ic_bookmark);
         return item;
     }
 
@@ -79,10 +79,10 @@ public final class BookmarksHelper {
         int usbCount = 0;
 
         final Resources.Theme theme = activity.getTheme();
-        final Drawable iconStorage = ThemeUtils.getDrawable(theme, R.attr.ic_storage);
-        final Drawable iconSdcard = ThemeUtils.getDrawable(theme, R.attr.ic_sdcard);
-        final Drawable iconUsb = ThemeUtils.getDrawable(theme, R.attr.ic_usb);
-        final Drawable iconUser = ThemeUtils.getDrawable(theme, R.attr.ic_bookmark);
+        final Drawable iconStorage = ThemeUtils.getDrawableNonNull(theme, R.attr.ic_storage);
+        final Drawable iconSdcard = ThemeUtils.getDrawableNonNull(theme, R.attr.ic_sdcard);
+        final Drawable iconUsb = ThemeUtils.getDrawableNonNull(theme, R.attr.ic_usb);
+        final Drawable iconUser = ThemeUtils.getDrawableNonNull(theme, R.attr.ic_bookmark);
 
         for (final StorageHelper.StorageVolume v : Environment.getStorageVolumes()) {
             final BookmarkItem item = new BookmarkItem();
@@ -119,7 +119,7 @@ public final class BookmarksHelper {
             items.add(item);
         }
 
-        for (final String bookmark : Settings.getBookmarks(activity)) {
+        for (final String bookmark : Settings.getInstance(activity).getBookmarks()) {
             final BookmarkItem item = new BookmarkItem();
             item.mDisplayName = FilenameUtils.getName(bookmark);
             if (item.mDisplayName.equals(Environment.sRootDirectory.getAbsolutePath())) {
@@ -145,7 +145,7 @@ public final class BookmarksHelper {
     public static Set<String> getAllLocations(@NonNull final Context context) {
         final Set<String> result = new TreeSet<>();
         result.addAll(BookmarksHelper.getStorageBookmarks());
-        result.addAll(Settings.getBookmarks(context));
+        result.addAll(Settings.getInstance(context).getBookmarks());
         return result;
     }
 

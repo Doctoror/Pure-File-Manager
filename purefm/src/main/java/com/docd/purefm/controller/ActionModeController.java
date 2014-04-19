@@ -87,31 +87,33 @@ public final class ActionModeController {
                     R.menu.browser_contextual, menu);
 
             final SparseBooleanArray items = mListView.getCheckedItemPositions();
-            final int checkedCount = mListView.getCheckedItemCount();
+            if (items != null) {
+                final int checkedCount = mListView.getCheckedItemCount();
 
-            final ArrayList<GenericFile> toShare = new ArrayList<>(checkedCount);
-            for (int i = 0; i < items.size(); i++) {
-                final int key = items.keyAt(i);
-                if (items.get(key)) {
-                    final GenericFile selected = (GenericFile) mListView.getItemAtPosition(key);
-                    if (selected != null && !selected.isDirectory()) {
-                        toShare.add(selected);
+                final ArrayList<GenericFile> toShare = new ArrayList<>(checkedCount);
+                for (int i = 0; i < items.size(); i++) {
+                    final int key = items.keyAt(i);
+                    if (items.get(key)) {
+                        final GenericFile selected = (GenericFile) mListView.getItemAtPosition(key);
+                        if (selected != null && !selected.isDirectory()) {
+                            toShare.add(selected);
+                        }
                     }
                 }
-            }
 
-            mShareItemsCount = toShare.size();
-            if (toShare.isEmpty()) {
-                menu.removeItem(R.id.menu_share);
-            } else if (toShare.size() == 1) {
-                mShareIntent = IntentsActionPolicy.createShareIntent(mActivity, toShare.get(0));
-            } else {
-                mShareIntent = IntentsActionPolicy.createShareIntent(mActivity, toShare);
-            }
+                mShareItemsCount = toShare.size();
+                if (toShare.isEmpty()) {
+                    menu.removeItem(R.id.menu_share);
+                } else if (toShare.size() == 1) {
+                    mShareIntent = IntentsActionPolicy.createShareIntent(mActivity, toShare.get(0));
+                } else {
+                    mShareIntent = IntentsActionPolicy.createShareIntent(mActivity, toShare);
+                }
 
-            if (checkedCount > 1) {
-                menu.removeItem(android.R.id.edit);
-                menu.removeItem(R.id.properties);
+                if (checkedCount > 1) {
+                    menu.removeItem(android.R.id.edit);
+                    menu.removeItem(R.id.properties);
+                }
             }
 
             return true;
@@ -133,123 +135,136 @@ public final class ActionModeController {
                                            final MenuItem item) {
             final SparseBooleanArray items = mListView
                     .getCheckedItemPositions();
-            final int checkedItemSize = items.size();
-            final Resources res = mActivity.getResources();
-            switch (item.getItemId()) {
-                case android.R.id.edit:
-                    for (int i = 0; i < checkedItemSize; i++) {
-                        final int key = items.keyAt(i);
-                        if (items.get(key)) {
-                            final RenameFileDialog rename = RenameFileDialog
-                                    .instantiate(mode, (GenericFile) mListView
-                                            .getItemAtPosition(key));
-                            rename.show(mActivity.getFragmentManager(),
-                                    BrowserPagerActivity.TAG_DIALOG);
-                            return true;
+            if (items != null) {
+                final int checkedItemSize = items.size();
+                final Resources res = mActivity.getResources();
+                switch (item.getItemId()) {
+                    case android.R.id.edit:
+                        for (int i = 0; i < checkedItemSize; i++) {
+                            final int key = items.keyAt(i);
+                            if (items.get(key)) {
+                                final RenameFileDialog rename = RenameFileDialog
+                                        .instantiate(mode, (GenericFile) mListView
+                                                .getItemAtPosition(key));
+                                rename.show(mActivity.getFragmentManager(),
+                                        BrowserPagerActivity.TAG_DIALOG);
+                                return true;
+                            }
                         }
-                    }
-                    return false;
+                        return false;
 
-                case R.id.properties:
-                    for (int i = 0; i < checkedItemSize; i++) {
-                        final int key = items.keyAt(i);
-                        if (items.get(key)) {
-                            final FilePropertiesDialog prop = FilePropertiesDialog
-                                    .newInstance((GenericFile) mListView.getItemAtPosition(key));
-                            mode.finish();
-                            prop.show(mActivity.getFragmentManager(),
-                                    BrowserPagerActivity.TAG_DIALOG);
-                            break;
+                    case R.id.properties:
+                        for (int i = 0; i < checkedItemSize; i++) {
+                            final int key = items.keyAt(i);
+                            if (items.get(key)) {
+                                final GenericFile itemAtPosition = (GenericFile)
+                                        mListView.getItemAtPosition(key);
+                                if (itemAtPosition == null) {
+                                    throw new RuntimeException("Item at position: " + key + "is null");
+                                }
+                                final FilePropertiesDialog prop = FilePropertiesDialog
+                                        .newInstance(itemAtPosition);
+                                mode.finish();
+                                prop.show(mActivity.getFragmentManager(),
+                                        BrowserPagerActivity.TAG_DIALOG);
+                                break;
+                            }
                         }
-                    }
-                    return true;
+                        return true;
 
-                case R.id.menu_delete:
-                    final List<GenericFile> files1 = new LinkedList<>();
-                    final BrowserBaseAdapter adapter = (BrowserBaseAdapter) mListView.getAdapter();
-                    for (int i = 0; i < checkedItemSize; i++) {
-                        final int key = items.keyAt(i);
-                        if (items.get(key)) {
-                            files1.add(adapter.getItem(key));
+                    case R.id.menu_delete:
+                        final List<GenericFile> files1 = new LinkedList<>();
+                        final BrowserBaseAdapter adapter = (BrowserBaseAdapter) mListView.getAdapter();
+                        for (int i = 0; i < checkedItemSize; i++) {
+                            final int key = items.keyAt(i);
+                            if (items.get(key)) {
+                                files1.add(adapter.getItem(key));
+                            }
                         }
-                    }
-                    final DeleteFilesDialog dialog = DeleteFilesDialog.newInstance(mode, files1);
-                    dialog.show(mActivity.getFragmentManager(), BrowserPagerActivity.TAG_DIALOG);
-                    return true;
+                        final DeleteFilesDialog dialog = DeleteFilesDialog.newInstance(mode, files1);
+                        dialog.show(mActivity.getFragmentManager(), BrowserPagerActivity.TAG_DIALOG);
+                        return true;
 
-                case android.R.id.cut:
-                    final GenericFile[] files = new GenericFile[mListView
-                            .getCheckedItemCount()];
-                    int index = -1;
-                    for (int i = 0; i < checkedItemSize; i++) {
-                        final int key = items.keyAt(i);
-                        if (items.get(key)) {
-                            files[++index] = (GenericFile) mListView.getItemAtPosition(key);
+                    case android.R.id.cut:
+                        final GenericFile[] files = new GenericFile[mListView
+                                .getCheckedItemCount()];
+                        int index = -1;
+                        for (int i = 0; i < checkedItemSize; i++) {
+                            final int key = items.keyAt(i);
+                            if (items.get(key)) {
+                                files[++index] = (GenericFile) mListView.getItemAtPosition(key);
+                            }
                         }
-                    }
-                    ClipBoard.cutMove(files);
-                    Toast.makeText(
-                            mActivity,
-                            res.getQuantityString(
-                                    R.plurals.cut_n_files_to_clipboard, index + 1, index + 1),
-                             Toast.LENGTH_SHORT
+                        ClipBoard.cutMove(files);
+                        Toast.makeText(
+                                mActivity,
+                                res.getQuantityString(
+                                        R.plurals.cut_n_files_to_clipboard, index + 1, index + 1),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        mode.finish();
+                        return true;
+
+                    case android.R.id.copy:
+                        final GenericFile[] files2 = new GenericFile[mListView
+                                .getCheckedItemCount()];
+                        int index1 = -1;
+                        for (int i = 0; i < checkedItemSize; i++) {
+                            final int key = items.keyAt(i);
+                            if (items.get(key)) {
+                                files2[++index1] = (GenericFile) mListView.getItemAtPosition(key);
+                            }
+                        }
+                        ClipBoard.cutCopy(files2);
+                        Toast.makeText(
+                                mActivity,
+                                res.getQuantityString(R.plurals.copied_n_files_to_clipboard, index1 + 1,
+                                        index1 + 1),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        mode.finish();
+                        return true;
+
+                    case R.id.select_all:
+                        for (int i = 0; i < mListView.getCount(); i++) {
+                            mListView.setItemChecked(i, true);
+                        }
+                        return true;
+
+                    case R.id.menu_add_to_media_store:
+                        final String[] paths = new String[mListView.getCheckedItemCount()];
+                        int pathsCounter = 0;
+                        for (int i = 0; i < checkedItemSize; i++) {
+                            final int key = items.keyAt(i);
+                            if (items.get(key)) {
+                                final GenericFile itemAtPosition = (GenericFile)
+                                        mListView.getItemAtPosition(key);
+                                if (itemAtPosition == null) {
+                                    throw new RuntimeException("Item at position: " + key + "is null");
+                                }
+                                paths[pathsCounter++] = PFMFileUtils.fullPath(itemAtPosition);
+                            }
+                        }
+                        MediaScannerConnection.scanFile(mActivity, paths, null, null);
+                        mode.finish();
+                        return true;
+
+                    case R.id.menu_share:
+                        if (mShareIntent != null) {
+                            mActivity.startActivity(mShareIntent);
+                        } else {
+                            Toast.makeText(mActivity, res.getQuantityText(
+                                            R.plurals.no_applications_can_share, mShareItemsCount),
+                                    Toast.LENGTH_SHORT
                             ).show();
-                    mode.finish();
-                    return true;
-
-                case android.R.id.copy:
-                    final GenericFile[] files2 = new GenericFile[mListView
-                            .getCheckedItemCount()];
-                    int index1 = -1;
-                    for (int i = 0; i < checkedItemSize; i++) {
-                        final int key = items.keyAt(i);
-                        if (items.get(key)) {
-                            files2[++index1] = (GenericFile) mListView.getItemAtPosition(key);
                         }
-                    }
-                    ClipBoard.cutCopy(files2);
-                    Toast.makeText(
-                            mActivity,
-                            res.getQuantityString(R.plurals.copied_n_files_to_clipboard, index1 + 1,
-                                    index1 + 1),
-                            Toast.LENGTH_SHORT
-                    ).show();
-                    mode.finish();
-                    return true;
+                        return true;
 
-                case R.id.select_all:
-                    for (int i = 0; i < mListView.getCount(); i++) {
-                        mListView.setItemChecked(i, true);
-                    }
-                    return true;
-
-                case R.id.menu_add_to_media_store:
-                    final String[] paths = new String[mListView.getCheckedItemCount()];
-                    int pathsCounter = 0;
-                    for (int i = 0; i < checkedItemSize; i++) {
-                        final int key = items.keyAt(i);
-                        if (items.get(key)) {
-                            paths[pathsCounter++] = PFMFileUtils.fullPath((GenericFile)
-                                    mListView.getItemAtPosition(key));
-                        }
-                    }
-                    MediaScannerConnection.scanFile(mActivity, paths, null, null);
-                    mode.finish();
-                    return true;
-
-                case R.id.menu_share:
-                    if (mShareIntent != null) {
-                        mActivity.startActivity(mShareIntent);
-                    } else {
-                        Toast.makeText(mActivity, res.getQuantityText(
-                                R.plurals.no_applications_can_share, mShareItemsCount),
-                                        Toast.LENGTH_SHORT).show();
-                    }
-                    return true;
-
-                default:
-                    return false;
+                    default:
+                        return false;
+                }
             }
+            return false;
         }
 
         @Override

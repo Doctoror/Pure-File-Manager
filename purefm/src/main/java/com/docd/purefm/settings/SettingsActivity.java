@@ -28,10 +28,15 @@ public final class SettingsActivity extends ActionBarIconThemableActivity {
     private boolean needInvalidate;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_settings);
-        this.getActionBar().setDisplayOptions(
+
+        final ActionBar actionBar = getActionBar();
+        if (actionBar == null) {
+            throw new RuntimeException("Should have ActionBar");
+        }
+        actionBar.setDisplayOptions(
                 ActionBar.DISPLAY_SHOW_HOME |
                 ActionBar.DISPLAY_HOME_AS_UP |
                 ActionBar.DISPLAY_SHOW_TITLE |
@@ -40,7 +45,11 @@ public final class SettingsActivity extends ActionBarIconThemableActivity {
 
     @Override
     protected void setActionBarIcon(final Drawable icon) {
-        getActionBar().setIcon(icon);
+        final ActionBar actionBar = getActionBar();
+        if (actionBar == null) {
+            throw new RuntimeException("Should have ActionBar");
+        }
+        actionBar.setIcon(icon);
     }
 
     @Override

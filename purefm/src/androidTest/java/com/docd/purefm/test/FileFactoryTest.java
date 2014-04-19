@@ -69,13 +69,13 @@ public final class FileFactoryTest extends AndroidTestCase {
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");
         }
-        Settings.useCommandLine = true;
+        Settings.sUseCommandLine = true;
 
         final GenericFile file1 = FileFactory.newFile(test1);
         assertTrue(file1 instanceof CommandLineFile);
         assertEquals(test1, file1.toFile());
 
-        Settings.useCommandLine = false;
+        Settings.sUseCommandLine = false;
         final GenericFile file2 = FileFactory.newFile(test1);
         assertTrue(file2 instanceof JavaFile);
         assertEquals(test1, file2.toFile());

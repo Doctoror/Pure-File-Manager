@@ -81,7 +81,11 @@ public final class SearchActivity extends ActionBarIconThemableActivity
 
     @Override
     protected void setActionBarIcon(final Drawable icon) {
-        getActionBar().setIcon(icon);
+        final ActionBar actionBar = getActionBar();
+        if (actionBar == null) {
+            throw new RuntimeException("ActionBar should not be null");
+        }
+        actionBar.setIcon(icon);
     }
 
     @Override
@@ -112,10 +116,16 @@ public final class SearchActivity extends ActionBarIconThemableActivity
 
     private void initActionBar() {
         final View actionBarCustom = this.getLayoutInflater().inflate(R.layout.activity_search_actionbar, null);
+        if (actionBarCustom == null) {
+            throw new RuntimeException("Inflated View is null");
+        }
         final TextView path = (TextView) actionBarCustom.findViewById(android.R.id.text1);
         path.setText(mStartDirectory.getAbsolutePath());
 
         final ActionBar bar = this.getActionBar();
+        if (bar == null) {
+            throw new RuntimeException("ActionBar should not be null");
+        }
         bar.setDisplayOptions(
                 ActionBar.DISPLAY_HOME_AS_UP |
                 ActionBar.DISPLAY_SHOW_HOME |
@@ -157,7 +167,7 @@ public final class SearchActivity extends ActionBarIconThemableActivity
             mSearchTask.cancel(true);
         }
         mAdapter.updateData(new GenericFile[0]);
-        mSearchTask = AbstractSearchTask.create(mStartDirectory, this);
+        mSearchTask = AbstractSearchTask.create(this, mStartDirectory, this);
         mSearchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, text);
     }
 
@@ -203,39 +213,48 @@ public final class SearchActivity extends ActionBarIconThemableActivity
     }
 
     private void initList() {
-        if (this.mList != null) {
-            this.mList.getEmptyView().setVisibility(View.GONE);
-            this.mList.setVisibility(View.GONE);
+        if (mList != null) {
+            final View emptyView = mList.getEmptyView();
+            if (emptyView != null) {
+                emptyView.setVisibility(View.GONE);
+            }
+            mList.setVisibility(View.GONE);
         }
 
-        if (Settings.appearance == Settings.APPEARANCE_LIST) {
+        if (Settings.getInstance(this).getAppearance() == Settings.APPEARANCE_LIST) {
             View vs = findViewById(android.R.id.list);
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.mList = (AbsListView) vs;
-            this.mAdapter = new BrowserListAdapter(this);
+            mList = (AbsListView) vs;
+            mAdapter = new BrowserListAdapter(this);
         } else {
             View vs = findViewById(R.id.grid);
             if (vs instanceof ViewStub) {
                 vs = ((ViewStub) vs).inflate();
             }
-            this.mList = (AbsListView) vs;
-            this.mAdapter = new BrowserGridAdapter(this);
+            mList = (AbsListView) vs;
+            mAdapter = new BrowserGridAdapter(this);
         }
 
-        this.mList.setId(this.getNewId());
-        this.mList.setEmptyView(findViewById(android.R.id.empty));
-        this.mList.setAdapter(this.mAdapter);
-        this.mList.getEmptyView().setVisibility(View.GONE);
-        this.mList.setVisibility(View.GONE);
+        mList.setId(this.getNewId());
+        mList.setEmptyView(findViewById(android.R.id.empty));
+        mList.setAdapter(this.mAdapter);
+        final View emptyView = mList.getEmptyView();
+        if (emptyView != null) {
+            emptyView.setVisibility(View.GONE);
+        }
+        mList.setVisibility(View.GONE);
 
-        this.mActionModeController.setListView(this.mList);
+        mActionModeController.setListView(this.mList);
 
-        this.mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
-                final GenericFile target = (GenericFile) (av.getItemAtPosition(pos));
+                final GenericFile target = (GenericFile) av.getItemAtPosition(pos);
+                if (target == null) {
+                    throw new RuntimeException("Item at position is null");
+                }
                 PFMFileUtils.openFile(SearchActivity.this, target.toFile());
             }
         });

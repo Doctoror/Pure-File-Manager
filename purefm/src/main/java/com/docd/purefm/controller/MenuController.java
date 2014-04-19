@@ -69,10 +69,11 @@ public final class MenuController {
                 return true;
 
             case android.R.id.content:
-                if (Settings.appearance == Settings.APPEARANCE_LIST) {
-                    Settings.saveAppearance(mActivity, Settings.APPEARANCE_GRID);
+                final Settings settings = Settings.getInstance(mActivity);
+                if (settings.getAppearance() == Settings.APPEARANCE_LIST) {
+                    settings.setAppearance(Settings.APPEARANCE_GRID);
                 } else {
-                    Settings.saveAppearance(mActivity, Settings.APPEARANCE_LIST);
+                    settings.setAppearance(Settings.APPEARANCE_LIST);
                 }
                 mActivity.invalidateList();
                 return true;

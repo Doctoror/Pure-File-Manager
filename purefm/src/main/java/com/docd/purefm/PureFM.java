@@ -37,18 +37,18 @@ public final class PureFM extends Application implements
         RootTools.handlerEnabled = false;
         RootTools.debugMode = BuildConfig.DEBUG;
         Environment.init(this);
-        Settings.init(this, getResources());
         PFMTextUtils.init(this);
         ensureNoShellUsedIfNoBusybox();
         registerActivityLifecycleCallbacks(this);
     }
 
     private void ensureNoShellUsedIfNoBusybox() {
-        if (Settings.useCommandLine) {
+        final Settings settings = Settings.getInstance(this);
+        if (settings.useCommandLine()) {
             if (!Environment.hasBusybox()) {
-                Settings.setUseCommandLine(this, false);
-                if (Settings.su) {
-                    Settings.setAllowRoot(this, false);
+                settings.setUseCommandLine(false, true);
+                if (settings.isSuEnabled()) {
+                    settings.setSuEnabled(false, true);
                 }
             }
         }

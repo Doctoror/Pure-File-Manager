@@ -69,7 +69,7 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity {
     protected final void invalidateActionBarIcon() {
         if (ShellHolder.isCurrentShellRoot()) {
             setActionBarIcon(getResources().getDrawable(R.drawable.ic_root));
-        } else if (Settings.useCommandLine && ShellHolder.getShell() != null) {
+        } else if (Settings.getInstance(this).useCommandLine() && ShellHolder.getShell() != null) {
             setActionBarIcon(getResources().getDrawable(R.drawable.ic_shell));
         } else {
             setActionBarIcon(mDefaultIcon);

@@ -70,7 +70,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private static final String STATE_BROWSER = "BrowserFragment.state.mBrowser";
 
     //private ActionBar actionBar;
-    private AbstractBrowserActivity mAttachedBrowserActivity;
     private ActionModeController actionModeController;
     private MenuController menuController;
 
@@ -108,7 +107,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
         if (activity instanceof AbstractBrowserActivity) {
@@ -150,18 +149,28 @@ public final class BrowserFragment extends UserVisibleHintFragment
         });
 
         mOnSequenceListener = new OnSequenceClickListener() {
+
             @Override
             public void onSequenceClick(String sequence) {
-                final GenericFile target = FileFactory.newFile(sequence);
+                final GenericFile target = FileFactory.newFile(
+                        Settings.getInstance(getBrowserActivity()), sequence);
                 mBrowser.navigate(target, true);
             }
         };
 
-        mAttachedBrowserActivity = (AbstractBrowserActivity) activity;
-        menuController = new MenuController(this.mAttachedBrowserActivity, mBrowser);
+        menuController = new MenuController((AbstractBrowserActivity) activity, mBrowser);
 
         // needs FragmentActivity because FilePropertiesDialog uses childFragmentManager
-        actionModeController = new ActionModeController(mAttachedBrowserActivity);
+        actionModeController = new ActionModeController(activity);
+    }
+
+    @NonNull
+    private AbstractBrowserActivity getBrowserActivity() {
+        final AbstractBrowserActivity a = (AbstractBrowserActivity) getActivity();
+        if (a == null) {
+            throw new IllegalStateException("Not attached to the activity");
+        }
+        return a;
     }
 
     @Override
@@ -180,9 +189,9 @@ public final class BrowserFragment extends UserVisibleHintFragment
     public void onCreate(Bundle state) {
         setRetainInstance(true);
         setHasOptionsMenu(true);
+        super.onCreate(state);
         firstRun = true;
         restoreManualState(state);
-        super.onCreate(state);
     }
 
     public void restoreManualState(final Bundle state) {
@@ -220,7 +229,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
         actionModeController.setListView(mListView);
-        mParentOnNavigateListener = mAttachedBrowserActivity;
+        mParentOnNavigateListener = getBrowserActivity();
 
         mBrowser.restoreState(mBrowserInitialState);
         mBrowserInitialState = null;
@@ -229,8 +238,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (mAttachedBrowserActivity != null && mAttachedBrowserActivity
-                .shouldShowBrowserFragmentMenu()) {
+        final AbstractBrowserActivity activity = getBrowserActivity();
+        if (activity.shouldShowBrowserFragmentMenu()) {
             inflater.inflate(R.menu.browser, menu);
 
             // TODO it returns true even on devices that don't have the physical key. Find a better method to detect search hardware button
@@ -239,13 +248,16 @@ public final class BrowserFragment extends UserVisibleHintFragment
             //}
 
             final MenuItem content = menu.findItem(android.R.id.content);
+            if (content == null) {
+                throw new RuntimeException("Inflated menu item should contain android.R.id.content");
+            }
 
-            if (Settings.appearance == Settings.APPEARANCE_LIST) {
-                content.setIcon(ThemeUtils.getDrawable(mAttachedBrowserActivity, R.attr.ic_menu_view_as_grid))
+            if (Settings.getInstance(activity).getAppearance() == Settings.APPEARANCE_LIST) {
+                content.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_view_as_grid))
                         .setTitle(R.string.menu_view_as_grid)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             } else {
-                content.setIcon(ThemeUtils.getDrawable(mAttachedBrowserActivity, R.attr.ic_menu_view_as_list))
+                content.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_view_as_list))
                         .setTitle(R.string.menu_view_as_list)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
@@ -265,28 +277,50 @@ public final class BrowserFragment extends UserVisibleHintFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View parent = inflater.inflate(R.layout.fragment_browser, null);
+        if (parent == null) {
+            throw new RuntimeException("Inflated view is null");
+        }
         initList(inflater, parent);
         firstRun = true;
         return parent;
     }
 
     private void initList(@NonNull final LayoutInflater inflater, @NonNull final View parent) {
+        final AbstractBrowserActivity context = getBrowserActivity();
+
         if (mListView != null) {
-            mListView.getEmptyView().setVisibility(View.GONE);
+            final View emptyView = mListView.getEmptyView();
+            if (emptyView != null) {
+                emptyView.setVisibility(View.GONE);
+            }
             mListView.setVisibility(View.GONE);
         }
+
+        final Settings settings = Settings.getInstance(context);
+
+        final ViewGroup listContainer = (ViewGroup) parent.findViewById(R.id.list_container);
+        if (listContainer == null) {
+            throw new RuntimeException("parent should contain ViewGroup with id R.id.list_container");
+        }
+
+        final View swipeRefreshList = inflater.inflate(
+                settings.getAppearance() == Settings.APPEARANCE_LIST
+                        ? R.layout.browser_listview : R.layout.browser_gridview, listContainer);
+        if (swipeRefreshList == null) {
+            throw new RuntimeException("Inflated View is null");
+        }
+
         mMainProgress = parent.findViewById(android.R.id.progress);
-        mSwipeRefreshLayoutList = (SwipeRefreshLayout) inflater.inflate(
-                Settings.appearance == Settings.APPEARANCE_LIST ? R.layout.browser_listview :
-                        R.layout.browser_gridview, (ViewGroup) parent.findViewById(
-                        R.id.list_container)).findViewById(R.id.browser_list_swipe_refresh);
+        mSwipeRefreshLayoutList = (SwipeRefreshLayout) swipeRefreshList.findViewById(
+                R.id.browser_list_swipe_refresh);
+
         mSwipeRefreshLayoutEmpty = (SwipeRefreshLayout) parent.findViewById(android.R.id.empty);
 
         mListView = (AbsListView) mSwipeRefreshLayoutList.findViewById(android.R.id.list);
         if (mListView instanceof ListView) {
-            mAdapter = new BrowserListAdapter(getActivity());
+            mAdapter = new BrowserListAdapter(context);
         } else {
-            mAdapter = new BrowserGridAdapter(getActivity());
+            mAdapter = new BrowserGridAdapter(context);
         }
 
         menuController.setBrowserAdapter(this.mAdapter);
@@ -294,7 +328,10 @@ public final class BrowserFragment extends UserVisibleHintFragment
         mListView.setId(this.getNewId(parent));
         mListView.setEmptyView(parent.findViewById(android.R.id.empty));
         mListView.setAdapter(this.mAdapter);
-        mListView.getEmptyView().setVisibility(View.GONE);
+        final View emptyView = mListView.getEmptyView();
+        if (emptyView != null) {
+            emptyView.setVisibility(View.GONE);
+        }
         mListView.setVisibility(View.GONE);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -302,18 +339,21 @@ public final class BrowserFragment extends UserVisibleHintFragment
             public void onItemClick(AdapterView<?> av, View v, int pos, long id) {
                 final GenericFile target = (GenericFile) (av
                         .getItemAtPosition(pos));
+                if (target == null) {
+                    throw new RuntimeException("onItemClick(): item at position is null");
+                }
                 if (target.isDirectory()) {
                     mBrowser.navigate(target, true);
                 } else {
-                    if (mAttachedBrowserActivity.getGetContentMimeType() == null) {
-                        PFMFileUtils.openFile(mAttachedBrowserActivity, target.toFile());
+                    final AbstractBrowserActivity activity = getBrowserActivity();
+                    if (activity.getGetContentMimeType() == null) {
+                        PFMFileUtils.openFile(activity, target.toFile());
                     } else {
                         final Intent intent = new Intent();
-                        intent.setData(getResultUriForFileFromIntent(mAttachedBrowserActivity
-                                .getContentResolver(), target.toFile(), mAttachedBrowserActivity
-                                        .getIntent()));
-                        mAttachedBrowserActivity.setResult(Activity.RESULT_OK, intent);
-                        mAttachedBrowserActivity.finish();
+                        intent.setData(getResultUriForFileFromIntent(activity.getContentResolver(),
+                                target.toFile(), activity.getIntent()));
+                        activity.setResult(Activity.RESULT_OK, intent);
+                        activity.finish();
                     }
                 }
             }
@@ -351,13 +391,13 @@ public final class BrowserFragment extends UserVisibleHintFragment
             }
         });
 
-        mListView.setChoiceMode(mAttachedBrowserActivity.getGetContentMimeType() == null ?
+        mListView.setChoiceMode(context.getGetContentMimeType() == null ?
                 AbsListView.CHOICE_MODE_MULTIPLE_MODAL : AbsListView.CHOICE_MODE_NONE);
 
         mSwipeRefreshLayoutList.setOnRefreshListener(this);
         mSwipeRefreshLayoutEmpty.setOnRefreshListener(this);
 
-        final int color2resId = Settings.theme == R.style.ThemeLight ?
+        final int color2resId = settings.getTheme() == R.style.ThemeLight ?
                 R.color.holo_light_progress_color_res_id : R.color.holo_dark_window_background;
         mSwipeRefreshLayoutList.setColorScheme(R.color.holo_light_selected,
                 color2resId,
@@ -388,8 +428,11 @@ public final class BrowserFragment extends UserVisibleHintFragment
             mParentOnNavigateListener.onNavigationCompleted(mBrowser
                     .getCurrentPath());
         }
-        mAttachedBrowserActivity.setOnSequenceClickListener(mOnSequenceListener);
-        mAttachedBrowserActivity.setCurrentlyDisplayedFragment(this);
+        final AbstractBrowserActivity activity = (AbstractBrowserActivity) getActivity();
+        if (activity != null && !activity.isFinishing()) {
+            activity.setOnSequenceClickListener(mOnSequenceListener);
+            activity.setCurrentlyDisplayedFragment(this);
+        }
     }
 
     @Override
@@ -416,10 +459,15 @@ public final class BrowserFragment extends UserVisibleHintFragment
             mScannerTask.cancel(false);
         }
 
-        mScannerTask = new DirectoryScanTask(mBrowser,
-                mAttachedBrowserActivity.getGetContentMimeType(), mAdapter,
-                        mSwipeRefreshLayoutList, mSwipeRefreshLayoutEmpty);
-        mScannerTask.execute(mBrowser.getCurrentPath());
+        final AbstractBrowserActivity activity = (AbstractBrowserActivity) getActivity();
+        if (activity != null) {
+            mScannerTask = new DirectoryScanTask(mBrowser,
+                    activity.getGetContentMimeType(),
+                    mAdapter,
+                    Settings.getInstance(activity),
+                    mSwipeRefreshLayoutList, mSwipeRefreshLayoutEmpty);
+            mScannerTask.execute(mBrowser.getCurrentPath());
+        }
     }
 
     private int getNewId(View parent) {

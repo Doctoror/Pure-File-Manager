@@ -35,7 +35,7 @@ public final class ClipBoardTest extends AndroidTestCase {
     @Override
     protected void runTest() throws Throwable {
         super.runTest();
-        Settings.useCommandLine = false;
+        Settings.sUseCommandLine = false;
         final GenericFile[] files = new GenericFile[] {
                 FileFactory.newFile("/one"),
                 FileFactory.newFile("/two"),

@@ -14,6 +14,8 @@
  */
 package com.docd.purefm.commandline;
 
+import android.support.annotation.NonNull;
+
 import com.docd.purefm.settings.Settings;
 
 import java.io.File;
@@ -32,14 +34,14 @@ import java.io.File;
  */
 public final class CommandListFile extends BusyboxCommand {
 
-    public CommandListFile(final File file) {
-        super(buildCommand(file));
+    public CommandListFile(@NonNull final File file, @NonNull final Settings settings) {
+        super(buildCommand(file, settings));
     }
 
-    private static String buildCommand(final File file) {
+    private static String buildCommand(@NonNull final File file, @NonNull final Settings settings) {
         final StringBuilder command = new StringBuilder(50);
         command.append("ls -lnped");
-        if (Settings.showHidden) {
+        if (settings.showHidden()) {
             command.append('A');
         }
         command.append(' ');

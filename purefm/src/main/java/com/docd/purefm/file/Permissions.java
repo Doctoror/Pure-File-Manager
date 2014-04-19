@@ -47,6 +47,7 @@ public final class Permissions implements Serializable {
         this.ow = false;
         this.ox = false;
         
+        @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder sb = new StringBuilder();
         sb.append(ur ? 'r' : '-');
         sb.append(uw ? 'w' : '-');
@@ -71,6 +72,7 @@ public final class Permissions implements Serializable {
         this.ow = ow;
         this.ox = ox;
         
+        @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder sb = new StringBuilder();
         sb.append(ur ? 'r' : '-');
         sb.append(uw ? 'w' : '-');
@@ -101,6 +103,7 @@ public final class Permissions implements Serializable {
         this.ow = line.charAt(8) == 'w';
         this.ox = line.charAt(9) == 'x';
         
+        @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder sb = new StringBuilder();
         sb.append(ur ? 'r' : '-');
         sb.append(uw ? 'w' : '-');

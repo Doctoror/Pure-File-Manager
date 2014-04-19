@@ -39,7 +39,8 @@ public final class SettingsFragment extends PreferenceFragment {
             Integer.toString(R.style.ThemeLight)
     };
 
-    private boolean wasAllowRoot;
+    private Settings mSettings;
+    private boolean mWasAllowRoot;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -47,13 +48,14 @@ public final class SettingsFragment extends PreferenceFragment {
         if (!(activity instanceof SettingsActivity)) {
             throw new RuntimeException("Should be attached only to SettingsActivity");
         }
+        mSettings = Settings.getInstance(activity);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.addPreferencesFromResource(R.xml.settings);
-        this.wasAllowRoot = Settings.su;
+        this.mWasAllowRoot = mSettings.isSuEnabled();
         this.init();
     }
 
@@ -76,7 +78,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showPermissions = (Boolean) newValue;
+                mSettings.setShowPermissions((Boolean) newValue, false);
                 getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
@@ -90,7 +92,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showHidden = (Boolean) newValue;
+                mSettings.setShowLastModified((Boolean) newValue, false);
                 getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
@@ -104,7 +106,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showPreviews = (Boolean) newValue;
+                mSettings.setShowPreviews((Boolean) newValue, false);
                 getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
@@ -118,7 +120,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showSize = (Boolean) newValue;
+                mSettings.setShowSize((Boolean) newValue, false);
                 getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
@@ -132,7 +134,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.showLastModified = (Boolean) newValue;
+                mSettings.setShowLastModified((Boolean) newValue, false);
                 getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
@@ -143,13 +145,13 @@ public final class SettingsFragment extends PreferenceFragment {
             throw new RuntimeException("Theme preference not found");
         }
         theme.setEntryValues(THEMES_VALUES);
-        theme.setValue(String.valueOf(Settings.theme));
+        theme.setValue(String.valueOf(mSettings.getTheme()));
         theme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 final int chosenTheme = Integer.parseInt((String) newValue);
-                if (chosenTheme != Settings.theme) {
-                    Settings.theme = chosenTheme;
+                if (chosenTheme != mSettings.getTheme()) {
+                    mSettings.setTheme(chosenTheme, false);
                     getSettingsActivity().proxyRestart();
                     return true;
                 }
@@ -165,12 +167,13 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.appearance = Integer.parseInt((String) newValue);
-                perm.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
-                size.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
-                modif.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
+                final int appearance = Integer.parseInt((String) newValue);
+                mSettings.setAppearance(appearance);
+                perm.setEnabled(appearance == Settings.APPEARANCE_LIST);
+                size.setEnabled(appearance == Settings.APPEARANCE_LIST);
+                modif.setEnabled(appearance == Settings.APPEARANCE_LIST);
                 getSettingsActivity().notifyNeedInvalidate();
-                return true;
+                return false;
             }
         });
         
@@ -183,18 +186,18 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.useCommandLine = (Boolean) newValue;
+                final boolean useCommandLine = (Boolean) newValue;
+                mSettings.setUseCommandLine(useCommandLine, false);
                 final SettingsActivity parent = getSettingsActivity();
-                if (!Settings.useCommandLine) {
-                    if (Settings.su) {
+                if (!useCommandLine) {
+                    if (mSettings.isSuEnabled()) {
                         final CheckBoxPreference root = (CheckBoxPreference) findPreference(
                                 res.getString(R.string.key_preference_allow_root));
                         if (root == null) {
                             throw new RuntimeException("Allow root preference not found");
                         }
                         root.setChecked(false);
-                        Settings.su = false;
-                        Settings.setAllowRoot(parent, false);
+                        mSettings.setSuEnabled(false, true);
                     }
                 }
                 parent.proxyInvalidateActionBarIcon();
@@ -211,26 +214,27 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                Settings.su = (Boolean) newValue;
+                final boolean suEnabled = (Boolean) newValue;
+                mSettings.setSuEnabled(suEnabled, false);
                 final SettingsActivity parent = getSettingsActivity();
-                if (Settings.su) {
-                    if (!Settings.useCommandLine) {
+                if (suEnabled) {
+                    if (!mSettings.useCommandLine()) {
                         command.setChecked(true);
-                        Settings.setUseCommandLine(parent, true);
-                        Settings.useCommandLine = true;
+                        mSettings.setUseCommandLine(true, true);
                     }
                 }
                 
-                command.setEnabled(!Settings.su);
+                command.setEnabled(!suEnabled);
                 parent.proxyInvalidateActionBarIcon();
                 parent.notifyNeedInvalidate();
                 return true;
             }
         });
 
-        perm.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
-        size.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
-        modif.setEnabled(Settings.appearance == Settings.APPEARANCE_LIST);
+        final int appearance = mSettings.getAppearance();
+        perm.setEnabled(appearance == Settings.APPEARANCE_LIST);
+        size.setEnabled(appearance == Settings.APPEARANCE_LIST);
+        modif.setEnabled(appearance == Settings.APPEARANCE_LIST);
         
         command.setEnabled(Environment.hasBusybox());
         root.setEnabled(Environment.sHasRoot && Environment.hasBusybox());
@@ -249,7 +253,7 @@ public final class SettingsFragment extends PreferenceFragment {
         if (home == null) {
             throw new RuntimeException("Home directory preference not found");
         }
-        home.setSummary(Settings.getHomeDirectory(appContext));
+        home.setSummary(mSettings.getHomeDirectory());
         final CharSequence[] opts = new CharSequence[options.size()];
         options.toArray(opts);
         home.setEntries(opts);
@@ -268,7 +272,7 @@ public final class SettingsFragment extends PreferenceFragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (!Settings.useCommandLine || this.wasAllowRoot != Settings.su) {
+        if (!mSettings.useCommandLine() || mWasAllowRoot != mSettings.isSuEnabled()) {
             ShellHolder.releaseShell();
         }
     }

@@ -160,7 +160,7 @@ public final class Environment {
         return true;
     }
 
-    public static boolean isBusyboxUtilAvailable(final String util) {
+    public static boolean isBusyboxUtilAvailable(@NonNull final String util) {
         if (sBusybox == null) {
             return false;
         }

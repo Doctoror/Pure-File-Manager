@@ -15,6 +15,8 @@
 package com.docd.purefm.commandline;
 
 
+import android.support.annotation.NonNull;
+
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 
@@ -33,17 +35,19 @@ import java.io.File;
  */
 public final class CommandListContents extends BusyboxCommand {
 
-    public CommandListContents(final GenericFile dir) {
-        super(buildCommand(dir));
+    public CommandListContents(@NonNull final GenericFile dir,
+                               @NonNull final Settings settings) {
+        super(buildCommand(dir, settings));
     }
 
-    private static String buildCommand(final GenericFile file) {
+    private static String buildCommand(@NonNull final GenericFile file,
+                                       @NonNull final Settings settings) {
         if (!file.isDirectory()) {
             throw new RuntimeException("You should pass a directory here");
         }
         final StringBuilder command = new StringBuilder(50);
         command.append("ls -lnpe");
-        if (Settings.showHidden) {
+        if (settings.showHidden()) {
             command.append('A');
         }
         command.append(' ');

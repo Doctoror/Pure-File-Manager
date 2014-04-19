@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.tasks;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.docd.purefm.commandline.ShellHolder;
@@ -27,13 +28,15 @@ import java.util.List;
 
 public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, Void> {
 
-    public static AbstractSearchTask create(@NonNull final GenericFile startDirectory,
+    public static AbstractSearchTask create(@NonNull final Context context,
+                                            @NonNull final GenericFile startDirectory,
                                             @NonNull final SearchTaskListener listener) {
         AbstractSearchTask task = null;
-        if (Settings.useCommandLine) {
+        final Settings settings = Settings.getInstance(context);
+        if (settings.useCommandLine()) {
             final Shell shell = ShellHolder.getShell();
             if (shell != null) {
-                task = new SearchCommandLineTask(shell, startDirectory, listener);
+                task = new SearchCommandLineTask(shell, settings, startDirectory, listener);
             }
         }
         if (task == null) {

@@ -74,7 +74,7 @@ public final class JavaFileTest extends AndroidTestCase {
         // init what application inits
         final Context context = this.getContext();
         PFMTextUtils.init(context);
-        Settings.useCommandLine = false;
+        Settings.sUseCommandLine = false;
         test();
         test1.delete();
         test();

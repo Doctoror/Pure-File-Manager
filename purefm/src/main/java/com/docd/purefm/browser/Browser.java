@@ -52,6 +52,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
     private static Handler sHandler;
     private final Context mContext;
+    private final Settings mSettings;
 
     public interface OnNavigateListener {
         void onNavigate(GenericFile path);
@@ -76,12 +77,13 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             sHandler = new Handler(activity.getMainLooper());
         }
         mContext = activity;
+        mSettings = Settings.getInstance(activity);
         mHistoryEnabled = historyEnabled;
         mObserverCache = FileObserverCache.getInstance();
         mHistory = new ArrayDeque<>(historyEnabled ? 15 : 0);
 
-        final String home = Settings.getHomeDirectory(activity);
-        mInitialPathTask = new ResolveInitialPathTask(this, home);
+        final String home = Settings.getInstance(activity).getHomeDirectory();
+        mInitialPathTask = new ResolveInitialPathTask(this, mSettings, home);
         mInitialPathTask.execute();
     }
 
@@ -112,7 +114,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                 mPreviousPath != null ? mPreviousPath.getAbsolutePath() : null);
     }
 
-    public void restoreState(final Parcelable state) {
+    public void restoreState(@Nullable final Parcelable state) {
         final SavedState savedState = (SavedState) state;
         if (savedState != null) {
             mHistory.clear();
@@ -121,7 +123,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
             if (savedState.mCurrentPath != null) {
                 final GenericFile savedStateCurrentFile = FileFactory.newFile(
-                        savedState.mCurrentPath);
+                        mSettings, savedState.mCurrentPath);
                 if (savedStateCurrentFile.exists() &&
                         savedStateCurrentFile.isDirectory()) {
                     mCurrentPath = savedStateCurrentFile;
@@ -130,7 +132,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
             if (savedState.mPreviousPath != null) {
                 final GenericFile savedStatePreviousFile = FileFactory.newFile(
-                        savedState.mPreviousPath);
+                        mSettings, savedState.mPreviousPath);
                 if (savedStatePreviousFile.exists() &&
                         savedStatePreviousFile.isDirectory()) {
                     mPreviousPath = savedStatePreviousFile;
@@ -227,9 +229,9 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     public boolean back() {
         cancelInitialPathLoading();
         if (!this.mHistory.isEmpty()) {
-            GenericFile f = FileFactory.newFile(mHistory.pop());
+            GenericFile f = FileFactory.newFile(mSettings, mHistory.pop());
             while (!this.mHistory.isEmpty() && !f.exists()) {
-                f = FileFactory.newFile(this.mHistory.pop());
+                f = FileFactory.newFile(mSettings, this.mHistory.pop());
             }
             if (f.exists() && f.isDirectory()) {
                 this.navigate(f, false);
@@ -291,7 +293,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
             this.mPreviousPath = previousPath;
         }
 
-        @SuppressWarnings("Unchecked")
+        @SuppressWarnings("unchecked")
         SavedState(final Parcel source) {
             this.mHistory = (ArrayDeque<String>) source.readSerializable();
             this.mCurrentPath = source.readString();
@@ -328,10 +330,13 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
         private final WeakReference<Browser> mBrowserReference;
         private final String mHomeDirectory;
+        private final Settings mSettings;
 
         private ResolveInitialPathTask(@NonNull final Browser browser,
+                                       @NonNull final Settings settings,
                                        @Nullable final String homeDirectory) {
             this.mBrowserReference = new WeakReference<>(browser);
+            this.mSettings = settings;
             this.mHomeDirectory = homeDirectory;
         }
 
@@ -339,7 +344,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         protected GenericFile doInBackground(Void... params) {
             GenericFile initialFile = null;
             if (mHomeDirectory != null) {
-                final GenericFile currentFile = FileFactory.newFile(mHomeDirectory);
+                final GenericFile currentFile = FileFactory.newFile(mSettings, mHomeDirectory);
                 if (currentFile.exists() && currentFile.isDirectory()) {
                     initialFile = currentFile;
                 }
@@ -348,11 +353,13 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                 final String state = Environment.getExternalStorageState();
                 if (state.equals(Environment.MEDIA_MOUNTED) ||
                         state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-                    initialFile = FileFactory.newFile(Environment.getExternalStorageDirectory());
+                    initialFile = FileFactory.newFile(mSettings,
+                            Environment.getExternalStorageDirectory());
                 }
             }
             if (initialFile == null) {
-                initialFile = FileFactory.newFile(com.docd.purefm.Environment.sRootDirectory.getAbsolutePath());
+                initialFile = FileFactory.newFile(mSettings,
+                        com.docd.purefm.Environment.sRootDirectory.getAbsolutePath());
             }
             return initialFile;
         }

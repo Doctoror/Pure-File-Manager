@@ -87,7 +87,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");
         }
-        Settings.useCommandLine = true;
+        Settings.sUseCommandLine = true;
 
         testAgainstJavaIoFile(shell);
         testFileReading(shell);
@@ -119,7 +119,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
             throw new RuntimeException("Failed to create test file: " + e);
         }
 
-        Settings.useCommandLine = true;
+        Settings.sUseCommandLine = true;
         file1 = CommandLineFile.fromFile(shell, test1);
         testAgainstJavaIoFile(file1, test1, true);
 

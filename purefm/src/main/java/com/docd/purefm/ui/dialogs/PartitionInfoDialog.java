@@ -55,14 +55,21 @@ public final class PartitionInfoDialog extends DialogFragment {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         final Bundle args = this.getArguments();
+        if (args == null) {
+            throw new RuntimeException(
+                    "Arguments were not supplied. The DialogFragment should be obtained by instantiate(GenericFile) method");
+        }
         this.mFile = (GenericFile) args.getSerializable(Extras.EXTRA_FILE);
     }
     
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final Activity activity = this.getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return null;
+        }
         mView = activity.getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setIcon(ThemeUtils.getDrawable(activity, R.attr.ic_menu_info));
+        builder.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_info));
         builder.setTitle(R.string.menu_partition);
         builder.setView(mView);
         builder.setNeutralButton(R.string.close, null);

@@ -383,6 +383,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

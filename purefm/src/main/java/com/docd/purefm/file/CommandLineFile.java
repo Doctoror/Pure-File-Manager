@@ -44,6 +44,7 @@ import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
 import com.docd.purefm.commandline.ShellHolder;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.PFMTextUtils;
 import com.stericson.RootTools.execution.Shell;
@@ -66,6 +67,9 @@ public final class CommandLineFile implements GenericFile,
     private static final int LS_TIME = 8;
     private static final int LS_YEAR = 9;
     private static final int LS_FILE = 10;
+
+    @NonNull
+    private final Settings mSettings;
 
     @NonNull
     private final File mFile;
@@ -92,7 +96,9 @@ public final class CommandLineFile implements GenericFile,
      * @param file File
      */
     private CommandLineFile(@NonNull final Shell shell,
+                            @NonNull final Settings settings,
                             @NonNull final File file) {
+        this.mSettings = settings;
         this.mFile = file;
         this.mCanonicalPath = CommandReadlink.readlink(shell, file.getAbsolutePath());
     }
@@ -104,8 +110,10 @@ public final class CommandLineFile implements GenericFile,
      * @param path File path
      */
     private CommandLineFile(@NonNull final Shell shell,
+                            @NonNull final Settings settings,
                             @NonNull final String path) {
         this.mFile = new File(path);
+        this.mSettings = settings;
         this.mCanonicalPath = CommandReadlink.readlink(shell, path);
     }
 
@@ -118,8 +126,10 @@ public final class CommandLineFile implements GenericFile,
      * @param name file name
      */
     private CommandLineFile(@NonNull final Shell shell,
+                            @NonNull final Settings settings,
                             @NonNull File parent,
                             @NonNull String name) {
+        this.mSettings = settings;
         this.mFile = new File(parent, name);
         this.mCanonicalPath = CommandReadlink.readlink(shell, mFile.getAbsolutePath());
     }
@@ -130,7 +140,9 @@ public final class CommandLineFile implements GenericFile,
      *
      * @param path File path
      */
-    private CommandLineFile(@NonNull String path) {
+    private CommandLineFile(@NonNull final Settings settings,
+                            @NonNull String path) {
+        this.mSettings = settings;
         this.mFile = new File(path);
         String canonicalPath;
         try {
@@ -147,8 +159,11 @@ public final class CommandLineFile implements GenericFile,
      * @param path File path
      * @param canonicalPath Canonical File path
      */
-    private CommandLineFile(@NonNull final String path,
+    @SuppressWarnings("NullableProblems")
+    private CommandLineFile(@NonNull final Settings settings,
+                            @NonNull final String path,
                             @NonNull final String canonicalPath) {
+        this.mSettings = settings;
         this.mFile = new File(path);
         this.mCanonicalPath = canonicalPath;
     }
@@ -164,19 +179,22 @@ public final class CommandLineFile implements GenericFile,
 
     @NonNull
     public static CommandLineFile fromFile(@NonNull final Shell shell,
+                                           @NonNull final Settings settings,
                                            @NonNull final File file) {
-        final List<String> res = CommandLine.executeForResult(shell, new CommandListFile(file));
+        final List<String> res = CommandLine.executeForResult(shell,
+                new CommandListFile(file, settings));
 
         if (res == null || res.isEmpty()) {
             // file not yet exists
-            return new CommandLineFile(shell, file);
+            return new CommandLineFile(shell, settings, file);
         }
 
-        return fromLSL(shell, null, res.get(0));
+        return fromLSL(shell, settings, null, res.get(0));
     }
 
     @NonNull
     public static CommandLineFile fromLSL(@NonNull final Shell shell,
+                                          @NonNull final Settings settings,
                                           @Nullable final File parent,
                                           @NonNull final String line) {
 
@@ -203,12 +221,12 @@ public final class CommandLineFile implements GenericFile,
         final CommandLineFile f;
         if (parent == null) {
             if (canonicalPath != null) {
-                f = new CommandLineFile(name, canonicalPath);
+                f = new CommandLineFile(settings, name, canonicalPath);
             } else {
-                f = new CommandLineFile(shell, name);
+                f = new CommandLineFile(shell, settings, name);
             }
         } else {
-            f = new CommandLineFile(shell, parent, name);
+            f = new CommandLineFile(shell, settings, parent, name);
         }
         init(f, line);
         return f;
@@ -295,7 +313,7 @@ public final class CommandLineFile implements GenericFile,
         c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(attrs[LS_DAY_OF_MONTH]));
 
         final int index1 = attrs[LS_TIME].indexOf(':');
-        final int index2 = attrs[LS_TIME].lastIndexOf(':');
+        final int index2        = attrs[LS_TIME].lastIndexOf(':');
         if (index1 != -1 && index2 != -1) {
             c.set(Calendar.HOUR_OF_DAY,
                     Integer.parseInt(attrs[LS_TIME].substring(0, index1)));
@@ -383,7 +401,7 @@ public final class CommandLineFile implements GenericFile,
             return null;
         }
         final List<String> result = CommandLine.executeForResult(shell,
-                new CommandListContents(this));
+                new CommandListContents(this, mSettings));
         if (result == null) {
             return null;
         }
@@ -391,7 +409,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (final String f : result) {
             try {
-                res.add(CommandLineFile.fromLSL(shell, this.mFile, f));
+                res.add(CommandLineFile.fromLSL(shell, mSettings, this.mFile, f));
             } catch (IllegalArgumentException e) {
                 //e.printStackTrace();
                 // not a valid ls -l file line
@@ -417,7 +435,7 @@ public final class CommandLineFile implements GenericFile,
             return null;
         }
         final List<String> result = CommandLine.executeForResult(shell,
-                new CommandListContents(this));
+                new CommandListContents(this, mSettings));
         if (result == null) {
             return null;
         }
@@ -425,7 +443,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mSettings, mFile, f);
                 if (filter.accept(tmp.toFile())) {
                     res.add(tmp);
                 }
@@ -453,7 +471,7 @@ public final class CommandLineFile implements GenericFile,
             return null;
         }
         final List<String> result = CommandLine.executeForResult(shell,
-                new CommandListContents(this));
+                new CommandListContents(this, mSettings));
         if (result == null) {
             return null;
         }
@@ -461,7 +479,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mSettings, mFile, f);
                 if (filter.accept(mFile, tmp.getName())) {
                     res.add(tmp);
                 }
@@ -489,7 +507,7 @@ public final class CommandLineFile implements GenericFile,
             return null;
         }
         final List<String> result = CommandLine.executeForResult(shell,
-                new CommandListContents(this));
+                new CommandListContents(this, mSettings));
         if (result == null) {
             return null;
         }
@@ -497,7 +515,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mSettings, mFile, f);
                 if (filter.accept(tmp)) {
                     res.add(tmp);
                 }
@@ -519,6 +537,7 @@ public final class CommandLineFile implements GenericFile,
         final GenericFile[] files = listFiles();
         if (files != null) {
             final String[] result = new String[files.length];
+            //noinspection LoopStatementThatDoesntLoop
             for (int i = 0; i < result.length; i++) {
                 result[i] = files[i].getName();
                 return result;
@@ -571,7 +590,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(shell,
                 new CommandTouch(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(CommandLineFile.fromFile(shell, mFile));
+            this.apply(CommandLineFile.fromFile(shell, mSettings, mFile));
             return true;
         }
         throw new IOException("Could not create file+");
@@ -590,7 +609,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(shell,
                 new CommandMkdir(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(CommandLineFile.fromFile(shell, mFile));
+            this.apply(CommandLineFile.fromFile(shell, mSettings, mFile));
         }
         return result;
     }
@@ -608,7 +627,7 @@ public final class CommandLineFile implements GenericFile,
         final boolean result = CommandLine.execute(shell,
                 new CommandMkdirs(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(CommandLineFile.fromFile(shell, mFile));
+            this.apply(CommandLineFile.fromFile(shell, mSettings, mFile));
         }
         return result;
     }
@@ -621,7 +640,7 @@ public final class CommandLineFile implements GenericFile,
      * @return true, if this file points to the same location
      */
     @Override
-    public int compareTo(GenericFile arg0) {
+    public int compareTo(@NonNull final GenericFile arg0) {
         return this.mFile.compareTo(arg0.toFile());
     }
 
@@ -671,12 +690,13 @@ public final class CommandLineFile implements GenericFile,
         if (mFile.getAbsolutePath().equals(canonicalPath)) {
             return this;
         }
-        return new CommandLineFile(canonicalPath);
+        return new CommandLineFile(mSettings, canonicalPath);
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -738,7 +758,7 @@ public final class CommandLineFile implements GenericFile,
             Log.w(LOG_TAG, "getParentFile(): shell is null");
             return null;
         }
-        return CommandLineFile.fromFile(shell, parentFile);
+        return CommandLineFile.fromFile(shell, mSettings, parentFile);
     }
 
     /**
@@ -761,7 +781,7 @@ public final class CommandLineFile implements GenericFile,
      * {@inheritDoc}
      */
     @Override
-    public boolean renameTo(final GenericFile newName) {
+    public boolean renameTo(@NonNull final GenericFile newName) {
         final Shell shell = ShellHolder.getShell();
         if (shell == null) {
             Log.w(LOG_TAG, "renameTo(): shell is null");
@@ -792,7 +812,7 @@ public final class CommandLineFile implements GenericFile,
      * {@inheritDoc}
      */
     @Override
-    public boolean applyPermissions(final Permissions newPerm) {
+    public boolean applyPermissions(@NonNull final Permissions newPerm) {
         if (this.mPermissions.equals(newPerm)) {
             return true;
         }
@@ -813,7 +833,7 @@ public final class CommandLineFile implements GenericFile,
      * {@inheritDoc}
      */
     @Override
-    public boolean copy(final GenericFile target) {
+    public boolean copy(@NonNull final GenericFile target) {
         if (!this.mExists) {
             return false;
         }
@@ -830,7 +850,7 @@ public final class CommandLineFile implements GenericFile,
      * {@inheritDoc}
      */
     @Override
-    public boolean move(final GenericFile target) {
+    public boolean move(@NonNull final GenericFile target) {
         if (!this.mExists) {
             return false;
         }

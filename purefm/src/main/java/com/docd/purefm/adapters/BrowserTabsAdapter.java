@@ -173,6 +173,7 @@ public final class BrowserTabsAdapter extends FragmentStatePagerAdapter {
             this.mFragmentStates = new HashMap<>();
         }
 
+        @SuppressWarnings("unchecked")
         BrowserTabsAdapterState(final Parcel source) {
             this.mFragmentStates = source.readHashMap(HashMap.class.getClassLoader());
             this.mCurrentPage = source.readInt();

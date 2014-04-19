@@ -37,7 +37,8 @@ public final class PreviewHolder {
 
     public static PreviewHolder getInstance(@NonNull final Context context) {
         if (sInstance == null) {
-            sInstance = new PreviewHolder(context);
+            //noinspection ConstantConditions
+            sInstance = new PreviewHolder(context.getApplicationContext());
         }
         return sInstance;
     }

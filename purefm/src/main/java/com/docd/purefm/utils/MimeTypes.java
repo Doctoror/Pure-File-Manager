@@ -20,6 +20,8 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
+
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -365,9 +367,11 @@ public final class MimeTypes {
         MIME_TYPES.put("mkv", "video/x-matroska");
         
     }
-    
+
+    @DrawableRes
     public static int getIconForExt(String ext) {
         final Integer res = EXT_ICONS.get(ext);
+        //noinspection ResourceType
         return res == null ? 0 : res.intValue();
     }
     

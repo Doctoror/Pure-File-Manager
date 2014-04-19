@@ -30,8 +30,6 @@ import android.support.annotation.Nullable;
 public final class DirectoryScanTask extends
         AsyncTask<GenericFile, Void, GenericFile[]> {
 
-    private static final ListFileFilter sFilter;
-
     @NonNull
     private final BrowserBaseAdapter mBrowserAdapter;
 
@@ -40,21 +38,21 @@ public final class DirectoryScanTask extends
 
     @NonNull
     private final SwipeRefreshLayout[] mSwipeRefreshLayouts;
+
+    private final ListFileFilter mFileFilter;
     
     private GenericFile mFile;
-    
-    static {
-        sFilter = new ListFileFilter();
-    }
 
     public DirectoryScanTask(@NonNull final Browser browser,
                              @Nullable final String mimeType,
                              @NonNull final BrowserBaseAdapter adapter,
+                             @NonNull final Settings settings,
                              @NonNull final SwipeRefreshLayout... refreshLayouts) {
-        this.mBrowser = browser;
-        this.mSwipeRefreshLayouts = refreshLayouts;
-        this.mBrowserAdapter = adapter;
-        sFilter.setMimeType(mimeType);
+        mBrowser = browser;
+        mSwipeRefreshLayouts = refreshLayouts;
+        mBrowserAdapter = adapter;
+        mFileFilter = new ListFileFilter(settings.showHidden());
+        mFileFilter.setMimeType(mimeType);
     }
 
     @Override
@@ -67,7 +65,7 @@ public final class DirectoryScanTask extends
     @Override
     protected GenericFile[] doInBackground(GenericFile... arg0) {
         this.mFile = arg0[0];
-        return arg0[0].listFiles(sFilter);
+        return arg0[0].listFiles(mFileFilter);
     }
 
     @Override
@@ -94,7 +92,10 @@ public final class DirectoryScanTask extends
         private String mType;
         private boolean mAcceptAll;
 
-        protected ListFileFilter() {
+        private final boolean mShowHidden;
+
+        protected ListFileFilter(final boolean showHidden) {
+            mShowHidden = showHidden;
         }
         
         protected void setMimeType(String type) {
@@ -103,8 +104,8 @@ public final class DirectoryScanTask extends
         }
 
         @Override
-        public boolean accept(GenericFile pathname) {
-            if (!Settings.showHidden && pathname.isHidden()) {
+        public boolean accept(final GenericFile pathname) {
+            if (!mShowHidden && pathname.isHidden()) {
                 return false;
             }
             if (this.mType == null) {

@@ -16,7 +16,6 @@ package com.docd.purefm.adapters;
 
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.view.OverlayImageView;
 
 import android.app.Activity;
@@ -47,7 +46,10 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
         Holder h;
         
         if (v == null) {
-            v = this.mLayoutInflater.inflate(R.layout.grid_item_file, null);
+            v = this.mLayoutInflater.inflate(R.layout.grid_item_file, arg2, false);
+            if (v == null) {
+                throw new RuntimeException("Inflated view is null");
+            }
             h = new Holder();
             h.mIcon = (OverlayImageView) v.findViewById(android.R.id.icon);
             h.mTitle = (TextView) v.findViewById(android.R.id.title);
@@ -61,7 +63,7 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
                 R.drawable.ic_fso_default);
         this.applyOverlay(f, h.mIcon);
         
-        if (Settings.showPreviews) {
+        if (mSettings.showPreviews()) {
             loadPreview(f, h.mIcon);
         }
         h.mTitle.setText(f.getName());
