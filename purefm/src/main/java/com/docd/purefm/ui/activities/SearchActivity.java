@@ -50,7 +50,7 @@ import android.support.annotation.NonNull;
  * Activity used for Searching files.
  * @author Doctoror
  */
-public final class SearchActivity extends ActionBarIconMonitoredActivity
+public final class SearchActivity extends ActionBarIconThemableActivity
         implements AbstractSearchTask.SearchTaskListener {
 
     private ActionModeController mActionModeController;

@@ -14,10 +14,10 @@
  */
 package com.docd.purefm.tasks;
 
+import android.app.Activity;
 import android.widget.Toast;
 
 import com.docd.purefm.operations.OperationsService;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 
 import android.support.annotation.NonNull;
 
@@ -33,7 +33,7 @@ public final class CreateFileTask extends OperationTask<String, CharSequence> {
     @NonNull
     private final File mParentDir;
 
-    public CreateFileTask(@NonNull MonitoredActivity activity, @NonNull final File parent) {
+    public CreateFileTask(@NonNull Activity activity, @NonNull final File parent) {
         super(activity);
         mParentDir = parent;
     }

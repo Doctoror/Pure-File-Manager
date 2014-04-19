@@ -16,11 +16,11 @@ package com.docd.purefm.tasks;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.Dialog;
 
 import com.docd.purefm.R;
 import com.docd.purefm.operations.OperationsService;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
@@ -34,7 +34,7 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
     @NonNull
     private final GenericFile mTarget;
 
-    protected PasteTask(@NonNull final MonitoredActivity activity,
+    protected PasteTask(@NonNull final Activity activity,
                         @NonNull final GenericFile target) {
         super(activity);
         this.mTarget = target;

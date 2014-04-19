@@ -14,11 +14,11 @@
  */
 package com.docd.purefm.tasks;
 
+import android.app.Activity;
 import android.widget.Toast;
 
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 
 import android.support.annotation.NonNull;
 
@@ -35,7 +35,7 @@ public final class RenameFileTask extends OperationTask<Void, CharSequence> {
     @NonNull
     private final String mTargetName;
 
-    public RenameFileTask(@NonNull final MonitoredActivity activity,
+    public RenameFileTask(@NonNull final Activity activity,
                           @NonNull final GenericFile source,
                           @NonNull final String targetName) {
         super(activity);

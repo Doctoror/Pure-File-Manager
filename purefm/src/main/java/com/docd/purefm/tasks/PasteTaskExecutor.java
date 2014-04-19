@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.util.Log;
 import android.view.View;
@@ -28,7 +29,6 @@ import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandExists;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
@@ -40,7 +40,7 @@ import android.support.annotation.NonNull;
 public final class PasteTaskExecutor implements OnClickListener {
 
     @NonNull
-    private final WeakReference<MonitoredActivity> mActivityReference;
+    private final WeakReference<Activity> mActivityReference;
 
     @NonNull
     private final GenericFile mTargetFile;
@@ -53,7 +53,7 @@ public final class PasteTaskExecutor implements OnClickListener {
 
     private GenericFile mCurrentFile;
     
-    public PasteTaskExecutor(@NonNull final MonitoredActivity activity,
+    public PasteTaskExecutor(@NonNull final Activity activity,
                              @NonNull final GenericFile targetFile) {
         this.mActivityReference = new WeakReference<>(activity);
         this.mTargetFile = targetFile;
@@ -131,7 +131,7 @@ public final class PasteTaskExecutor implements OnClickListener {
         next();
     }   
     private void next() {
-        final MonitoredActivity activity = this.mActivityReference.get();
+        final Activity activity = this.mActivityReference.get();
         if (activity != null) {
             if (mExisting.isEmpty()) {
             

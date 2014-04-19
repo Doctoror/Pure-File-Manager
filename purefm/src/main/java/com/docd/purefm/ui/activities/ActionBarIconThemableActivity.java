@@ -29,7 +29,7 @@ import com.docd.purefm.settings.Settings;
  *
  * @author Doctoror
  */
-public abstract class ActionBarIconMonitoredActivity extends MonitoredActivity {
+public abstract class ActionBarIconThemableActivity extends ThemableActivity {
 
     /**
      * Default Activity icon

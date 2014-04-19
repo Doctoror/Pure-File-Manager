@@ -15,7 +15,7 @@
 package com.docd.purefm.settings;
 
 import com.docd.purefm.R;
-import com.docd.purefm.ui.activities.ActionBarIconMonitoredActivity;
+import com.docd.purefm.ui.activities.ActionBarIconThemableActivity;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -23,7 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-public final class SettingsActivity extends ActionBarIconMonitoredActivity {
+public final class SettingsActivity extends ActionBarIconThemableActivity {
 
     private boolean needInvalidate;
 

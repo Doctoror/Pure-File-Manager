@@ -16,12 +16,14 @@ package com.docd.purefm.ui.dialogs;
 
 import java.io.File;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.widget.EditText;
@@ -29,7 +31,6 @@ import android.widget.EditText;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.tasks.CreateFileTask;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PFMFileUtils;
 
 public final class CreateFileDialog extends DialogFragment {
@@ -47,7 +48,10 @@ public final class CreateFileDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final MonitoredActivity activity = (MonitoredActivity) getActivity();
+        final Activity activity = getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return null;
+        }
         this.buildEditText(activity);
         final File current = (File) this.getArguments().getSerializable(Extras.EXTRA_CURRENT_DIR);
         final AlertDialog.Builder b = new AlertDialog.Builder(activity);
@@ -68,7 +72,7 @@ public final class CreateFileDialog extends DialogFragment {
         return b.create();
     }
 
-    private void buildEditText(final Context context) {
+    private void buildEditText(@NonNull final Context context) {
         mFileNameInput = (EditText) LayoutInflater.from(
                 context).inflate(R.layout.text_field_filename, null);
         mFileNameInput.setHint(R.string.menu_new_file);

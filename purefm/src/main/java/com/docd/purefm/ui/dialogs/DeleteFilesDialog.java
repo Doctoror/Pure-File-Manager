@@ -21,21 +21,23 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.DeleteTask;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PFMTextUtils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.method.ScrollingMovementMethod;
 import android.view.ActionMode;
 import android.widget.TextView;
 
 public final class DeleteFilesDialog extends DialogFragment {
     
-    public static DeleteFilesDialog newInstance(ActionMode mode, List<GenericFile> files) {
+    public static DeleteFilesDialog newInstance(@NonNull final ActionMode mode,
+                                                @NonNull final List<GenericFile> files) {
         final GenericFile[] extraFiles = new GenericFile[files.size()];
         files.toArray(extraFiles);
         final Bundle extras = new Bundle();
@@ -55,6 +57,9 @@ public final class DeleteFilesDialog extends DialogFragment {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         final Bundle extras = this.getArguments();
+        if (extras == null) {
+            throw new IllegalArgumentException("Arguments not supplied");
+        }
         final Object[] o = (Object[]) extras.getSerializable(Extras.EXTRA_FILE);
         this.files = new GenericFile[o.length];
         for (int i = 0; i < o.length; i++) {
@@ -64,7 +69,10 @@ public final class DeleteFilesDialog extends DialogFragment {
     
     @Override
     public Dialog onCreateDialog(Bundle state) {
-        final MonitoredActivity a = (MonitoredActivity) getActivity();
+        final Activity a = getActivity();
+        if (a == null || a.isFinishing()) {
+            return null;
+        }
         final AlertDialog.Builder b = new AlertDialog.Builder(a);
         b.setTitle(R.string.dialog_delete_title);
         

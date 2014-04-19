@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.tasks;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +23,6 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.docd.purefm.operations.OperationsService;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 
 import android.support.annotation.NonNull;
 
@@ -35,11 +35,10 @@ import java.io.Serializable;
  * @param <Param> type of objects that will be passed to {@link #startService(Object[])}
  * @param <Result> type of object that will be delivered in {@link #onPreExecute()}
  */
-public abstract class OperationTask<Param, Result> implements
-        MonitoredActivity.OnStopListener {
+public abstract class OperationTask<Param, Result> {
 
     @NonNull
-    protected final MonitoredActivity mActivity;
+    protected final Activity mActivity;
 
     @NonNull
     private final LocalBroadcastManager mBroadcastManager;
@@ -47,14 +46,14 @@ public abstract class OperationTask<Param, Result> implements
     @NonNull
     private final OperationReceiver mOperationReceiver;
 
-    protected OperationTask(@NonNull final MonitoredActivity activity) {
+    protected OperationTask(@NonNull final Activity activity) {
         mActivity = activity;
         mBroadcastManager = LocalBroadcastManager.getInstance(activity);
         mOperationReceiver = new OperationReceiver();
     }
 
+    @SafeVarargs
     public final void execute(@NonNull final Param... params) {
-        mActivity.setOnStopListener(this);
         mBroadcastManager.registerReceiver(mOperationReceiver, new IntentFilter(
                 OperationsService.BROADCAST_OPERATION_COMPLETED));
         onPreExecute();
@@ -77,11 +76,6 @@ public abstract class OperationTask<Param, Result> implements
 
     protected void onPostExecute(Result result) {
 
-    }
-
-    @Override
-    public void onActivityStop(MonitoredActivity activity) {
-        mBroadcastManager.unregisterReceiver(mOperationReceiver);
     }
 
     private final class OperationReceiver extends BroadcastReceiver {

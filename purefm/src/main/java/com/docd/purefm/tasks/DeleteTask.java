@@ -16,11 +16,11 @@ package com.docd.purefm.tasks;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.Dialog;
 
 import com.docd.purefm.R;
 import com.docd.purefm.operations.OperationsService;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.PFMTextUtils;
@@ -35,7 +35,7 @@ import android.support.annotation.NonNull;
 public final class DeleteTask extends
         OperationTask<GenericFile, ArrayList<GenericFile>> {
 
-    public DeleteTask(@NonNull final MonitoredActivity activity) {
+    public DeleteTask(@NonNull final Activity activity) {
         super(activity);
     }
 
@@ -69,8 +69,8 @@ public final class DeleteTask extends
 
     private void finish(@NonNull final ArrayList<GenericFile> failed) {
         if (!failed.isEmpty()) {
-            final Dialog dialog = MessageDialogBuilder.create(mActivity, R.string.dialog_delete_failed,
-                    PFMTextUtils.fileListToDashList(failed));
+            final Dialog dialog = MessageDialogBuilder.create(mActivity,
+                    R.string.dialog_delete_failed, PFMTextUtils.fileListToDashList(failed));
             if (!mActivity.isFinishing()) {
                 dialog.show();
             }

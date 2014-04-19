@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.ui.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -28,7 +29,6 @@ import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.tasks.RenameFileTask;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PFMFileUtils;
 
 public final class RenameFileDialog extends DialogFragment {
@@ -81,18 +81,20 @@ public final class RenameFileDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                final MonitoredActivity a = (MonitoredActivity) getActivity();
-                CharSequence newNameField = text.getText();
-                String newName = newNameField.toString().trim();
-                if (newName.isEmpty()) {
-                    newName = text.getHint().toString();
-                }
-                if (!newName.equals(mSource.getName())) {
-                    if (mActionMode != null) {
-                        mActionMode.finish();
+                final Activity a = getActivity();
+                if (a != null) {
+                    CharSequence newNameField = text.getText();
+                    String newName = newNameField.toString().trim();
+                    if (newName.isEmpty()) {
+                        newName = text.getHint().toString();
                     }
+                    if (!newName.equals(mSource.getName())) {
+                        if (mActionMode != null) {
+                            mActionMode.finish();
+                        }
 
-                    new RenameFileTask(a, mSource, newName).execute();
+                        new RenameFileTask(a, mSource, newName).execute();
+                    }
                 }
             }
         });

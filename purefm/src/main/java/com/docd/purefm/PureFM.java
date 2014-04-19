@@ -18,24 +18,29 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PFMTextUtils;
 import com.stericson.RootTools.RootTools;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 
 public final class PureFM extends Application implements
-        ActivityMonitor.OnActivitiesOpenedListener {
+        Application.ActivityLifecycleCallbacks {
 
     public static final int THEME_ID_LIGHT = 1;
     public static final int THEME_ID_DARK = 2;
 
+    private int mActivityStartedCount;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        ActivityMonitor.init(this);
         RootTools.handlerEnabled = false;
         RootTools.debugMode = BuildConfig.DEBUG;
         Environment.init(this);
         Settings.init(this, getResources());
         PFMTextUtils.init(this);
         ensureNoShellUsedIfNoBusybox();
-        ActivityMonitor.addOnActivitiesOpenedListener(this);
+        registerActivityLifecycleCallbacks(this);
     }
 
     private void ensureNoShellUsedIfNoBusybox() {
@@ -50,24 +55,40 @@ public final class PureFM extends Application implements
     }
 
     @Override
-    public void onActivitiesStarted() {
-        //rescan for environment changes
-        Environment.init(this);
-        ensureNoShellUsedIfNoBusybox();
-    }
-
-    @Override
-    public void onActivitiesStopped() {
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
     }
 
     @Override
-    public void onActivitiesCreated() {
+    public void onActivityStarted(Activity activity) {
+        if (++mActivityStartedCount == 1) {
+            //rescan for environment changes
+            ensureNoShellUsedIfNoBusybox();
+        }
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
 
     }
 
     @Override
-    public void onActivitiesDestroyed() {
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+        mActivityStartedCount--;
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
 
     }
 }

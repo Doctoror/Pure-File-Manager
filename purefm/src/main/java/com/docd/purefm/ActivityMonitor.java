@@ -14,129 +14,135 @@
  */
 package com.docd.purefm;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.app.Activity;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-
+import android.app.Application;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public final class ActivityMonitor
-{
-    private static final long DELAY_CLOSED = 300;
-    
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-    private static volatile int sCreated;
-    private static volatile int sStarted;
-    
-    public interface OnActivitiesOpenedListener {
-        void onActivitiesCreated();
-        void onActivitiesStarted();
-        void onActivitiesStopped();
-        void onActivitiesDestroyed();
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+public final class ActivityMonitor implements Application.ActivityLifecycleCallbacks {
+
+    private static ActivityMonitor sInstance;
+
+    static void init(@NonNull final Application application) {
+        if (sInstance != null) {
+            throw new IllegalStateException("ActivityMonitor is already initialized");
+        }
+        sInstance = new ActivityMonitor(application);
     }
 
-    private static final Object LISTENERS_LOCK = new Object();
-    private static Set<OnActivitiesOpenedListener> sListeners;
-    
-    static {
-        sListeners = new HashSet<>();
-    }
-    
-    public static void addOnActivitiesOpenedListener(
-            @NonNull final OnActivitiesOpenedListener l) {
-        synchronized (LISTENERS_LOCK) {
-            sListeners.add(l);
+    @NonNull
+    public static ActivityMonitor getInstance() {
+        if (sInstance == null) {
+            throw new IllegalStateException("ActivityMonitor was not initialized");
         }
-    }
-    
-    public static void removeOnActivitiesOpenedListener(
-            @NonNull final OnActivitiesOpenedListener l) {
-        synchronized (LISTENERS_LOCK) {
-            sListeners.remove(l);
-        }
-    }
-    
-    private static final Runnable sOnActivitiesStoppedRunnable = new Runnable() {
-        @Override
-        public void run() {
-            synchronized (LISTENERS_LOCK) {
-                if (BuildConfig.DEBUG) {
-                    Log.d("ActivityMonitor", "Activities stopped");
-                }
-                for (final OnActivitiesOpenedListener listener : sListeners) {
-                    listener.onActivitiesStopped();
-                }
-            }
-        }
-    };
-
-    private static final Runnable sOnActivitiesDestroyedRunnable = new Runnable() {
-        @Override
-        public void run() {
-            synchronized (LISTENERS_LOCK) {
-                if (BuildConfig.DEBUG) {
-                    Log.d("ActivityMonitor", "Activities destroyed");
-                }
-                for (final OnActivitiesOpenedListener listener : sListeners) {
-                    listener.onActivitiesDestroyed();
-                }
-            }
-        }
-    };
-    
-    public static synchronized void onStart(Activity a) {
-        HANDLER.removeCallbacks(sOnActivitiesStoppedRunnable);
-        sStarted++;
-        if (sStarted == 1) {
-            synchronized (LISTENERS_LOCK) {
-                if (BuildConfig.DEBUG) {
-                    Log.d("ActivityMonitor", "Activities started");
-                }
-                for (final OnActivitiesOpenedListener listener : sListeners) {
-                    listener.onActivitiesStarted();
-                }
-            }
-        }
-    }
-    
-    public static synchronized void onStop(Activity a) {
-        HANDLER.removeCallbacks(sOnActivitiesStoppedRunnable);
-        sStarted--;
-        if (sStarted < 0) {
-            throw new IllegalStateException("Number of opened activities is less than zero. Check whether you call ActivityMonitor.onStart in all activities");
-        }
-        if (sStarted == 0) {
-            HANDLER.postDelayed(sOnActivitiesStoppedRunnable, DELAY_CLOSED);
-        }
+        return sInstance;
     }
 
-    public static synchronized void onCreate(Activity a) {
-        HANDLER.removeCallbacks(sOnActivitiesDestroyedRunnable);
-        sCreated++;
-        if (sCreated == 1) {
-            synchronized (LISTENERS_LOCK) {
-                if (BuildConfig.DEBUG) {
-                    Log.d("ActivityMonitor", "Activities created");
-                }
-                for (final OnActivitiesOpenedListener listener : sListeners) {
-                    listener.onActivitiesCreated();
+    public interface ActivityMonitorListener {
+        
+        void onAtLeastOneActivityStarted();
+
+        void onAllActivitiesStopped();
+    }
+
+    private final Collection<WeakReference<ActivityMonitorListener>>
+            mListeners = new LinkedList<>();
+
+    private int mActivityStartedCount;
+
+    public ActivityMonitor(@NonNull final Application application) {
+        application.registerActivityLifecycleCallbacks(this);
+    }
+
+    public synchronized void registerActivityMonitorListener(@NonNull final ActivityMonitorListener l) {
+        final Collection<WeakReference<ActivityMonitorListener>> toRemove = new HashSet<>();
+        try {
+            for (final WeakReference<ActivityMonitorListener> registeredRef : mListeners) {
+                final ActivityMonitorListener registered = registeredRef.get();
+                if (registered == null) {
+                    toRemove.add(registeredRef);
+                } else if (registered == l) {
+                    //already registered
+                    return;
                 }
             }
+        } finally {
+            mListeners.removeAll(toRemove);
+        }
+        mListeners.add(new WeakReference<>(l));
+    }
+
+    public synchronized void unregisterActivityMonitorListener(@NonNull final ActivityMonitorListener l) {
+        final Collection<WeakReference<ActivityMonitorListener>> toRemove = new HashSet<>();
+        for (final WeakReference<ActivityMonitorListener> registeredRef : mListeners) {
+            final ActivityMonitorListener registered = registeredRef.get();
+            if (registered == null || registered == l) {
+                toRemove.add(registeredRef);
+            }
+        }
+        mListeners.removeAll(toRemove);
+    }
+
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+        if (++mActivityStartedCount == 1) {
+            final Collection<WeakReference<ActivityMonitorListener>> toRemove = new HashSet<>();
+            for (final WeakReference<ActivityMonitorListener> registeredRef : mListeners) {
+                final ActivityMonitorListener l = registeredRef.get();
+                if (l != null) {
+                    l.onAtLeastOneActivityStarted();
+                } else {
+                    toRemove.add(registeredRef);
+                }
+            }
+            mListeners.removeAll(toRemove);
         }
     }
 
-    public static synchronized void onDestroy(Activity a) {
-        HANDLER.removeCallbacks(sOnActivitiesDestroyedRunnable);
-        sCreated--;
-        if (sCreated < 0) {
-            throw new IllegalStateException("Number of created activities is less than zero. Check whether you call ActivityMonitor.onCreate in all activities");
+    @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+        if (--mActivityStartedCount == 0) {
+            final Collection<WeakReference<ActivityMonitorListener>> toRemove = new HashSet<>();
+            for (final WeakReference<ActivityMonitorListener> registeredRef : mListeners) {
+                final ActivityMonitorListener l = registeredRef.get();
+                if (l != null) {
+                    l.onAllActivitiesStopped();
+                } else {
+                    toRemove.add(registeredRef);
+                }
+            }
+            mListeners.removeAll(toRemove);
+
         }
-        if (sCreated == 0) {
-            HANDLER.postDelayed(sOnActivitiesDestroyedRunnable, DELAY_CLOSED);
-        }
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+
     }
 }

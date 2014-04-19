@@ -15,6 +15,8 @@
 package com.docd.purefm;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +28,7 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.StorageHelper;
 import com.stericson.RootTools.execution.Shell;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -57,7 +60,7 @@ public final class Environment {
     private static List<StorageHelper.Volume> sVolumes;
     private static List<StorageHelper.StorageVolume> sStorages;
     
-    public static void init(final Context context) {
+    public static void init(final Application context) {
         sContext = context;
         sBusybox = getUtilPath("busybox");
         if (sBusybox == null) {
@@ -65,7 +68,7 @@ public final class Environment {
         }
         sHasRoot = isUtilAvailable("su");
         updateExternalStorageState();
-        ActivityMonitor.addOnActivitiesOpenedListener(sActivityMonitorListener);
+        context.registerActivityLifecycleCallbacks(sActivityMonitorListener);
     }
 
     @NonNull
@@ -216,39 +219,62 @@ public final class Environment {
     
     // =============== ACTIVITY MONITOR ===============
 
-    private static final class ActivityMonitorListener implements ActivityMonitor.OnActivitiesOpenedListener {
+    private static final class ActivityMonitorListener implements
+            Application.ActivityLifecycleCallbacks {
 
         private static final Object LOCK = new Object();
-        private volatile boolean isRegistered;
+        private volatile boolean mIsReceiverRegistered;
+
+        private volatile int mStartedCount;
 
         @Override
-        public void onActivitiesCreated() {
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
         }
 
         @Override
-        public void onActivitiesDestroyed() {
-
-        }
-
-        @Override
-        public void onActivitiesStarted() {
-            synchronized (LOCK) {
-                if (!this.isRegistered) {
-                    sContext.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
-                    this.isRegistered = true;
+        public void onActivityStarted(Activity activity) {
+            if (++mStartedCount == 1) {
+                synchronized (LOCK) {
+                    if (!mIsReceiverRegistered) {
+                        sContext.registerReceiver(externalStorageStateReceiver, ExternalStorageStateReceiver.intentFilter);
+                        mIsReceiverRegistered = true;
+                        updateExternalStorageState();
+                    }
                 }
             }
         }
 
         @Override
-        public void onActivitiesStopped() {
-            synchronized (LOCK) {
-                if (this.isRegistered) {
-                    sContext.unregisterReceiver(externalStorageStateReceiver);
-                    this.isRegistered = false;
+        public void onActivityResumed(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            if (--mStartedCount == 0) {
+                synchronized (LOCK) {
+                    if (this.mIsReceiverRegistered) {
+                        sContext.unregisterReceiver(externalStorageStateReceiver);
+                        this.mIsReceiverRegistered = false;
+                    }
                 }
             }
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+
         }
     }
 }

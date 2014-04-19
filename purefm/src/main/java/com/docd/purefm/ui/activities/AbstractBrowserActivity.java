@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
  *
  * @author Doctoror
  */
-public abstract class AbstractBrowserActivity extends ActionBarIconMonitoredActivity
+public abstract class AbstractBrowserActivity extends ActionBarIconThemableActivity
         implements Browser.OnNavigateListener {
 
     public static final int REQUEST_CODE_SETTINGS = 0;

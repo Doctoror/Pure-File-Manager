@@ -52,7 +52,7 @@ import java.io.Serializable;
  * @author Doctoror
  */
 public final class OperationsService extends MultiWorkerService
-        implements ActivityMonitor.OnActivitiesOpenedListener {
+        implements ActivityMonitor.ActivityMonitorListener {
 
     public static final String BROADCAST_OPERATION_COMPLETED = "OperationsService.broadcasts.OPERATION_COMPLETED";
     public static final String EXTRA_ACTION = "OperationsService.extras.ACTION";
@@ -172,13 +172,13 @@ public final class OperationsService extends MultiWorkerService
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler(getMainLooper());
-        ActivityMonitor.addOnActivitiesOpenedListener(this);
+        ActivityMonitor.getInstance().registerActivityMonitorListener(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ActivityMonitor.removeOnActivitiesOpenedListener(this);
+        ActivityMonitor.getInstance().unregisterActivityMonitorListener(this);
     }
 
     @Override
@@ -235,12 +235,12 @@ public final class OperationsService extends MultiWorkerService
         final GenericFile[] files = new GenericFile[filesObject.length];
         ArrayUtils.copyArrayAndCast(filesObject, files);
         final boolean isMove = pasteIntent.getBooleanExtra(EXTRA_IS_MOVE, false);
-        mPasteOperation = new PasteOperation(getApplicationContext(), target, isMove);
+        mPasteOperation = new PasteOperation(this, target, isMove);
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
                 mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
                         mOperationListener, getOperationMessage(EOperation.PASTE),
-                                getCancelPasteIntent(getApplicationContext()));
+                                getCancelPasteIntent(this));
                 mHandler.removeCallbacks(mPendingOperationEndedRunnable);
                 mHandler.post(mPendingOperationStartedRunnable);
             }
@@ -259,12 +259,12 @@ public final class OperationsService extends MultiWorkerService
 
         final GenericFile[] files = new GenericFile[filesObject.length];
         ArrayUtils.copyArrayAndCast(filesObject, files);
-        mDeleteOperation = new DeleteOperation(getApplicationContext());
+        mDeleteOperation = new DeleteOperation(this);
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
                 mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
                         mOperationListener, getOperationMessage(EOperation.DELETE),
-                                getCancelDeleteIntent(getApplicationContext()));
+                                getCancelDeleteIntent(this));
                 mHandler.removeCallbacks(mPendingOperationEndedRunnable);
                 mHandler.post(mPendingOperationStartedRunnable);
             }
@@ -282,8 +282,9 @@ public final class OperationsService extends MultiWorkerService
                     "ACTION_RENAME intent should contain non-null EXTRA_FILE1 and EXTRA_FILE_NAME");
         }
 
+
         final RenameOperation renameOperation = new RenameOperation(
-                getApplicationContext(), source, target);
+                this, source, target);
         onOperationCompleted(ACTION_RENAME,
                 renameOperation.execute(),
                 renameOperation.isCanceled());
@@ -399,16 +400,12 @@ public final class OperationsService extends MultiWorkerService
     }
 
     @Override
-    public void onActivitiesCreated() {
+    public void onAtLeastOneActivityStarted() {
+        //stub
     }
 
     @Override
-    public void onActivitiesStarted() {
-        //once notification is shown, it's okay to leave it until the operation completed
-    }
-
-    @Override
-    public void onActivitiesStopped() {
+    public void onAllActivitiesStopped() {
         if (mPasteOperation != null) {
             startForeground(EOperation.PASTE);
         } else if (mDeleteOperation != null) {
@@ -416,21 +413,20 @@ public final class OperationsService extends MultiWorkerService
         }
     }
 
-    @Override
-    public void onActivitiesDestroyed() {
-    }
-
-    private void startForeground(@NonNull final EOperation opeartion) {
+    private void startForeground(@NonNull final EOperation operation) {
         final Context context = getApplicationContext();
+        if (context == null) {
+            throw new IllegalStateException("getApplicationContext() returned null");
+        }
         final Notification.Builder b = new Notification.Builder(context);
         b.setContentTitle(getText(R.string.app_name));
         b.setOngoing(true);
         b.setProgress(0, 0, true);
         b.setSmallIcon(R.drawable.ic_stat_notify);
-        b.setContentText(getOperationMessage(opeartion));
+        b.setContentText(getOperationMessage(operation));
         b.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(
                 context, BrowserPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
-        startForeground(opeartion.mId, build(b));
+        startForeground(operation.mId, build(b));
     }
 
     @SuppressWarnings("deprecation")
@@ -531,11 +527,19 @@ public final class OperationsService extends MultiWorkerService
         public void setOperationListener(@Nullable final OperationListener l) {
             if (l != null) {
                 if (mDeleteOperation != null) {
+                    final Context context = getApplicationContext();
+                    if (context == null) {
+                        throw new IllegalStateException("getApplicationContext() returned null");
+                    }
                     l.onOperationStarted(getOperationMessage(EOperation.DELETE),
-                            getCancelDeleteIntent(getApplicationContext()));
+                            getCancelDeleteIntent(context));
                 } else if (mPasteOperation != null) {
+                    final Context context = getApplicationContext();
+                    if (context == null) {
+                        throw new IllegalStateException("getApplicationContext() returned null");
+                    }
                     l.onOperationStarted(getOperationMessage(EOperation.PASTE),
-                            getCancelPasteIntent(getApplicationContext()));
+                            getCancelPasteIntent(context));
                 } else {
                     l.onOperationEnded(null);
                 }

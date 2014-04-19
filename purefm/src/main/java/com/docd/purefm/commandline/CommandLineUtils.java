@@ -19,7 +19,6 @@ import com.docd.purefm.file.Permissions;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
 
-import org.intellij.lang.annotations.Language;
 import android.support.annotation.NonNull;
 
 /**
@@ -31,7 +30,6 @@ public final class CommandLineUtils {
 
     private CommandLineUtils(){}
 
-    @Language("RegExp")
     private static final String UNIX_ESCAPE_EXPRESSION = "(\\(|\\)|\\[|\\]|\\s|\'|\"|`|\\{|\\}|&|\\\\|\\?)";
 
     /**

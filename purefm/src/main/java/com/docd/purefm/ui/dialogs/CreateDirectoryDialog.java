@@ -19,9 +19,9 @@ import java.io.File;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.tasks.CreateDirectoryTask;
-import com.docd.purefm.ui.activities.MonitoredActivity;
 import com.docd.purefm.utils.PFMFileUtils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -45,7 +45,10 @@ public final class CreateDirectoryDialog extends DialogFragment {
     
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final MonitoredActivity activity = (MonitoredActivity) this.getActivity();
+        final Activity activity = this.getActivity();
+        if (activity == null || activity.isFinishing()) {
+            return null;
+        }
         mFileNameInput = (EditText) activity.getLayoutInflater().inflate(
                 R.layout.text_field_filename, null);
         mFileNameInput.setHint(R.string.menu_new_folder);
