@@ -56,26 +56,13 @@
         android:src="?attr/ic_menu_search"
         android:contentDescription="@string/menu_search"
         style="?android:attr/actionButtonStyle" />
-    
-    <ViewStub
-        android:id="@android:id/list"
-        android:inflatedId="@android:id/list"
-        android:layout="@layout/browser_listview"
+
+    <FrameLayout
+        android:id="@+id/list_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@android:id/input"
-        android:layout_alignParentBottom="true"
-    	android:saveEnabled="false"/>
-    
-    <ViewStub
-        android:id="@+id/grid"
-        android:inflatedId="@+id/grid"
-        android:layout="@layout/browser_gridview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@android:id/input"
-        android:layout_alignParentBottom="true"
-    	android:saveEnabled="false"/>
+        android:layout_alignParentBottom="true"/>
 
     <TextView
         android:id="@android:id/empty"

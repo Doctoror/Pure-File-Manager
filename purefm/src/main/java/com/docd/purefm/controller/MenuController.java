@@ -70,10 +70,18 @@ public final class MenuController {
 
             case android.R.id.content:
                 final Settings settings = Settings.getInstance(mActivity);
-                if (settings.getAppearance() == Settings.APPEARANCE_LIST) {
-                    settings.setAppearance(Settings.APPEARANCE_GRID);
-                } else {
-                    settings.setAppearance(Settings.APPEARANCE_LIST);
+                switch (settings.getListAppearance()) {
+                    case LIST:
+                        settings.setListAppearance(Settings.ListAppearance.GRID);
+                        break;
+
+                    case GRID:
+                        settings.setListAppearance(Settings.ListAppearance.LIST);
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Unexpected ListAppearance: " +
+                        settings.getListAppearance());
                 }
                 mActivity.invalidateList();
                 return true;

@@ -68,6 +68,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/browser_listview"
-        class="com.docd.purefm.ui.activities.BrowserFragment"/>
+        class="com.docd.purefm.ui.fragments.BrowserFragment"/>
 
 </LinearLayout>

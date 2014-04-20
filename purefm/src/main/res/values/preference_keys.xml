@@ -14,15 +14,15 @@
 <!--limitations under the License.-->
 <resources>
 
-    <string translatable="false" name="key_preference_theme">key_preference_theme</string>
-    <string translatable="false" name="key_preference_appearance">key_preference_appearance</string>
-    <string translatable="false" name="key_preference_show_permissions">key_preference_show_permissions</string>
-    <string translatable="false" name="key_preference_show_hidden">key_preference_show_hidden</string>
-    <string translatable="false" name="key_preference_show_modified">key_preference_show_modified</string>
-    <string translatable="false" name="key_preference_show_size">key_preference_show_size</string>
-    <string translatable="false" name="key_preference_show_preview">key_preference_show_preview</string>
+    <string translatable="false" name="key_preference_theme">key.preference.theme</string>
+    <string translatable="false" name="key_preference_list_appearance">key.preference.list_appearance</string>
+    <string translatable="false" name="key_preference_list_show_permissions">key.preference.list.show.permissions</string>
+    <string translatable="false" name="key_preference_list_show_hidden_files">key.preference.list.show.hidden_files</string>
+    <string translatable="false" name="key_preference_list_show_modified_date">key.preference.list.show.modified_date</string>
+    <string translatable="false" name="key_preference_list_show_size">key.preference.list.show.size</string>
+    <string translatable="false" name="key_preference_list_show_preview">key.preference.list.show.preview</string>
     <string translatable="false" name="key_preference_use_commandline">key_preference_use_commandline</string>
-    <string translatable="false" name="key_preference_allow_root">key_preference_allow_root</string>
-    <string translatable="false" name="key_preference_home_directory">key_preference_home_directory</string>
+    <string translatable="false" name="key_preference_allow_superuser">key.preference.allow_superuser</string>
+    <string translatable="false" name="key_preference_home_directory">key.preference.home_directory</string>
     
 </resources>

@@ -35,14 +35,14 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewStub;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import android.support.annotation.NonNull;
@@ -66,8 +66,6 @@ public final class SearchActivity extends ActionBarIconThemableActivity
 
     private AbstractSearchTask mSearchTask;
     private GenericFile mStartDirectory;
-
-    private int mPrevId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,23 +220,43 @@ public final class SearchActivity extends ActionBarIconThemableActivity
             mList.setVisibility(View.GONE);
         }
 
-        if (Settings.getInstance(this).getAppearance() == Settings.APPEARANCE_LIST) {
-            View vs = findViewById(android.R.id.list);
-            if (vs instanceof ViewStub) {
-                vs = ((ViewStub) vs).inflate();
-            }
-            mList = (AbsListView) vs;
+        final ViewGroup listContainer = (ViewGroup) findViewById(R.id.list_container);
+        if (listContainer == null) {
+            throw new RuntimeException("parent should contain ViewGroup with id R.id.list_container");
+        }
+
+        final Settings settings = Settings.getInstance(this);
+        final View swipeRefreshList;
+        switch (settings.getListAppearance()) {
+            case LIST:
+                swipeRefreshList = getLayoutInflater().inflate(
+                        R.layout.browser_listview, listContainer);
+                break;
+
+            case GRID:
+                swipeRefreshList = getLayoutInflater().inflate(
+                        R.layout.browser_gridview, listContainer);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unexpected ListApeparance: " +
+                        settings.getListAppearance());
+        }
+
+        if (swipeRefreshList == null) {
+            throw new RuntimeException("Inflated View is null");
+        }
+
+        final ViewGroup swipeRefreshLayoutList = (ViewGroup) swipeRefreshList.findViewById(
+                R.id.browser_list_swipe_refresh);
+
+        mList = (AbsListView) swipeRefreshLayoutList.getChildAt(0);
+        if (mList instanceof ListView) {
             mAdapter = new BrowserListAdapter(this);
         } else {
-            View vs = findViewById(R.id.grid);
-            if (vs instanceof ViewStub) {
-                vs = ((ViewStub) vs).inflate();
-            }
-            mList = (AbsListView) vs;
             mAdapter = new BrowserGridAdapter(this);
         }
 
-        mList.setId(this.getNewId());
         mList.setEmptyView(findViewById(android.R.id.empty));
         mList.setAdapter(this.mAdapter);
         final View emptyView = mList.getEmptyView();
@@ -259,14 +277,5 @@ public final class SearchActivity extends ActionBarIconThemableActivity
                 PFMFileUtils.openFile(SearchActivity.this, target.toFile());
             }
         });
-    }
-
-    @IdRes
-    private int getNewId() {
-        this.mPrevId++;
-        while (findViewById(this.mPrevId) != null){
-              this.mPrevId++;
-        }
-        return this.mPrevId;
     }
 }

@@ -31,14 +31,14 @@ import android.support.annotation.NonNull;
 final class SearchJavaTask extends AbstractSearchTask {
 
     SearchJavaTask(@NonNull final GenericFile startDirectory,
-                             @NonNull final SearchTaskListener listener) {
+                   @NonNull final SearchTaskListener listener) {
         super(startDirectory, listener);
     }
 
     @Override
     protected Void doInBackground(String... params) {
         try {
-            new SearchDirectoryWalker(params[0]).walk(new File(params[1]));
+            new SearchDirectoryWalker(params[0]).walk(mStartDirectory.toFile());
         } catch (Throwable e) {
             e.printStackTrace();
         }

@@ -87,12 +87,12 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         this.setIcon(f, h.mIcon);
         this.applyOverlay(f, h.mIcon);
 
-        if (mSettings.showPreviews()) {
+        if (mSettings.listShowPreviewsEnabled()) {
             loadPreview(f, h.mIcon);
         }
         h.mTitle.setText(f.getName());
 
-        if (mSettings.showLastModified()) {
+        if (mSettings.listShowModifiedDateEnabled()) {
             final long lastModified = f.lastModified();
             String humanReadableLastModified = mHumanReadableLastModified.get(lastModified);
             if (humanReadableLastModified == null) {
@@ -106,7 +106,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h.mDate.setText(null);
         }
 
-        if (mSettings.showSize() && !f.isDirectory()) {
+        if (mSettings.listShowFileSizeEnabled() && !f.isDirectory()) {
             final long fileSize = f.length();
             String humanReadableFileSize = mHumanReadableLength.get(fileSize);
             if (humanReadableFileSize == null) {
@@ -118,7 +118,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
             h.mSize.setText(null);
         }
 
-        if (mSettings.showPermissions()) {
+        if (mSettings.listShowPermissionsEnabled()) {
             h.mPerm.setText(f.getPermissions().toString());
         } else {
             h.mPerm.setText(null);

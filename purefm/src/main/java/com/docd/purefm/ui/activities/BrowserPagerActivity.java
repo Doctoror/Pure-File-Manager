@@ -51,6 +51,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
+import com.docd.purefm.ui.fragments.BrowserFragment;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 import com.docd.purefm.utils.ThemeUtils;
@@ -244,7 +245,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    protected void setOnSequenceClickListener(BreadCrumbTextView.OnSequenceClickListener
+    public void setOnSequenceClickListener(BreadCrumbTextView.OnSequenceClickListener
                                                           sequenceListener) {
         if (mBreadCrumbView != null) {
             mBreadCrumbView.setOnSequenceClickListener(sequenceListener);
@@ -252,12 +253,12 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    protected boolean shouldShowBrowserFragmentMenu() {
+    public boolean shouldShowBrowserFragmentMenu() {
         return !isDrawerOpened;
     }
 
     @Override
-    protected void setCurrentlyDisplayedFragment(final BrowserFragment fragment) {
+    public void setCurrentlyDisplayedFragment(final BrowserFragment fragment) {
         mCurrentlyDisplayedFragment = fragment;
     }
 

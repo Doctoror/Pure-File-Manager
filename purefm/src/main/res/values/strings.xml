@@ -79,7 +79,6 @@
     <!-- Preferences -->
     <string name="preference_category_view">View Settings</string>
     <string name="preference_theme">Theme</string>
-    <string name="preference_appearance">Appearance</string>
     <string name="preference_show_hidden">Show hidden files</string>
     <string name="preference_show_permissions">Show permissions</string>
     <string name="preference_show_preview">Show previews</string>

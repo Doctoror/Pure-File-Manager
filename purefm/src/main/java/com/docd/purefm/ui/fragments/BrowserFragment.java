@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.docd.purefm.ui.activities;
+package com.docd.purefm.ui.fragments;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -23,7 +23,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IdRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,7 +48,7 @@ import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.tasks.DirectoryScanTask;
-import com.docd.purefm.ui.fragments.UserVisibleHintFragment;
+import com.docd.purefm.ui.activities.AbstractBrowserActivity;
 import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.PFMFileUtils;
 import com.docd.purefm.utils.ThemeUtils;
@@ -253,14 +252,23 @@ public final class BrowserFragment extends UserVisibleHintFragment
                 throw new RuntimeException("Inflated menu item should contain android.R.id.content");
             }
 
-            if (Settings.getInstance(activity).getAppearance() == Settings.APPEARANCE_LIST) {
-                content.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_view_as_grid))
-                        .setTitle(R.string.menu_view_as_grid)
-                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-            } else {
-                content.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_view_as_list))
-                        .setTitle(R.string.menu_view_as_list)
-                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            final Settings settings = Settings.getInstance(activity);
+            switch (settings.getListAppearance()) {
+                case LIST:
+                    content.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_view_as_grid))
+                            .setTitle(R.string.menu_view_as_grid)
+                            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                    break;
+
+                case GRID:
+                    content.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_view_as_list))
+                            .setTitle(R.string.menu_view_as_list)
+                            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Unexpected ListAppearance:" +
+                            settings.getListAppearance());
             }
 
             if (ClipBoard.isEmpty()) {
@@ -304,9 +312,21 @@ public final class BrowserFragment extends UserVisibleHintFragment
             throw new RuntimeException("parent should contain ViewGroup with id R.id.list_container");
         }
 
-        final View swipeRefreshList = inflater.inflate(
-                settings.getAppearance() == Settings.APPEARANCE_LIST
-                        ? R.layout.browser_listview : R.layout.browser_gridview, listContainer);
+        final View swipeRefreshList;
+        switch (settings.getListAppearance()) {
+            case LIST:
+                swipeRefreshList = inflater.inflate(R.layout.browser_listview, listContainer);
+                break;
+
+            case GRID:
+                swipeRefreshList = inflater.inflate(R.layout.browser_gridview, listContainer);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unexpected ListAppearance: " +
+                        settings.getListAppearance());
+        }
+
         if (swipeRefreshList == null) {
             throw new RuntimeException("Inflated View is null");
         }
@@ -317,7 +337,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
         mSwipeRefreshLayoutEmpty = (SwipeRefreshLayout) parent.findViewById(android.R.id.empty);
 
-        mListView = (AbsListView) mSwipeRefreshLayoutList.findViewById(android.R.id.list);
+        mListView = (AbsListView) mSwipeRefreshLayoutList.getChildAt(0);
         if (mListView instanceof ListView) {
             mAdapter = new BrowserListAdapter(context);
         } else {
@@ -326,7 +346,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
         menuController.setBrowserAdapter(this.mAdapter);
 
-        mListView.setId(this.getNewId(parent));
         mListView.setEmptyView(parent.findViewById(android.R.id.empty));
         mListView.setAdapter(this.mAdapter);
         final View emptyView = mListView.getEmptyView();
@@ -469,15 +488,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
                     mSwipeRefreshLayoutList, mSwipeRefreshLayoutEmpty);
             mScannerTask.execute(mBrowser.getCurrentPath());
         }
-    }
-
-    @IdRes
-    private int getNewId(@NonNull final View parent) {
-        mPrevId++;
-        while (parent.findViewById(mPrevId) != null) {
-            mPrevId++;
-        }
-        return mPrevId;
     }
 
     @Nullable

@@ -63,7 +63,7 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
                 R.drawable.ic_fso_default);
         this.applyOverlay(f, h.mIcon);
         
-        if (mSettings.showPreviews()) {
+        if (mSettings.listShowPreviewsEnabled()) {
             loadPreview(f, h.mIcon);
         }
         h.mTitle.setText(f.getName());

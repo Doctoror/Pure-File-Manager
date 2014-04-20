@@ -51,7 +51,7 @@ public final class DirectoryScanTask extends
         mBrowser = browser;
         mSwipeRefreshLayouts = refreshLayouts;
         mBrowserAdapter = adapter;
-        mFileFilter = new ListFileFilter(settings.showHidden());
+        mFileFilter = new ListFileFilter(settings.listShowHiddenFilesEnabled());
         mFileFilter.setMimeType(mimeType);
     }
 

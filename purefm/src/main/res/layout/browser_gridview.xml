@@ -20,7 +20,6 @@
     android:layout_height="match_parent">
 
     <GridView
-        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="10dp"

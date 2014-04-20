@@ -21,7 +21,6 @@ import com.docd.purefm.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -30,9 +29,10 @@ import android.support.annotation.StyleRes;
 public final class Settings {
     
     private static final String KEY_BOOKMARKS = "purefm.settings.keys.bookmarks";
-    
-    public static final int APPEARANCE_LIST = 0;
-    public static final int APPEARANCE_GRID = 1;
+
+    public enum ListAppearance {
+        LIST, GRID
+    }
 
     private static final Object LOCK = new Object();
 
@@ -62,12 +62,12 @@ public final class Settings {
     private final Resources mResources;
 
     private int mTheme;
-    private int mAppearance;
-    private boolean mShowSize;
-    private boolean mShowHidden;
-    private boolean mShowPermissions;
-    private boolean mShowPreviews;
-    private boolean mShowLastModified;
+    private ListAppearance mListAppearance;
+    private boolean mListShowFileSize;
+    private boolean mListShowHiddenFiles;
+    private boolean mListShowPermissions;
+    private boolean mListShowPreviews;
+    private boolean mListShowModifiedDate;
     private boolean mUseCommandLine;
     private boolean mSuEnabled;
     private String mHomeDirectory;
@@ -79,32 +79,31 @@ public final class Settings {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         mTheme = Integer.parseInt(mSharedPreferences.getString(
                 res.getString(R.string.key_preference_theme),
-                Integer.toString(R.style.ThemeDark)));
+                        Integer.toString(R.style.ThemeDark)));
 
-        mAppearance = Integer.parseInt(mSharedPreferences.getString(
-                res.getString(R.string.key_preference_appearance),
-                Integer.toString(APPEARANCE_LIST)));
+        mListAppearance = ListAppearance.valueOf(mSharedPreferences.getString(
+                res.getString(R.string.key_preference_list_appearance), ListAppearance.LIST.name()));
 
-        mShowHidden = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_show_hidden), false);
+        mListShowHiddenFiles = mSharedPreferences.getBoolean(
+                res.getString(R.string.key_preference_list_show_hidden_files), false);
 
-        mShowSize = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_show_size), true);
+        mListShowFileSize = mSharedPreferences.getBoolean(
+                res.getString(R.string.key_preference_list_show_size), true);
 
-        mShowPermissions = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_show_permissions), true);
+        mListShowPermissions = mSharedPreferences.getBoolean(
+                res.getString(R.string.key_preference_list_show_permissions), true);
 
-        mShowPreviews = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_show_preview), true);
+        mListShowPreviews = mSharedPreferences.getBoolean(
+                res.getString(R.string.key_preference_list_show_preview), true);
 
-        mShowLastModified = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_show_modified), true);
+        mListShowModifiedDate = mSharedPreferences.getBoolean(
+                res.getString(R.string.key_preference_list_show_modified_date), true);
 
         mUseCommandLine = mSharedPreferences.getBoolean(
                 res.getString(R.string.key_preference_use_commandline), false);
 
         mSuEnabled = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_allow_root), false);
+                res.getString(R.string.key_preference_allow_superuser), false);
 
         mHomeDirectory = mSharedPreferences.getString(
                 res.getString(R.string.key_preference_home_directory),
@@ -115,9 +114,7 @@ public final class Settings {
     
     public void setBookmarks(@NonNull final Set<String> bookmarks) {
         mBookmarks = bookmarks;
-        final Editor e = mSharedPreferences.edit();
-        e.putStringSet(KEY_BOOKMARKS, bookmarks);
-        e.apply();
+        mSharedPreferences.edit().putStringSet(KEY_BOOKMARKS, bookmarks).apply();
     }
 
     public void setTheme(final int theme, final boolean update) {
@@ -133,74 +130,79 @@ public final class Settings {
         return mTheme;
     }
 
-    public void setAppearance(final int appearance) {
-        mAppearance = appearance;
-        mSharedPreferences.edit().putInt(
-                mResources.getString(R.string.key_preference_appearance), appearance).apply();
+    public void setListAppearance(final ListAppearance appearance) {
+        mListAppearance = appearance;
+        mSharedPreferences.edit().putString(
+                mResources.getString(R.string.key_preference_list_appearance),
+                appearance.name()).apply();
     }
 
-    public int getAppearance() {
-        return mAppearance;
+    public ListAppearance getListAppearance() {
+        return mListAppearance;
     }
 
-    public void setShowSize(final boolean show, final boolean update) {
-        mShowSize = show;
+    public void setListShowFileSize(final boolean show, final boolean update) {
+        mListShowFileSize = show;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_show_size), show).apply();
+                    mResources.getString(R.string.key_preference_list_show_size), show).apply();
         }
     }
 
-    public boolean showSize() {
-        return mShowSize;
+    public boolean listShowFileSizeEnabled() {
+        return mListShowFileSize;
     }
 
-    public void setShowHiddenFiles(final boolean show, final boolean update) {
-        mShowHidden = show;
+    public void setListShowHiddenFiles(final boolean show, final boolean update) {
+        mListShowHiddenFiles = show;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_show_hidden), show).apply();
+                    mResources.getString(R.string.key_preference_list_show_hidden_files),
+                            show).apply();
         }
     }
 
-    public boolean showHidden() {
-        return mShowHidden;
+    public boolean listShowHiddenFilesEnabled() {
+        return mListShowHiddenFiles;
     }
 
-    public void setShowPermissions(final boolean show, final boolean update) {
-        mShowPermissions = show;
+    public void setListShowPermissions(final boolean show, final boolean update) {
+        mListShowPermissions = show;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_show_permissions), show).apply();
+                    mResources.getString(R.string.key_preference_list_show_permissions),
+                            show).apply();
         }
     }
 
-    public boolean showPermissions() {
-        return mShowPermissions;
+    public boolean listShowPermissionsEnabled() {
+        return mListShowPermissions;
     }
 
-    public void setShowPreviews(final boolean show, final boolean update) {
-        mShowPreviews = show;
+    public void setListShowPreviews(final boolean show, final boolean update) {
+        mListShowPreviews = show;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_show_preview), show).apply();
+                    mResources.getString(R.string.key_preference_list_show_preview),
+                            show).apply();
         }
     }
 
-    public boolean showPreviews() {
-        return mShowPreviews;
+    public boolean listShowPreviewsEnabled() {
+        return mListShowPreviews;
     }
 
-    public void setShowLastModified(final boolean show, final boolean update) {
-        mShowLastModified = show;
+    public void setListShowModifiedDate(final boolean show, final boolean update) {
+        mListShowModifiedDate = show;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_show_modified), show).apply();
+                    mResources.getString(R.string.key_preference_list_show_modified_date),
+                            show).apply();
         }
     }
 
-    public boolean showLastModified() {
-        return mShowLastModified;
+    public boolean listShowModifiedDateEnabled() {
+        return mListShowModifiedDate;
     }
 
     public void setUseCommandLine(final boolean use, final boolean update) {
@@ -219,7 +221,7 @@ public final class Settings {
         mSuEnabled = enabled;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_allow_root), enabled).apply();
+                    mResources.getString(R.string.key_preference_allow_superuser), enabled).apply();
         }
     }
 

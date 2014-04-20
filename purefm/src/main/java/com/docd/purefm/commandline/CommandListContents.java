@@ -47,7 +47,7 @@ public final class CommandListContents extends BusyboxCommand {
         }
         final StringBuilder command = new StringBuilder(50);
         command.append("ls -lnpe");
-        if (settings.showHidden()) {
+        if (settings.listShowHiddenFilesEnabled()) {
             command.append('A');
         }
         command.append(' ');

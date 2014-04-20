@@ -16,6 +16,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.browser.Browser;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.ui.fragments.BrowserFragment;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.ThemeUtils;
@@ -64,19 +65,19 @@ public final class PickerActivity extends AbstractBrowserActivity {
     }
 
     @Override
-    protected void setCurrentlyDisplayedFragment(BrowserFragment fragment) {
+    public void setCurrentlyDisplayedFragment(BrowserFragment fragment) {
         //do nothing
     }
 
     @Override
-    protected void setOnSequenceClickListener(BreadCrumbTextView.OnSequenceClickListener sequenceListener) {
+    public void setOnSequenceClickListener(BreadCrumbTextView.OnSequenceClickListener sequenceListener) {
         if (mBreadCrumbView != null) {
             mBreadCrumbView.setOnSequenceClickListener(sequenceListener);
         }
     }
 
     @Override
-    protected boolean shouldShowBrowserFragmentMenu() {
+    public boolean shouldShowBrowserFragmentMenu() {
         return false;
     }
 
@@ -145,7 +146,7 @@ public final class PickerActivity extends AbstractBrowserActivity {
     }
 
     @Override
-    protected String getGetContentMimeType() {
+    public String getGetContentMimeType() {
         return mGetContentMimeType;
     }
 
