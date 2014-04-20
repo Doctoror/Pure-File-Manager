@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.adapters;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import android.graphics.drawable.Drawable;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
@@ -277,7 +279,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * {@inheritDoc}
      */
     @Override
-    public void registerDataSetObserver(DataSetObserver arg0) {
+    public void registerDataSetObserver(final DataSetObserver arg0) {
         this.mDataSetObservable.registerObserver(arg0);
     }
 
@@ -285,7 +287,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * {@inheritDoc}
      */
     @Override
-    public void unregisterDataSetObserver(DataSetObserver arg0) {
+    public void unregisterDataSetObserver(final DataSetObserver arg0) {
         this.mDataSetObservable.unregisterObserver(arg0);
     }
 
@@ -320,7 +322,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     public void onEvent(final int event, final String path) {
         final Message message = mHandler.obtainMessage(FileObserverEventHandler.MESSAGE_OBSERVER_EVENT);
         message.arg1 = event;
-        message.obj = path;
+        message.obj = FileFactory.newFile(mSettings, path);
         mHandler.sendMessage(message);
     }
 
@@ -328,61 +330,63 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * {@link android.os.FileObserver} event that should be ran only on UI thread
      *
      * @param event The type of event which happened
-     * @param path The path, relative to the main monitored file or directory,
+     * @param file The modified file, relative to the main monitored file or directory,
      *             of the file or directory which triggered the event
      */
-    synchronized void onEventUIThread(final int event, final String path) {
+    synchronized void onEventUIThread(final int event,
+                                      @NonNull final GenericFile file) {
         switch (event & FileObserver.ALL_EVENTS) {
-            case FileObserver.ATTRIB:
-            case FileObserver.MODIFY:
-                onFileModified(path);
-                break;
-
-            case FileObserver.DELETE_SELF:
-            case FileObserver.MOVED_TO:
-                final int filesSize = mContent.size();
-                for (int i = 0; i < filesSize; i++) {
-                    final GenericFile file = mContent.get(i);
-                    if (file.getAbsolutePath().equals(path)) {
-                        mContent.remove(i);
-                        break;
-                    }
-                }
-                removeObserverForPath(path);
-                break;
-
             case FileObserver.CREATE:
                 //Do nothing. The event is handled in Browser
                 break;
 
             default:
-                //Sometimes it happens that some unknown event is delivered instead of DELETE_SELF
-                //So check what happened and perform corresponding action
-                onFileModified(path);
+                onFileModified(file);
                 break;
-
         }
     }
 
     /**
      * Should be called when the file at path was modified
      *
-     * @param path of the modified file
+     * @param modified The modified file
      */
-    private void onFileModified(final String path) {
-        final GenericFile affectedFile = FileFactory.newFile(mSettings, path);
-        mContent.remove(affectedFile);
-        if (affectedFile.exists()) {
-            final int index = mContent.indexOf(affectedFile);
-            if (index != -1) {
-                mContent.set(index, affectedFile);
+    private void onFileModified(@NonNull final GenericFile modified) {
+        final GenericFile affectedFile = getFileByPath(modified.getAbsolutePath());
+        if (affectedFile != null) {
+            if (modified.exists()) {
+                final int index = mContent.indexOf(affectedFile);
+                if (index != -1) {
+                    mContent.set(index, modified);
+                } else {
+                    mContent.add(modified);
+                    Collections.sort(mContent, mComparator.getComparator());
+                }
             } else {
-                mContent.add(affectedFile);
-                Collections.sort(mContent, mComparator.getComparator());
+                mContent.remove(affectedFile);
+                removeObserverForPath(modified.getAbsolutePath());
             }
-        } else {
-            removeObserverForPath(path);
         }
+    }
+
+    @Nullable
+    private GenericFile getFileByPath(@NonNull final String path) {
+        for (final GenericFile file : mContent) {
+            if (file.getAbsolutePath().equals(path)) {
+                return file;
+            }
+        }
+        //try with canonical paths
+        for (final GenericFile file : mContent) {
+            try {
+                if (file.getCanonicalPath().equals(path)) {
+                    return file;
+                }
+            } catch (IOException e) {
+                //ignored
+            }
+        }
+        return null;
     }
 
     /**
@@ -527,7 +531,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             if (msg.what == MESSAGE_OBSERVER_EVENT) {
                 final BrowserBaseAdapter adapter = mAdapterReference.get();
                 if (adapter != null) {
-                    adapter.onEventUIThread(msg.arg1, (String) msg.obj);
+                    adapter.onEventUIThread(msg.arg1, (GenericFile) msg.obj);
                     if (!hasMessages(MESSAGE_OBSERVER_EVENT)) {
                         adapter.notifyDataSetChanged();
                     }
