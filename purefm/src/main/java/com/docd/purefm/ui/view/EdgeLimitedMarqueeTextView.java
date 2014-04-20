@@ -76,7 +76,7 @@ public class EdgeLimitedMarqueeTextView extends TextView {
         this.invalidateMarquee();
     }
 
-    public void invalidateMarquee() {
+    protected void invalidateMarquee() {
         final Layout layout = getLayout();
         if (layout != null) {
             final int lineWidth = (int) layout.getLineWidth(0);

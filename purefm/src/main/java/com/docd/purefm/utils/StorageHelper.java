@@ -326,7 +326,7 @@ public final class StorageHelper {
         /**
          * if true, the storage is mounted as read-only
          */
-        protected boolean mReadOnly;
+        boolean mReadOnly;
 
         Volume(@NonNull final String device,
                @NonNull final File file,

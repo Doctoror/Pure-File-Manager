@@ -48,7 +48,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
     @NonNull
     private final Context mContext;
 
-    protected DeleteOperation(@NonNull final Context context) {
+    DeleteOperation(@NonNull final Context context) {
         mContext = context;
     }
 

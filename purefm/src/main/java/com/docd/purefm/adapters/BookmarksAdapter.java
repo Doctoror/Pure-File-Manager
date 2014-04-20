@@ -46,7 +46,7 @@ public final class BookmarksAdapter implements ListAdapter {
     
     private boolean modified;
     
-    private int mUserBookmarksStart;
+    private final int mUserBookmarksStart;
     
     public BookmarksAdapter(@NonNull final BrowserPagerActivity activity) {
         mActivity = activity;

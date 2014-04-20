@@ -35,11 +35,12 @@ public final class ClipBoardTest extends AndroidTestCase {
     @Override
     protected void runTest() throws Throwable {
         super.runTest();
-        Settings.sUseCommandLine = false;
+        final Settings settings = Settings.getInstance(getContext());
+        settings.setUseCommandLine(false, false);
         final GenericFile[] files = new GenericFile[] {
-                FileFactory.newFile("/one"),
-                FileFactory.newFile("/two"),
-                FileFactory.newFile("/three")
+                FileFactory.newFile(settings, "/one"),
+                FileFactory.newFile(settings, "/two"),
+                FileFactory.newFile(settings, "/three")
         };
         testCopy(files);
         testMove(files);

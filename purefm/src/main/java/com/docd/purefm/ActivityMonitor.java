@@ -55,7 +55,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     private int mActivityStartedCount;
 
-    public ActivityMonitor(@NonNull final Application application) {
+    private ActivityMonitor(@NonNull final Application application) {
         application.registerActivityLifecycleCallbacks(this);
     }
 

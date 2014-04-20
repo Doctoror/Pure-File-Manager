@@ -34,7 +34,7 @@ final class PasteTask extends OperationTask<GenericFile, ArrayList<GenericFile>>
     @NonNull
     private final GenericFile mTarget;
 
-    protected PasteTask(@NonNull final Activity activity,
+    PasteTask(@NonNull final Activity activity,
                         @NonNull final GenericFile target) {
         super(activity);
         this.mTarget = target;

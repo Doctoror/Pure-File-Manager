@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.test;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
 import android.test.InstrumentationTestCase;
@@ -45,9 +46,9 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
 
     private static final File testDir = new File(Environment.getExternalStorageDirectory(), "_test_CommandLineFile");
 
-    private static File test1 = new File(testDir, "test1.jpg");
-    private static File test2 = new File(testDir, "test2.jpg");
-    private static File test3 = new File(testDir.getAbsolutePath() + "/test3dir/", "test3.jpg");
+    private static final File test1 = new File(testDir, "test1.jpg");
+    private static final File test2 = new File(testDir, "test2.jpg");
+    private static final File test3 = new File(testDir.getAbsolutePath() + "/test3dir/", "test3.jpg");
 
     @Override
     protected void setUp() throws Exception {
@@ -77,8 +78,8 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
 
         // init what application inits
         final Context context = getInstrumentation().getContext();
-        com.docd.purefm.Environment.init(context);
-        Settings.init(context, context.getResources());
+        final Settings settings = Settings.getInstance(context);
+        com.docd.purefm.Environment.init((Application) context.getApplicationContext());
         PFMTextUtils.init(context);
         final Shell shell = ShellHolder.getShell();
         assertNotNull(shell);
@@ -87,20 +88,21 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");
         }
-        Settings.sUseCommandLine = true;
+        settings.setUseCommandLine(true, false);
 
-        testAgainstJavaIoFile(shell);
-        testFileReading(shell);
-        testFileDeletion(shell);
-        testFileCreation(shell);
-        testFileMoving(shell);
-        testFileCopying(shell);
-        testMkdir(shell);
-        testMkdirs(shell);
+        testAgainstJavaIoFile(shell, settings);
+        testFileReading(shell, settings);
+        testFileDeletion(shell, settings);
+        testFileCreation(shell, settings);
+        testFileMoving(shell, settings);
+        testFileCopying(shell, settings);
+        testMkdir(shell, settings);
+        testMkdirs(shell, settings);
     }
 
-    private void testAgainstJavaIoFile(@NonNull final Shell shell) throws Throwable {
-        CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
+    private void testAgainstJavaIoFile(@NonNull final Shell shell,
+                                       @NonNull final Settings settings) throws Throwable {
+        CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
         testAgainstJavaIoFile(file1, test1, true);
         assertTrue(file1.delete());
         testAgainstJavaIoFile(file1, test1, false);
@@ -119,8 +121,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
             throw new RuntimeException("Failed to create test file: " + e);
         }
 
-        Settings.sUseCommandLine = true;
-        file1 = CommandLineFile.fromFile(shell, test1);
+        file1 = CommandLineFile.fromFile(shell, settings, test1);
         testAgainstJavaIoFile(file1, test1, true);
 
         try {
@@ -224,22 +225,25 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         return true;
     }
 
-    private void testFileReading(@NonNull final Shell shell) {
-        final CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
+    private void testFileReading(@NonNull final Shell shell,
+                                 @NonNull final Settings settings) {
+        final CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
         assertEquals(test1.getAbsolutePath(), file1.getAbsolutePath());
         assertEquals(test1, file1.toFile());
         assertIsNormalFile(file1);
         assertEquals(4, file1.length());
     }
 
-    private void testFileDeletion(@NonNull final Shell shell) {
-        final CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
+    private void testFileDeletion(@NonNull final Shell shell,
+                                  @NonNull final Settings settings) {
+        final CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
         file1.delete();
         assertIsEmptyFile(file1);
     }
 
-    private void testFileCreation(@NonNull final Shell shell) {
-        final CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
+    private void testFileCreation(@NonNull final Shell shell,
+                                  @NonNull final Settings settings) {
+        final CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
         try {
             file1.createNewFile();
             assertIsNormalFile(file1);
@@ -248,42 +252,46 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         }
     }
 
-    private void testFileMoving(@NonNull final Shell shell) {
-        final CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
+    private void testFileMoving(@NonNull final Shell shell,
+                                @NonNull final Settings settings) {
+        final CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
         final String file1sum = md5sum(file1.toFile());
 
-        CommandLineFile file2 = CommandLineFile.fromFile(shell, test2);
+        CommandLineFile file2 = CommandLineFile.fromFile(shell, settings, test2);
         assertIsEmptyFile(file2);
 
         file1.move(file2);
         assertIsEmptyFile(file1);
 
-        file2 = CommandLineFile.fromFile(shell, test2);
+        file2 = CommandLineFile.fromFile(shell, settings, test2);
         assertIsNormalFile(file2);
         assertEquals(file1sum, md5sum(file2.toFile()));
     }
 
-    private void testFileCopying(@NonNull final Shell shell) {
-        CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
-        final CommandLineFile file2 = CommandLineFile.fromFile(shell, test2);
+    private void testFileCopying(@NonNull final Shell shell,
+                                 @NonNull final Settings settings) {
+        CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
+        final CommandLineFile file2 = CommandLineFile.fromFile(shell, settings, test2);
 
         file2.copy(file1);
-        file1 = CommandLineFile.fromFile(shell, test1);
+        file1 = CommandLineFile.fromFile(shell, settings, test1);
         assertIsNormalFile(file1);
         assertIsNormalFile(file2);
         assertEquals(md5sum(file2.toFile()), md5sum(file1.toFile()));
     }
 
-    private void testMkdir(@NonNull final Shell shell) {
-        final CommandLineFile file1 = CommandLineFile.fromFile(shell, test1);
+    private void testMkdir(@NonNull final Shell shell,
+                           @NonNull final Settings settings) {
+        final CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
         file1.delete();
         assertIsEmptyFile(file1);
         assertTrue(file1.mkdir());
         assertIsDirectory(file1);
     }
 
-    private void testMkdirs(@NonNull final Shell shell) {
-        final CommandLineFile file3 = CommandLineFile.fromFile(shell, test3);
+    private void testMkdirs(@NonNull final Shell shell,
+                            @NonNull final Settings settings) {
+        final CommandLineFile file3 = CommandLineFile.fromFile(shell, settings, test3);
         assertIsEmptyFile(file3);
         assertTrue(file3.mkdirs());
         assertIsDirectory(file3);

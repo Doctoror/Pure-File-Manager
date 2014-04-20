@@ -57,10 +57,9 @@ public final class AIDHelper {
     @Nullable
     public synchronized static SparseArray<String> getAIDs(Context context, boolean force) {
         if (sAids == null || force) {
-            Properties systemAIDs = null;
+            final Properties systemAIDs = new Properties();
             try {
                 // Load the default known system identifiers
-                systemAIDs = new Properties();
                 systemAIDs.load(context.getResources().openRawResource(R.raw.aid));
             } catch (Exception e) {
                 Log.e(TAG, "Fail to load AID raw file.", e);
@@ -68,7 +67,7 @@ public final class AIDHelper {
             }
 
             // Add the default known system identifiers
-            final SparseArray<String> aids = new SparseArray<String>();
+            final SparseArray<String> aids = new SparseArray<>();
             for (final Object key : systemAIDs.keySet()) {
                 final String stringKey = (String) key;
                 final String value = systemAIDs.getProperty(stringKey);

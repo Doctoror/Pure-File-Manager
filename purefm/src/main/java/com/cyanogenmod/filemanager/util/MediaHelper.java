@@ -60,10 +60,10 @@ public final class MediaHelper {
      * Method that returns an array with all the unique albums paths and ids.
      *
      * @param cr The ContentResolver
-     * @return Map<String, Long> The albums map
+     * @return The albums map
      */
     public static Map<String, Long> getAllAlbums(ContentResolver cr) {
-        Map<String, Long> albums = new HashMap<String, Long>();
+        final Map<String, Long> albums = new HashMap<>();
         final String[] projection =
                 {
                         "distinct " + MediaStore.Audio.Media.ALBUM_ID,
@@ -177,7 +177,7 @@ public final class MediaHelper {
         }
 
         // Retrieve the request id
-        long id = 0;
+        long id;
         try {
             id = Long.parseLong(new File(uri.getPath()).getName());
         } catch (NumberFormatException nfex) {
@@ -263,11 +263,7 @@ public final class MediaHelper {
                 final Method myUserIdMethod = android.os.UserHandle.class.getMethod("myUserId");
                 myUserIdMethod.setAccessible(true);
                 return (Integer) myUserIdMethod.invoke(null);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
             return 0;

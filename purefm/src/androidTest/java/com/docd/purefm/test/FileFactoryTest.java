@@ -14,6 +14,8 @@
  */
 package com.docd.purefm.test;
 
+import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
 import android.test.AndroidTestCase;
 
@@ -37,7 +39,7 @@ public final class FileFactoryTest extends AndroidTestCase {
 
     private static final File testDir = new File(Environment.getExternalStorageDirectory(), "_test_FileFactory");
 
-    private static File test1 = new File(testDir, "test1.jpg");
+    private static final File test1 = new File(testDir, "test1.jpg");
 
     @Override
     protected void setUp() throws Exception {
@@ -64,19 +66,21 @@ public final class FileFactoryTest extends AndroidTestCase {
     protected void runTest() throws Throwable {
         super.runTest();
 
-        com.docd.purefm.Environment.init(getContext());
+        final Context appContext = getContext().getApplicationContext();
+        final Settings settings = Settings.getInstance(appContext);
+        com.docd.purefm.Environment.init((Application) appContext);
 
         if (!com.docd.purefm.Environment.hasBusybox()) {
             throw new RuntimeException("install busybox on a device before running this test");
         }
-        Settings.sUseCommandLine = true;
+        settings.setUseCommandLine(true, false);
 
-        final GenericFile file1 = FileFactory.newFile(test1);
+        final GenericFile file1 = FileFactory.newFile(settings, test1);
         assertTrue(file1 instanceof CommandLineFile);
         assertEquals(test1, file1.toFile());
 
-        Settings.sUseCommandLine = false;
-        final GenericFile file2 = FileFactory.newFile(test1);
+        settings.setUseCommandLine(false, false);
+        final GenericFile file2 = FileFactory.newFile(settings, test1);
         assertTrue(file2 instanceof JavaFile);
         assertEquals(test1, file2.toFile());
     }

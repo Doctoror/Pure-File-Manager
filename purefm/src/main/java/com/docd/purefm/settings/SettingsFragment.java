@@ -92,7 +92,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(Preference preference,
                     Object newValue) {
-                mSettings.setShowLastModified((Boolean) newValue, false);
+                mSettings.setShowHiddenFiles((Boolean) newValue, false);
                 getSettingsActivity().notifyNeedInvalidate();
                 return true;
             }
@@ -262,7 +262,9 @@ public final class SettingsFragment extends PreferenceFragment {
         home.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                preference.setSummary((CharSequence) newValue);
+                final CharSequence newPath = (CharSequence) newValue;
+                preference.setSummary(newPath);
+                mSettings.setHomeDirectory(newPath.toString(), false);
                 return true;
             }
         });

@@ -20,7 +20,6 @@ import android.test.AndroidTestCase;
 
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.JavaFile;
-import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PFMTextUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -38,7 +37,7 @@ public final class JavaFileTest extends AndroidTestCase {
 
     private static final File testDir = new File(Environment.getExternalStorageDirectory(), "_test_JavaFile");
 
-    private static File test1 = new File(testDir, "test1.jpg");
+    private static final File test1 = new File(testDir, "test1.jpg");
 
     @Override
     protected void setUp() throws Exception {
@@ -74,7 +73,6 @@ public final class JavaFileTest extends AndroidTestCase {
         // init what application inits
         final Context context = this.getContext();
         PFMTextUtils.init(context);
-        Settings.sUseCommandLine = false;
         test();
         test1.delete();
         test();

@@ -94,11 +94,11 @@ public final class DirectoryScanTask extends
 
         private final boolean mShowHidden;
 
-        protected ListFileFilter(final boolean showHidden) {
+        ListFileFilter(final boolean showHidden) {
             mShowHidden = showHidden;
         }
         
-        protected void setMimeType(String type) {
+        void setMimeType(String type) {
             this.mType = type;
             this.mAcceptAll = type == null || type.equals("*/*");
         }

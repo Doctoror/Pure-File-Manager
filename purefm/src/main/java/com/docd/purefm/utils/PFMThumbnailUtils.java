@@ -35,7 +35,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public final class PFMThumbnailUtils extends ThumbnailUtils {
+final class PFMThumbnailUtils extends ThumbnailUtils {
     
     private PFMThumbnailUtils() {}
 

@@ -61,7 +61,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 
     private final ArrayDeque<String> mHistory;
 
-    private FileObserverCache mObserverCache;
+    private final FileObserverCache mObserverCache;
     private MultiListenerFileObserver mCurrentPathObserver;
     private GenericFile mCurrentPath;
     private GenericFile mPreviousPath;
@@ -70,7 +70,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     private Runnable mLastRunnable;
     private boolean mHistoryEnabled;
 
-    private ResolveInitialPathTask mInitialPathTask;
+    private final ResolveInitialPathTask mInitialPathTask;
 
     public Browser(@NonNull final AbstractBrowserActivity activity, final boolean historyEnabled) {
         if (sHandler == null) {
@@ -96,7 +96,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
 //    }
 
     private void cancelInitialPathLoading() {
-        if (mInitialPathTask != null && mInitialPathTask.getStatus() == AsyncTask.Status.RUNNING) {
+        if (mInitialPathTask.getStatus() == AsyncTask.Status.RUNNING) {
             mInitialPathTask.cancel(true);
         }
     }

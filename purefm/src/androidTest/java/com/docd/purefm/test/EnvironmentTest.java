@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.test;
 
+import android.app.Application;
 import android.test.AndroidTestCase;
 
 import com.docd.purefm.Environment;
@@ -31,7 +32,7 @@ public final class EnvironmentTest extends AndroidTestCase {
     @Override
     protected void runTest() throws Throwable {
         super.runTest();
-        Environment.init(getContext());
+        Environment.init((Application) getContext().getApplicationContext());
         assertEquals(android.os.Environment.getRootDirectory(),
                 Environment.sAndroidRootDirectory);
         assertEquals(File.listRoots()[0], Environment.sRootDirectory);

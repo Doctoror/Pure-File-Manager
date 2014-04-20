@@ -134,6 +134,7 @@ public final class PartitionInfoDialog extends DialogFragment {
             this.mAvailableBytesText = FileUtils.byteCountToDisplaySize(availableBytes);
 
             if (totalBytes != 0L) {
+                @SuppressWarnings("StringBufferReplaceableByString")
                 final StringBuilder usage = new StringBuilder();
                 usage.append(FileUtils.byteCountToDisplaySize(usedSpace));
                 usage.append(' ');
@@ -154,7 +155,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         private final WeakReference<View> mViewRef;
 
         PartitionInfoTask(@NonNull final View view) {
-            this.mViewRef = new WeakReference<View>(view);
+            this.mViewRef = new WeakReference<>(view);
         }
 
         @NonNull

@@ -128,7 +128,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     protected final LayoutInflater mLayoutInflater;
 
-    protected final PreviewHolder mPreviewHolder;
+    private final PreviewHolder mPreviewHolder;
 
     /**
      * Settings instance

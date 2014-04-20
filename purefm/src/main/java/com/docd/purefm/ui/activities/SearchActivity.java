@@ -35,6 +35,7 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewStub;
@@ -260,6 +261,7 @@ public final class SearchActivity extends ActionBarIconThemableActivity
         });
     }
 
+    @IdRes
     private int getNewId() {
         this.mPrevId++;
         while (findViewById(this.mPrevId) != null){

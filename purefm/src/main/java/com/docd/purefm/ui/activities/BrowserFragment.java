@@ -23,6 +23,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.IdRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -470,7 +471,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
         }
     }
 
-    private int getNewId(View parent) {
+    @IdRes
+    private int getNewId(@NonNull final View parent) {
         mPrevId++;
         while (parent.findViewById(mPrevId) != null) {
             mPrevId++;

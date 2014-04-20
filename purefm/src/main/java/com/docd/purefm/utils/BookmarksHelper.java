@@ -150,7 +150,7 @@ public final class BookmarksHelper {
     }
 
     @NonNull
-    public static Set<String> getStorageBookmarks() {
+    private static Set<String> getStorageBookmarks() {
         final LinkedHashSet<String> storages = new LinkedHashSet<>();
         for (final StorageHelper.StorageVolume v : Environment.getStorageVolumes()) {
             storages.add(v.file.getAbsolutePath());

@@ -155,6 +155,14 @@ public final class Settings {
         return mShowSize;
     }
 
+    public void setShowHiddenFiles(final boolean show, final boolean update) {
+        mShowHidden = show;
+        if (update) {
+            mSharedPreferences.edit().putBoolean(
+                    mResources.getString(R.string.key_preference_show_hidden), show).apply();
+        }
+    }
+
     public boolean showHidden() {
         return mShowHidden;
     }
@@ -217,6 +225,14 @@ public final class Settings {
 
     public boolean isSuEnabled() {
         return mSuEnabled;
+    }
+
+    public void setHomeDirectory(final String path, final boolean update) {
+        mHomeDirectory = path;
+        if (update) {
+            mSharedPreferences.edit().putString(
+                    mResources.getString(R.string.key_preference_home_directory), path).apply();
+        }
     }
 
     public String getHomeDirectory() {

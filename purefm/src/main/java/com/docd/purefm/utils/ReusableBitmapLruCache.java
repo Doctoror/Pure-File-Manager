@@ -3,9 +3,9 @@ package com.docd.purefm.utils;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
-public class ReusableBitmapLruCache<T> extends LruCache<T, Bitmap> {
+class ReusableBitmapLruCache<T> extends LruCache<T, Bitmap> {
 
-    public ReusableBitmapLruCache() {
+    ReusableBitmapLruCache() {
         super(1024 * 1024);
     }
 

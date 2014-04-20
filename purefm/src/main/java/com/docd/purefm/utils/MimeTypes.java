@@ -371,7 +371,7 @@ public final class MimeTypes {
     @DrawableRes
     public static int getIconForExt(String ext) {
         final Integer res = EXT_ICONS.get(ext);
-        //noinspection ResourceType
+        //noinspection ResourceType,UnnecessaryUnboxing
         return res == null ? 0 : res.intValue();
     }
     
@@ -405,7 +405,7 @@ public final class MimeTypes {
      * @return mime type based on file extension
      */
     @Nullable
-    public static String getMimeType(@NonNull final String path) {
+    private static String getMimeType(@NonNull final String path) {
         if (path.endsWith(File.separator)) {
             return null;
         }

@@ -29,7 +29,7 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public final class ShellFactory {
+final class ShellFactory {
     private ShellFactory() {}
 
     @Nullable

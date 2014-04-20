@@ -334,7 +334,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      * @return true, if this file points to the same location
      */
     @Override
-    public int compareTo(GenericFile arg0) {
+    public int compareTo(@NonNull final GenericFile arg0) {
         return this.mFile.compareTo(arg0.toFile());
     }
 

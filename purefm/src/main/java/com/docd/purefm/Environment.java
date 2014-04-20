@@ -28,6 +28,7 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.utils.StorageHelper;
 import com.stericson.RootTools.execution.Shell;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -71,6 +72,19 @@ public final class Environment {
         context.registerActivityLifecycleCallbacks(sActivityMonitorListener);
     }
 
+
+    public static boolean isReadOnly(@NonNull final StorageHelper.StorageVolume volume) {
+        if (volume.file.getAbsolutePath().equals(
+                android.os.Environment.getExternalStorageDirectory().getAbsolutePath())) {
+            return android.os.Environment.getExternalStorageState().equals(
+                    android.os.Environment.MEDIA_MOUNTED_READ_ONLY);
+        }
+        if (volume.getType() == StorageHelper.StorageVolume.Type.EXTERNAL) {
+            return volume.isReadOnly() || Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        }
+        return false;
+    }
+
     @NonNull
     public static List<StorageHelper.Volume> getVolumes() {
         if (sVolumes == null) {
@@ -100,6 +114,7 @@ public final class Environment {
         return sExternalStorageMounted;
     }
     
+    @SuppressWarnings("ForLoopReplaceableByForEach")
     @SuppressLint("SdCardPath")
     @Nullable
     public static String getUtilPath(String utilname) {
@@ -119,7 +134,8 @@ public final class Environment {
         }
         return null;
     }
-    
+
+    @SuppressWarnings("ForLoopReplaceableByForEach")
     @SuppressLint("SdCardPath")
     public static boolean isUtilAvailable(String utilname) {
         final String[] places = { "/sbin/", "/system/bin/", "/system/xbin/", "/data/local/xbin/",
@@ -188,7 +204,7 @@ public final class Environment {
         
     // ============== STORAGE LISTENER ===============
     
-    static void updateExternalStorageState() {
+    private static void updateExternalStorageState() {
         final boolean isExternalStorageMounted = isExternalMounted();
         if (sVolumes == null && isExternalStorageMounted || sExternalStorageMounted != isExternalStorageMounted) {
             sExternalStorageMounted = isExternalStorageMounted;
@@ -199,7 +215,7 @@ public final class Environment {
         }
     }
     
-    static final ExternalStorageStateReceiver externalStorageStateReceiver =
+    private static final ExternalStorageStateReceiver externalStorageStateReceiver =
             new ExternalStorageStateReceiver();
     
     static final class ExternalStorageStateReceiver extends BroadcastReceiver {

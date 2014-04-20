@@ -82,8 +82,8 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     private boolean mShowHomeAsUp;
 
     private ListView mDrawerList;
-    BookmarksAdapter mBookmarksAdapter;
-    GenericFile currentPath;
+    private BookmarksAdapter mBookmarksAdapter;
+    private GenericFile currentPath;
 
     private BrowserTabsAdapter mPagerAdapter;
 

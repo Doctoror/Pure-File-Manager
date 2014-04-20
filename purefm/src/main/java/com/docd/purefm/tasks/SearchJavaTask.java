@@ -30,7 +30,7 @@ import android.support.annotation.NonNull;
 
 final class SearchJavaTask extends AbstractSearchTask {
 
-    protected SearchJavaTask(@NonNull final GenericFile startDirectory,
+    SearchJavaTask(@NonNull final GenericFile startDirectory,
                              @NonNull final SearchTaskListener listener) {
         super(startDirectory, listener);
     }

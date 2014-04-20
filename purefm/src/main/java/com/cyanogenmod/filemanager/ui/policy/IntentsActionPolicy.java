@@ -89,11 +89,10 @@ public final class IntentsActionPolicy {
 
             // Create an array list of the uris to send
             final int cc = genericFiles.size();
-            final ArrayList<Uri> uris = new ArrayList<Uri>(cc);
+            final ArrayList<Uri> uris = new ArrayList<>(cc);
             String lastMimeType = null;
             boolean sameMimeType = true;
-            for (int i = 0; i < cc; i++) {
-                final GenericFile fso = genericFiles.get(i);
+            for (final GenericFile fso : genericFiles) {
 
                 // Folders are not allowed
                 if (fso.isDirectory()) continue;

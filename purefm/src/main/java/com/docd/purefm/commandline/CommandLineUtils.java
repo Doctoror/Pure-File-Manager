@@ -26,7 +26,7 @@ import android.support.annotation.NonNull;
  *
  * @author Doctoror
  */
-public final class CommandLineUtils {
+final class CommandLineUtils {
 
     private CommandLineUtils(){}
 
@@ -49,7 +49,7 @@ public final class CommandLineUtils {
      * @return octal-formatted permission representation
      */
     @NonNull
-    protected static String toOctalPermission(final Permissions p) {
+    static String toOctalPermission(final Permissions p) {
         byte user = 00;
         byte group = 00;
         byte other = 00;
@@ -84,6 +84,7 @@ public final class CommandLineUtils {
             other += 01;
         }
         
+        @SuppressWarnings("StringBufferReplaceableByString")
         final StringBuilder perm = new StringBuilder(3);
         perm.append(user);
         perm.append(group);
