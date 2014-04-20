@@ -21,6 +21,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 public final class SettingsActivity extends ActionBarIconThemableActivity {
@@ -57,10 +58,11 @@ public final class SettingsActivity extends ActionBarIconThemableActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.onBeforeFinish();
-                return super.onOptionsItemSelected(item);
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
 
             default:
-                return false;
+                return super.onOptionsItemSelected(item);
         }
     }
     
