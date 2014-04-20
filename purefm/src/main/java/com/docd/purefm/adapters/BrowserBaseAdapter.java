@@ -31,6 +31,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.FileObserver;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -522,7 +523,8 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
         @NonNull
         private final WeakReference<BrowserBaseAdapter> mAdapterReference;
 
-        FileObserverEventHandler(BrowserBaseAdapter adapter) {
+        FileObserverEventHandler(@NonNull final BrowserBaseAdapter adapter) {
+            super(Looper.getMainLooper());
             this.mAdapterReference = new WeakReference<>(adapter);
         }
 

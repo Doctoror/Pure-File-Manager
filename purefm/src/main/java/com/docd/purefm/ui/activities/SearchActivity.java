@@ -272,14 +272,14 @@ public final class SearchActivity extends ActionBarIconThemableActivity
         }
 
         mList.setEmptyView(findViewById(android.R.id.empty));
-        mList.setAdapter(this.mAdapter);
+        mList.setAdapter(mAdapter);
         final View emptyView = mList.getEmptyView();
         if (emptyView != null) {
             emptyView.setVisibility(View.GONE);
         }
         mList.setVisibility(View.GONE);
 
-        mActionModeController.setListView(this.mList);
+        mActionModeController.setListView(mList);
 
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
