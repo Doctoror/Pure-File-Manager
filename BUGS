@@ -1,3 +1,5 @@
 - Sometimes after navigation can't focus to AbsListView no more
 - Cyrillic text from busybox is not displayed properly
 - MultiListenerFileObserver will fail if opened the same device from different mount points (for example /storage/emulated/0 and /storage/emulated/legacy have different canonical paths but are the same locations)
+- SearchActivity ListAdapter not refreshed on fie modification
+- State of Browser is restored in BrowserFragment, but the path seems default for some reason

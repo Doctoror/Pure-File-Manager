@@ -21,6 +21,7 @@ import com.stericson.RootTools.RootTools;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.os.StrictMode;
 
 public final class PureFM extends Application implements
         Application.ActivityLifecycleCallbacks {
@@ -32,6 +33,19 @@ public final class PureFM extends Application implements
 
     @Override
     public void onCreate() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                     .detectAll()
+                     .penaltyLog()
+                     .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectFileUriExposure()
+                    .detectLeakedClosableObjects()
+                    .detectLeakedRegistrationObjects()
+                    .detectLeakedSqlLiteObjects()
+                    .penaltyLog()
+                    .build());
+        }
         super.onCreate();
         ActivityMonitor.init(this);
         RootTools.handlerEnabled = false;
