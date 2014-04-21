@@ -15,32 +15,22 @@
 package com.docd.purefm.operations;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
 
 import com.docd.purefm.Environment;
-import com.docd.purefm.commandline.Command;
-import com.docd.purefm.commandline.CommandCopyRecursively;
-import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.CommandMove;
-import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.settings.Settings;
-import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.MediaStoreUtils;
+import com.docd.purefm.utils.PFMFileUtils;
 import com.stericson.RootTools.RootTools;
-import com.stericson.RootTools.execution.Shell;
 
 import android.support.annotation.NonNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Performs paste operation
@@ -68,16 +58,50 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
     }
 
     @Override
-    protected ArrayList<GenericFile> doInBackground(GenericFile... files) {
+    protected ArrayList<GenericFile> doInBackground(@NonNull final GenericFile... files) {
         final LinkedList<Pair<GenericFile, GenericFile>> filesAffected =
                 new LinkedList<>();
 
-        final ArrayList<GenericFile> failed;
+        final ArrayList<GenericFile> failed = new ArrayList<>();
 
-        if (mTarget instanceof JavaFile) {
-            failed = processJavaFiles(files, mTarget, mIsMove, filesAffected);
+        final String targetPath = mTarget.getAbsolutePath();
+        final boolean remounted;
+
+        final boolean useCommandLine = mSettings.useCommandLine();
+        if (useCommandLine && Environment.needsRemount(targetPath)) {
+            RootTools.remount(targetPath, "RW");
+            remounted = true;
         } else {
-            failed = processCommandLineFiles(mSettings, files, mTarget, mIsMove, filesAffected);
+            remounted = false;
+        }
+
+        for (final GenericFile current : files) {
+            if (isCanceled()) {
+                return failed;
+            }
+
+            if (current != null && current.exists()) {
+                try {
+                    if (mIsMove) {
+                        PFMFileUtils.moveToDirectory(current, mTarget, useCommandLine, true);
+                    } else {
+                        if (current.isDirectory()) {
+                            PFMFileUtils.copyDirectoryToDirectory(current, mTarget, useCommandLine);
+                        } else {
+                            PFMFileUtils.copyFileToDirectory(current, mTarget, useCommandLine);
+                        }
+                    }
+                    filesAffected.add(new Pair<>(current, FileFactory.newFile(
+                            mSettings, mTarget.toFile(), current.getName())));
+                } catch (IOException e) {
+                    failed.add(current);
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (remounted) {
+            RootTools.remount(targetPath, "RO");
         }
 
         if (!filesAffected.isEmpty()) {
@@ -95,104 +119,6 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             }
         }
 
-        return failed;
-    }
-
-    /**
-     * Copies or moves the files and returns list of files that failed.
-     *
-     * @param contents files to process
-     * @param target target directory to move to
-     * @param isMove if true, means the files should be moved, otherwise they will be copied
-     * @param filesAffected Pair of removed and created files
-     * @return List of files that were failed to process
-     */
-    @NonNull
-    private ArrayList<GenericFile> processJavaFiles(
-            @NonNull final GenericFile[] contents,
-            @NonNull final GenericFile target,
-            final boolean isMove,
-            @NonNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
-        final ArrayList<GenericFile> failed = new ArrayList<>();
-        for (final GenericFile current : contents) {
-            if (isCanceled()) {
-                return failed;
-            }
-
-            if (current != null && current.exists()) {
-
-                if (isMove) {
-                    if (current.move(target)) {
-                        filesAffected.add(new Pair<>(current, FileFactory.newFile(
-                                mSettings, target.toFile(), current.getName())));
-                    } else {
-                        failed.add(current);
-                    }
-                } else {
-                    if (current.copy(target)) {
-                        filesAffected.add(new Pair<>(current, FileFactory.newFile(
-                                mSettings, target.toFile(), current.getName())));
-                    } else {
-                        failed.add(current);
-                    }
-                }
-            }
-        }
-        return failed;
-    }
-
-    /**
-     * Copies or moves the files and returns list of files that failed.
-     *
-     * @param contents files to process
-     * @param target target directory to move to
-     * @param isMove if true, means the files should be moved, otherwise they will be copied
-     * @param filesAffected Pair of removed and created files
-     * @return List of files that were failed to process
-     */
-    @NonNull
-    private static ArrayList<GenericFile> processCommandLineFiles(
-            @NonNull final Settings settings,
-            @NonNull final GenericFile[] contents,
-            @NonNull final GenericFile target,
-            final boolean isMove,
-            @NonNull final List<Pair<GenericFile, GenericFile>> filesAffected) {
-        final ArrayList<GenericFile> failed = new ArrayList<>();
-        final Shell shell = ShellHolder.getShell();
-        if (shell == null) {
-            Log.w("PasteOperation", "shell is null, aborting");
-            failed.addAll(Arrays.asList(contents));
-            return failed;
-        }
-
-        final CommandLineFile[] cont = new CommandLineFile[contents.length];
-        ArrayUtils.copyArrayAndCast(contents, cont);
-        final CommandLineFile t = (CommandLineFile) target;
-        final String targetPath = target.getAbsolutePath();
-        final boolean wasRemounted;
-        if (Environment.needsRemount(targetPath)) {
-            RootTools.remount(targetPath, "RW");
-            wasRemounted = true;
-        } else {
-            wasRemounted = false;
-        }
-
-        for (final CommandLineFile current : cont) {
-            final Command command = (isMove ? new CommandMove(current, t) :
-                    new CommandCopyRecursively(current, t));
-
-            final boolean res = CommandLine.execute(shell, command);
-            if (res) {
-                filesAffected.add(new Pair<GenericFile, GenericFile>(current,
-                        FileFactory.newFile(settings, t.toFile(), current.getName())));
-            } else {
-                failed.add(current);
-            }
-
-        }
-        if (wasRemounted) {
-            RootTools.remount(targetPath, "RO");
-        }
         return failed;
     }
 }

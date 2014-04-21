@@ -25,6 +25,7 @@
         android:saveEnabled="false"
         android:choiceMode="multipleChoiceModal"
         tools:listitem="@layout/list_item_file"
-        tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity"/>
+        tools:context="com.docd.purefm.ui.activities.BrowserPagerActivity"
+        tools:ignore="UselessLeaf"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>

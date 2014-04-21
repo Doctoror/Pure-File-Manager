@@ -33,6 +33,7 @@
         android:verticalSpacing="4dp"
         android:saveEnabled="false"
         android:choiceMode="multipleChoiceModal"
-        tools:listitem="@layout/grid_item_file" />
+        tools:listitem="@layout/grid_item_file"
+        tools:ignore="UselessLeaf"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>

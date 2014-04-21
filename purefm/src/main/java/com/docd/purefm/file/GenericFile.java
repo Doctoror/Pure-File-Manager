@@ -74,22 +74,6 @@ public interface GenericFile extends Serializable {
     boolean mkdirs();
 
     /**
-     * Moves the file to target file or directory
-     *
-     * @param target file or directory to move to
-     * @return true if successfully moved
-     */
-    boolean copy(GenericFile target);
-
-    /**
-     * Moves the file to target file or directory
-     *
-     * @param target file or directory to move to
-     * @return true if successfully moved
-     */
-    boolean move(GenericFile target);
-
-    /**
      * Force-deletes this file.
      *
      * <p>Note that this method does <i>not</i> throw {@code IOException} on failure.
@@ -151,7 +135,7 @@ public interface GenericFile extends Serializable {
      * @param newFile the new file.
      * @return true on success.
      */
-    boolean renameTo(GenericFile newFile);
+    boolean renameTo(@NonNull GenericFile newFile);
 
     /**
      * Returns the length of this file in bytes.

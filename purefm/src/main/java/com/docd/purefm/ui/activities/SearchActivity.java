@@ -288,7 +288,7 @@ public final class SearchActivity extends ActionBarIconThemableActivity
                 if (target == null) {
                     throw new RuntimeException("Item at position is null");
                 }
-                PFMFileUtils.openFile(SearchActivity.this, target.toFile());
+                PFMFileUtils.openFileInExternalApp(SearchActivity.this, target.toFile());
             }
         });
     }

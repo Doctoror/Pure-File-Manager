@@ -14,33 +14,34 @@
  */
 package com.docd.purefm.tasks;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 
 import com.docd.purefm.R;
-import com.docd.purefm.commandline.CommandExists;
-import com.docd.purefm.commandline.CommandLine;
-import com.docd.purefm.commandline.ShellHolder;
+import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.file.JavaFile;
 import com.docd.purefm.utils.ClipBoard;
-import com.stericson.RootTools.execution.Shell;
 
+import android.content.Context;
+import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.util.Pair;
+import android.widget.Toast;
 
-public final class PasteTaskExecutor implements OnClickListener {
+public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialogListener {
 
     @NonNull
     private final WeakReference<Activity> mActivityReference;
+
+    @NonNull
+    private final Settings mSettings;
 
     @NonNull
     private final GenericFile mTargetFile;
@@ -49,87 +50,74 @@ public final class PasteTaskExecutor implements OnClickListener {
     private final LinkedList<GenericFile> mToProcess = new LinkedList<>();
 
     @NonNull
-    private final HashMap<File, GenericFile> mExisting = new HashMap<>();
+    private final HashMap<GenericFile, GenericFile> mExisting = new HashMap<>();
 
-    private GenericFile mCurrentFile;
+    private Thread mStartThread;
+
+    private Pair<GenericFile, GenericFile> mCurrentPair;
     
     public PasteTaskExecutor(@NonNull final Activity activity,
                              @NonNull final GenericFile targetFile) {
-        this.mActivityReference = new WeakReference<>(activity);
-        this.mTargetFile = targetFile;
+        mActivityReference = new WeakReference<>(activity);
+        mSettings = Settings.getInstance(activity);
+        mTargetFile = targetFile;
     }
     
     public void start() {
-        final GenericFile[] contents = ClipBoard.getClipBoardContents();
-        if (contents == null) {
-            return;
+        if (mStartThread == null) {
+            mStartThread = new StartThread();
+            mStartThread.start();
         }
+    }
 
-        final GenericFile target = this.mTargetFile;
-
-        if (target instanceof JavaFile) {
-            for (final GenericFile file : contents) {
-
-                if (file != null && file.exists()) {
-                    
-                    final File testTarget = new File(target.toFile(), file.getName());
-                    if (testTarget.exists()) {
-                        mExisting.put(testTarget, file);
-                    } else {
-                        mToProcess.add(file);
-                    }
-                }
-            }
-        } else {
-            final Shell shell = ShellHolder.getShell();
-            if (shell != null) {
-                Log.w("PasteTaskExecutor", "shell is null, skipping");
-                for (final GenericFile file : contents) {
-                    final File tmp = new File(target.toFile(), file.getName());
-                    if (CommandLine.execute(shell, new CommandExists(tmp.getAbsolutePath()))) {
-                        mExisting.put(tmp, file);
-                    } else {
-                        mToProcess.add(file);
-                    }
-                }
-            }
+    @Override
+    public void onActionSkip(final boolean all) {
+        if (all) {
+            mExisting.clear();
         }
-        
         next();
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case android.R.id.button1:
-                // replace
-                mToProcess.add(mCurrentFile);
-                break;
-                    
-            case android.R.id.button2:
-                // replace all;
-                mToProcess.add(mCurrentFile);
-                for (File f : mExisting.keySet()) {
-                    mToProcess.add(mExisting.get(f));
-                }
-                mExisting.clear();
-                break;
-                
-            case R.id.button4:
-                //skip all
-                mExisting.clear();
-                break;
-                
-            case R.id.button5:
-                //abort
-                mExisting.clear();
-                mToProcess.clear();
-                return;
-                
+    public void onActionReplace(final boolean all) {
+        if (mCurrentPair.second.delete()) {
+            mToProcess.add(mCurrentPair.first);
+        } else {
+            final Context context = mActivityReference.get();
+            if (context != null) {
+                Toast.makeText(context, context.getString(R.string.dialog_overwrite_replace_failed,
+                        mCurrentPair.second.getAbsolutePath()), Toast.LENGTH_LONG).show();
+            }
         }
-            
+        if (all) {
+            mToProcess.addAll(mExisting.keySet());
+            mExisting.clear();
+        }
         next();
-    }   
+    }
+
+    @Override
+    public void onActionWriteInto(final boolean all) {
+        if (all) {
+            final Set<GenericFile> toRemove = new HashSet<>();
+            for (final GenericFile file : mExisting.keySet()) {
+                if (file.isDirectory()) {
+                    toRemove.add(file);
+                }
+            }
+            for (final GenericFile file : toRemove) {
+                mExisting.remove(file);
+            }
+        }
+        next();
+    }
+
+    @Override
+    public void onActionAbort() {
+        mExisting.clear();
+        mToProcess.clear();
+    }
+
     private void next() {
         final Activity activity = this.mActivityReference.get();
         if (activity != null) {
@@ -141,21 +129,61 @@ public final class PasteTaskExecutor implements OnClickListener {
                     final GenericFile[] files = new GenericFile[mToProcess.size()];
                     mToProcess.toArray(files);
 
-                    final PasteTask task = new PasteTask(activity, this.mTargetFile);
+                    final PasteTask task = new PasteTask(activity, mTargetFile);
                     task.execute(files);
                 }
             
             } else {
-                final File key = mExisting.keySet().iterator().next();
-                this.mCurrentFile = mExisting.get(key);
+                final GenericFile key = mExisting.keySet().iterator().next();
+                final GenericFile target = mExisting.get(key);
+                mCurrentPair = new Pair<>(key, target);
                 mExisting.remove(key);
 
-                final Dialog dialog = new FileExistsDialog(activity, mCurrentFile.getAbsolutePath(),
-                        key.getAbsolutePath(), this, this, this, this, this);
                 if (!activity.isFinishing()) {
-                    dialog.show();
+                    if (Looper.myLooper() == Looper.getMainLooper()) {
+                        showExistsDialog(activity, key, target);
+                    } else {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showExistsDialog(activity, key, target);
+                            }
+                        });
+                    }
                 }
             }
+        }
+    }
+
+    private void showExistsDialog(@NonNull final Context context,
+                                  @NonNull final GenericFile source,
+                                  @NonNull final GenericFile target) {
+
+        new FileExistsDialog(context, source, target, this).show();
+    }
+
+    private final class StartThread extends Thread {
+
+        @Override
+        public void run() {
+            final GenericFile[] contents = ClipBoard.getClipBoardContents();
+            if (contents == null) {
+                return;
+            }
+
+            for (final GenericFile file : contents) {
+                if (file != null && file.exists()) {
+                    final GenericFile testTarget = FileFactory.newFile(mSettings,
+                            mTargetFile.toFile(), file.getName());
+                    if (testTarget.exists()) {
+                        mExisting.put(file, testTarget);
+                    } else {
+                        mToProcess.add(file);
+                    }
+                }
+            }
+
+            next();
         }
     }
 }

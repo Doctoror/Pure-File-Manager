@@ -16,6 +16,7 @@
  */
 package com.cyanogenmod.filemanager.util;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -258,6 +259,7 @@ public final class MediaHelper {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private static final class UserHandleJellyBeanMR1 {
 
+        @SuppressLint("NewApi")
         static int myUserId() {
             try {
                 final Method myUserIdMethod = android.os.UserHandle.class.getMethod("myUserId");

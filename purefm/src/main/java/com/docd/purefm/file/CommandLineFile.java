@@ -31,7 +31,6 @@ import android.support.annotation.Nullable;
 
 import com.docd.purefm.commandline.Command;
 import com.docd.purefm.commandline.CommandChmod;
-import com.docd.purefm.commandline.CommandCopyRecursively;
 import com.docd.purefm.commandline.CommandDu;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandListContents;
@@ -825,49 +824,6 @@ public final class CommandLineFile implements GenericFile,
                 new CommandChmod(mFile.getAbsolutePath(), newPerm));
         if (result) {
             this.mPermissions = newPerm;
-        }
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean copy(@NonNull final GenericFile target) {
-        if (!this.mExists) {
-            return false;
-        }
-        final Shell shell = ShellHolder.getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "copy(): shell is null");
-            return false;
-        }
-        return CommandLine.execute(shell,
-                new CommandCopyRecursively(this, target));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean move(@NonNull final GenericFile target) {
-        if (!this.mExists) {
-            return false;
-        }
-        final Shell shell = ShellHolder.getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "move(): shell is null");
-            return false;
-        }
-        final boolean result = CommandLine.execute(shell,
-                new CommandMove(this, target));
-        if (result) {
-            this.mExists = false;
-            this.mIsDirectory = false;
-            this.mIsSymlink = false;
-            this.mOwner = 0;
-            this.mGroup = 0;
-            this.mPermissions = null;
         }
         return result;
     }

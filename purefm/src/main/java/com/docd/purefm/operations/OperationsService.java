@@ -226,7 +226,7 @@ public final class OperationsService extends MultiWorkerService
     private synchronized void onActionPaste(@NonNull final Intent pasteIntent) {
         final GenericFile target = (GenericFile) pasteIntent.getSerializableExtra(EXTRA_FILE);
         if (target == null) {
-            throw new RuntimeException("ACTION_PASTE intent should contain non-null EXTRA_FILE1");
+            throw new RuntimeException("ACTION_PASTE intent should contain non-null EXTRA_FILE");
         }
 
         final Object[] filesObject = (Object[]) pasteIntent.getSerializableExtra(EXTRA_FILES);

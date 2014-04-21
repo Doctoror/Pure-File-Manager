@@ -18,8 +18,10 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.PFMTextUtils;
 import com.stericson.RootTools.RootTools;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 
@@ -38,13 +40,7 @@ public final class PureFM extends Application implements
                      .detectAll()
                      .penaltyLog()
                      .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectFileUriExposure()
-                    .detectLeakedClosableObjects()
-                    .detectLeakedRegistrationObjects()
-                    .detectLeakedSqlLiteObjects()
-                    .penaltyLog()
-                    .build());
+            StrictMode.setVmPolicy(buildStrictModeVmPolicy().build());
         }
         super.onCreate();
         ActivityMonitor.init(this);
@@ -104,5 +100,38 @@ public final class PureFM extends Application implements
     @Override
     public void onActivityDestroyed(Activity activity) {
 
+    }
+
+    private static StrictMode.VmPolicy.Builder buildStrictModeVmPolicy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            return StrictModeVmPolicyBuilder_JB_MR2.build();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return StrictModeVmPolicyBuilder_JB.build();
+        }
+        return StrictModeVmPolicyBuilder.build();
+    }
+
+    private static final class StrictModeVmPolicyBuilder {
+        static StrictMode.VmPolicy.Builder build() {
+            return new StrictMode.VmPolicy.Builder()
+                    .penaltyLog()
+                    .detectLeakedClosableObjects()
+                    .detectLeakedSqlLiteObjects();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private static final class StrictModeVmPolicyBuilder_JB {
+        static StrictMode.VmPolicy.Builder build() {
+            return StrictModeVmPolicyBuilder.build().detectLeakedRegistrationObjects();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private static final class StrictModeVmPolicyBuilder_JB_MR2 {
+        static StrictMode.VmPolicy.Builder build() {
+            return StrictModeVmPolicyBuilder_JB.build().detectFileUriExposure();
+        }
     }
 }

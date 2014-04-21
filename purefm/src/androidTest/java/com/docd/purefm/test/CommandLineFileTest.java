@@ -260,7 +260,7 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         CommandLineFile file2 = CommandLineFile.fromFile(shell, settings, test2);
         assertIsEmptyFile(file2);
 
-        file1.move(file2);
+        file1.moveToDirectory(file2);
         assertIsEmptyFile(file1);
 
         file2 = CommandLineFile.fromFile(shell, settings, test2);

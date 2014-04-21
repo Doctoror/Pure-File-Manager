@@ -15,11 +15,13 @@
 package com.docd.purefm.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import android.support.annotation.NonNull;
@@ -27,7 +29,9 @@ import android.support.annotation.Nullable;
 
 import com.docd.purefm.Environment;
 import com.docd.purefm.R;
+import com.docd.purefm.commandline.CommandCopyRecursively;
 import com.docd.purefm.commandline.CommandLine;
+import com.docd.purefm.commandline.CommandMove;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
@@ -159,7 +163,8 @@ public final class PFMFileUtils {
                 null : fsTypeResult.get(0);
     }
     
-    public static void openFile(@NonNull final Context context, @NonNull final File target) {
+    public static void openFileInExternalApp(@NonNull final Context context,
+                                             @NonNull final File target) {
         final String mime = MimeTypes.getMimeType(target);
         if (mime != null) {
             final Intent i = new Intent(Intent.ACTION_VIEW);
@@ -177,6 +182,188 @@ public final class PFMFileUtils {
             } catch (Exception e) {
                 Toast.makeText(context, context.getString(R.string.could_not_open_file_) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    public static void moveFile(@NonNull final GenericFile source,
+                                @NonNull final GenericFile target,
+                                final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            if (target.exists()) {
+                throw new FileExistsException("Target exists");
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandMove(source, target));
+            if (!result) {
+                throw new IOException("Move failed");
+            }
+        } else {
+            FileUtils.moveFile(source.toFile(), target.toFile());
+        }
+    }
+
+    public static void copyFile(@NonNull final GenericFile source,
+                                @NonNull final GenericFile target,
+                                final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandCopyRecursively(source, target));
+            if (!result) {
+                throw new IOException("Move failed");
+            }
+        } else {
+            FileUtils.copyFile(source.toFile(), target.toFile());
+        }
+    }
+
+    public static void copyFileToDirectory(@NonNull final GenericFile source,
+                                           @NonNull final GenericFile target,
+                                           final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            if (!target.exists()) {
+                throw new FileNotFoundException("Target doesn't exist");
+            }
+            if (!target.isDirectory()) {
+                throw new IllegalArgumentException("Target is not a directory");
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandCopyRecursively(source, target));
+            if (!result) {
+                throw new IOException("Move failed");
+            }
+        } else {
+            FileUtils.copyFileToDirectory(source.toFile(), target.toFile());
+        }
+    }
+
+    public static void moveDirectory(@NonNull final GenericFile source,
+                                     @NonNull final GenericFile target,
+                                     final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            if (target.exists()) {
+                throw new FileExistsException("Target exists");
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandMove(source, target));
+            if (!result) {
+                throw new IOException("Move failed");
+            }
+        } else {
+            FileUtils.moveDirectory(source.toFile(), target.toFile());
+        }
+    }
+
+    public static void moveToDirectory(@NonNull final GenericFile source,
+                                       @NonNull final GenericFile target,
+                                       final boolean useCommandLine,
+                                       final boolean createDestDir) throws IOException {
+
+        if (useCommandLine) {
+            if (!source.exists()) {
+                throw new FileNotFoundException("Source '" + source + "' does not exist");
+            }
+            if (target.exists()) {
+                if (!target.isDirectory()) {
+                    throw new IOException("Target is not a directory");
+                }
+            } else {
+                if (createDestDir) {
+                    if (!target.mkdirs()) {
+                        throw new IOException("Failed to create target directory");
+                    }
+                } else {
+                    throw new FileNotFoundException("Target directory doesn't exist");
+                }
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandMove(source, target));
+            if (!result) {
+                throw new IOException("Moving failed");
+            }
+        } else {
+            FileUtils.moveToDirectory(source.toFile(), target.toFile(), createDestDir);
+        }
+    }
+
+    public static void copyDirectory(@NonNull final GenericFile source,
+                                     @NonNull final GenericFile target,
+                                     final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            if (!source.exists()) {
+                throw new FileNotFoundException("Source '" + source + "' does not exist");
+            }
+            if (!source.isDirectory()) {
+                throw new IOException("Source '" + source + "' exists but is not a directory");
+            }
+            if (source.getCanonicalPath().equals(target.getCanonicalPath())) {
+                throw new IOException("Source '" + source + "' and destination '" + target +
+                        "' are the same");
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandCopyRecursively(source, target));
+            if (!result) {
+                throw new IOException("Copying failed");
+            }
+        } else {
+            FileUtils.copyDirectory(source.toFile(), target.toFile());
+        }
+    }
+
+    public static void copyDirectoryToDirectory(@NonNull final GenericFile source,
+                                                @NonNull final GenericFile target,
+                                                final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            if (!source.exists()) {
+                throw new FileNotFoundException("Source '" + source + "' does not exist");
+            }
+            if (!source.isDirectory()) {
+                throw new IOException("Source '" + source + "' exists but is not a directory");
+            }
+            if (source.getCanonicalPath().equals(target.getCanonicalPath())) {
+                throw new IOException("Source '" + source + "' and destination '" + target +
+                        "' are the same");
+            }
+            if (!target.exists()) {
+                throw new FileNotFoundException("Target dir does not exist");
+            }
+            if (!target.isDirectory()) {
+                throw new IOException("Target is not a directory");
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandCopyRecursively(source, target));
+            if (!result) {
+                throw new IOException("Copying failed");
+            }
+        } else {
+            FileUtils.copyDirectoryToDirectory(source.toFile(), target.toFile());
         }
     }
     

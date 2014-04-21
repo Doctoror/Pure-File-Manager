@@ -135,9 +135,10 @@
     <string name="dialog_overwrite_destination">Destination</string>
     <string name="dialog_overwrite_abort">Abort</string>
     <string name="dialog_overwrite_skip">Skip</string>
-    <string name="dialog_overwrite_skip_all">Skip all</string>
     <string name="dialog_overwrite_replace">Replace</string>
-    <string name="dialog_overwrite_replace_all">Replace all</string>
+    <string name="dialog_overwrite_write_into">Write into</string>
+    <string name="dialog_overwrite_apply_to_all">Apply to all</string>
+    <string name="dialog_overwrite_replace_failed">Failed to replace “%1$s”</string>
 
     <string name="dialog_copy_failed">Failed to copy the following files</string>
     <string name="dialog_move_failed">Failed to move the following files</string>

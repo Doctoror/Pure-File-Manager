@@ -15,88 +15,85 @@
 package com.docd.purefm.ui.dialogs;
 
 import com.docd.purefm.R;
+import com.docd.purefm.file.GenericFile;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import android.support.annotation.NonNull;
 
 public final class FileExistsDialog extends Dialog {
+
+    public interface FileExistsDialogListener {
+        void onActionSkip(boolean all);
+        void onActionReplace(boolean all);
+        void onActionWriteInto(boolean all);
+        void onActionAbort();
+    }
     
     public FileExistsDialog(
             @NonNull final Context context,
-            @NonNull final String source,
-            @NonNull final String target,
-            @NonNull final View.OnClickListener abortAction,
-            @NonNull final View.OnClickListener skipAction,
-            @NonNull final View.OnClickListener skipAllAction,
-            @NonNull final View.OnClickListener replaceAction,
-            @NonNull final View.OnClickListener replaceAllAction) {
+            @NonNull final GenericFile source,
+            @NonNull final GenericFile target,
+            @NonNull final FileExistsDialogListener listener) {
         super(context);
         
         this.setTitle(R.string.dialog_overwrite_title);
         this.setContentView(R.layout.dialog_exists);
         
-        this.initView(source, target, abortAction, skipAction, skipAllAction, replaceAction, replaceAllAction);
+        this.initView(source, target, listener);
     }
     
     private void initView(
-            @NonNull final String sourcePath,
-            @NonNull final String targetPath,
-            @NonNull final View.OnClickListener abortAction,
-            @NonNull final View.OnClickListener skipAction,
-            @NonNull final View.OnClickListener skipAllAction,
-            @NonNull final View.OnClickListener replaceAction,
-            @NonNull final View.OnClickListener replaceAllAction) {
+            @NonNull final GenericFile sourceFile,
+            @NonNull final GenericFile targetFile,
+            @NonNull final FileExistsDialogListener listener) {
         
-        final TextView source = (TextView) this.findViewById(android.R.id.text1);
-        source.setText(sourcePath);
+        final TextView source = (TextView) findViewById(android.R.id.text1);
+        source.setText(sourceFile.getAbsolutePath());
         
-        final TextView target = (TextView) this.findViewById(android.R.id.text2);
-        target.setText(targetPath);
-        
-        this.findViewById(android.R.id.button1).setOnClickListener(new View.OnClickListener() {
+        final TextView target = (TextView) findViewById(android.R.id.text2);
+        target.setText(targetFile.getAbsolutePath());
+
+        final CompoundButton applyToAll = (CompoundButton) findViewById(android.R.id.checkbox);
+
+        final View writeInto = findViewById(android.R.id.button1);
+        if (sourceFile.isDirectory()) {
+            writeInto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                    listener.onActionWriteInto(applyToAll.isChecked());
+                }
+            });
+        } else {
+            writeInto.setVisibility(View.GONE);
+        }
+
+        findViewById(android.R.id.button2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
-                replaceAction.onClick(v);
+                listener.onActionReplace(applyToAll.isChecked());
             }
         });
-        this.findViewById(android.R.id.button2).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(android.R.id.button3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
-                replaceAllAction.onClick(v);
+                listener.onActionSkip(applyToAll.isChecked());
             }
         });
-        this.findViewById(android.R.id.button3).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(R.id.abort).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
-                skipAction.onClick(v);
-            }
-        });
-        this.findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-                skipAllAction.onClick(v);
-            }
-        });
-        this.findViewById(R.id.button5).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-                abortAction.onClick(v);
-            }
-        });
-        this.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                skipAllAction.onClick(findViewById(R.id.button5));
+                listener.onActionAbort();
             }
         });
     }

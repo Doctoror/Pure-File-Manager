@@ -148,58 +148,10 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      * {@inheritDoc}
      */
     @Override
-    public boolean copy(GenericFile target) {
-        try {
-            if (this.mFile.isDirectory()) {
-                if (target.exists() && !target.isDirectory()) {
-                    return false;
-                }
-                FileUtils.copyDirectoryToDirectory(this.mFile, target.toFile());
-            } else {
-                if (target.isDirectory()) {
-                    FileUtils.copyFileToDirectory(this.mFile, target.toFile());
-                } else {
-                    FileUtils.copyFile(this.mFile, target.toFile());
-                }
-            }
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean move(GenericFile target) {
-        try {
-            if (this.mFile.isDirectory()) {
-                if (target.exists() && !target.isDirectory()) {
-                    return false;
-                }
-                FileUtils.moveDirectoryToDirectory(this.mFile, target.toFile(), false);
-            } else {
-                if (target.isDirectory()) {
-                    FileUtils.moveFileToDirectory(this.mFile, target.toFile(), false);
-                } else {
-                    FileUtils.moveFile(this.mFile, target.toFile());
-                }
-            }
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean delete() {
-        if (this.mFile.isDirectory()) {
+        if (mFile.isDirectory()) {
             try {
-                FileUtils.deleteDirectory(this.mFile);
+                FileUtils.deleteDirectory(mFile);
                 return true;
             } catch (IOException e) {
                 return false;
@@ -445,7 +397,7 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      * {@inheritDoc}
      */
     @Override
-    public boolean renameTo(final GenericFile newName) {
+    public boolean renameTo(@NonNull final GenericFile newName) {
         return this.mFile.renameTo(newName.toFile());
     }
 

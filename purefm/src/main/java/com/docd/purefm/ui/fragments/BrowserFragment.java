@@ -367,7 +367,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
                 } else {
                     final AbstractBrowserActivity activity = getBrowserActivity();
                     if (activity.getGetContentMimeType() == null) {
-                        PFMFileUtils.openFile(activity, target.toFile());
+                        PFMFileUtils.openFileInExternalApp(activity, target.toFile());
                     } else {
                         final Intent intent = new Intent();
                         intent.setData(getResultUriForFileFromIntent(activity.getContentResolver(),
