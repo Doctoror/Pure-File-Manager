@@ -106,9 +106,13 @@ public final class PFMTextUtils {
             fileList.append('\n');
         }
         // remove last '\n'
-        fileList.deleteCharAt(fileList.length() - 1);
-        final SpannableString ss = new SpannableString(fileList.toString());
-        ss.setSpan(new DashSpan(), 0, ss.length(), 0);
-        return ss;
+        if (fileList.length() != 0) {
+            fileList.deleteCharAt(fileList.length() - 1);
+            final SpannableString ss = new SpannableString(fileList.toString());
+            ss.setSpan(new DashSpan(), 0, ss.length(), 0);
+
+            return ss;
+        }
+        return new SpannableString("");
     }
 }

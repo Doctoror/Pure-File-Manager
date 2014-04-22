@@ -432,17 +432,19 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
         }
         if (operation != null) {
             switch (operation) {
-                case OperationsService.ACTION_DELETE:
-                    if (result != null && !isFinishing()) {
-                        //noinspection unchecked
+                case OperationsService.ACTION_DELETE: {
+                    @SuppressWarnings("unchecked")
+                    final ArrayList<GenericFile> failed = (ArrayList<GenericFile>) result;
+                    if (failed != null && !failed.isEmpty() && !isFinishing()) {
                         MessageDialogBuilder.create(this,
                                 R.string.dialog_delete_failed, PFMTextUtils.fileListToDashList(
-                                        (ArrayList<GenericFile>) result)
+                                        failed)
                         ).show();
                     }
                     break;
+                }
 
-                case OperationsService.ACTION_PASTE:
+                case OperationsService.ACTION_PASTE: {
                     @SuppressWarnings("unchecked")
                     final ArrayList<GenericFile> failed = (ArrayList<GenericFile>) result;
                     if (failed != null && !failed.isEmpty() && !isFinishing()) {
@@ -453,6 +455,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
                     }
                     invalidateOptionsMenu();
                     break;
+                }
 
                 case OperationsService.ACTION_RENAME:
                 case OperationsService.ACTION_CREATE_FILE:

@@ -128,6 +128,8 @@
         <item quantity="one">Copied %1$d file to clipboard</item>
         <item quantity="other">Copied %1$d files to clipboard</item>
     </plurals>
+
+    <string name="not_enough_space_message">Not enough space to paste files. Available %1$s, required %2$s.</string>
     
     <string name="dialog_overwrite_title">Target file already exists</string>
     <string name="dialog_overwrite_message">This action will overwrite destination.</string>

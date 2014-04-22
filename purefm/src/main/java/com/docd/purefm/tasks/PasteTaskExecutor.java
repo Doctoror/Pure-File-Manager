@@ -15,6 +15,7 @@
 package com.docd.purefm.tasks;
 
 import java.lang.ref.WeakReference;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,8 +30,11 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
+import com.docd.purefm.utils.PFMFileUtils;
+import com.docd.purefm.utils.StatFsCompat;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Pair;
@@ -53,6 +57,10 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
     @NonNull
     private final HashMap<GenericFile, GenericFile> mExisting = new HashMap<>();
 
+    private FreeSpaceTask mFreeSpaceTask;
+
+
+    @SuppressWarnings("FieldCanBeLocal")
     private Thread mStartThread;
 
     private Pair<GenericFile, GenericFile> mCurrentPair;
@@ -65,9 +73,9 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
     }
     
     public void start() {
-        if (mStartThread == null) {
-            mStartThread = new StartThread();
-            mStartThread.start();
+        if (mFreeSpaceTask == null) {
+            mFreeSpaceTask = new FreeSpaceTask(mTargetFile, mToProcess);
+            mFreeSpaceTask.execute();
         }
     }
 
@@ -160,6 +168,61 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
                                   @NonNull final GenericFile target) {
 
         new FileExistsDialog(context, source, target, this).show();
+    }
+
+    private static final class FreeSpaceTaskResult {
+
+        final long mFreeSpace;
+        final long mFilesSize;
+        final boolean mHasEnoughFreeSpace;
+
+        FreeSpaceTaskResult(final long freeSpace,
+                            final long filesSize) {
+            this.mFreeSpace = freeSpace;
+            this.mFilesSize = filesSize;
+            mHasEnoughFreeSpace = freeSpace > mFilesSize;
+        }
+    }
+
+    private final class FreeSpaceTask extends AsyncTask<Void, Void, FreeSpaceTaskResult> {
+
+        private final GenericFile mTarget;
+        private final Iterable<GenericFile> mFiles;
+
+        FreeSpaceTask(@NonNull final GenericFile target,
+                             @NonNull final Iterable<GenericFile> files) {
+            this.mTarget = target;
+            this.mFiles = files;
+        }
+
+        @NonNull
+        @Override
+        protected FreeSpaceTaskResult doInBackground(Void... params) {
+            long total = 0;
+            for (final GenericFile file : mFiles) {
+                total += file.length();
+            }
+            final StatFsCompat statFs = new StatFsCompat(PFMFileUtils.fullPath(mTarget));
+            return new FreeSpaceTaskResult(statFs.getAvailableBytes(), total);
+        }
+
+        @Override
+        protected void onPostExecute(@NonNull final FreeSpaceTaskResult freeSpaceTaskResult) {
+            if (freeSpaceTaskResult.mHasEnoughFreeSpace) {
+                mStartThread = new StartThread();
+                mStartThread.start();
+            } else {
+                final Context context = mActivityReference.get();
+                if (context != null) {
+                    final String freeSpace = PFMFileUtils.byteCountToDisplaySize(
+                            BigInteger.valueOf(freeSpaceTaskResult.mFreeSpace));
+                    final String filesSize = PFMFileUtils.byteCountToDisplaySize(
+                            BigInteger.valueOf(freeSpaceTaskResult.mFilesSize));
+                    Toast.makeText(context, context.getString(R.string.not_enough_space_message,
+                            freeSpace, filesSize), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     private final class StartThread extends Thread {
