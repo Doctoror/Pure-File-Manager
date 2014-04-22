@@ -18,7 +18,7 @@ import java.io.File;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.tasks.CreateDirectoryTask;
+import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.utils.PFMFileUtils;
 
 import android.app.Activity;
@@ -66,7 +66,7 @@ public final class CreateDirectoryDialog extends DialogFragment {
                 if (newName.isEmpty()) {
                     newName = mFileNameInput.getHint().toString();
                 }
-                new CreateDirectoryTask(activity, current).execute(newName);
+                OperationsService.createDirectory(activity, current, newName);
             }
         });
         b.setNegativeButton(R.string.cancel, null);

@@ -50,14 +50,20 @@ import com.docd.purefm.adapters.BrowserTabsAdapter;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.ui.fragments.BrowserFragment;
+import com.docd.purefm.utils.ClipBoard;
+import com.docd.purefm.utils.PFMTextUtils;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.ui.view.BreadCrumbTextView;
 import com.docd.purefm.utils.ThemeUtils;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 /**
  * Activity that holds ViewPager with BrowserFragments
@@ -400,7 +406,8 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     // ================= OPERATION LISTENER ====================
 
     @Override
-    public void onOperationStarted(@Nullable final CharSequence operationMessage,
+    public void onOperationStarted(@NonNull final String action,
+                                   @Nullable final CharSequence operationMessage,
                                    @NonNull final Intent cancelIntent) {
         if (mOperationProgressDialog == null || !mOperationProgressDialog.isShowing()) {
             mOperationProgressDialog = ProgressAlertDialogBuilder.create(this,
@@ -417,10 +424,42 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onOperationEnded(@Nullable final Object result) {
+    public void onOperationEnded(@Nullable final String operation,
+                                 @Nullable final Object result) {
         if (mOperationProgressDialog != null) {
             mOperationProgressDialog.dismiss();
             mOperationProgressDialog = null;
+        }
+        if (operation != null) {
+            switch (operation) {
+                case OperationsService.ACTION_DELETE:
+                    if (result != null && !isFinishing()) {
+                        //noinspection unchecked
+                        MessageDialogBuilder.create(this,
+                                R.string.dialog_delete_failed, PFMTextUtils.fileListToDashList(
+                                        (ArrayList<GenericFile>) result)
+                        ).show();
+                    }
+                    break;
+
+                case OperationsService.ACTION_PASTE:
+                    @SuppressWarnings("unchecked")
+                    final ArrayList<GenericFile> failed = (ArrayList<GenericFile>) result;
+                    if (failed != null && !failed.isEmpty() && !isFinishing()) {
+                        MessageDialogBuilder.create(this, ClipBoard.isMove() ?
+                                        R.string.dialog_move_failed : R.string.dialog_copy_failed,
+                                PFMTextUtils.fileListToDashList(failed)
+                        ).show();
+                    }
+                    invalidateOptionsMenu();
+                    break;
+
+                case OperationsService.ACTION_RENAME:
+                case OperationsService.ACTION_CREATE_FILE:
+                case OperationsService.ACTION_CREATE_DIRECTORY:
+                    Toast.makeText(this, (CharSequence) result, Toast.LENGTH_SHORT).show();
+                    break;
+            }
         }
     }
 

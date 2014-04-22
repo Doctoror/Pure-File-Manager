@@ -30,7 +30,7 @@ import android.widget.EditText;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
-import com.docd.purefm.tasks.CreateFileTask;
+import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.utils.PFMFileUtils;
 
 public final class CreateFileDialog extends DialogFragment {
@@ -65,7 +65,7 @@ public final class CreateFileDialog extends DialogFragment {
                         if (newName.isEmpty()) {
                             newName = mFileNameInput.getHint().toString();
                         }
-                        new CreateFileTask(activity, current).execute(newName);
+                        OperationsService.createFile(activity, current, newName);
                     }
                 });
         b.setNegativeButton(R.string.cancel, null);

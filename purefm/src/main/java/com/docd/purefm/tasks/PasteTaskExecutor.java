@@ -24,6 +24,7 @@ import android.app.Activity;
 
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
@@ -129,8 +130,7 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
                     final GenericFile[] files = new GenericFile[mToProcess.size()];
                     mToProcess.toArray(files);
 
-                    final PasteTask task = new PasteTask(activity, mTargetFile);
-                    task.execute(files);
+                    OperationsService.paste(activity, mTargetFile, files, ClipBoard.isMove());
                 }
             
             } else {

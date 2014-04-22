@@ -22,6 +22,7 @@ import com.docd.purefm.file.FileFactory;
 import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
+import com.docd.purefm.utils.ClipBoard;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PFMFileUtils;
 import com.stericson.RootTools.RootTools;
@@ -59,6 +60,8 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
 
     @Override
     protected ArrayList<GenericFile> doInBackground(@NonNull final GenericFile... files) {
+        ClipBoard.lock();
+
         final LinkedList<Pair<GenericFile, GenericFile>> filesAffected =
                 new LinkedList<>();
 
@@ -74,49 +77,53 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
         } else {
             remounted = false;
         }
+        try {
+            for (final GenericFile current : files) {
+                if (isCanceled()) {
+                    return failed;
+                }
 
-        for (final GenericFile current : files) {
-            if (isCanceled()) {
-                return failed;
-            }
-
-            if (current != null && current.exists()) {
-                try {
-                    if (mIsMove) {
-                        PFMFileUtils.moveToDirectory(current, mTarget, useCommandLine, true);
-                    } else {
-                        if (current.isDirectory()) {
-                            PFMFileUtils.copyDirectoryToDirectory(current, mTarget, useCommandLine);
+                if (current != null && current.exists()) {
+                    try {
+                        if (mIsMove) {
+                            PFMFileUtils.moveToDirectory(current, mTarget, useCommandLine, true);
                         } else {
-                            PFMFileUtils.copyFileToDirectory(current, mTarget, useCommandLine);
+                            if (current.isDirectory()) {
+                                PFMFileUtils.copyDirectoryToDirectory(current, mTarget, useCommandLine);
+                            } else {
+                                PFMFileUtils.copyFileToDirectory(current, mTarget, useCommandLine);
+                            }
                         }
+                        filesAffected.add(new Pair<>(current, FileFactory.newFile(
+                                mSettings, mTarget.toFile(), current.getName())));
+                    } catch (IOException e) {
+                        failed.add(current);
+                        e.printStackTrace();
                     }
-                    filesAffected.add(new Pair<>(current, FileFactory.newFile(
-                            mSettings, mTarget.toFile(), current.getName())));
-                } catch (IOException e) {
-                    failed.add(current);
-                    e.printStackTrace();
                 }
             }
-        }
+        } finally {
+            if (remounted) {
+                RootTools.remount(targetPath, "RO");
+            }
 
-        if (remounted) {
-            RootTools.remount(targetPath, "RO");
-        }
-
-        if (!filesAffected.isEmpty()) {
-            if (mIsMove) {
-                MediaStoreUtils.moveFiles(mContext, filesAffected);
-                for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
-                    FileObserverNotifier.notifyDeleted(filesPair.first);
-                    FileObserverNotifier.notifyCreated(filesPair.second);
-                }
-            } else {
-                MediaStoreUtils.copyFiles(mContext, filesAffected);
-                for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
-                    FileObserverNotifier.notifyCreated(filesPair.second);
+            if (!filesAffected.isEmpty()) {
+                if (mIsMove) {
+                    MediaStoreUtils.moveFiles(mContext, filesAffected);
+                    for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
+                        FileObserverNotifier.notifyDeleted(filesPair.first);
+                        FileObserverNotifier.notifyCreated(filesPair.second);
+                    }
+                } else {
+                    MediaStoreUtils.copyFiles(mContext, filesAffected);
+                    for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
+                        FileObserverNotifier.notifyCreated(filesPair.second);
+                    }
                 }
             }
+
+            ClipBoard.unlock();
+            ClipBoard.clear();
         }
 
         return failed;

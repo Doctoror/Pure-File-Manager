@@ -23,7 +23,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.docd.purefm.ActivityMonitor;
 import com.docd.purefm.Environment;
@@ -45,7 +44,6 @@ import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
  * IntentService that performs file operations
@@ -54,12 +52,6 @@ import java.io.Serializable;
  */
 public final class OperationsService extends MultiWorkerService
         implements ActivityMonitor.ActivityMonitorListener {
-
-    public static final String BROADCAST_OPERATION_COMPLETED = "OperationsService.broadcasts.OPERATION_COMPLETED";
-    public static final String EXTRA_ACTION = "OperationsService.extras.ACTION";
-    public static final String EXTRA_WAS_CANCELED = "OperationsService.extras.WAS_CANCELED";
-    public static final String EXTRA_RESULT = "OperationsService.extras.RESULT";
-    public static final String EXTRA_RESULT_CLASS = "OperationsService.extras.RESULT_CLASS";
 
     public static final String ACTION_PASTE = "OperationsService.actions.PASTE";
     public static final String ACTION_DELETE = "OperationsService.actions.DELETE";
@@ -240,7 +232,7 @@ public final class OperationsService extends MultiWorkerService
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
                 mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
-                        mOperationListener, getOperationMessage(EOperation.PASTE),
+                        ACTION_PASTE, mOperationListener, getOperationMessage(EOperation.PASTE),
                                 getCancelPasteIntent(this));
                 mHandler.removeCallbacks(mPendingOperationEndedRunnable);
                 mHandler.post(mPendingOperationStartedRunnable);
@@ -264,7 +256,7 @@ public final class OperationsService extends MultiWorkerService
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
                 mPendingOperationStartedRunnable = new OnOperationStartedRunnable(
-                        mOperationListener, getOperationMessage(EOperation.DELETE),
+                        ACTION_DELETE, mOperationListener, getOperationMessage(EOperation.DELETE),
                                 getCancelDeleteIntent(this));
                 mHandler.removeCallbacks(mPendingOperationEndedRunnable);
                 mHandler.post(mPendingOperationStartedRunnable);
@@ -370,45 +362,18 @@ public final class OperationsService extends MultiWorkerService
                 false);
     }
 
-    private void onOperationCompleted(@NonNull final String action, @Nullable CharSequence result, final boolean wasCanceled) {
+    private void onOperationCompleted(@NonNull final String action,
+                                      @Nullable final Object result,
+                                      final boolean wasCanceled) {
         mHandler.removeCallbacks(mPendingOperationStartedRunnable);
         synchronized (mOperationListenerLock) {
             if (mOperationListener != null) {
                 mPendingOperationEndedRunnable = new OnOperationEndedRunnable(
-                        mOperationListener, result);
+                        mOperationListener, action, result);
                 mHandler.post(mPendingOperationEndedRunnable);
             }
         }
         stopForeground(true);
-        final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
-        broadcast.putExtra(EXTRA_RESULT, result);
-        broadcast.putExtra(EXTRA_RESULT_CLASS, CharSequence.class);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(broadcast);
-    }
-
-    private <T extends Serializable> void onOperationCompleted(
-            @NonNull final String action, @Nullable T result, final boolean wasCanceled) {
-        mHandler.removeCallbacks(mPendingOperationStartedRunnable);
-        synchronized (mOperationListenerLock) {
-            if (mOperationListener != null) {
-                mPendingOperationEndedRunnable = new OnOperationEndedRunnable(
-                        mOperationListener, result);
-                mHandler.post(mPendingOperationEndedRunnable);
-            }
-        }
-        stopForeground(true);
-        final Intent broadcast = createOperationCompletedIntent(action, wasCanceled);
-        broadcast.putExtra(EXTRA_RESULT, result);
-        broadcast.putExtra(EXTRA_RESULT_CLASS, Serializable.class);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(broadcast);
-    }
-
-    private Intent createOperationCompletedIntent(
-            @NonNull final String action, final boolean wasCanceled) {
-        final Intent broadcast = new Intent(BROADCAST_OPERATION_COMPLETED);
-        broadcast.putExtra(EXTRA_ACTION, action);
-        broadcast.putExtra(EXTRA_WAS_CANCELED, wasCanceled);
-        return broadcast;
     }
 
     @Override
@@ -490,47 +455,59 @@ public final class OperationsService extends MultiWorkerService
     }
 
     public interface OperationListener {
-        void onOperationStarted(@Nullable CharSequence operationMessage,
+        void onOperationStarted(@NonNull String operation,
+                                @Nullable CharSequence operationMessage,
                                 @NonNull Intent cancelIntent);
 
-        void onOperationEnded(@Nullable Object result);
+        void onOperationEnded(@Nullable String operation, @Nullable Object result);
     }
 
     private static final class OnOperationStartedRunnable implements Runnable {
 
+        private final String mOperation;
         private final CharSequence mOperationMessage;
         private final Intent mCancelIntent;
 
         private final OperationListener mOperationListener;
 
-        OnOperationStartedRunnable(@NonNull OperationListener operationListener,
+        OnOperationStartedRunnable(@NonNull final String operation,
+                                   @NonNull OperationListener operationListener,
                                    @Nullable final CharSequence operationMessage,
                                    @NonNull final Intent cancelIntent) {
-            this.mOperationListener = operationListener;
-            this.mOperationMessage = operationMessage;
-            this.mCancelIntent = cancelIntent;
+            mOperation = operation;
+            mOperationListener = operationListener;
+            mOperationMessage = operationMessage;
+            mCancelIntent = cancelIntent;
         }
 
         @Override
         public void run() {
-            mOperationListener.onOperationStarted(mOperationMessage, mCancelIntent);
+            mOperationListener.onOperationStarted(mOperation, mOperationMessage, mCancelIntent);
         }
     }
 
     private static final class OnOperationEndedRunnable implements Runnable {
 
+        @NonNull
+        private final String mOperation;
+
+        @Nullable
         private final Object mResult;
+
+        @NonNull
         private final OperationListener mOperationListener;
 
         OnOperationEndedRunnable(@NonNull OperationListener operationListener,
+                                 @NonNull final String operation,
                                  @Nullable final Object result) {
             this.mOperationListener = operationListener;
+            this.mOperation = operation;
             this.mResult = result;
         }
 
         @Override
         public void run() {
-            mOperationListener.onOperationEnded(mResult);
+            mOperationListener.onOperationEnded(mOperation, mResult);
         }
     }
 
@@ -539,21 +516,13 @@ public final class OperationsService extends MultiWorkerService
         public void setOperationListener(@Nullable final OperationListener l) {
             if (l != null) {
                 if (mDeleteOperation != null) {
-                    final Context context = getApplicationContext();
-                    if (context == null) {
-                        throw new IllegalStateException("getApplicationContext() returned null");
-                    }
-                    l.onOperationStarted(getOperationMessage(EOperation.DELETE),
-                            getCancelDeleteIntent(context));
+                    l.onOperationStarted(ACTION_DELETE, getOperationMessage(EOperation.DELETE),
+                            getCancelDeleteIntent(getApplicationContext()));
                 } else if (mPasteOperation != null) {
-                    final Context context = getApplicationContext();
-                    if (context == null) {
-                        throw new IllegalStateException("getApplicationContext() returned null");
-                    }
-                    l.onOperationStarted(getOperationMessage(EOperation.PASTE),
-                            getCancelPasteIntent(context));
+                    l.onOperationStarted(ACTION_PASTE, getOperationMessage(EOperation.PASTE),
+                            getCancelPasteIntent(getApplicationContext()));
                 } else {
-                    l.onOperationEnded(null);
+                    l.onOperationEnded(null, null);
                 }
             }
             synchronized (mOperationListenerLock) {

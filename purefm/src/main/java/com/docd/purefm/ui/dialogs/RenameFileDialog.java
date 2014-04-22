@@ -28,7 +28,7 @@ import android.widget.EditText;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.tasks.RenameFileTask;
+import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.utils.PFMFileUtils;
 
 public final class RenameFileDialog extends DialogFragment {
@@ -93,7 +93,7 @@ public final class RenameFileDialog extends DialogFragment {
                             mActionMode.finish();
                         }
 
-                        new RenameFileTask(a, mSource, newName).execute();
+                        OperationsService.rename(a, mSource, newName);
                     }
                 }
             }

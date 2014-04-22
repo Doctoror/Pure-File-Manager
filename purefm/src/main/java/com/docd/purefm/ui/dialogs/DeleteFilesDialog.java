@@ -20,7 +20,7 @@ import java.util.List;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.file.GenericFile;
-import com.docd.purefm.tasks.DeleteTask;
+import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.utils.PFMTextUtils;
 
 import android.app.Activity;
@@ -88,8 +88,7 @@ public final class DeleteFilesDialog extends DialogFragment {
                 if (mode != null) {
                     mode.finish();
                 }
-                final DeleteTask task = new DeleteTask(a);
-                task.execute(files);
+                OperationsService.delete(a, files);
             }
         });
         b.setNegativeButton(R.string.cancel, null);
