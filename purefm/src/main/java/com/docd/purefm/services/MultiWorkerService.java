@@ -33,7 +33,7 @@ public abstract class MultiWorkerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mExecutors = Executors.newFixedThreadPool(3);
+        mExecutors = Executors.newFixedThreadPool(2);
     }
 
     @Override

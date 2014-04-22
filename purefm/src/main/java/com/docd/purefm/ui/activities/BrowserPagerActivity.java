@@ -457,7 +457,9 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
                 case OperationsService.ACTION_RENAME:
                 case OperationsService.ACTION_CREATE_FILE:
                 case OperationsService.ACTION_CREATE_DIRECTORY:
-                    Toast.makeText(this, (CharSequence) result, Toast.LENGTH_SHORT).show();
+                    if (result != null) {
+                        Toast.makeText(this, (CharSequence) result, Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
         }

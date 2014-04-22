@@ -108,22 +108,21 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
             }
 
             if (!filesAffected.isEmpty()) {
+                ClipBoard.unlock();
+                ClipBoard.clear();
                 if (mIsMove) {
                     MediaStoreUtils.moveFiles(mContext, filesAffected);
-                    for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
+                    for (final Pair<GenericFile, GenericFile> filesPair : filesAffected) {
                         FileObserverNotifier.notifyDeleted(filesPair.first);
                         FileObserverNotifier.notifyCreated(filesPair.second);
                     }
                 } else {
                     MediaStoreUtils.copyFiles(mContext, filesAffected);
-                    for (Pair<GenericFile, GenericFile> filesPair : filesAffected) {
+                    for (final Pair<GenericFile, GenericFile> filesPair : filesAffected) {
                         FileObserverNotifier.notifyCreated(filesPair.second);
                     }
                 }
             }
-
-            ClipBoard.unlock();
-            ClipBoard.clear();
         }
 
         return failed;

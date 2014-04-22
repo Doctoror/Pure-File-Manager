@@ -94,8 +94,6 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         testFileReading(shell, settings);
         testFileDeletion(shell, settings);
         testFileCreation(shell, settings);
-        testFileMoving(shell, settings);
-        testFileCopying(shell, settings);
         testMkdir(shell, settings);
         testMkdirs(shell, settings);
     }
@@ -250,34 +248,6 @@ public final class CommandLineFileTest extends InstrumentationTestCase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void testFileMoving(@NonNull final Shell shell,
-                                @NonNull final Settings settings) {
-        final CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
-        final String file1sum = md5sum(file1.toFile());
-
-        CommandLineFile file2 = CommandLineFile.fromFile(shell, settings, test2);
-        assertIsEmptyFile(file2);
-
-        file1.moveToDirectory(file2);
-        assertIsEmptyFile(file1);
-
-        file2 = CommandLineFile.fromFile(shell, settings, test2);
-        assertIsNormalFile(file2);
-        assertEquals(file1sum, md5sum(file2.toFile()));
-    }
-
-    private void testFileCopying(@NonNull final Shell shell,
-                                 @NonNull final Settings settings) {
-        CommandLineFile file1 = CommandLineFile.fromFile(shell, settings, test1);
-        final CommandLineFile file2 = CommandLineFile.fromFile(shell, settings, test2);
-
-        file2.copy(file1);
-        file1 = CommandLineFile.fromFile(shell, settings, test1);
-        assertIsNormalFile(file1);
-        assertIsNormalFile(file2);
-        assertEquals(md5sum(file2.toFile()), md5sum(file1.toFile()));
     }
 
     private void testMkdir(@NonNull final Shell shell,

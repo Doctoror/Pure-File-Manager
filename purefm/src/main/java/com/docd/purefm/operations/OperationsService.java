@@ -238,9 +238,14 @@ public final class OperationsService extends MultiWorkerService
                 mHandler.post(mPendingOperationStartedRunnable);
             }
         }
-        onOperationCompleted(ACTION_PASTE,
-                mPasteOperation.execute(files),
-                mPasteOperation.isCanceled());
+        Object result = null;
+        try {
+            result = mPasteOperation.execute(files);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        } finally {
+            onOperationCompleted(ACTION_PASTE, result, mPasteOperation.isCanceled());
+        }
     }
 
     //only one deletion operation can be done simultaneously
@@ -262,9 +267,14 @@ public final class OperationsService extends MultiWorkerService
                 mHandler.post(mPendingOperationStartedRunnable);
             }
         }
-        onOperationCompleted(ACTION_DELETE,
-                mDeleteOperation.execute(files),
-                mDeleteOperation.isCanceled());
+        Object result = null;
+        try {
+            result = mDeleteOperation.execute(files);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        } finally {
+            onOperationCompleted(ACTION_DELETE, result, mDeleteOperation.isCanceled());
+        }
     }
 
     private void onActionRename(@NonNull final Intent renameIntent) {
@@ -275,12 +285,16 @@ public final class OperationsService extends MultiWorkerService
                     "ACTION_RENAME intent should contain non-null EXTRA_FILE1 and EXTRA_FILE_NAME");
         }
 
-
         final RenameOperation renameOperation = new RenameOperation(
                 this, source, target);
-        onOperationCompleted(ACTION_RENAME,
-                renameOperation.execute(),
-                renameOperation.isCanceled());
+        Object result = null;
+        try {
+            result = renameOperation.execute();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        } finally {
+            onOperationCompleted(ACTION_RENAME, result, renameOperation.isCanceled());
+        }
     }
 
     private void onActionCreateFile(@NonNull final Intent createIntent) {
@@ -298,31 +312,31 @@ public final class OperationsService extends MultiWorkerService
         final GenericFile target = FileFactory.newFile(
                 Settings.getInstance(this), parent, fileName);
         CharSequence message = null;
-        if (target.exists()) {
-            message = getText(R.string.file_exists);
-        } else {
-            final String path = PFMFileUtils.fullPath(target);
-            final boolean remount = Environment.needsRemount(path);
-            if (remount) {
-                RootTools.remount(path, "RW");
-            }
-            try {
+        final String path = PFMFileUtils.fullPath(target);
+        boolean remount = false;
+        try {
+            if (target.exists()) {
+                message = getText(R.string.file_exists);
+            } else {
+                if (Environment.needsRemount(path)) {
+                    remount = true;
+                    RootTools.remount(path, "RW");
+                }
                 if (!target.createNewFile()) {
                     message = getText(R.string.could_not_create_file);
                 } else {
                     MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
                     FileObserverNotifier.notifyCreated(target);
                 }
-            } catch (IOException e) {
-                message = e.getMessage();
             }
+        } catch (IOException e) {
+            message = e.getMessage();
+        } finally {
+            onOperationCompleted(ACTION_CREATE_FILE, message, false);
             if (remount) {
                 RootTools.remount(path, "RO");
             }
         }
-        onOperationCompleted(ACTION_CREATE_FILE,
-                message,
-                false);
     }
 
     private void onActionCreateDirectory(@NonNull final Intent createIntent) {
@@ -339,27 +353,29 @@ public final class OperationsService extends MultiWorkerService
         final GenericFile target = FileFactory.newFile(
                 Settings.getInstance(this), parent, fileName);
         CharSequence message = null;
-        if (target.exists()) {
-            message = getText(R.string.file_exists);
-        } else {
-            final String path = PFMFileUtils.fullPath(target);
-            final boolean remount = Environment.needsRemount(path);
-            if (remount) {
-                RootTools.remount(path, "RW");
-            }
-            if (!target.mkdir()) {
-                message = getText(R.string.could_not_create_dir);
+        final String path = PFMFileUtils.fullPath(target);
+        boolean remount = false;
+        try {
+            if (target.exists()) {
+                message = getText(R.string.file_exists);
             } else {
-                MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
-                FileObserverNotifier.notifyCreated(target);
+                if (Environment.needsRemount(path)) {
+                    remount = true;
+                    RootTools.remount(path, "RW");
+                }
+                if (!target.mkdir()) {
+                    message = getText(R.string.could_not_create_dir);
+                } else {
+                    MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
+                    FileObserverNotifier.notifyCreated(target);
+                }
             }
+        } finally {
+            onOperationCompleted(ACTION_CREATE_DIRECTORY, message, false);
             if (remount) {
                 RootTools.remount(path, "RO");
             }
         }
-        onOperationCompleted(ACTION_CREATE_DIRECTORY,
-                message,
-                false);
     }
 
     private void onOperationCompleted(@NonNull final String action,

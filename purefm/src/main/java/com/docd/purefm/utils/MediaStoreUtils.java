@@ -48,13 +48,14 @@ public final class MediaStoreUtils {
         MediaScannerConnection.scanFile(context, paths, null, null);
     }
 
-    public static void renameFileOrDirectory(@NonNull final ContentResolver contentResolver,
+    public static void renameFileOrDirectory(@NonNull final Context context,
                                              @NonNull final GenericFile oldFile,
                                              @NonNull final GenericFile newFile) {
         if (oldFile.isDirectory()) {
-            moveOrRenameDirectory(contentResolver, oldFile, newFile);
+            deleteFileOrDirectory(context.getContentResolver(), oldFile);
+            requestMediaScanner(context, newFile);
         } else {
-            renameFile(contentResolver, oldFile, newFile);
+            renameFile(context.getContentResolver(), oldFile, newFile);
         }
     }
 
@@ -72,77 +73,11 @@ public final class MediaStoreUtils {
         }
     }
 
-    private static void moveOrRenameDirectory(@NonNull final ContentResolver contentResolver,
-                                              @NonNull final GenericFile oldFile,
-                                              @NonNull final GenericFile newFile) {
-        final String oldPath = PFMFileUtils.fullPath(oldFile);
-        final String newPath = PFMFileUtils.fullPath(newFile);
-        final Uri uri = getContentUri(oldPath);
-
-        final Pair<String, String[]> selection = listDirectoryRecursiveSelelction(oldFile);
-        final Cursor c = contentResolver.query(uri, new String[] {
-                        MediaStore.Files.FileColumns._ID,
-                        MediaStore.Files.FileColumns.DATA},
-                selection.first, selection.second, null);
-        if (c != null){
-            try {
-                for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-                    final long id = c.getLong(0);
-                    final String data = c.getString(1);
-                    final ContentValues values = new ContentValues(1);
-                    values.put(MediaStore.Files.FileColumns.DATA, data.replace(oldPath, newPath));
-                    contentResolver.update(ContentUris.withAppendedId(uri, id), values, null, null);
-                }
-            } finally {
-                c.close();
-            }
-        }
-    }
-
-    private static void moveFileInSameVolume(@NonNull final ContentResolver contentResolver,
-                                            @NonNull final GenericFile oldFile,
-                                            @NonNull final GenericFile newFile) {
-        final Uri uri = getContentUri(oldFile);
-        final long id = fileId(contentResolver, uri, oldFile.toFile());
-        final long parentId;
-        final File newFileParent = newFile.toFile().getParentFile();
-        if (newFileParent != null) {
-            parentId = fileId(contentResolver, uri, newFileParent);
-        } else {
-            parentId = -1;
-        }
-        if (id != -1) {
-            final ContentValues values = new ContentValues(parentId == -1 ? 1 : 2);
-            values.put(MediaStore.Files.FileColumns.DATA, PFMFileUtils.fullPath(newFile));
-            if (parentId != -1) {
-                values.put(MediaStore.Files.FileColumns.PARENT, parentId);
-            }
-            contentResolver.update(ContentUris.withAppendedId(uri, id),
-                    values, null, null);
-        }
-    }
-
     public static void moveFiles(@NonNull final Context context,
                                  @NonNull final List<Pair<GenericFile, GenericFile>> files) {
         for (final Pair<GenericFile, GenericFile> pair : files) {
-            final String secondPath = PFMFileUtils.fullPath(pair.second);
-            boolean firstExternal = isExternal(PFMFileUtils.fullPath(pair.first));
-            boolean secondExternal = isExternal(secondPath);
-
-            // Move only if CONTENT_URI is the same and the File is not a picture
-            // if you move pictures, the bucket can be updated only from MediaScanner
-            if (((firstExternal && secondExternal) ||
-                    (!firstExternal && !secondExternal)) &&
-                            !MimeTypes.isPicture(pair.second.toFile())) {
-                if (pair.first.isDirectory()) {
-                    moveOrRenameDirectory(context.getContentResolver(), pair.first, pair.second);
-                } else {
-                    moveFileInSameVolume(context.getContentResolver(), pair.first, pair.second);
-                }
-            } else {
-                deleteFileOrDirectory(context.getContentResolver(), pair.first);
-                requestMediaScanner(context, pair.second);
-            }
+            deleteFileOrDirectory(context.getContentResolver(), pair.first);
+            requestMediaScanner(context, pair.second);
         }
     }
 
