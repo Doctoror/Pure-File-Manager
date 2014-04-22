@@ -176,6 +176,16 @@ public final class Environment {
         return true;
     }
 
+    @Nullable
+    public static StorageHelper.StorageVolume volumeOfPath(@NonNull final String path) {
+        for (final StorageHelper.StorageVolume volume : sStorages) {
+            if (path.startsWith(volume.file.getAbsolutePath())) {
+                return volume;
+            }
+        }
+        return null;
+    }
+
     public static boolean isBusyboxUtilAvailable(@NonNull final String util) {
         if (sBusybox == null) {
             return false;

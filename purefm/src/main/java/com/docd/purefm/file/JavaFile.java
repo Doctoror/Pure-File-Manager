@@ -27,7 +27,10 @@ import org.apache.commons.io.FileUtils;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.utils.MimeTypes;
+import com.docd.purefm.utils.PFMFileUtils;
+import com.docd.purefm.utils.StorageHelper;
 
 public final class JavaFile implements GenericFile, Comparable<GenericFile> {
 
@@ -84,7 +87,15 @@ public final class JavaFile implements GenericFile, Comparable<GenericFile> {
      */
     @NonNull
     private Permissions readPermissions() {
-        return new Permissions(this.mFile.canRead(), this.mFile.canWrite(), this.mFile.canExecute());
+        boolean canWrite = mFile.canWrite();
+        if (canWrite) {
+            final StorageHelper.StorageVolume volume = Environment.volumeOfPath(
+                    PFMFileUtils.fullPath(mFile));
+            if (volume != null) {
+                canWrite = !Environment.isReadOnly(volume);
+            }
+        }
+        return new Permissions(mFile.canRead(), canWrite, mFile.canExecute());
     }
 
     /**
