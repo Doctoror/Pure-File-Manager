@@ -126,6 +126,9 @@
         <item quantity="one">Kopiere %1$d Datei in den Zwischenspeicher</item>
         <item quantity="other">Kopiere %1$d Dateien in den Zwischenspeicher</item>
     </plurals>
+
+    <!-- TODO transate to German -->
+    <string name="not_enough_space_message">Not enough space to paste files. Available %1$s, required %2$s.</string>
     
     <string name="dialog_overwrite_title">Zieldatei existiert bereits</string>
     <string name="dialog_overwrite_message">Diese Aktion überschreibt das Ziel</string>
