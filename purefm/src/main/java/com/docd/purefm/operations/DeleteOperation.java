@@ -24,6 +24,7 @@ import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
+import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.Shell;
@@ -57,6 +58,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
         final ArrayList<GenericFile> failed = new ArrayList<>();
         final List<GenericFile> filesAffected = new LinkedList<>();
 
+        final Settings settings = Settings.getInstance(mContext);
         if (files[0] instanceof CommandLineFile) {
             final Shell shell = ShellHolder.getShell();
             if (shell == null) {
@@ -66,60 +68,70 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
             }
 
             final HashSet<String> remountPaths = new HashSet<>();
-            for (GenericFile file : files) {
-                try {
-                    file = file.getCanonicalFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                final String parent = file.getParent();
-                if (parent != null) {
-                    if (Environment.needsRemount(parent)) {
-                        remountPaths.add(parent);
+            // find paths to remount as read-write
+            if (settings.useCommandLine() && settings.isSuEnabled()) {
+                for (GenericFile file : files) {
+                    try {
+                        file = file.getCanonicalFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } else if (Environment.needsRemount(file.getAbsolutePath())) {
-                    remountPaths.add(file.getAbsolutePath());
+                    final String parent = file.getParent();
+                    if (parent != null) {
+                        if (Environment.needsRemount(parent)) {
+                            remountPaths.add(parent);
+                        }
+                    } else if (Environment.needsRemount(file.getAbsolutePath())) {
+                        remountPaths.add(file.getAbsolutePath());
+                    }
                 }
             }
             for (final String remountPath : remountPaths) {
                 RootTools.remount(remountPath, "RW");
             }
 
-            for (final GenericFile file : files) {
-                if (isCanceled()) {
-                    break;
+            try {
+                for (final GenericFile file : files) {
+                    if (isCanceled()) {
+                        break;
+                    }
+                    final File fileFile = file.toFile();
+                    if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
+                        filesAffected.add(file);
+                    } else {
+                        failed.add(file);
+                    }
                 }
-                final File fileFile = file.toFile();
-                if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
-                    filesAffected.add(file);
-                } else {
-                    failed.add(file);
+            } finally {
+                for (final String remountPath : remountPaths) {
+                    RootTools.remount(remountPath, "RO");
                 }
-            }
-
-            for (final String remountPath : remountPaths) {
-                RootTools.remount(remountPath, "RO");
+                postProcess(filesAffected);
             }
 
         } else {
-            for (final GenericFile file : files) {
-                if (isCanceled()) {
-                    break;
+            try {
+                for (final GenericFile file : files) {
+                    if (isCanceled()) {
+                        break;
+                    }
+                    if (file.delete()) {
+                        filesAffected.add(file);
+                    } else {
+                        failed.add(file);
+                    }
                 }
-                if (file.delete()) {
-                    filesAffected.add(file);
-                } else {
-                    failed.add(file);
-                }
+            } finally {
+                postProcess(filesAffected);
             }
         }
-
-        if (!filesAffected.isEmpty()) {
-            MediaStoreUtils.deleteFilesOrDirectories(mContext.getContentResolver(), filesAffected);
-            FileObserverNotifier.notifyDeleted(filesAffected);
-        }
-
         return failed;
     }
 
+    private void postProcess(@NonNull final List<GenericFile> filesDeleted) {
+        if (!filesDeleted.isEmpty()) {
+            MediaStoreUtils.deleteFilesOrDirectories(mContext.getContentResolver(), filesDeleted);
+            FileObserverNotifier.notifyDeleted(filesDeleted);
+        }
+    }
 }

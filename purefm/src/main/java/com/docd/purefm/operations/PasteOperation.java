@@ -71,7 +71,7 @@ final class PasteOperation extends Operation<GenericFile, ArrayList<GenericFile>
         final boolean remounted;
 
         final boolean useCommandLine = mSettings.useCommandLine();
-        if (useCommandLine && Environment.needsRemount(targetPath)) {
+        if (useCommandLine && mSettings.isSuEnabled() && Environment.needsRemount(targetPath)) {
             RootTools.remount(targetPath, "RW");
             remounted = true;
         } else {

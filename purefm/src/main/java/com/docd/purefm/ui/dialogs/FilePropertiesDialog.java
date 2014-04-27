@@ -394,23 +394,25 @@ public final class FilePropertiesDialog extends DialogFragment {
 
         private static final class ApplyTask extends AsyncTask<GenericFile, Void, Boolean> {
 
-            private final Context context;
-            private final Permissions target;
+            private final Context mContext;
+            private final Permissions mTarget;
 
             private ApplyTask(Context context, Permissions target) {
-                this.context = context;
-                this.target = target;
+                this.mContext = context;
+                this.mTarget = target;
             }
 
             @Override
             protected Boolean doInBackground(final GenericFile... params) {
                 final String path = params[0].getAbsolutePath();
-                final boolean remount = Environment.needsRemount(path);
+                final Settings settings = Settings.getInstance(mContext);
+                final boolean remount = settings.useCommandLine() && settings.isSuEnabled() &&
+                        Environment.needsRemount(path);
                 if (remount) {
                     RootTools.remount(path, "RW");
                 }
                 try {
-                    return params[0].applyPermissions(this.target);
+                    return params[0].applyPermissions(this.mTarget);
                 } finally {
                     if (remount) {
                         RootTools.remount(path, "RO");
@@ -420,7 +422,7 @@ public final class FilePropertiesDialog extends DialogFragment {
 
             @Override
             protected void onPostExecute(Boolean result) {
-                Toast.makeText(this.context, this.context.getText(result ?
+                Toast.makeText(this.mContext, this.mContext.getText(result ?
                         R.string.permissions_changed : R.string.applying_failed), Toast.LENGTH_SHORT).show();
             }
 

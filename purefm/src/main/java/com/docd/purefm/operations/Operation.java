@@ -14,6 +14,8 @@
  */
 package com.docd.purefm.operations;
 
+import android.support.annotation.NonNull;
+
 /**
  * Operation that is performed by {@link com.docd.purefm.operations.OperationsService}
  *
@@ -41,11 +43,11 @@ abstract class Operation<Param, Result> {
         return mCanceled;
     }
 
-    public final Result execute(Param... params) {
+    public final Result execute(@NonNull final Param... params) {
         mOperationThread = Thread.currentThread();
         return doInBackground(params);
     }
 
-    protected abstract Result doInBackground(Param... params);
+    protected abstract Result doInBackground(@NonNull Param... params);
 
 }

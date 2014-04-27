@@ -4,4 +4,3 @@
 - SearchActivity ListAdapter not refreshed on fie modification
 - State of Browser is restored in BrowserFragment, but the path seems default for some reason
 - "Write into" doesn't work properly
-- Asks for superuser on superuser disabled when trying to create a file in root directory

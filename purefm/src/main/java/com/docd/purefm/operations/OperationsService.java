@@ -25,25 +25,19 @@ import android.os.Handler;
 import android.os.IBinder;
 
 import com.docd.purefm.ActivityMonitor;
-import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
-import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.services.MultiWorkerService;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.activities.BrowserPagerActivity;
 import com.docd.purefm.utils.ArrayUtils;
 import com.docd.purefm.utils.ClipBoard;
-import com.docd.purefm.utils.MediaStoreUtils;
-import com.docd.purefm.utils.PFMFileUtils;
-import com.stericson.RootTools.RootTools;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * IntentService that performs file operations
@@ -309,33 +303,15 @@ public final class OperationsService extends MultiWorkerService
                     "ACTION_CREATE_FILE intent should contain non-null EXTRA_FILE_NAME");
         }
 
-        final GenericFile target = FileFactory.newFile(
-                Settings.getInstance(this), parent, fileName);
-        CharSequence message = null;
-        final String path = PFMFileUtils.fullPath(target);
-        boolean remount = false;
+        final GenericFile target = FileFactory.newFile(Settings.getInstance(this), parent, fileName);
+        final CreateFileOperation operation = new CreateFileOperation(this);
+        CharSequence result = null;
         try {
-            if (target.exists()) {
-                message = getText(R.string.file_exists);
-            } else {
-                if (Environment.needsRemount(path)) {
-                    remount = true;
-                    RootTools.remount(path, "RW");
-                }
-                if (!target.createNewFile()) {
-                    message = getText(R.string.could_not_create_file);
-                } else {
-                    MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
-                    FileObserverNotifier.notifyCreated(target);
-                }
-            }
-        } catch (IOException e) {
-            message = e.getMessage();
+            result = operation.execute(target);
+        } catch (Throwable e) {
+            e.printStackTrace();
         } finally {
-            onOperationCompleted(ACTION_CREATE_FILE, message, false);
-            if (remount) {
-                RootTools.remount(path, "RO");
-            }
+            onOperationCompleted(ACTION_CREATE_FILE, result, false);
         }
     }
 
@@ -350,31 +326,18 @@ public final class OperationsService extends MultiWorkerService
             throw new RuntimeException(
                     "ACTION_CREATE_DIRECTORY intent should contain non-null EXTRA_FILE_NAME");
         }
+
+
         final GenericFile target = FileFactory.newFile(
                 Settings.getInstance(this), parent, fileName);
-        CharSequence message = null;
-        final String path = PFMFileUtils.fullPath(target);
-        boolean remount = false;
+        final CreateDirectoryOperation operation = new CreateDirectoryOperation(this);
+        CharSequence result = null;
         try {
-            if (target.exists()) {
-                message = getText(R.string.file_exists);
-            } else {
-                if (Environment.needsRemount(path)) {
-                    remount = true;
-                    RootTools.remount(path, "RW");
-                }
-                if (!target.mkdir()) {
-                    message = getText(R.string.could_not_create_dir);
-                } else {
-                    MediaStoreUtils.addEmptyFileOrDirectory(getContentResolver(), target);
-                    FileObserverNotifier.notifyCreated(target);
-                }
-            }
+            result = operation.execute(target);
+        } catch (Throwable e) {
+            e.printStackTrace();
         } finally {
-            onOperationCompleted(ACTION_CREATE_DIRECTORY, message, false);
-            if (remount) {
-                RootTools.remount(path, "RO");
-            }
+            onOperationCompleted(ACTION_CREATE_DIRECTORY, result, false);
         }
     }
 
