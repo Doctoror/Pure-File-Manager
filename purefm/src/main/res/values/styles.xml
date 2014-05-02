@@ -16,6 +16,7 @@
 
     <style name="ThemeLight" parent="android:Theme.Holo.Light">
         <item name="themeId">1</item>
+        <item name="android:windowBackground">@color/holo_light_window_background</item>
         <item name="browserGridColumns">@integer/browserGridColumns</item>
         <item name="browserListTextColor">#454545</item>
         <item name="ic_menu_copy">@drawable/holo_light_ic_menu_copy</item>
