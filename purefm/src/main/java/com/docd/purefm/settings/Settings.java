@@ -34,6 +34,17 @@ public final class Settings {
         LIST, GRID
     }
 
+    public enum Theme {
+        DARK(R.style.ThemeDark), LIGHT(R.style.ThemeLight);
+
+        @StyleRes
+        public final int resId;
+
+        private Theme(final int resId) {
+            this.resId = resId;
+        }
+    }
+
     private static final Object LOCK = new Object();
 
     private static Settings sInstance;
@@ -61,7 +72,7 @@ public final class Settings {
     private final SharedPreferences mSharedPreferences;
     private final Resources mResources;
 
-    private int mTheme;
+    private Theme mTheme;
     private ListAppearance mListAppearance;
     private boolean mListShowFileSize;
     private boolean mListShowHiddenFiles;
@@ -77,9 +88,8 @@ public final class Settings {
         final Resources res = context.getResources();
         mResources = res;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        mTheme = Integer.parseInt(mSharedPreferences.getString(
-                res.getString(R.string.key_preference_theme),
-                        Integer.toString(R.style.ThemeDark)));
+        mTheme = Theme.valueOf(mSharedPreferences.getString(
+                res.getString(R.string.key_preference_theme), Theme.DARK.name()));
 
         mListAppearance = ListAppearance.valueOf(mSharedPreferences.getString(
                 res.getString(R.string.key_preference_list_appearance), ListAppearance.LIST.name()));
@@ -117,16 +127,15 @@ public final class Settings {
         mSharedPreferences.edit().putStringSet(KEY_BOOKMARKS, bookmarks).apply();
     }
 
-    public void setTheme(final int theme, final boolean update) {
+    public void setTheme(final Theme theme, final boolean update) {
         mTheme = theme;
         if (update) {
-            mSharedPreferences.edit().putInt(
-                    mResources.getString(R.string.key_preference_theme), theme).apply();
+            mSharedPreferences.edit().putString(
+                    mResources.getString(R.string.key_preference_theme), theme.name()).apply();
         }
     }
 
-    @StyleRes
-    public int getTheme() {
+    public Theme getTheme() {
         return mTheme;
     }
 

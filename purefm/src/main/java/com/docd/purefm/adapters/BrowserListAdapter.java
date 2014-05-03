@@ -84,7 +84,7 @@ public final class BrowserListAdapter extends BrowserBaseAdapter {
         }
         
         final GenericFile f = this.getItem(pos);
-        this.setIcon(f, h.mIcon);
+        this.setIcon(f, h.mIcon, false);
         this.applyOverlay(f, h.mIcon);
 
         if (mSettings.listShowPreviewsEnabled()) {

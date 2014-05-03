@@ -32,6 +32,7 @@ import com.docd.purefm.R;
 import com.docd.purefm.commandline.CommandCopyRecursively;
 import com.docd.purefm.commandline.CommandLine;
 import com.docd.purefm.commandline.CommandMove;
+import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
@@ -364,6 +365,26 @@ public final class PFMFileUtils {
             }
         } else {
             FileUtils.copyDirectoryToDirectory(source.toFile(), target.toFile());
+        }
+    }
+
+    public static void forceDelete(@NonNull final GenericFile file,
+                                   final boolean useCommandLine) throws IOException {
+        if (useCommandLine) {
+            if (!file.exists()) {
+                throw new FileNotFoundException("File does not exist: " + file);
+            }
+            final Shell shell = ShellHolder.getShell();
+            if (shell == null) {
+                throw new IOException("Shell is null");
+            }
+            final boolean result = CommandLine.execute(shell,
+                    new CommandRemove(file.toFile()));
+            if (!result) {
+                throw new IOException("Removing failed");
+            }
+        } else {
+            FileUtils.forceDelete(file.toFile());
         }
     }
     

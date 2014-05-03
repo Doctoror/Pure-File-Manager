@@ -413,9 +413,10 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param file File to set icon for
      * @param icon View to set icon
      */
-    protected final void setIcon(final GenericFile file, final ImageView icon) {
+    protected final void setIcon(final GenericFile file, final ImageView icon, boolean large) {
         if (file.isDirectory()) {
-            icon.setImageDrawable(getDrawableForRes(mResources, R.drawable.ic_fso_folder));
+            icon.setImageDrawable(getDrawableForRes(mResources, large ?
+                    R.drawable.ic_fso_folder_large : R.drawable.ic_fso_folder));
         } else {
             final String fileExt = FilenameUtils.getExtension(file.getName());
             Drawable mimeIcon = sMimeTypeIconCache.get(fileExt);

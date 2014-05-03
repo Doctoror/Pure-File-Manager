@@ -59,8 +59,7 @@ public final class BrowserGridAdapter extends BrowserBaseAdapter {
         }
         
         final GenericFile f = this.getItem(pos);
-        h.mIcon.setImageResource(f.isDirectory() ? R.drawable.ic_fso_folder :
-                R.drawable.ic_fso_default);
+        this.setIcon(f, h.mIcon, true);
         this.applyOverlay(f, h.mIcon);
         
         if (mSettings.listShowPreviewsEnabled()) {

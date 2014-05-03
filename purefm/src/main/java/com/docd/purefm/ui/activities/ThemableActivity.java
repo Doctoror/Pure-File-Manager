@@ -17,7 +17,6 @@ package com.docd.purefm.ui.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.StyleRes;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
@@ -32,15 +31,14 @@ public abstract class ThemableActivity extends Activity {
 
     protected static final String EXTRA_SAVED_STATE = "ThemableActivity.extras.SAVED_STATE";
 
-    @StyleRes
-    private int mCurrentTheme;
+    private Settings.Theme mCurrentTheme;
 
     @SuppressWarnings("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mCurrentTheme = Settings.getInstance(this).getTheme();
         if (setThemeInOnCreate()) {
-            setTheme(mCurrentTheme);
+            setTheme(mCurrentTheme.resId);
         }
         super.onCreate(savedInstanceState);
     }
@@ -56,8 +54,8 @@ public abstract class ThemableActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         if (mCurrentTheme != Settings.getInstance(this).getTheme()) {
             restart();
         }

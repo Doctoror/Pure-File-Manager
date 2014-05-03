@@ -34,7 +34,7 @@ public final class PickerActivity extends AbstractBrowserActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Settings.getInstance(this).getTheme() == R.style.ThemeDark) {
+        if (Settings.getInstance(this).getTheme() == Settings.Theme.DARK) {
             setTheme(R.style.ThemeDark_Overlay);
         } else {
             setTheme(R.style.ThemeLight_Overlay);

@@ -35,8 +35,8 @@ import android.support.annotation.NonNull;
 public final class SettingsFragment extends PreferenceFragment {
 
     private static final String[] THEMES_VALUES = new String[] {
-            Integer.toString(R.style.ThemeDark),
-            Integer.toString(R.style.ThemeLight)
+            Settings.Theme.DARK.name(),
+            Settings.Theme.LIGHT.name()
     };
 
     private Settings mSettings;
@@ -157,7 +157,7 @@ public final class SettingsFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceChange(final Preference preference,
                                               final Object newValue) {
-                final int chosenTheme = Integer.parseInt((String) newValue);
+                final Settings.Theme chosenTheme = Settings.Theme.valueOf((String) newValue);
                 if (chosenTheme != mSettings.getTheme()) {
                     mSettings.setTheme(chosenTheme, false);
                     getSettingsActivity().proxyRestart();
