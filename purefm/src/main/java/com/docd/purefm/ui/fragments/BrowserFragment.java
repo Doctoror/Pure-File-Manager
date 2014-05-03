@@ -148,6 +148,9 @@ public final class BrowserFragment extends UserVisibleHintFragment
             }
         });
 
+        mBrowser.restoreState(mBrowserInitialState);
+        mBrowserInitialState = null;
+
         mOnSequenceListener = new OnSequenceClickListener() {
 
             @Override
@@ -159,8 +162,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
         };
 
         menuController = new MenuController((AbstractBrowserActivity) activity, mBrowser);
-
-        // needs FragmentActivity because FilePropertiesDialog uses childFragmentManager
         actionModeController = new ActionModeController(activity);
     }
 
@@ -230,9 +231,6 @@ public final class BrowserFragment extends UserVisibleHintFragment
         super.onActivityCreated(state);
         actionModeController.setListView(mListView);
         mParentOnNavigateListener = getBrowserActivity();
-
-        mBrowser.restoreState(mBrowserInitialState);
-        mBrowserInitialState = null;
     }
 
     @Override

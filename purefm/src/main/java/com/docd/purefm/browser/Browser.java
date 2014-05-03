@@ -117,6 +117,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     public void restoreState(@Nullable final Parcelable state) {
         final SavedState savedState = (SavedState) state;
         if (savedState != null) {
+            cancelInitialPathLoading();
             mHistory.clear();
             mHistory.addAll(savedState.mHistory);
 

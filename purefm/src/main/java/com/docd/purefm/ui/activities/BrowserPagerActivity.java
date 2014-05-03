@@ -78,7 +78,8 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
      * Saved fragment state. This saving mechanism is used for restoring
      * the state when Activity is recreated because of theme change
      */
-    private static final String EXTRA_SAVED_FRAGMENT_ADAPTER_STATE = "BrowserPagerActivity.extras.SAVED_FRAGMENT_STATE";
+    private static final String EXTRA_SAVED_FRAGMENT_ADAPTER_STATE =
+            "BrowserPagerActivity.extras.SAVED_FRAGMENT_STATE";
 
     private ActionBar mActionBar;
     private BreadCrumbTextView mBreadCrumbView;
