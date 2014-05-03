@@ -73,6 +73,7 @@ public final class CreateFileDialog extends DialogFragment {
     }
 
     private void buildEditText(@NonNull final Context context) {
+        //noinspection InflateParams
         mFileNameInput = (EditText) LayoutInflater.from(
                 context).inflate(R.layout.text_field_filename, null);
         mFileNameInput.setHint(R.string.menu_new_file);

@@ -14,6 +14,7 @@
  */
 package com.docd.purefm.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -170,6 +171,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
                 | ActionBar.DISPLAY_USE_LOGO
                 | ActionBar.DISPLAY_HOME_AS_UP);
 
+        //noinspection InflateParams
         final View custom = LayoutInflater.from(this).inflate(
                 R.layout.activity_browser_actionbar, null);
         if (custom == null) {

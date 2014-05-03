@@ -283,7 +283,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final View parent = inflater.inflate(R.layout.fragment_browser, null);
+        final View parent = inflater.inflate(R.layout.fragment_browser, container, false);
         if (parent == null) {
             throw new RuntimeException("Inflated view is null");
         }
@@ -415,16 +415,16 @@ public final class BrowserFragment extends UserVisibleHintFragment
         mSwipeRefreshLayoutList.setOnRefreshListener(this);
         mSwipeRefreshLayoutEmpty.setOnRefreshListener(this);
 
-        //final int color2resId = settings.getTheme() == Settings.Theme.LIGHT ?
-        //        R.color.holo_light_progress_color_res_id : R.color.holo_dark_window_background;
+        final int color2resId = settings.getTheme() == Settings.Theme.LIGHT ?
+                R.color.holo_light_window_background : R.color.holo_dark_window_background;
         mSwipeRefreshLayoutList.setColorScheme(R.color.holo_light_selected,
-                android.R.color.transparent,
+                color2resId,
                 R.color.holo_light_selected,
-                android.R.color.transparent);
+                color2resId);
         mSwipeRefreshLayoutEmpty.setColorScheme(R.color.holo_light_selected,
-                android.R.color.transparent,
+                color2resId,
                 R.color.holo_light_selected,
-                android.R.color.transparent);
+                color2resId);
     }
 
     private void onFirstInvalidate() {

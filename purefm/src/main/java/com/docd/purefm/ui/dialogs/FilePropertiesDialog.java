@@ -98,6 +98,8 @@ public final class FilePropertiesDialog extends DialogFragment {
                 fragment.applyPermissions(getActivity());
             }
         });
+
+        //noinspection InflateParams
         final View content = activity.getLayoutInflater()
                 .inflate(R.layout.dialog_properties_container, null);
         if (content == null) {
@@ -184,7 +186,7 @@ public final class FilePropertiesDialog extends DialogFragment {
         void onStop();
 
         @NonNull
-        View onCreateView(@NonNull LayoutInflater inflater);
+        View onCreateView(@NonNull LayoutInflater inflater, @NonNull final ViewGroup container);
     }
 
     static final class FilePermissionsPagerItem implements PagerItem, CompoundButton.OnCheckedChangeListener {
@@ -198,7 +200,9 @@ public final class FilePropertiesDialog extends DialogFragment {
 
         @NonNull
         @Override
-        public View onCreateView(@NonNull final LayoutInflater inflater) {
+        public View onCreateView(@NonNull final LayoutInflater inflater,
+                                 @NonNull final ViewGroup container) {
+            //noinspection InflateParams
             mView = inflater.inflate(R.layout.dialog_permissions, null);
             initView(mView);
             return mView;
@@ -447,7 +451,9 @@ public final class FilePropertiesDialog extends DialogFragment {
 
         @NonNull
         @Override
-        public View onCreateView(@NonNull final LayoutInflater inflater) {
+        public View onCreateView(@NonNull final LayoutInflater inflater,
+                                 @NonNull final ViewGroup container) {
+            //noinspection InflateParams
             mView = inflater.inflate(R.layout.dialog_properties, null);
             return mView;
         }
@@ -608,7 +614,7 @@ public final class FilePropertiesDialog extends DialogFragment {
         @Override
         public Object instantiateItem(final ViewGroup container, final int position) {
             final PagerItem item = mItems[position];
-            final View view = item.onCreateView(mLayoutInflater);
+            final View view = item.onCreateView(mLayoutInflater, container);
             container.addView(view);
             item.onStart();
             return view;

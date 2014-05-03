@@ -67,6 +67,8 @@ public final class RenameFileDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.new_name);
+
+        //noinspection InflateParams
         final EditText text = (EditText) LayoutInflater.from(
                 getActivity()).inflate(R.layout.text_field_filename, null);
         text.setFilters(new InputFilter[] {

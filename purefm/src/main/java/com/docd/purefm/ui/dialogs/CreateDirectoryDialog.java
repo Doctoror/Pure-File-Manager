@@ -42,13 +42,14 @@ public final class CreateDirectoryDialog extends DialogFragment {
     }
     
     private EditText mFileNameInput;
-    
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = this.getActivity();
         if (activity == null || activity.isFinishing()) {
             return null;
         }
+        //noinspection InflateParams
         mFileNameInput = (EditText) activity.getLayoutInflater().inflate(
                 R.layout.text_field_filename, null);
         mFileNameInput.setHint(R.string.menu_new_folder);

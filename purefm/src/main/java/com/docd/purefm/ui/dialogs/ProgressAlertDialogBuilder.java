@@ -19,7 +19,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
@@ -85,8 +84,7 @@ public final class ProgressAlertDialogBuilder {
         @Override
         protected void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(LayoutInflater.from(getContext()).inflate(
-                    R.layout.dialog_progress, null));
+            setContentView(R.layout.dialog_progress);
             final TextView messageView = (TextView) findViewById(android.R.id.message);
             messageView.setText(mMessage);
             messageView.setVisibility(mMessage == null ? View.GONE : View.VISIBLE);

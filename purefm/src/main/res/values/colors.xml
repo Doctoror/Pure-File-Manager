@@ -13,7 +13,6 @@
 <!--See the License for the specific language governing permissions and-->
 <!--limitations under the License.-->
 <resources>
-    <color name="holo_light_progress_color_res_id">#f0f0f0</color>
 
     <color name="holo_light_window_background">#e8e8e8</color>
     <color name="holo_dark_window_background">#353535</color>

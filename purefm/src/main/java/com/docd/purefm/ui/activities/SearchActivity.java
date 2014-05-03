@@ -128,6 +128,7 @@ public final class SearchActivity extends ActionBarIconThemableActivity
     }
 
     private void initActionBar() {
+        //noinspection InflateParams
         final View actionBarCustom = this.getLayoutInflater().inflate(
                 R.layout.activity_search_actionbar, null);
         if (actionBarCustom == null) {

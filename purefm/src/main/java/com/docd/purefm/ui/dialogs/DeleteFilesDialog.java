@@ -66,7 +66,7 @@ public final class DeleteFilesDialog extends DialogFragment {
             this.files[i] = (GenericFile) o[i];
         }
     }
-    
+
     @Override
     public Dialog onCreateDialog(Bundle state) {
         final Activity a = getActivity();
@@ -75,7 +75,8 @@ public final class DeleteFilesDialog extends DialogFragment {
         }
         final AlertDialog.Builder b = new AlertDialog.Builder(a);
         b.setTitle(R.string.dialog_delete_title);
-        
+
+        //noinspection InflateParams
         final TextView content = (TextView) a.getLayoutInflater()
                 .inflate(R.layout.dialog_delete, null);
         content.setMovementMethod(new ScrollingMovementMethod());

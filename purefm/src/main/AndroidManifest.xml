@@ -60,6 +60,7 @@
             </intent-filter>
         </activity>
 
+        <!--suppress UnusedAttribute-->
         <activity
             android:name=".ui.activities.SearchActivity"
             android:label="@string/menu_search"
@@ -73,6 +74,7 @@
 
         </activity>
 
+        <!--suppress UnusedAttribute-->
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="orientation|screenSize"

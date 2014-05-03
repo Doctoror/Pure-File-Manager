@@ -67,6 +67,7 @@ public final class PartitionInfoDialog extends DialogFragment {
         if (activity == null || activity.isFinishing()) {
             return null;
         }
+        //noinspection InflateParams
         mView = activity.getLayoutInflater().inflate(R.layout.dialog_partition_info, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setIcon(ThemeUtils.getDrawableNonNull(activity, R.attr.ic_menu_info));
