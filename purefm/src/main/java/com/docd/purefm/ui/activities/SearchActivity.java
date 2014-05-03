@@ -128,10 +128,12 @@ public final class SearchActivity extends ActionBarIconThemableActivity
     }
 
     private void initActionBar() {
-        final View actionBarCustom = this.getLayoutInflater().inflate(R.layout.activity_search_actionbar, null);
+        final View actionBarCustom = this.getLayoutInflater().inflate(
+                R.layout.activity_search_actionbar, null);
         if (actionBarCustom == null) {
             throw new RuntimeException("Inflated View is null");
         }
+
         final TextView path = (TextView) actionBarCustom.findViewById(android.R.id.text1);
         path.setText(mStartDirectory.getAbsolutePath());
 
@@ -204,25 +206,25 @@ public final class SearchActivity extends ActionBarIconThemableActivity
     @Override
     public void onPostExecute(@NonNull AbstractSearchTask task) {
         mProgress.setVisibility(View.INVISIBLE);
-            final List<String> denied = mSearchTask.getDeniedLocations();
-            if (!denied.isEmpty()) {
-                final AlertDialog.Builder b = new AlertDialog.Builder(this);
-                final StringBuilder message = new StringBuilder(getString(R.string.search_denied_message));
-                for (final String deniedItem : denied) {
-                    message.append('\n').append(deniedItem);
-                }
-                b.setMessage(message.toString());
-                b.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                final Dialog dialog = b.create();
-                if (!isFinishing()) {
-                    dialog.show();
-                }
+        final List<String> denied = mSearchTask.getDeniedLocations();
+        if (!denied.isEmpty()) {
+            final AlertDialog.Builder b = new AlertDialog.Builder(this);
+            final StringBuilder message = new StringBuilder(getString(R.string.search_denied_message));
+            for (final String deniedItem : denied) {
+                message.append('\n').append(deniedItem);
             }
+            b.setMessage(message.toString());
+            b.setNeutralButton(R.string.close, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            final Dialog dialog = b.create();
+            if (!isFinishing()) {
+                dialog.show();
+            }
+        }
     }
 
     private void initList() {

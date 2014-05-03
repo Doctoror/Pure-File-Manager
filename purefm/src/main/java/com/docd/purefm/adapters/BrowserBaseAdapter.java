@@ -49,6 +49,7 @@ import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.DrawableLruCache;
 import com.docd.purefm.utils.FileSortType;
 import com.docd.purefm.utils.MimeTypes;
+import com.docd.purefm.utils.PFMFileUtils;
 import com.docd.purefm.utils.PreviewHolder;
 import com.docd.purefm.utils.ThemeUtils;
 import com.docd.purefm.ui.view.OverlayImageView;
@@ -233,7 +234,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * {@inheritDoc}
      */
     @Override
-    public GenericFile getItem(int pos) {
+    public GenericFile getItem(final int pos) {
         return this.mContent.get(pos);
     }
 
@@ -241,7 +242,7 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * {@inheritDoc}
      */
     @Override
-    public long getItemId(int pos) {
+    public long getItemId(final int pos) {
         return 0L;
     }
 
@@ -321,7 +322,8 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      */
     @Override
     public void onEvent(final int event, final String path) {
-        final Message message = mHandler.obtainMessage(FileObserverEventHandler.MESSAGE_OBSERVER_EVENT);
+        final Message message = mHandler.obtainMessage(
+                FileObserverEventHandler.MESSAGE_OBSERVER_EVENT);
         message.arg1 = event;
         message.obj = FileFactory.newFile(mSettings, path);
         mHandler.sendMessage(message);
@@ -334,11 +336,17 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
      * @param file The modified file, relative to the main monitored file or directory,
      *             of the file or directory which triggered the event
      */
-    synchronized void onEventUIThread(final int event,
+    void onEventUIThread(final int event,
                                       @NonNull final GenericFile file) {
         switch (event & FileObserver.ALL_EVENTS) {
             case FileObserver.CREATE:
                 //Do nothing. The event is handled in Browser
+                break;
+
+            case FileObserver.DELETE:
+            case FileObserver.DELETE_SELF:
+            case FileObserver.MOVED_FROM:
+                onFileDeleted(file);
                 break;
 
             default:
@@ -355,18 +363,21 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
     private void onFileModified(@NonNull final GenericFile modified) {
         final GenericFile affectedFile = getFileByPath(modified.getAbsolutePath());
         if (affectedFile != null) {
-            if (modified.exists()) {
-                final int index = mContent.indexOf(affectedFile);
-                if (index != -1) {
-                    mContent.set(index, modified);
-                } else {
-                    mContent.add(modified);
-                    Collections.sort(mContent, mComparator.getComparator());
-                }
+            final int index = mContent.indexOf(affectedFile);
+            if (index != -1) {
+                mContent.set(index, modified);
             } else {
-                mContent.remove(affectedFile);
-                removeObserverForPath(modified.getAbsolutePath());
+                mContent.add(modified);
+                Collections.sort(mContent, mComparator.getComparator());
             }
+        }
+    }
+
+    private void onFileDeleted(@NonNull final GenericFile deleted) {
+        final GenericFile affectedFile = getFileByPath(deleted.getAbsolutePath());
+        if (affectedFile != null) {
+            mContent.remove(affectedFile);
+            removeObserverForPath(PFMFileUtils.fullPath(affectedFile));
         }
     }
 
@@ -376,14 +387,11 @@ public abstract class BrowserBaseAdapter implements ListAdapter,
             if (file.getAbsolutePath().equals(path)) {
                 return file;
             }
-        }
-        //try with canonical paths
-        for (final GenericFile file : mContent) {
             try {
                 if (file.getCanonicalPath().equals(path)) {
                     return file;
                 }
-            } catch (IOException e) {
+            } catch (IOException ignored) {
                 //ignored
             }
         }
