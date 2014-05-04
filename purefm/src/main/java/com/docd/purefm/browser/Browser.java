@@ -179,18 +179,6 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         }
     }
 
-    public boolean goBack(final boolean invalidate) {
-        cancelInitialPathLoading();
-        if (mPreviousPath != null) {
-            mCurrentPath = this.mPreviousPath;
-            if (invalidate) {
-                invalidate();
-            }
-            return true;
-        }
-        return false;
-    }
-
     @NonNull
     private GenericFile resolveExistingParent(@NonNull final GenericFile file) {
         GenericFile parent = file.getParentFile();
@@ -218,8 +206,9 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                     if (addToHistory && mHistoryEnabled && mPreviousPath != null) {
                         mHistory.push(mPreviousPath.getAbsolutePath());
                     }
-                    this.invalidate();
+                    invalidate();
                 }
+                return;
             } else {
                 Log.w("Browser", "The target is not a directory");
                 Toast.makeText(mContext, R.string.target_is_not_a_directory,
@@ -230,14 +219,17 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                     "Trying to navigate to non-existing directory. Searching for existing parent");
             Toast.makeText(mContext, mContext.getString(R.string.directory_not_exists,
                     PFMFileUtils.fullPath(target)), Toast.LENGTH_SHORT).show();
-            final GenericFile parent = resolveExistingParent(target);
-            if (!parent.equals(target)) {
-                navigate(parent, addToHistory);
-            }
+        }
+        final GenericFile parent = resolveExistingParent(target);
+        if (!parent.equals(target)) {
+            navigate(parent, addToHistory);
         }
     }
     
     public boolean back() {
+        if (mCurrentPath == null) {
+            return false;
+        }
         cancelInitialPathLoading();
         if (!this.mHistory.isEmpty()) {
             GenericFile f = FileFactory.newFile(mSettings, mHistory.pop());
@@ -253,8 +245,12 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
     }
     
     public void up() {
+        if (mCurrentPath == null) {
+            return;
+        }
         cancelInitialPathLoading();
-        if (this.mCurrentPath.toFile().equals(com.docd.purefm.Environment.sRootDirectory)) {
+        if (mCurrentPath.toFile().equals(
+                com.docd.purefm.Environment.sRootDirectory)) {
             return;
         }
         final GenericFile parent = resolveExistingParent(mCurrentPath);

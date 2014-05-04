@@ -240,7 +240,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
         if (activity.shouldShowBrowserFragmentMenu()) {
             inflater.inflate(R.menu.browser, menu);
 
-            // TODO it returns true even on devices that don't have the physical key. Find a better method to detect search hardware button
+            // TODO it returns true even on devices that don't have the physical key.
+            // Find a better method to detect search hardware button
             //if (KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_SEARCH)) {
             //    menu.removeItem(R.id.menu_search);
             //}

@@ -24,8 +24,8 @@ public abstract class UserVisibleHintFragment extends Fragment {
     private boolean mResumed;
 
     @Override
-    public final void setUserVisibleHint(boolean isVisibleToUser) {
-        final boolean needUpdate = mResumed && isVisibleToUser != this.getUserVisibleHint();
+    public final void setUserVisibleHint(final boolean isVisibleToUser) {
+        final boolean needUpdate = mResumed && isVisibleToUser != getUserVisibleHint();
         super.setUserVisibleHint(isVisibleToUser);
         if (needUpdate) {
             if (isVisibleToUser) {
