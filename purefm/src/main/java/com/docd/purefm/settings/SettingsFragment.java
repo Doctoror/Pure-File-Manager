@@ -40,6 +40,7 @@ public final class SettingsFragment extends PreferenceFragment {
     };
 
     private Settings mSettings;
+    private ShellHolder mShellHolder;
     private boolean mWasAllowRoot;
 
     @Override
@@ -54,6 +55,7 @@ public final class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mShellHolder = ShellHolder.getInstance();
         this.addPreferencesFromResource(R.xml.settings);
         this.init();
     }
@@ -188,8 +190,10 @@ public final class SettingsFragment extends PreferenceFragment {
                         prefAllowSuperuser.setChecked(false);
                         mSettings.setSuEnabled(false, true);
                     }
+                    mShellHolder.releaseShell(true);
+                } else {
+                    mShellHolder.getShell();
                 }
-                parent.proxyInvalidateActionBarIcon();
                 parent.notifyNeedInvalidate();
                 return true;
             }
@@ -213,9 +217,8 @@ public final class SettingsFragment extends PreferenceFragment {
                         mSettings.setUseCommandLine(true, true);
                     }
                 }
-
                 prefUseCommandline.setEnabled(!suEnabled);
-                parent.proxyInvalidateActionBarIcon();
+                mShellHolder.getShell();
                 parent.notifyNeedInvalidate();
                 return true;
             }
@@ -230,7 +233,8 @@ public final class SettingsFragment extends PreferenceFragment {
         }
 
         final Set<String> options = BookmarksHelper.getAllLocations(appContext);
-        final String defaultHome = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        final String defaultHome = android.os.Environment.getExternalStorageDirectory()
+                .getAbsolutePath();
         options.add(defaultHome);
         
         final ListPreference prefHomeDirectory = (ListPreference) this.findPreference(

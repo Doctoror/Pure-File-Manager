@@ -49,13 +49,15 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity imp
             if (packageManager == null) {
                 throw new RuntimeException("PackageManager is null");
             }
-            mDefaultIcon = packageManager.getActivityIcon(this.getComponentName());
+            mDefaultIcon = packageManager.getActivityIcon(getComponentName());
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             mDefaultIcon = getResources().getDrawable(R.drawable.ic_fso_folder);
         }
 
         mShellHolder = ShellHolder.getInstance();
+
+        invalidateActionBarIcon();
         mShellHolder.addOnShellChangedListener(this);
     }
 
@@ -68,12 +70,6 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity imp
     @Override
     public final void onShellChanged(@Nullable final Shell shell, final boolean isRootShell) {
         invalidateActionBarIcon(shell, isRootShell);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        this.invalidateActionBarIcon(mShellHolder.getShell(), mShellHolder.isCurrentShellRoot());
     }
 
     @NonNull
@@ -96,12 +92,11 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity imp
     /**
      * Sets ActionBar icon to ic_superuser if superuser enabled.
      */
-    protected final void invalidateActionBarIcon(@Nullable final Shell shell,
-                                                 final boolean isRootShell) {
-        if (isRootShell) {
-            setActionBarIcon(getResources().getDrawable(R.drawable.ic_root));
-        } else if (getSettings().useCommandLine() && shell != null) {
-            setActionBarIcon(getResources().getDrawable(R.drawable.ic_shell));
+    private void invalidateActionBarIcon(@Nullable final Shell shell,
+                                         final boolean isRootShell) {
+        if (shell != null) {
+            setActionBarIcon(getResources().getDrawable(isRootShell ?
+                    R.drawable.ic_root : R.drawable.ic_shell));
         } else {
             setActionBarIcon(mDefaultIcon);
         }

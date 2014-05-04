@@ -26,7 +26,7 @@ import android.view.MenuItem;
 
 public final class SettingsActivity extends ActionBarIconThemableActivity {
 
-    private boolean needInvalidate;
+    private boolean mNeedInvalidate;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -77,14 +77,10 @@ public final class SettingsActivity extends ActionBarIconThemableActivity {
     }
 
     private void onBeforeFinish() {
-        this.setResult(this.needInvalidate ? Activity.RESULT_OK : Activity.RESULT_CANCELED);
+        this.setResult(mNeedInvalidate ? Activity.RESULT_OK : Activity.RESULT_CANCELED);
     }
     
     public void notifyNeedInvalidate() {
-        this.needInvalidate = true;
-    }
-
-    void proxyInvalidateActionBarIcon() {
-        invalidateActionBarIcon();
+        mNeedInvalidate = true;
     }
 }

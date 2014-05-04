@@ -161,9 +161,11 @@ public final class ShellHolder {
             }
             if (!suEnabled && mShell != null && mIsRootShell) {
                 openNewShell();
+                mSkipReaskForRootShellCount = REASK_FOR_ROOT_SHELL_THRESHOLD;
             }
             if (mShell == null || !Shell.isAnyShellOpen()) {
                 openNewShell();
+                mSkipReaskForRootShellCount = REASK_FOR_ROOT_SHELL_THRESHOLD;
             }
             return mShell;
         }
