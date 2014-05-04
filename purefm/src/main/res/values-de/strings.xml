@@ -26,7 +26,7 @@
     <string name="close">Schließen</string>
 
     <!-- Browser -->
-    <string name="directory_not_exists">Der Pfad existiert nicht</string>
+    <string name="directory_not_exists">Der Pfad “%1$s” existiert nicht</string>
     <string name="target_is_not_a_directory">Das Ziel ist kein Verzeichnis</string>
     
     <string name="remove">Entfernen</string>

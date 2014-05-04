@@ -35,6 +35,7 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.file.MultiListenerFileObserver;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.activities.AbstractBrowserActivity;
+import com.docd.purefm.utils.PFMFileUtils;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -147,6 +148,7 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         this.mNavigateListener = l;
     }
 
+    @Nullable
     public GenericFile getCurrentPath() {
         return this.mCurrentPath;
     }
@@ -189,7 +191,8 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
         return false;
     }
 
-    private GenericFile resolveExistingParent(final GenericFile file) {
+    @NonNull
+    private GenericFile resolveExistingParent(@NonNull final GenericFile file) {
         GenericFile parent = file.getParentFile();
         if (parent == null) {
             return file;
@@ -219,11 +222,18 @@ public final class Browser implements MultiListenerFileObserver.OnEventListener 
                 }
             } else {
                 Log.w("Browser", "The target is not a directory");
-                Toast.makeText(mContext, R.string.target_is_not_a_directory, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.target_is_not_a_directory,
+                        Toast.LENGTH_SHORT).show();
             }
         } else {
-            Log.w("Browser", "Trying to navigate to non-existing directory");
-            Toast.makeText(mContext, R.string.directory_not_exists, Toast.LENGTH_SHORT).show();
+            Log.w("Browser",
+                    "Trying to navigate to non-existing directory. Searching for existing parent");
+            Toast.makeText(mContext, mContext.getString(R.string.directory_not_exists,
+                    PFMFileUtils.fullPath(target)), Toast.LENGTH_SHORT).show();
+            final GenericFile parent = resolveExistingParent(target);
+            if (!parent.equals(target)) {
+                navigate(parent, addToHistory);
+            }
         }
     }
     

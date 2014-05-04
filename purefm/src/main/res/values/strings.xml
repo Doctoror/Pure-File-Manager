@@ -25,7 +25,7 @@
     <string name="storage_usb">USB</string>
 
     <!-- Browser -->
-    <string name="directory_not_exists">The directory does not exist</string>
+    <string name="directory_not_exists">The directory “%1$s” does not exist</string>
     <string name="target_is_not_a_directory">The target is not a directory</string>
     
     <string name="yes">Yes</string>

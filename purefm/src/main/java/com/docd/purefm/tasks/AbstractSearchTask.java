@@ -34,7 +34,7 @@ public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, 
         AbstractSearchTask task = null;
         final Settings settings = Settings.getInstance(context);
         if (settings.useCommandLine()) {
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell != null) {
                 task = new SearchCommandLineTask(shell, settings, startDirectory, listener);
             }

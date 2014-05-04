@@ -37,20 +37,21 @@ public final class FileFactory {
         //} TODO check this
         Shell shell = null;
         if (settings.useCommandLine() && Environment.hasBusybox()) {
-            shell = ShellHolder.getShell();
+            shell = ShellHolder.getInstance().getShell();
         }
         return shell == null ? new JavaFile(path) :
                 CommandLineFile.fromFile(shell, settings, new File(path));
     }
 
     @NonNull
-    public static GenericFile newFile(@NonNull final Settings settings, @NonNull final File path) {
+    public static GenericFile newFile(@NonNull final Settings settings,
+                                      @NonNull final File path) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");
         }
         Shell shell = null;
         if (settings.useCommandLine() && Environment.hasBusybox()) {
-            shell = ShellHolder.getShell();
+            shell = ShellHolder.getInstance().getShell();
         }
         return shell != null ?
                 CommandLineFile.fromFile(shell, settings, path) :
@@ -66,10 +67,10 @@ public final class FileFactory {
         }
         Shell shell = null;
         if (settings.useCommandLine() && Environment.hasBusybox()) {
-            shell = ShellHolder.getShell();
+            shell = ShellHolder.getInstance().getShell();
         }
-        return  shell != null ?
-                CommandLineFile.fromFile(shell, settings, new File(parent, name)) :
-                new JavaFile(parent, name);
+        return shell != null ?
+               CommandLineFile.fromFile(shell, settings, new File(parent, name)) :
+               new JavaFile(parent, name);
     }
 }

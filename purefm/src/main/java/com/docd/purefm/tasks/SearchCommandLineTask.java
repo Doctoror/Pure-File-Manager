@@ -84,7 +84,7 @@ final class SearchCommandLineTask extends AbstractSearchTask {
             String line;
             try {
                 while (!isCancelled() && (line = is.readLine()) != null) {
-                    this.publishProgress(CommandLineFile.fromLSL(mShell, mSettings, null, line));
+                    this.publishProgress(CommandLineFile.fromLSL(mShell, null, line));
                 }
             } catch (EOFException e) {
                 //ignore

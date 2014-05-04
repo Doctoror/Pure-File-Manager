@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -30,18 +31,19 @@ import android.widget.EditText;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.utils.PFMFileUtils;
 
 public final class CreateFileDialog extends DialogFragment {
     
-    public static DialogFragment instantiate(File currentDir) {
+    public static DialogFragment instantiate(@NonNull final Context context,
+                                             @NonNull final GenericFile currentDir) {
         final Bundle extras = new Bundle();
-        extras.putSerializable(Extras.EXTRA_CURRENT_DIR, currentDir);
-        
-        final CreateFileDialog cd = new CreateFileDialog();
-        cd.setArguments(extras);
-        return cd;
+        extras.putSerializable(Extras.EXTRA_CURRENT_DIR, currentDir.toFile());
+
+        return (DialogFragment) Fragment.instantiate(context,
+                CreateFileDialog.class.getName(), extras);
     }
 
     private EditText mFileNameInput;

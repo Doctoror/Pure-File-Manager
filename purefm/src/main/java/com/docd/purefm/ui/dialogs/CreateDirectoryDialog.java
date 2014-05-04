@@ -18,6 +18,7 @@ import java.io.File;
 
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.utils.PFMFileUtils;
 
@@ -25,20 +26,24 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.widget.EditText;
 
 public final class CreateDirectoryDialog extends DialogFragment {
-    
-    public static DialogFragment instantiate(final File currentDir) {
+
+    @NonNull
+    public static DialogFragment instantiate(@NonNull final Context context,
+                                             @NonNull final GenericFile currentDir) {
         final Bundle extras = new Bundle();
-        extras.putSerializable(Extras.EXTRA_CURRENT_DIR, currentDir);
-        
-        final CreateDirectoryDialog cd = new CreateDirectoryDialog();
-        cd.setArguments(extras);
-        return cd;
+        extras.putSerializable(Extras.EXTRA_CURRENT_DIR, currentDir.toFile());
+
+        return (DialogFragment) Fragment.instantiate(context,
+                CreateDirectoryDialog.class.getName(), extras);
     }
     
     private EditText mFileNameInput;

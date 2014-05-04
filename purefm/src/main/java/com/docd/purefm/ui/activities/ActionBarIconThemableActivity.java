@@ -17,10 +17,12 @@ package com.docd.purefm.ui.activities;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.ShellHolder;
-import com.docd.purefm.settings.Settings;
+import com.stericson.RootTools.execution.Shell;
 
 /**
  * Manages ActionBar icon. If superuser is enabled, the ActionBar
@@ -29,7 +31,10 @@ import com.docd.purefm.settings.Settings;
  *
  * @author Doctoror
  */
-public abstract class ActionBarIconThemableActivity extends ThemableActivity {
+public abstract class ActionBarIconThemableActivity extends ThemableActivity implements
+        ShellHolder.OnShellChangedListener {
+
+    private ShellHolder mShellHolder;
 
     /**
      * Default Activity icon
@@ -49,27 +54,53 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity {
             e.printStackTrace();
             mDefaultIcon = getResources().getDrawable(R.drawable.ic_fso_folder);
         }
+
+        mShellHolder = ShellHolder.getInstance();
+        mShellHolder.addOnShellChangedListener(this);
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        this.invalidateActionBarIcon();
+    protected void onDestroy() {
+        super.onDestroy();
+        mShellHolder.removeOnShellChangedListener(this);
+    }
+
+    @Override
+    public final void onShellChanged(@Nullable final Shell shell, final boolean isRootShell) {
+        invalidateActionBarIcon(shell, isRootShell);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        this.invalidateActionBarIcon();
+        this.invalidateActionBarIcon(mShellHolder.getShell(), mShellHolder.isCurrentShellRoot());
+    }
+
+    @NonNull
+    protected final ShellHolder getShellHolder() {
+        if (mShellHolder == null) {
+            throw new IllegalStateException("getShellHolder() can be called only after onCreate()");
+        }
+        return mShellHolder;
     }
 
     /**
      * Sets ActionBar icon to ic_superuser if superuser enabled.
      */
     protected final void invalidateActionBarIcon() {
-        if (ShellHolder.isCurrentShellRoot()) {
+        final Shell shell = getSettings().useCommandLine() ?
+                mShellHolder.getShell() : null;
+        invalidateActionBarIcon(shell, mShellHolder.isCurrentShellRoot());
+    }
+
+    /**
+     * Sets ActionBar icon to ic_superuser if superuser enabled.
+     */
+    protected final void invalidateActionBarIcon(@Nullable final Shell shell,
+                                                 final boolean isRootShell) {
+        if (isRootShell) {
             setActionBarIcon(getResources().getDrawable(R.drawable.ic_root));
-        } else if (Settings.getInstance(this).useCommandLine() && ShellHolder.getShell() != null) {
+        } else if (getSettings().useCommandLine() && shell != null) {
             setActionBarIcon(getResources().getDrawable(R.drawable.ic_shell));
         } else {
             setActionBarIcon(mDefaultIcon);

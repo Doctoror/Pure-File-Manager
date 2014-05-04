@@ -14,7 +14,6 @@
  */
 package com.docd.purefm.ui.activities;
 
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,7 +49,6 @@ import com.docd.purefm.adapters.BookmarksAdapter;
 import com.docd.purefm.adapters.BrowserTabsAdapter;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.operations.OperationsService;
-import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.MessageDialogBuilder;
 import com.docd.purefm.ui.dialogs.ProgressAlertDialogBuilder;
 import com.docd.purefm.ui.fragments.BrowserFragment;
@@ -224,7 +222,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
         super.onStop();
         unbindService(this);
         if (mBookmarksAdapter.isModified()) {
-            Settings.getInstance(this).setBookmarks(mBookmarksAdapter.getData());
+            getSettings().setBookmarks(mBookmarksAdapter.getData());
         }
     }
 
@@ -232,6 +230,7 @@ public final class BrowserPagerActivity extends AbstractBrowserActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
+        //noinspection SimplifiableIfStatement
         if (mDrawerToggle.isDrawerIndicatorEnabled() &&
                 mDrawerToggle.onOptionsItemSelected(item)) {
             return true;

@@ -242,7 +242,7 @@ public final class SearchActivity extends ActionBarIconThemableActivity
             throw new RuntimeException("parent should contain ViewGroup with id R.id.list_container");
         }
 
-        final Settings settings = Settings.getInstance(this);
+        final Settings settings = getSettings();
         final View swipeRefreshList;
         switch (settings.getListAppearance()) {
             case LIST:

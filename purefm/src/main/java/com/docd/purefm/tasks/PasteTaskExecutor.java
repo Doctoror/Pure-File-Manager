@@ -14,24 +14,30 @@
  */
 package com.docd.purefm.tasks;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 
+import com.docd.purefm.Environment;
 import com.docd.purefm.R;
 import com.docd.purefm.file.FileFactory;
+import com.docd.purefm.file.FileObserverNotifier;
 import com.docd.purefm.operations.OperationsService;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.ui.dialogs.FileExistsDialog;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.utils.ClipBoard;
+import com.docd.purefm.utils.MediaStoreUtils;
 import com.docd.purefm.utils.PFMFileUtils;
 import com.docd.purefm.utils.StatFsCompat;
+import com.stericson.RootTools.RootTools;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -52,16 +58,29 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
     private final GenericFile mTargetFile;
 
     @NonNull
-    private final LinkedList<GenericFile> mToProcess = new LinkedList<>();
+    private final List<GenericFile> mToProcess = new LinkedList<>();
 
     @NonNull
-    private final HashMap<GenericFile, GenericFile> mExisting = new HashMap<>();
+    private final Map<GenericFile, GenericFile> mExisting = new HashMap<>();
+
+    @NonNull
+    private final Map<GenericFile, GenericFile> mWriteInto = new HashMap<>();
+
+    @NonNull
+    private final List<GenericFile> mProcessedWriteInto = new LinkedList<>();
 
     private FreeSpaceTask mFreeSpaceTask;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private StartThread mStartThread;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private Thread mStartThread;
+    private WriteIntoTask mWriteIntoTask;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private DeleteProcessedWriteIntoThread mDeleteProcessedWriteIntoThread;
+
+    private boolean mWriteIntoAll;
 
     private Pair<GenericFile, GenericFile> mCurrentPair;
     
@@ -99,6 +118,7 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
             }
         }
         if (all) {
+            //TODO check if it really works
             mToProcess.addAll(mExisting.keySet());
             mExisting.clear();
         }
@@ -108,16 +128,18 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
     @Override
     public void onActionWriteInto(final boolean all) {
         if (all) {
-            final Set<GenericFile> toRemove = new HashSet<>();
+            mWriteIntoAll = true;
             for (final GenericFile file : mExisting.keySet()) {
                 if (file.isDirectory()) {
-                    toRemove.add(file);
+                    mWriteInto.put(file, mExisting.get(file));
                 }
             }
-            for (final GenericFile file : toRemove) {
+            for (final GenericFile file : mWriteInto.keySet()) {
                 mExisting.remove(file);
             }
         }
+        mWriteInto.put(mCurrentPair.first, mCurrentPair.second);
+        mExisting.remove(mCurrentPair.first);
         next();
     }
 
@@ -125,42 +147,66 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
     public void onActionAbort() {
         mExisting.clear();
         mToProcess.clear();
+        mProcessedWriteInto.clear();
     }
 
     private void next() {
         final Activity activity = this.mActivityReference.get();
         if (activity != null) {
-            if (mExisting.isEmpty()) {
-            
-                if (mToProcess.isEmpty()) {
-                    ClipBoard.clear();
-                } else {
-                    final GenericFile[] files = new GenericFile[mToProcess.size()];
-                    mToProcess.toArray(files);
+            if (!mExisting.isEmpty()) {
+                processNext(activity);
+                return;
+            }
 
-                    OperationsService.paste(activity, mTargetFile, files, ClipBoard.isMove());
-                }
-            
+            if (!mToProcess.isEmpty()) {
+                startPasteOperation(activity);
+                return;
+            }
+
+            if (!mWriteInto.isEmpty()) {
+                processWriteInto();
+                return;
+            }
+
+            ClipBoard.clear();
+            deleteProcessedWriteInto();
+        }
+    }
+
+    private void processNext(@NonNull final Activity activity) {
+        final GenericFile key = mExisting.keySet().iterator().next();
+        final GenericFile target = mExisting.get(key);
+        mCurrentPair = new Pair<>(key, target);
+        mExisting.remove(key);
+
+        if (!activity.isFinishing()) {
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                showExistsDialog(activity, key, target);
             } else {
-                final GenericFile key = mExisting.keySet().iterator().next();
-                final GenericFile target = mExisting.get(key);
-                mCurrentPair = new Pair<>(key, target);
-                mExisting.remove(key);
-
-                if (!activity.isFinishing()) {
-                    if (Looper.myLooper() == Looper.getMainLooper()) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
                         showExistsDialog(activity, key, target);
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showExistsDialog(activity, key, target);
-                            }
-                        });
                     }
-                }
+                });
             }
         }
+    }
+
+    private void startPasteOperation(@NonNull final Context context) {
+        final GenericFile[] files = new GenericFile[mToProcess.size()];
+        mToProcess.toArray(files);
+        OperationsService.paste(context, mTargetFile, files, ClipBoard.isMove());
+    }
+
+    private void processWriteInto() {
+        mWriteIntoTask = new WriteIntoTask();
+        mWriteIntoTask.execute();
+    }
+
+    private void deleteProcessedWriteInto() {
+        mDeleteProcessedWriteIntoThread = new DeleteProcessedWriteIntoThread();
+        mDeleteProcessedWriteIntoThread.start();
     }
 
     private void showExistsDialog(@NonNull final Context context,
@@ -168,6 +214,98 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
                                   @NonNull final GenericFile target) {
 
         new FileExistsDialog(context, source, target, this).show();
+    }
+
+    private final class DeleteProcessedWriteIntoThread extends Thread {
+
+        @Override
+        public void run() {
+            final HashSet<String> remountPaths = new HashSet<>();
+            // find paths to remount as read-write
+            if (mSettings.useCommandLine() && mSettings.isSuEnabled()) {
+                for (GenericFile file : mProcessedWriteInto) {
+                    try {
+                        file = file.getCanonicalFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    final String parent = file.getParent();
+                    if (parent != null) {
+                        if (Environment.needsRemount(parent)) {
+                            remountPaths.add(parent);
+                        }
+                    } else if (Environment.needsRemount(file.getAbsolutePath())) {
+                        remountPaths.add(file.getAbsolutePath());
+                    }
+                }
+            }
+            for (final String remountPath : remountPaths) {
+                RootTools.remount(remountPath, "RW");
+            }
+            final LinkedList<GenericFile> filesDeleted = new LinkedList<>();
+            try {
+                for (final GenericFile file : mProcessedWriteInto) {
+                    if (file.delete()) {
+                        filesDeleted.add(file);
+                    }
+                }
+            } finally {
+                for (final String remountPath : remountPaths) {
+                    RootTools.remount(remountPath, "RO");
+                }
+                if (!filesDeleted.isEmpty()) {
+                    final Context context = mActivityReference.get();
+                    if (context != null) {
+                        MediaStoreUtils.deleteFilesOrDirectories(context.getContentResolver(), filesDeleted);
+                        FileObserverNotifier.notifyDeleted(filesDeleted);
+                    }
+                }
+                mDeleteProcessedWriteIntoThread = null;
+            }
+        }
+    }
+
+    private final class WriteIntoTask extends AsyncTask<Void, Void, Void> {
+
+        WriteIntoTask() {
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mExisting.clear();
+            mToProcess.clear();
+            final HashMap<GenericFile, GenericFile> mNewWriteInto = new HashMap<>();
+            for (final GenericFile file : mWriteInto.keySet()) {
+                final GenericFile target = mWriteInto.get(file);
+                final GenericFile[] files = file.listFiles();
+                if (files != null) {
+                    for (final GenericFile childFile : files) {
+                        final GenericFile testTarget = FileFactory.newFile(mSettings,
+                                target.toFile(), childFile.getName());
+                        if (testTarget.exists()) {
+                            if (mWriteIntoAll && file.isDirectory()) {
+                                mNewWriteInto.put(file, testTarget);
+                            } else {
+                                mExisting.put(file, testTarget);
+                            }
+                        } else {
+                            mToProcess.add(file);
+                        }
+                    }
+                }
+                mProcessedWriteInto.add(file);
+            }
+            mWriteInto.clear();
+            mWriteInto.putAll(mNewWriteInto);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mWriteIntoTask = null;
+            next();
+        }
     }
 
     private static final class FreeSpaceTaskResult {
@@ -208,6 +346,7 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
 
         @Override
         protected void onPostExecute(@NonNull final FreeSpaceTaskResult freeSpaceTaskResult) {
+            mFreeSpaceTask = null;
             if (freeSpaceTaskResult.mHasEnoughFreeSpace) {
                 mStartThread = new StartThread();
                 mStartThread.start();
@@ -239,13 +378,18 @@ public final class PasteTaskExecutor implements FileExistsDialog.FileExistsDialo
                     final GenericFile testTarget = FileFactory.newFile(mSettings,
                             mTargetFile.toFile(), file.getName());
                     if (testTarget.exists()) {
-                        mExisting.put(file, testTarget);
+                        if (mWriteIntoAll && file.isDirectory()) {
+                            mWriteInto.put(file, testTarget);
+                        } else {
+                            mExisting.put(file, testTarget);
+                        }
                     } else {
                         mToProcess.add(file);
                     }
                 }
             }
 
+            mStartThread = null;
             next();
         }
     }

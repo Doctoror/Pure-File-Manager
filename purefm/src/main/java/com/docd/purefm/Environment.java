@@ -191,7 +191,7 @@ public final class Environment {
             return false;
         }
 
-        final Shell shell = ShellHolder.getShell();
+        final Shell shell = ShellHolder.getInstance().getShell();
         if (shell != null) {
             final List<String> result = CommandLine.executeForResult(shell,
                     new CommandListBusyboxApplets());

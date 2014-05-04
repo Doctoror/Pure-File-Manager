@@ -17,6 +17,7 @@ package com.docd.purefm.controller;
 import com.docd.purefm.Extras;
 import com.docd.purefm.R;
 import com.docd.purefm.browser.Browser;
+import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.ui.activities.AbstractBrowserActivity;
 import com.docd.purefm.ui.activities.SearchActivity;
 import com.docd.purefm.settings.SettingsActivity;
@@ -63,11 +64,14 @@ public final class MenuController {
                 this.mBrowser.up();
                 return true;
 
-            case android.R.id.paste:
-                final PasteTaskExecutor ptc = new PasteTaskExecutor(mActivity,
-                        mBrowser.getCurrentPath());
-                ptc.start();
+            case android.R.id.paste: {
+                final GenericFile currentPath = mBrowser.getCurrentPath();
+                if (currentPath != null) {
+                    final PasteTaskExecutor ptc = new PasteTaskExecutor(mActivity, currentPath);
+                    ptc.start();
+                }
                 return true;
+            }
 
             case android.R.id.content:
                 final Settings settings = Settings.getInstance(mActivity);
@@ -87,30 +91,49 @@ public final class MenuController {
                 mActivity.invalidateList();
                 return true;
 
-            case R.id.menu_search:
-                final Intent searchIntent = new Intent(mActivity, SearchActivity.class);
-                searchIntent.putExtra(Extras.EXTRA_FILE, mBrowser.getCurrentPath());
-                mActivity.startActivity(searchIntent);
+            case R.id.menu_search: {
+                final GenericFile currentPath = mBrowser.getCurrentPath();
+                if (currentPath != null) {
+                    final Intent searchIntent = new Intent(mActivity, SearchActivity.class);
+                    searchIntent.putExtra(Extras.EXTRA_FILE, currentPath);
+                    mActivity.startActivity(searchIntent);
+                }
                 return true;
+            }
 
             case R.id.menu_settings:
-                mActivity.startActivityForResult(new Intent(mActivity, SettingsActivity.class), AbstractBrowserActivity.REQUEST_CODE_SETTINGS);
+                mActivity.startActivityForResult(new Intent(mActivity, SettingsActivity.class),
+                        AbstractBrowserActivity.REQUEST_CODE_SETTINGS);
                 return true;
 
-            case R.id.menu_folder_new:
-                final DialogFragment cd = CreateDirectoryDialog.instantiate(mBrowser.getCurrentPath().toFile());
-                cd.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+            case R.id.menu_folder_new: {
+                final GenericFile currentPath = mBrowser.getCurrentPath();
+                if (currentPath != null) {
+                    final DialogFragment cd = CreateDirectoryDialog.instantiate(
+                            mActivity, currentPath);
+                    cd.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+                }
                 return true;
+            }
 
-            case R.id.menu_file_new:
-                final DialogFragment cf = CreateFileDialog.instantiate(mBrowser.getCurrentPath().toFile());
-                cf.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+            case R.id.menu_file_new: {
+                final GenericFile currentPath = mBrowser.getCurrentPath();
+                if (currentPath != null) {
+                    final DialogFragment cf = CreateFileDialog.instantiate(
+                            mActivity, currentPath);
+                    cf.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+                }
                 return true;
+            }
 
-            case R.id.menu_partition:
-                final DialogFragment pid = PartitionInfoDialog.instantiate(mBrowser.getCurrentPath());
-                pid.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+            case R.id.menu_partition: {
+                final GenericFile currentPath = mBrowser.getCurrentPath();
+                if (currentPath != null) {
+                    final DialogFragment pid = PartitionInfoDialog.instantiate(currentPath);
+                    pid.show(mActivity.getFragmentManager(), AbstractBrowserActivity.TAG_DIALOG);
+                }
                 return true;
+            }
 
             case R.id.menu_sort_name_asc:
                 mBrowserAdapter.setCompareType(FileSortType.NAME_ASC);

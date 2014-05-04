@@ -60,7 +60,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
 
         final Settings settings = Settings.getInstance(mContext);
         if (files[0] instanceof CommandLineFile) {
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 Log.w("DeleteOperation", "shell is null, aborting");
                 failed.addAll(Arrays.asList(files));

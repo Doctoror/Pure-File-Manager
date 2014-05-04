@@ -55,7 +55,6 @@ public final class SettingsFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.addPreferencesFromResource(R.xml.settings);
-        this.mWasAllowRoot = mSettings.isSuEnabled();
         this.init();
     }
 
@@ -258,10 +257,16 @@ public final class SettingsFragment extends PreferenceFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        this.mWasAllowRoot = mSettings.isSuEnabled();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         if (!mSettings.useCommandLine() || mWasAllowRoot != mSettings.isSuEnabled()) {
-            ShellHolder.releaseShell();
+            ShellHolder.getInstance().releaseShell(true);
         }
     }
 }

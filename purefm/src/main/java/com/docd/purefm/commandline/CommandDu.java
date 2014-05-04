@@ -35,7 +35,7 @@ public final class CommandDu extends BusyboxCommand {
     }
 
     public static long du_s(@NonNull final GenericFile file) {
-        final Shell shell = ShellHolder.getShell();
+        final Shell shell = ShellHolder.getInstance().getShell();
         if (shell == null) {
             Log.w("CommandDu", "shell is null, aborting");
             return 0L;

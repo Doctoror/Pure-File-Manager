@@ -152,7 +152,7 @@ public final class PFMFileUtils {
             }
         }
 
-        final Shell shell = ShellHolder.getShell();
+        final Shell shell = ShellHolder.getInstance().getShell();
         if (shell == null) {
             Log.w("resolveFileSystem()", "shell is null, aborting");
             return null;
@@ -193,7 +193,7 @@ public final class PFMFileUtils {
             if (target.exists()) {
                 throw new FileExistsException("Target exists");
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -211,7 +211,7 @@ public final class PFMFileUtils {
                                 @NonNull final GenericFile target,
                                 final boolean useCommandLine) throws IOException {
         if (useCommandLine) {
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -235,7 +235,7 @@ public final class PFMFileUtils {
             if (!target.isDirectory()) {
                 throw new IllegalArgumentException("Target is not a directory");
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -256,7 +256,7 @@ public final class PFMFileUtils {
             if (target.exists()) {
                 throw new FileExistsException("Target exists");
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -292,7 +292,7 @@ public final class PFMFileUtils {
                     throw new FileNotFoundException("Target directory doesn't exist");
                 }
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -320,7 +320,7 @@ public final class PFMFileUtils {
                 throw new IOException("Source '" + source + "' and destination '" + target +
                         "' are the same");
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -354,7 +354,7 @@ public final class PFMFileUtils {
             if (!target.isDirectory()) {
                 throw new IOException("Target is not a directory");
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
@@ -374,7 +374,7 @@ public final class PFMFileUtils {
             if (!file.exists()) {
                 throw new FileNotFoundException("File does not exist: " + file);
             }
-            final Shell shell = ShellHolder.getShell();
+            final Shell shell = ShellHolder.getInstance().getShell();
             if (shell == null) {
                 throw new IOException("Shell is null");
             }
