@@ -49,8 +49,7 @@
     <string name="menu_new_folder">Neuer Ordner</string>
     <string name="menu_settings">Einstellungen</string>
     <string name="menu_paste">Einfügen</string>
-    <!-- TODO translate -->
-    <string name="menu_add_to_media_store">Add to Media Store</string>
+    <string name="menu_add_to_media_store">Zur Medienbibliothek hinzufügen</string>
     <string name="menu_view_as_list">Zeige als Liste</string>
     <string name="menu_view_as_grid">Zeige als Raster</string>
     <string name="menu_sort">Sortieren</string>
@@ -127,8 +126,7 @@
         <item quantity="other">Kopiere %1$d Dateien in den Zwischenspeicher</item>
     </plurals>
 
-    <!-- TODO transate to German -->
-    <string name="not_enough_space_message">Not enough space to paste files. Available %1$s, required %2$s.</string>
+    <string name="not_enough_space_message">Nicht genug Speicher vorhanden. Verfügbar %1$s, benötigt %2$s.</string>
     
     <string name="dialog_overwrite_title">Zieldatei existiert bereits</string>
     <string name="dialog_overwrite_message">Diese Aktion überschreibt das Ziel</string>
@@ -137,18 +135,14 @@
     <string name="dialog_overwrite_abort">Abbrechen</string>
     <string name="dialog_overwrite_skip">Überspringen</string>
     <string name="dialog_overwrite_replace">Ersetzen</string>
-    <!-- TODO transate to German -->
-    <string name="dialog_overwrite_write_into">Write into</string>
-    <!-- TODO transate to German -->
-    <string name="dialog_overwrite_apply_to_all">Apply to all</string>
-    <!-- TODO transate to German -->
-    <string name="dialog_overwrite_replace_failed">Failed to replace “%1$s”</string>
+    <string name="dialog_overwrite_write_into">Speichern</string>
+    <string name="dialog_overwrite_apply_to_all">Für alle anwenden</string>
+    <string name="dialog_overwrite_replace_failed">Fehler beim kopieren von “%1$s”</string>
     <string name="dialog_copy_failed">Fehler beim Kopieren folgender Dateien</string>
     <string name="dialog_move_failed">Fehler beim Verschieben folgender Dateien</string>
     <string name="dialog_delete_failed">Fehler beim Löschen folgender Dateien</string>
 
-    <!-- TODO translate to German -->
-    <string name="canceling_suffix">\u0020(canceling…)</string>
+    <string name="canceling_suffix">\u0020(abbrechen…)</string>
 
     <!-- Delete -->
     <string name="dialog_delete_title">Folgende Dateien werden gelöscht:</string>

@@ -14,10 +14,9 @@
 <!--limitations under the License.-->
 <resources>
 
-    <!-- TODO translate to German -->
     <string-array name="themes">
-        <item>Dark</item>
-        <item>Light</item>
+        <item>Dunkel</item>
+        <item>Hell</item>
     </string-array>
     
 </resources>
