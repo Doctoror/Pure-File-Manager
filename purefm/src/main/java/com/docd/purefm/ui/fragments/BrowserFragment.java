@@ -95,7 +95,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
     private Parcelable mBrowserInitialState;
 
     private int mPrevId;
-    private boolean firstRun;
+    private boolean mFirstRun;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -136,8 +136,8 @@ public final class BrowserFragment extends UserVisibleHintFragment
                 if (mMainProgress.getVisibility() == View.VISIBLE) {
                     mMainProgress.setVisibility(View.GONE);
                 }
-                if (firstRun) {
-                    firstRun = false;
+                if (mFirstRun) {
+                    mFirstRun = false;
                 }
                 if (mRefreshFlag) {
                     mRefreshFlag = false;
@@ -191,7 +191,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
         setRetainInstance(true);
         setHasOptionsMenu(true);
         super.onCreate(state);
-        firstRun = true;
+        mFirstRun = true;
         restoreManualState(state);
     }
 
@@ -289,7 +289,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
             throw new RuntimeException("Inflated view is null");
         }
         initList(inflater, parent);
-        firstRun = true;
+        mFirstRun = true;
         return parent;
     }
 
@@ -441,7 +441,7 @@ public final class BrowserFragment extends UserVisibleHintFragment
 
     @Override
     protected void onVisible() {
-        if (firstRun || mRefreshFlag) {
+        if (mFirstRun || mRefreshFlag) {
             onFirstInvalidate();
         } else {
             mParentOnNavigateListener.onNavigationCompleted(mBrowser
