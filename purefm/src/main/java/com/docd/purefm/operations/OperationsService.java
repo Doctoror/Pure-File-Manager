@@ -74,7 +74,7 @@ public final class OperationsService extends MultiWorkerService
     private OnOperationEndedRunnable mPendingOperationEndedRunnable;
 
     private enum EOperation {
-        PASTE(0), DELETE(1);
+        PASTE(1), DELETE(2);
 
         final int mId;
 
