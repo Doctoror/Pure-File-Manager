@@ -17,7 +17,6 @@ package com.docd.purefm.commandline;
 import com.docd.purefm.Environment;
 import com.docd.purefm.file.Permissions;
 import com.stericson.RootTools.RootTools;
-import com.stericson.RootTools.execution.Shell;
 
 import android.support.annotation.NonNull;
 
@@ -93,7 +92,7 @@ final class CommandLineUtils {
         return perm.toString();
     }
 
-    public static boolean copyRecursively(@NonNull final Shell shell, @NonNull final CommandCopyRecursively command) {
+    public static boolean copyRecursively(@NonNull final CommandCopyRecursively command) {
         final boolean wasRemounted;
         if (command.target.startsWith(Environment.sAndroidRootDirectory.getAbsolutePath())) {
             RootTools.remount(command.target, "RW");
@@ -101,7 +100,7 @@ final class CommandLineUtils {
         } else {
             wasRemounted = false;
         }
-        final boolean result = CommandLine.execute(shell, command);
+        final boolean result = CommandLine.execute(command);
         if (wasRemounted) {
             RootTools.remount(command.target, "RO");
         }

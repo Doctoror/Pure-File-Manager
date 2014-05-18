@@ -84,7 +84,8 @@
     
     <string name="preference_category_performance">Erweitert</string>
     <string name="preference_use_commandline">Verwende Busybox</string>
-    <string name="preference_allow_root">Root-Zugriff erlauben</string>
+    <!-- TODO translate -->
+    <string name="preference_work_as_superuser">Work as superuser</string>
     
     <string name="preference_category_startup">Startoptionen</string>
     <string name="preference_home_directory">Startordner</string>

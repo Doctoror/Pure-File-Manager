@@ -19,7 +19,6 @@ import android.os.Looper;
 import com.docd.purefm.Environment;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.settings.Settings;
-import com.stericson.RootTools.execution.Shell;
 
 import android.support.annotation.NonNull;
 
@@ -35,12 +34,10 @@ public final class FileFactory {
         //if (Looper.myLooper() == Looper.getMainLooper()) {
             //throw new RuntimeException("Wrong thread");
         //} TODO check this
-        Shell shell = null;
-        if (settings.useCommandLine() && Environment.hasBusybox()) {
-            shell = ShellHolder.getInstance().getShell();
-        }
-        return shell == null ? new JavaFile(path) :
-                CommandLineFile.fromFile(shell, settings, new File(path));
+        return settings.useCommandLine() && Environment.hasBusybox() &&
+                ShellHolder.getInstance().hasShell() ?
+                        CommandLineFile.fromFile(settings, new File(path)) :
+                                new JavaFile(path);
     }
 
     @NonNull
@@ -49,13 +46,10 @@ public final class FileFactory {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");
         }
-        Shell shell = null;
-        if (settings.useCommandLine() && Environment.hasBusybox()) {
-            shell = ShellHolder.getInstance().getShell();
-        }
-        return shell != null ?
-                CommandLineFile.fromFile(shell, settings, path) :
-                new JavaFile(path);
+        return settings.useCommandLine() && Environment.hasBusybox() &&
+                ShellHolder.getInstance().hasShell() ?
+                        CommandLineFile.fromFile(settings, path) :
+                                new JavaFile(path);
     }
 
     @NonNull
@@ -65,12 +59,9 @@ public final class FileFactory {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Wrong thread");
         }
-        Shell shell = null;
-        if (settings.useCommandLine() && Environment.hasBusybox()) {
-            shell = ShellHolder.getInstance().getShell();
-        }
-        return shell != null ?
-               CommandLineFile.fromFile(shell, settings, new File(parent, name)) :
-               new JavaFile(parent, name);
+        return settings.useCommandLine() && Environment.hasBusybox() &&
+                ShellHolder.getInstance().hasShell() ?
+                        CommandLineFile.fromFile(settings, new File(parent, name)) :
+                                new JavaFile(parent, name);
     }
 }

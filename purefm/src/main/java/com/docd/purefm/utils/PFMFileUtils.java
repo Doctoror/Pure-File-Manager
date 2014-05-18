@@ -36,7 +36,6 @@ import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.CommandStat;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
-import com.stericson.RootTools.execution.Shell;
 
 import android.content.Context;
 import android.content.Intent;
@@ -152,14 +151,12 @@ public final class PFMFileUtils {
             }
         }
 
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w("resolveFileSystem()", "shell is null, aborting");
+        if (!ShellHolder.getInstance().hasShell()) {
+            Log.w("resolveFileSystem()", "no shell, aborting");
             return null;
         }
 
-        final List<String> fsTypeResult = CommandLine.executeForResult(shell,
-                new CommandStat(path));
+        final List<String> fsTypeResult = CommandLine.executeForResult(new CommandStat(path));
         return fsTypeResult == null || fsTypeResult.isEmpty() ?
                 null : fsTypeResult.get(0);
     }
@@ -193,12 +190,7 @@ public final class PFMFileUtils {
             if (target.exists()) {
                 throw new FileExistsException("Target exists");
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandMove(source, target));
+            final boolean result = CommandLine.execute(new CommandMove(source, target));
             if (!result) {
                 throw new IOException("Move failed");
             }
@@ -211,12 +203,7 @@ public final class PFMFileUtils {
                                 @NonNull final GenericFile target,
                                 final boolean useCommandLine) throws IOException {
         if (useCommandLine) {
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandCopyRecursively(source, target));
+            final boolean result = CommandLine.execute(new CommandCopyRecursively(source, target));
             if (!result) {
                 throw new IOException("Move failed");
             }
@@ -235,12 +222,7 @@ public final class PFMFileUtils {
             if (!target.isDirectory()) {
                 throw new IllegalArgumentException("Target is not a directory");
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandCopyRecursively(source, target));
+            final boolean result = CommandLine.execute(new CommandCopyRecursively(source, target));
             if (!result) {
                 throw new IOException("Move failed");
             }
@@ -256,12 +238,7 @@ public final class PFMFileUtils {
             if (target.exists()) {
                 throw new FileExistsException("Target exists");
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandMove(source, target));
+            final boolean result = CommandLine.execute(new CommandMove(source, target));
             if (!result) {
                 throw new IOException("Move failed");
             }
@@ -292,12 +269,7 @@ public final class PFMFileUtils {
                     throw new FileNotFoundException("Target directory doesn't exist");
                 }
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandMove(source, target));
+            final boolean result = CommandLine.execute(new CommandMove(source, target));
             if (!result) {
                 throw new IOException("Moving failed");
             }
@@ -320,12 +292,7 @@ public final class PFMFileUtils {
                 throw new IOException("Source '" + source + "' and destination '" + target +
                         "' are the same");
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandCopyRecursively(source, target));
+            final boolean result = CommandLine.execute(new CommandCopyRecursively(source, target));
             if (!result) {
                 throw new IOException("Copying failed");
             }
@@ -354,12 +321,7 @@ public final class PFMFileUtils {
             if (!target.isDirectory()) {
                 throw new IOException("Target is not a directory");
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandCopyRecursively(source, target));
+            final boolean result = CommandLine.execute(new CommandCopyRecursively(source, target));
             if (!result) {
                 throw new IOException("Copying failed");
             }
@@ -374,12 +336,7 @@ public final class PFMFileUtils {
             if (!file.exists()) {
                 throw new FileNotFoundException("File does not exist: " + file);
             }
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                throw new IOException("Shell is null");
-            }
-            final boolean result = CommandLine.execute(shell,
-                    new CommandRemove(file.toFile()));
+            final boolean result = CommandLine.execute(new CommandRemove(file.toFile()));
             if (!result) {
                 throw new IOException("Removing failed");
             }

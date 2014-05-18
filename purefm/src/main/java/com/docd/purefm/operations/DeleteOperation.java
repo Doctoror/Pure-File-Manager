@@ -27,7 +27,6 @@ import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MediaStoreUtils;
 import com.stericson.RootTools.RootTools;
-import com.stericson.RootTools.execution.Shell;
 
 import android.support.annotation.NonNull;
 
@@ -60,9 +59,8 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
 
         final Settings settings = Settings.getInstance(mContext);
         if (files[0] instanceof CommandLineFile) {
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell == null) {
-                Log.w("DeleteOperation", "shell is null, aborting");
+            if (!ShellHolder.getInstance().hasShell()) {
+                Log.w("DeleteOperation", "No shell, aborting");
                 failed.addAll(Arrays.asList(files));
                 return failed;
             }
@@ -96,7 +94,7 @@ final class DeleteOperation extends Operation<GenericFile, ArrayList<GenericFile
                         break;
                     }
                     final File fileFile = file.toFile();
-                    if (CommandLine.execute(shell, new CommandRemove(fileFile))) {
+                    if (CommandLine.execute(new CommandRemove(fileFile))) {
                         filesAffected.add(file);
                     } else {
                         failed.add(file);

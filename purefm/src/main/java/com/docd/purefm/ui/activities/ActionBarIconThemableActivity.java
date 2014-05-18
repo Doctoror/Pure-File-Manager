@@ -18,11 +18,9 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.docd.purefm.R;
 import com.docd.purefm.commandline.ShellHolder;
-import com.stericson.RootTools.execution.Shell;
 
 /**
  * Manages ActionBar icon. If superuser is enabled, the ActionBar
@@ -57,7 +55,7 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity imp
 
         mShellHolder = ShellHolder.getInstance();
 
-        invalidateActionBarIcon();
+        invalidateActionBarIcon(mShellHolder.hasShell(), mShellHolder.isCurrentShellRoot());
         mShellHolder.addOnShellChangedListener(this);
     }
 
@@ -68,8 +66,8 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity imp
     }
 
     @Override
-    public final void onShellChanged(@Nullable final Shell shell, final boolean isRootShell) {
-        invalidateActionBarIcon(shell, isRootShell);
+    public final void onShellChanged(final boolean hasShell, final boolean isRootShell) {
+        invalidateActionBarIcon(hasShell, isRootShell);
     }
 
     @NonNull
@@ -83,18 +81,8 @@ public abstract class ActionBarIconThemableActivity extends ThemableActivity imp
     /**
      * Sets ActionBar icon to ic_superuser if superuser enabled.
      */
-    protected final void invalidateActionBarIcon() {
-        final Shell shell = getSettings().useCommandLine() ?
-                mShellHolder.getShell() : null;
-        invalidateActionBarIcon(shell, mShellHolder.isCurrentShellRoot());
-    }
-
-    /**
-     * Sets ActionBar icon to ic_superuser if superuser enabled.
-     */
-    private void invalidateActionBarIcon(@Nullable final Shell shell,
-                                         final boolean isRootShell) {
-        if (shell != null) {
+    private void invalidateActionBarIcon(final boolean hasShell, final boolean isRootShell) {
+        if (hasShell) {
             setActionBarIcon(getResources().getDrawable(isRootShell ?
                     R.drawable.ic_root : R.drawable.ic_shell));
         } else {

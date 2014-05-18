@@ -87,7 +87,7 @@
     
     <string name="preference_category_performance">Performance</string>
     <string name="preference_use_commandline">Use Busybox</string>
-    <string name="preference_allow_root">Allow root access</string>
+    <string name="preference_work_as_superuser">Work as superuser</string>
     
     <string name="preference_category_startup">Startup</string>
     <string name="preference_home_directory">Home directory</string>

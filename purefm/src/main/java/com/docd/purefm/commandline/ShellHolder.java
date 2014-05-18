@@ -39,7 +39,7 @@ import java.util.Set;
 public final class ShellHolder {
 
     public interface OnShellChangedListener {
-        void onShellChanged(@Nullable Shell shell, boolean isRootShell);
+        void onShellChanged(boolean hasShell, boolean isRootShell);
     }
 
     private static final int REASK_FOR_ROOT_SHELL_THRESHOLD = 6;
@@ -138,6 +138,25 @@ public final class ShellHolder {
         }
     }
 
+    public boolean execute(@NonNull final Command command) {
+        final Shell shell = getShell();
+        if (shell == null) {
+            Log.w("ShellHolder", "No shell. Execution aborted.");
+            return false;
+        }
+        try {
+            shell.add(command);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean hasShell() {
+        return getShell() != null;
+    }
+
     /**
      * The shell is set by BrowserPagerActivity and is released when BrowserPagerActivity
      * is destroyed.
@@ -147,7 +166,7 @@ public final class ShellHolder {
      * @return shell shared Shell instance
      */
     @Nullable
-    public Shell getShell() {
+    private Shell getShell() {
         synchronized (mShellLock) {
             final boolean suEnabled = Settings.getInstance().isSuEnabled();
             if (suEnabled && mShell != null && !mIsRootShell) {
@@ -206,7 +225,7 @@ public final class ShellHolder {
             for (final WeakReference<OnShellChangedListener> ref : sListeners) {
                 final OnShellChangedListener l = ref.get();
                 if (l != null) {
-                    l.onShellChanged(mShell, mIsRootShell);
+                    l.onShellChanged(mShell != null, mIsRootShell);
                 }
             }
         }

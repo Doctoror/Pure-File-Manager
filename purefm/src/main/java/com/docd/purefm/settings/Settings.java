@@ -113,7 +113,7 @@ public final class Settings {
                 res.getString(R.string.key_preference_use_commandline), false);
 
         mSuEnabled = mSharedPreferences.getBoolean(
-                res.getString(R.string.key_preference_allow_superuser), false);
+                res.getString(R.string.key_preference_work_as_superuser), false);
 
         mHomeDirectory = mSharedPreferences.getString(
                 res.getString(R.string.key_preference_home_directory),
@@ -230,7 +230,7 @@ public final class Settings {
         mSuEnabled = enabled;
         if (update) {
             mSharedPreferences.edit().putBoolean(
-                    mResources.getString(R.string.key_preference_allow_superuser), enabled).apply();
+                    mResources.getString(R.string.key_preference_work_as_superuser), enabled).apply();
         }
     }
 

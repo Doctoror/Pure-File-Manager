@@ -14,8 +14,6 @@
  */
 package com.docd.purefm.commandline;
 
-import com.stericson.RootTools.execution.Shell;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -38,13 +36,12 @@ public final class CommandReadlink extends Command {
     /**
      * Excutes readlink command and returns result
      *
-     * @param shell Current Shell to execute with
      * @param path Path of file to readlink
      * @return canonical path of input file returned by readlink
      */
     @Nullable
-    public static String readlink(@NonNull final Shell shell, @NonNull final String path) {
-        final List<String> result = CommandLine.executeForResult(shell,
+    public static String readlink(@NonNull final String path) {
+        final List<String> result = CommandLine.executeForResult(
                 new CommandReadlink(CommandLineUtils.getCommandLineString(path)));
         return result == null || result.isEmpty() ? null : result.get(0);
     }

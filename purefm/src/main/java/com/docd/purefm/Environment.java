@@ -190,16 +190,11 @@ public final class Environment {
         if (sBusybox == null) {
             return false;
         }
-
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell != null) {
-            final List<String> result = CommandLine.executeForResult(shell,
-                    new CommandListBusyboxApplets());
-            if (result != null) {
-                for (final String resultLine : result) {
-                    if (resultLine.equals(util)) {
-                        return true;
-                    }
+        final List<String> result = CommandLine.executeForResult(new CommandListBusyboxApplets());
+        if (result != null) {
+            for (final String resultLine : result) {
+                if (resultLine.equals(util)) {
+                    return true;
                 }
             }
         }

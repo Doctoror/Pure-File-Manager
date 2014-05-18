@@ -60,8 +60,8 @@
             android:defaultValue="false"/>
         
         <CheckBoxPreference
-            android:title="@string/preference_allow_root"
-            android:key="@string/key_preference_allow_superuser"
+            android:title="@string/preference_work_as_superuser"
+            android:key="@string/key_preference_work_as_superuser"
             android:defaultValue="false"/>
         
     </PreferenceCategory>

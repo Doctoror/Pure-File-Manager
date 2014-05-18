@@ -14,8 +14,6 @@
  */
 package com.docd.purefm.file;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -42,18 +40,14 @@ import com.docd.purefm.commandline.CommandReadlink;
 import com.docd.purefm.commandline.CommandRemove;
 import com.docd.purefm.commandline.CommandTouch;
 import com.docd.purefm.commandline.Constants;
-import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.settings.Settings;
 import com.docd.purefm.utils.MimeTypes;
 import com.docd.purefm.utils.PFMTextUtils;
-import com.stericson.RootTools.execution.Shell;
 
 public final class CommandLineFile implements GenericFile,
         Comparable<GenericFile> {
 
     private static final long serialVersionUID = -8173533665283968040L;
-
-    private static final String LOG_TAG = "CommandLineFile";
 
     private static final int LS_PERMISSIONS = 0;
     // private static final int LS_NUMLINKS = 1;
@@ -88,40 +82,44 @@ public final class CommandLineFile implements GenericFile,
     /**
      * Creates a new CommandLineFile using File and canonical path from {@link CommandReadlink}
      *
-     * @param shell Current shell
      * @param file File
      */
-    private CommandLineFile(@NonNull final Shell shell,
-                            @NonNull final File file) {
+    private CommandLineFile(@NonNull final File file) {
         this.mFile = file;
-        this.mCanonicalPath = CommandReadlink.readlink(shell, file.getAbsolutePath());
+        this.mCanonicalPath = CommandReadlink.readlink(file.getAbsolutePath());
     }
 
     /**
      * Creates a new CommandLineFile using file path and canonical path from {@link CommandReadlink}
      *
-     * @param shell Current shell
      * @param path File path
      */
-    private CommandLineFile(@NonNull final Shell shell,
-                            @NonNull final String path) {
+    private CommandLineFile(@NonNull final String path, final boolean noReadlink) {
         this.mFile = new File(path);
-        this.mCanonicalPath = CommandReadlink.readlink(shell, path);
+        if (noReadlink) {
+            String canonicalPath;
+            try {
+                canonicalPath = mFile.getCanonicalPath();
+            } catch (IOException e) {
+                canonicalPath = null;
+            }
+            mCanonicalPath = canonicalPath;
+        } else {
+            mCanonicalPath = CommandReadlink.readlink(path);
+        }
     }
 
     /**
      * Creates a new CommandLineFile using parent File and file name.
      * Canonical path is retrieved from {@link CommandReadlink}
      *
-     * @param shell Current shell
      * @param parent Parent file
      * @param name file name
      */
-    private CommandLineFile(@NonNull final Shell shell,
-                            @NonNull final File parent,
+    private CommandLineFile(@NonNull final File parent,
                             @NonNull final String name) {
         this.mFile = new File(parent, name);
-        this.mCanonicalPath = CommandReadlink.readlink(shell, mFile.getAbsolutePath());
+        this.mCanonicalPath = CommandReadlink.readlink(mFile.getAbsolutePath());
     }
 
     /**
@@ -164,23 +162,21 @@ public final class CommandLineFile implements GenericFile,
     }
 
     @NonNull
-    public static CommandLineFile fromFile(@NonNull final Shell shell,
-                                           @NonNull final Settings settings,
+    public static CommandLineFile fromFile(@NonNull final Settings settings,
                                            @NonNull final File file) {
-        final List<String> res = CommandLine.executeForResult(shell,
+        final List<String> res = CommandLine.executeForResult(
                 new CommandListFile(file, settings));
 
         if (res == null || res.isEmpty()) {
             // file not yet exists
-            return new CommandLineFile(shell, file);
+            return new CommandLineFile(file);
         }
 
-        return fromLSL(shell, null, res.get(0));
+        return fromLSL(null, res.get(0));
     }
 
     @NonNull
-    public static CommandLineFile fromLSL(@NonNull final Shell shell,
-                                          @Nullable final File parent,
+    public static CommandLineFile fromLSL(@Nullable final File parent,
                                           @NonNull final String line) {
 
         if (line.isEmpty()) {
@@ -208,10 +204,10 @@ public final class CommandLineFile implements GenericFile,
             if (canonicalPath != null) {
                 f = new CommandLineFile(name, canonicalPath);
             } else {
-                f = new CommandLineFile(shell, name);
+                f = new CommandLineFile(name);
             }
         } else {
-            f = new CommandLineFile(shell, parent, name);
+            f = new CommandLineFile(parent, name);
         }
         init(f, line);
         return f;
@@ -358,12 +354,7 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public boolean delete() {
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "delete(): shell is null");
-            return false;
-        }
-        if (CommandLine.execute(shell, new CommandRemove(this.mFile))) {
+        if (CommandLine.execute(new CommandRemove(this.mFile))) {
             this.mExists = false;
             this.mIsDirectory = false;
             this.mIsSymlink = false;
@@ -380,13 +371,7 @@ public final class CommandLineFile implements GenericFile,
     @Nullable
     @Override
     public CommandLineFile[] listFiles() {
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "listFiles(): shell is null");
-            return null;
-        }
-
-        final List<String> result = CommandLine.executeForResult(shell,
+        final List<String> result = CommandLine.executeForResult(
                 new CommandListContents(this, Settings.getInstance()));
         if (result == null) {
             return null;
@@ -395,7 +380,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (final String f : result) {
             try {
-                res.add(CommandLineFile.fromLSL(shell, this.mFile, f));
+                res.add(CommandLineFile.fromLSL(mFile, f));
             } catch (IllegalArgumentException e) {
                 //e.printStackTrace();
                 // not a valid ls -l file line
@@ -415,21 +400,16 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "listFiles(FileFilter): shell is null");
-            return null;
-        }
-        final List<String> result = CommandLine.executeForResult(shell,
+        final List<String> result = CommandLine.executeForResult(
                 new CommandListContents(this, Settings.getInstance()));
         if (result == null) {
             return null;
         }
         final List<CommandLineFile> res = new ArrayList<>(
                 result.size());
-        for (String f : result) {
+        for (final String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
                 if (filter.accept(tmp.toFile())) {
                     res.add(tmp);
                 }
@@ -451,12 +431,7 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "listFiles(FilenameFilter): shell is null");
-            return null;
-        }
-        final List<String> result = CommandLine.executeForResult(shell,
+        final List<String> result = CommandLine.executeForResult(
                 new CommandListContents(this, Settings.getInstance()));
         if (result == null) {
             return null;
@@ -465,7 +440,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
                 if (filter.accept(mFile, tmp.getName())) {
                     res.add(tmp);
                 }
@@ -487,12 +462,7 @@ public final class CommandLineFile implements GenericFile,
         if (filter == null) {
             return listFiles();
         }
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "listFiles(GenericFileFilter): shell is null");
-            return null;
-        }
-        final List<String> result = CommandLine.executeForResult(shell,
+        final List<String> result = CommandLine.executeForResult(
                 new CommandListContents(this, Settings.getInstance()));
         if (result == null) {
             return null;
@@ -501,7 +471,7 @@ public final class CommandLineFile implements GenericFile,
                 result.size());
         for (final String f : result) {
             try {
-                final CommandLineFile tmp = CommandLineFile.fromLSL(shell, mFile, f);
+                final CommandLineFile tmp = CommandLineFile.fromLSL(mFile, f);
                 if (filter.accept(tmp)) {
                     res.add(tmp);
                 }
@@ -568,15 +538,10 @@ public final class CommandLineFile implements GenericFile,
             return false;
         }
 
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "createNewFile(): shell is null");
-            return false;
-        }
-        final boolean result = CommandLine.execute(shell,
+        final boolean result = CommandLine.execute(
                 new CommandTouch(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(CommandLineFile.fromFile(shell, Settings.getInstance(), mFile));
+            this.apply(CommandLineFile.fromFile(Settings.getInstance(), mFile));
             return true;
         }
         throw new IOException("Could not create file+");
@@ -587,15 +552,10 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public boolean mkdir() {
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "mkdir(): shell is null");
-            return false;
-        }
-        final boolean result = CommandLine.execute(shell,
+        final boolean result = CommandLine.execute(
                 new CommandMkdir(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(CommandLineFile.fromFile(shell, Settings.getInstance(), mFile));
+            this.apply(CommandLineFile.fromFile(Settings.getInstance(), mFile));
         }
         return result;
     }
@@ -605,15 +565,10 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public boolean mkdirs() {
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "mkdirs(): shell is null");
-            return false;
-        }
-        final boolean result = CommandLine.execute(shell,
+        final boolean result = CommandLine.execute(
                 new CommandMkdirs(mFile.getAbsolutePath()));
         if (result) {
-            this.apply(CommandLineFile.fromFile(shell, Settings.getInstance(), mFile));
+            this.apply(CommandLineFile.fromFile(Settings.getInstance(), mFile));
         }
         return result;
     }
@@ -739,12 +694,7 @@ public final class CommandLineFile implements GenericFile,
         if (parentFile == null) {
             return null;
         }
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "getParentFile(): shell is null");
-            return null;
-        }
-        return CommandLineFile.fromFile(shell, Settings.getInstance(), parentFile);
+        return CommandLineFile.fromFile(Settings.getInstance(), parentFile);
     }
 
     /**
@@ -768,13 +718,8 @@ public final class CommandLineFile implements GenericFile,
      */
     @Override
     public boolean renameTo(@NonNull final GenericFile newName) {
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "renameTo(): shell is null");
-            return false;
-        }
-        final Command move = new CommandMove(this.getAbsolutePath(), newName.getAbsolutePath());
-        final boolean result = CommandLine.execute(shell, move);
+        final Command move = new CommandMove(getAbsolutePath(), newName.getAbsolutePath());
+        final boolean result = CommandLine.execute(move);
         if (result) {
             this.mExists = false;
             this.mIsDirectory = false;
@@ -802,13 +747,8 @@ public final class CommandLineFile implements GenericFile,
         if (this.mPermissions.equals(newPerm)) {
             return true;
         }
-        final Shell shell = ShellHolder.getInstance().getShell();
-        if (shell == null) {
-            Log.w(LOG_TAG, "applyPermissions(): shell is null");
-            return false;
-        }
-        final boolean result = CommandLine.execute(shell,
-                new CommandChmod(mFile.getAbsolutePath(), newPerm));
+        final boolean result = CommandLine.execute(new CommandChmod(
+                mFile.getAbsolutePath(), newPerm));
         if (result) {
             this.mPermissions = newPerm;
         }

@@ -22,7 +22,7 @@
     <string translatable="false" name="key_preference_list_show_size">key.preference.list.show.size</string>
     <string translatable="false" name="key_preference_list_show_preview">key.preference.list.show.preview</string>
     <string translatable="false" name="key_preference_use_commandline">key_preference_use_commandline</string>
-    <string translatable="false" name="key_preference_allow_superuser">key.preference.allow_superuser</string>
+    <string translatable="false" name="key_preference_work_as_superuser">key.preference.work_as_superuser</string>
     <string translatable="false" name="key_preference_home_directory">key.preference.home_directory</string>
     
 </resources>

@@ -29,7 +29,6 @@ import com.docd.purefm.commandline.CommandFind;
 import com.docd.purefm.file.CommandLineFile;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.stericson.RootTools.execution.Shell;
 
 import org.apache.commons.io.IOUtils;
 import android.support.annotation.NonNull;
@@ -39,20 +38,15 @@ final class SearchCommandLineTask extends AbstractSearchTask {
     private static final Pattern DENIED = Pattern.compile("^find:\\s(.+):\\sPermission denied$");
 
     @NonNull
-    private final Shell mShell;
-
-    @NonNull
     private final Settings mSettings;
 
     @NonNull
     private final List<String> mDenied = new ArrayList<>();
 
-    public SearchCommandLineTask(@NonNull final Shell shell,
-                                 @NonNull final Settings settings,
+    public SearchCommandLineTask(@NonNull final Settings settings,
                                  @NonNull final GenericFile startDirectory,
                                  @NonNull final SearchTaskListener listener) {
         super(startDirectory, listener);
-        mShell = shell;
         mSettings = settings;
     }
 
@@ -84,7 +78,7 @@ final class SearchCommandLineTask extends AbstractSearchTask {
             String line;
             try {
                 while (!isCancelled() && (line = is.readLine()) != null) {
-                    this.publishProgress(CommandLineFile.fromLSL(mShell, null, line));
+                    this.publishProgress(CommandLineFile.fromLSL(null, line));
                 }
             } catch (EOFException e) {
                 //ignore

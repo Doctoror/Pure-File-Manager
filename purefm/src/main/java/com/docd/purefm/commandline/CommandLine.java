@@ -14,12 +14,9 @@
  */
 package com.docd.purefm.commandline;
 
-import com.stericson.RootTools.execution.Shell;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,8 +32,7 @@ public final class CommandLine {
     private CommandLine() {}
 
     @Nullable
-    public static synchronized List<String> executeForResult(@NonNull final Shell shell,
-                                                             @NonNull final Command command) {
+    public static synchronized List<String> executeForResult(@NonNull final Command command) {
         final List<String> result = new LinkedList<>();
         final ExecutionStatus status = new ExecutionStatus();
         command.setCommandListener(new Command.CommandListener() {
@@ -63,8 +59,7 @@ public final class CommandLine {
             }
         });
 
-        try {
-            shell.add(command);
+        if (ShellHolder.getInstance().execute(command)) {
             synchronized (status) {
                 if (!status.finished) {
                     try {
@@ -77,14 +72,11 @@ public final class CommandLine {
             if (status.exitCode == EXIT_CODE_SUCCESS) {
                 return result;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
-    public static synchronized boolean execute(@NonNull final Shell shell,
-                                               @NonNull final Command command) {
+    public static synchronized boolean execute(@NonNull final Command command) {
         final ExecutionStatus status = new ExecutionStatus();
         command.setCommandListener(new Command.CommandListener() {
             @Override
@@ -110,8 +102,7 @@ public final class CommandLine {
             }
         });
 
-        try {
-            shell.add(command);
+        if (ShellHolder.getInstance().execute(command)) {
             synchronized (status) {
                 if (!status.finished) {
                     try {
@@ -122,14 +113,12 @@ public final class CommandLine {
                 }
             }
             return status.exitCode == EXIT_CODE_SUCCESS;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
-    public static boolean execute(@NonNull final Shell shell, @NonNull final String command) {
-        return execute(shell, new Command(ShellHolder.getNextCommandId(), command));
+    public static boolean execute(@NonNull final String command) {
+        return ShellHolder.getInstance().execute(new Command(ShellHolder.getNextCommandId(), command));
     }
 
     public static final class ExecutionStatus {

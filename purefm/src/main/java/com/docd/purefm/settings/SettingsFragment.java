@@ -183,7 +183,7 @@ public final class SettingsFragment extends PreferenceFragment {
                 if (!useCommandLine) {
                     if (mSettings.isSuEnabled()) {
                         final CheckBoxPreference prefAllowSuperuser = (CheckBoxPreference) findPreference(
-                                res.getString(R.string.key_preference_allow_superuser));
+                                res.getString(R.string.key_preference_work_as_superuser));
                         if (prefAllowSuperuser == null) {
                             throw new RuntimeException("Allow supersuer preference not found");
                         }
@@ -192,7 +192,7 @@ public final class SettingsFragment extends PreferenceFragment {
                     }
                     mShellHolder.releaseShell(true);
                 } else {
-                    mShellHolder.getShell();
+                    mShellHolder.hasShell(); //invokes getShell() to refresh
                 }
                 parent.notifyNeedInvalidate();
                 return true;
@@ -200,7 +200,7 @@ public final class SettingsFragment extends PreferenceFragment {
         });
         
         final Preference prefSuperuser = findPreference(res.getString(
-                R.string.key_preference_allow_superuser));
+                R.string.key_preference_work_as_superuser));
         if (prefSuperuser == null) {
             throw new RuntimeException("Allow root preference not found");
         }
@@ -218,7 +218,7 @@ public final class SettingsFragment extends PreferenceFragment {
                     }
                 }
                 prefUseCommandline.setEnabled(!suEnabled);
-                mShellHolder.getShell();
+                mShellHolder.hasShell(); //invokes getShell() to refresh
                 parent.notifyNeedInvalidate();
                 return true;
             }

@@ -20,7 +20,6 @@ import android.os.AsyncTask;
 import com.docd.purefm.commandline.ShellHolder;
 import com.docd.purefm.file.GenericFile;
 import com.docd.purefm.settings.Settings;
-import com.stericson.RootTools.execution.Shell;
 
 import android.support.annotation.NonNull;
 
@@ -34,9 +33,8 @@ public abstract class AbstractSearchTask extends AsyncTask<String, GenericFile, 
         AbstractSearchTask task = null;
         final Settings settings = Settings.getInstance(context);
         if (settings.useCommandLine()) {
-            final Shell shell = ShellHolder.getInstance().getShell();
-            if (shell != null) {
-                task = new SearchCommandLineTask(shell, settings, startDirectory, listener);
+            if (ShellHolder.getInstance().hasShell()) {
+                task = new SearchCommandLineTask(settings, startDirectory, listener);
             }
         }
         if (task == null) {
