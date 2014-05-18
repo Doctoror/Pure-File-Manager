@@ -30,7 +30,6 @@ public final class FileExistsDialog extends Dialog {
     public interface FileExistsDialogListener {
         void onActionSkip(boolean all);
         void onActionReplace(boolean all);
-        void onActionWriteInto(boolean all);
         void onActionAbort();
     }
     
@@ -60,20 +59,7 @@ public final class FileExistsDialog extends Dialog {
 
         final CompoundButton applyToAll = (CompoundButton) findViewById(android.R.id.checkbox);
 
-        final View writeInto = findViewById(android.R.id.button1);
-        if (sourceFile.isDirectory()) {
-            writeInto.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                    listener.onActionWriteInto(applyToAll.isChecked());
-                }
-            });
-        } else {
-            writeInto.setVisibility(View.GONE);
-        }
-
-        findViewById(android.R.id.button2).setOnClickListener(new View.OnClickListener() {
+        findViewById(android.R.id.button1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
@@ -81,7 +67,7 @@ public final class FileExistsDialog extends Dialog {
             }
         });
 
-        findViewById(android.R.id.button3).setOnClickListener(new View.OnClickListener() {
+        findViewById(android.R.id.button2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();

@@ -109,18 +109,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dialog_overwrite_write_into" />
-
-        <Button
-            android:id="@android:id/button2"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@string/dialog_overwrite_replace" />
 
         <Button
-            android:id="@android:id/button3"
+            android:id="@android:id/button2"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
